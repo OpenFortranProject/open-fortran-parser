@@ -1,0 +1,3619 @@
+
+                                              Annex D
+
+                                                   (Informative)
+
+
+                                    Index of syntax rules
+Section 1:
+R101    xyz-list                      is    xyz [ , xyz ] ...
+
+R102    xyz-name                      is    name
+
+R103    scalar-xyz                    is    xyz
+
+C101    (R103) scalar-xyz shall be scalar.
+
+Section 2:
+R201    program                       is    program-unit
+
+                                                   [ program-unit ] ...
+
+R202    program-unit                  is    main-program
+
+                                      or external-subprogram
+
+                                      or module
+
+                                      or block-data
+
+R203    external-subprogram           is    function-subprogram
+
+                                      or subroutine-subprogram
+
+R204    specification-part             is    [ use-stmt ] ...
+
+                                                   [ import-stmt ] ...
+
+                                                   [ implicit-part ]
+
+                                                   [ declaration-construct ] ...
+
+R205    implicit-part                 is    [ implicit-part-stmt ] ...
+
+                                                   implicit-stmt
+
+R206    implicit-part-stmt            is    implicit-stmt
+
+                                      or parameter-stmt
+
+                                      or format-stmt
+
+                                      or entry-stmt
+
+R207    declaration-construct         is    derived-type-def
+
+                                      or entry-stmt
+
+                                      or enum-alias-def
+
+                                      or format-stmt
+
+                                      or interface-block
+
+                                      or parameter-stmt
+
+                                      or procedure-declaration-stmt
+
+                                      or specification-stmt
+
+                                      or type-alias-stmt
+
+                                      or type-declaration-stmt
+
+                                      or stmt-function-stmt
+
+R208    execution-part                is    executable-construct
+
+                                                   [ execution-part-construct ] ...
+
+R209    execution-part-construct      is    executable-construct
+
+                                      or format-stmt
+
+
+
+SEP 2002                                    COMMITTEE DRAFT                                      493
+
+
+ISO/IEC 1539-1                              COMMITTEE DRAFT                    SEP 2002
+
+
+
+                                      or entry-stmt
+
+                                      or data-stmt
+
+R210    internal-subprogram-part      is    contains-stmt
+
+                                                internal-subprogram
+
+                                                [ internal-subprogram ] ...
+
+R211    internal-subprogram           is    function-subprogram
+
+                                      or subroutine-subprogram
+
+                                      or subroutine-subprogram
+
+R212    specification-stmt             is    access-stmt
+
+                                      or allocatable-stmt
+
+                                      or asynchronous-stmt
+
+                                      or bind-stmt
+
+                                      or common-stmt
+
+                                      or data-stmt
+
+                                      or dimension-stmt
+
+                                      or equivalence-stmt
+
+                                      or external-stmt
+
+                                      or intent-stmt
+
+                                      or intrinsic-stmt
+
+                                      or namelist-stmt
+
+                                      or optional-stmt
+
+                                      or pointer-stmt
+
+                                      or protected-stmt
+
+                                      or save-stmt
+
+                                      or target-stmt
+
+                                      or volatile-stmt
+
+                                      or value-stmt
+
+R213    executable-construct          is    action-stmt
+
+                                      or associate-construct
+
+                                      or case-construct
+
+                                      or do-construct
+
+                                      or forall-construct
+
+                                      or if-construct
+
+                                      or select-type-construct
+
+                                      or where-construct
+
+R214    action-stmt                   is    allocate-stmt
+                                      or assignment-stmt
+                                      or backspace-stmt
+                                      or call-stmt
+                                      or close-stmt
+                                      or continue-stmt
+                                      or cycle-stmt
+                                      or deallocate-stmt
+                                      or endfile-stmt
+                                      or end-function-stmt
+                                      or end-program-stmt
+                                      or end-subroutine-stmt
+                                      or exit-stmt
+                                      or flush-stmt
+                                      or forall-stmt
+                                      or goto-stmt
+                                      or if-stmt
+                                      or inquire-stmt
+                                      or nullify-stmt
+                                      or open-stmt
+                                      or pointer-assignment-stmt
+                                      or print-stmt
+                                      or read-stmt
+                                      or return-stmt
+                                      or rewind-stmt
+                                      or stop-stmt
+                                      or wait-stmt
+                                      or where-stmt
+                                      or write-stmt
+                                      or arithmetic-if-stmt
+                                      or computed-goto-stmt
+
+
+C201    (R208) An execution-part shall not contain an end-function-stmt , end-program-stmt , or end-
+        subroutine-stmt .
+
+R215    keyword                      is    name
+
+Section 3:
+R301    character                    is    alphanumeric-character
+
+                                     or special-character
+
+R302    alphanumeric-character       is    letter
+
+                                     or digit
+
+                                     or underscore
+
+R303    underscore                   is
+
+R304    name                         is    letter [ alphanumeric-character ] ...
+
+C301    (R304) The maximum length of a name is 63 characters.
+
+R305    constant                     is    literal-constant
+
+                                     or named-constant
+
+R306    literal-constant             is    int-literal-constant
+
+                                     or real-literal-constant
+
+                                     or complex-literal-constant
+
+                                     or logical-literal-constant
+
+                                     or char-literal-constant
+
+                                     or boz-literal-constant
+
+R307    named-constant               is    name
+
+R308    int-constant                 is    constant
+
+C302    (R308)int-constant shall be of type integer.
+
+R309    char-constant                is    constant
+
+C303    (R309) char-constant shall be of type character.
+
+R310    intrinsic-operator           is    power-op
+
+
+
+
+SEP 2002                                   COMMITTEE DRAFT                                     495
+
+
+ISO/IEC 1539-1                               COMMITTEE DRAFT                                  SEP 2002
+
+
+
+                                       or mult-op
+
+                                       or add-op
+
+                                       or concat-op
+
+                                       or rel-op
+
+                                       or not-op
+
+                                       or and-op
+
+                                       or or-op
+
+                                       or equiv-op
+
+                                       or /
+
+                                       or ­
+
+                                       or .NE.
+
+                                       or .LT.
+
+                                       or .LE.
+
+                                       or .GT.
+
+                                       or .GE.
+
+                                       or ==
+
+                                       or /=
+
+                                       or <
+
+                                       or <=
+
+                                       or >
+
+                                       or >=
+
+                                       or .NEQV.
+
+R311    defined-operator                is    defined-unary-op
+
+                                       or defined-binary-op
+
+                                       or extended-intrinsic-op
+
+R312    extended-intrinsic-op          is    intrinsic-operator
+
+R313    label                          is    digit [ digit [ digit [ digit [ digit ] ] ] ]
+
+C304    (R313) At least one digit in a label shall be nonzero.
+
+Section 4:
+R401    type-param-value               is    scalar-int-expr
+
+                                       or *
+
+                                       or :
+
+C401    (R401) The type-param-value for a kind type parameter shall be an initialization expression.
+
+C402    (R401) A colon may be used as a type-param-value only in the declaration of an entity or
+        component that has the POINTER or ALLOCATABLE attribute.
+
+R402    signed-int-literal-constant    is    [ sign ] int-literal-constant
+
+R403    int-literal-constant           is    digit-string [     kind-param ]
+
+R404    kind-param                     is    digit-string
+
+                                       or scalar-int-constant-name
+
+R405    signed-digit-string            is    [ sign ] digit-string
+
+R406    digit-string                   is    digit [ digit ] ...
+
+R407    sign                           is    +
+
+                                       or ­
+
+C403    (R404) A scalar-int-constant-name shall be a named constant of type integer.
+
+C404    (R404) The value of kind-param shall be nonnegative.
+
+C405    (R403) The value of kind-param shall specify a representation method that exists on the pro-
+
+
+
+
+496                               COMMITTEE DRAFT                                             SEP 2002
+
+
+SEP 2002                            COMMITTEE DRAFT                                        ISO/IEC 1539-1
+
+
+
+        cessor.
+
+R408    boz-literal-constant            is    binary-constant
+
+                                        or octal-constant
+
+                                        or hex-constant
+
+R409    binary-constant                 is    B ' digit [ digit ] ... '
+
+                                        or B " digit [ digit ] ... "
+
+C406    (R409) digit shall have one of the values 0 or 1.
+
+R410    octal-constant                  is    O ' digit [ digit ] ... '
+
+                                        or O " digit [ digit ] ... "
+
+C407    (R410) digit shall have one of the values 0 through 7.
+
+R411    hex-constant                    is    Z ' hex-digit [ hex-digit ] ... '
+
+                                        or Z " hex-digit [ hex-digit ] ... "
+
+R412    hex-digit                       is    digit
+
+                                        or A
+
+                                        or B
+
+                                        or C
+
+                                        or D
+
+                                        or E
+
+                                        or F
+
+C408    (R408) A boz-literal-constant shall appear only as a data-stmt-constant in a DATA statement, as
+        the actual argument associated with the dummy argument A of the numeric intrinsic functions
+        DBLE, REAL or INT, or as the actual argument associated with the X or Y dummy argument
+        of the intrinsic CMPLX function.
+
+R413    signed-real-literal-constant    is    [ sign ] real-literal-constant
+
+R414    real-literal-constant           is    significand [ exponent-letter exponent ] [    kind-param ]
+
+                                        or digit-string exponent-letter exponent [       kind-param ]
+
+R415    significand                      is    digit-string . [ digit-string ]
+
+                                        or . digit-string
+
+R416    exponent-letter                 is    E
+
+                                        or D
+
+R417    exponent                        is    signed-digit-string
+
+C409    (R414) If both kind-param and exponent-letter are present, exponent-letter shall be E.
+
+C410    (R414) The value of kind-param shall specify an approximation method that exists on the
+        processor.
+
+R418    complex-literal-constant        is    ( real-part , imag-part )
+
+R419    real-part                       is    signed-int-literal-constant
+
+                                        or signed-real-literal-constant
+
+                                        or named-constant
+
+R420    imag-part                       is    signed-int-literal-constant
+
+                                        or signed-real-literal-constant
+
+                                        or named-constant
+
+C411    (R418) Each named constant in a complex literal constant shall be of type integer or real.
+
+R421    char-literal-constant           is    [ kind-param     ] ' [ rep-char ] ... '
+
+                                        or [ kind-param        ] " [ rep-char ] ... "
+
+C412    (R421) The value of kind-param shall specify a representation method that exists on the pro-
+        cessor.
+
+R422    logical-literal-constant        is    .TRUE. [     kind-param ]
+
+
+
+
+SEP 2002                                      COMMITTEE DRAFT                                              497
+
+
+ISO/IEC 1539-1                             COMMITTEE DRAFT                                      SEP 2002
+
+
+
+                                     or .FALSE. [         kind-param ]
+
+C413    (R422) The value of kind-param shall specify a representation method that exists on the pro-
+        cessor.
+
+R423    derived-type-def             is    derived-type-stmt
+
+                                               [ type-param-def-stmt ] ...
+
+                                               [ data-component-part ]
+
+                                               [ type-bound-procedure-part ]
+
+                                               end-type-stmt
+
+R424    derived-type-stmt            is    TYPE [ [ , type-attr-spec-list ] :: ] type-name
+
+                                             [ ( type-param-name-list ) ]
+
+R425    type-attr-spec               is    access-spec
+
+                                     or EXTENSIBLE
+
+                                     or EXTENDS ( [ access-spec :: ] parent-type-name
+
+                                             [ = initialization-expr ] )
+
+                                     or BIND (C)
+
+C414    (R424) A derived type type-name shall not be the same as the name of any intrinsic type defined
+        in this standard.
+
+C415    (R424) The same type-attr-spec shall not appear more than once in a given derived-type-stmt .
+
+C416    (R424) EXTENSIBLE and EXTENDS shall not both appear.
+
+C417    (R425) A parent-type-name shall be the name of an accessible extensible type (4.5.3).
+
+C418    (R423) If EXTENDS or EXTENSIBLE appears, neither BIND(C) nor SEQUENCE shall appear.
+
+R426    type-param-def-stmt          is    INTEGER [ kind-selector ] , type-param-attr-spec ::
+
+                                             type-param-name-list
+
+C419    (R426) A type-param-name in a type-param-def-stmt in a derived-type-def shall be one of the
+        type-param-names in the derived-type-stmt of that derived-type-def .
+
+C420    (R426) Each type-param-name in the derived-type-stmt in a derived-type-def shall appear as a
+        type-param-name in a type-param-def-stmt in that derived-type-def .
+
+R427    type-param-attr-spec         is    KIND
+
+                                     or NONKIND
+
+R428    data-component-part          is    [ private-sequence-stmt ] ...
+
+                                               [ component-def-stmt ] ...
+
+R429    private-sequence-stmt        is    PRIVATE
+
+                                     or SEQUENCE
+
+C421    (R429) A PRIVATE statement is permitted only if the type definition is within the specification
+        part of a module.
+
+C422    (R428) The same private-sequence-stmt shall not appear more than once in a given derived-type-
+        def .
+
+C423    (R428) If SEQUENCE appears, all derived types specified in component definitions shall be
+        sequence types.
+
+C424    (R423) If SEQUENCE appears, a type-bound-procedure-part shall not appear.
+
+R430    component-def-stmt           is    data-component-def-stmt
+
+                                     or proc-component-def-stmt
+
+R431    data-component-def-stmt      is    declaration-type-spec [ [ , component-attr-spec-list ] :: ]
+
+                                             component-decl -list
+
+R432    component-attr-spec          is    POINTER
+
+                                     or DIMENSION ( component-array-spec )
+
+                                     or ALLOCATABLE
+
+
+
+
+498                                COMMITTEE DRAFT                                              SEP 2002
+
+
+SEP 2002                            COMMITTEE DRAFT                                       ISO/IEC 1539-1
+
+
+
+                                      or access-spec
+
+R433    component-decl                is    component-name [ ( component-array-spec ) ]
+
+                                                [ * char-length ] [ component-initialization ]
+
+R434    component-array-spec          is    explicit-shape-spec-list
+
+                                      or deferred-shape-spec-list
+
+R435    component-initialization      is    = initialization-expr
+
+                                      or => null-init
+
+C425    (R431) No component-attr-spec shall appear more than once in a given component-def-stmt .
+
+C426    (R431) A component declared with the CLASS keyword (5.1.1.8) shall have the ALLOCATABLE
+        or POINTER attribute.
+
+C427    (R431) If the POINTER attribute is not specified for a component, the declaration-type-spec in
+        the component-def-stmt shall specify an intrinsic type or a previously defined derived type.
+
+C428    (R431) If the POINTER attribute is specified for a component, the declaration-type-spec in the
+        component-def-stmt shall specify an intrinsic type or any accessible derived type including the
+        type being defined.
+
+C429    (R431) If the POINTER or ALLOCATABLE attribute is specified, each component-array-spec
+        shall be a deferred-shape-spec-list.
+
+C430    (R431) If neither the POINTER attribute nor the ALLOCATABLE attribute is specified, each
+        component-array-spec shall be an explicit-shape-spec-list.
+
+C431    (R434) Each bound in the explicit-shape-spec shall either be an initialization expression or be a
+        specification expression that does not contain references to specification functions or any object
+        designators other than named constants or subobjects thereof.
+
+C432    (R431) A component shall not have both the ALLOCATABLE and the POINTER attribute.
+
+C433    (R433) The * char-length option is permitted only if the type specified is character.
+
+C434    (R430) Each type-param-value within a component-def-stmt shall either be a colon, be an ini-
+        tialization expression, or be a specification expression that contains neither references to speci-
+        fication functions nor any object designators other than named constants or subobjects thereof.
+
+C435    (R431) If component-initialization appears, a double-colon separator shall appear before the
+        component-decl -list.
+
+C436    (R431) If => appears in component-initialization, POINTER shall appear in the component-
+        attr-spec-list. If = appears in component-initialization, POINTER or ALLOCATABLE shall
+        not appear in the component-attr-spec-list.
+
+R436    proc-component-def-stmt       is    PROCEDURE ( [ proc-interface ] ) ,
+
+                                                proc-component-attr-spec-list :: proc-decl -list
+
+R437    proc-component-attr-spec      is    POINTER
+
+                                      or PASS [ (arg-name) ]
+
+                                      or NOPASS
+
+                                      or access-spec
+
+C437    (R436) The same proc-component-attr-spec shall not appear more than once in a given proc-
+        component-def-stmt .
+
+C438    (R436) POINTER shall appear in each proc-component-attr-spec-list.
+
+C439    (R436) If the procedure pointer component has an implicit interface or has no arguments,
+        NOPASS shall be specified.
+
+C440    (R436) If PASS (arg-name) appears, the interface shall have a dummy argument named arg-
+        name.
+
+C441    (R436) PASS and NOPASS shall not both appear in the same proc-component-attr-spec-list.
+
+R438    type-bound-procedure-part     is    contains-stmt
+
+                                                  [ binding-private-stmt ]
+
+                                                  proc-binding-stmt
+
+
+
+SEP 2002                                    COMMITTEE DRAFT                                          499
+
+
+ISO/IEC 1539-1                                 COMMITTEE DRAFT                                      SEP 2002
+
+
+
+                                                   [ proc-binding-stmt ] ...
+
+R439    binding-private-stmt             is    PRIVATE
+
+C442    (R438) A binding-private-stmt is permitted only if the type definition is within the specification
+        part of a module.
+
+R440    proc-binding-stmt                is    specific-binding
+
+                                         or generic-binding
+
+                                         or final-binding
+
+C443    (R440) No proc-binding-stmt shall specify a binding that overrides (4.5.3.2) one that is inherited
+        (4.5.3.1) from the parent type and has the NON OVERRIDABLE binding attribute.
+
+R441    specific-binding                  is    PROCEDURE
+
+                                                 [ [ , binding-attr -list ] :: ] binding-name [ => binding ]
+
+C444    (R441) If => binding appears, the double-colon separator shall appear.
+
+R442    generic-binding                  is    GENERIC
+
+                                                 [, binding-attr -list ] :: generic-spec => binding-list
+
+C445    (R442) If generic-spec is generic-name, generic-name shall not be the name of a nongeneric
+        binding of the type.
+
+C446    (R442) If generic-spec is OPERATOR ( defined-operator ), the interface of each binding shall
+        be as specified in 12.3.2.1.1.
+
+C447    (R442) If generic-spec is ASSIGNMENT ( = ), the interface of each binding shall be as specified
+        in 12.3.2.1.2.
+
+C448    (R442) If generic-spec is dtio-generic-spec, the interface of each binding shall be as specified in
+        9.5.3.7. The type of the dtv argument shall be type-name.
+
+R443    final-binding                     is    FINAL [ :: ] final-subroutine-name-list
+
+C449    (R443) A final-subroutine-name shall be the name of a module procedure with exactly one
+        dummy argument. That argument shall be nonoptional and shall be a nonpointer, nonallocat-
+        able, nonpolymorphic variable of the derived type being defined. All nonkind type parameters
+        of the dummy argument shall be assumed. The dummy argument shall not be INTENT(OUT).
+
+C450    (R443) A final-subroutine-name shall not be one previously specified as a final subroutine for
+        that type.
+
+C451    (R443) A final subroutine shall not have a dummy argument with the same kind type parameters
+        and rank as the dummy argument of another final subroutine of that type.
+
+R444    binding-attr                     is    PASS [ (arg-name) ]
+
+                                         or NOPASS
+
+                                         or NON OVERRIDABLE
+
+                                         or access-spec
+
+C452    (R444) The same binding-attr shall not appear more than once in a given binding-attr -list.
+
+C453    (R441, R442) If the interface of the binding has no dummy argument of the type being defined,
+        NOPASS shall appear.
+
+C454    (R441, R442) If PASS (arg-name) appears, the interface of the binding shall have a dummy
+        argument named arg-name.
+
+C455    (R440) PASS and NOPASS shall not both appear in the same binding-attr -list.
+
+C456    (R442) A generic-binding for which generic-spec is not generic-name shall have a passed-object
+        dummy argument (4.5.1.6).
+
+C457    (R442) An overriding binding shall have a passed-object dummy argument if and only if the
+        binding that it overrides has a passed-object dummy argument.
+
+C458    (R442) Within the specification-part of a module, each generic-binding shall specify, either
+        implicitly or explicitly, the same accessibility as every other generic-binding in the same derived-
+        type-def that has the same generic-spec.
+
+R445    binding                          is    procedure-name
+
+
+
+500                               COMMITTEE DRAFT                                                   SEP 2002
+
+
+SEP 2002                          COMMITTEE DRAFT                                          ISO/IEC 1539-1
+
+
+
+C459    (R445) The procedure-name shall be the name of an accessible module procedure or an external
+        procedure that has an explicit interface.
+
+R446    end-type-stmt                    is    END TYPE [ type-name ]
+
+C460    (R446) If END TYPE is followed by a type-name, the type-name shall be the same as that in
+        the corresponding derived-type-stmt .
+
+C461    The passed-object dummy argument shall be a scalar, nonpointer, nonallocatable dummy data
+        object with the same declared type as the type being defined; all of its nonkind type parameters
+        shall be assumed; it shall be polymorphic if and only if the type being defined is extensible.
+
+R447    derived-type-spec                is    type-name [ ( type-param-spec-list ) ]
+
+                                         or type-alias-name
+
+R448    type-param-spec                  is    [ keyword = ] type-param-value
+
+C462    (R447) type-name shall be the name of an accessible derived type.
+
+C463    (R447) type-alias-name shall be the name of an accessible type alias that is an alias for a derived
+        type.
+
+C464    (R447) type-param-spec-list shall appear if and only if the type is parameterized.
+
+C465    (R447) There shall be exactly one type-param-spec corresponding to each parameter of the type.
+
+C466    (R448) The keyword = may be omitted from a type-param-spec only if the keyword = has been
+        omitted from each preceding type-param-spec in the type-param-spec-list.
+
+C467    (R448) Each keyword shall be the name of a parameter of the type.
+
+C468    (R448) An asterisk may be used as a type-param-value in a type-param-spec only in the decla-
+        ration or allocation of a dummy argument.
+
+R449    structure-constructor            is    derived-type-spec ( [ component-spec-list ] )
+
+R450    component-spec                   is    [ keyword = ] component-data-source
+
+R451    component-data-source            is    expr
+
+                                         or data-target
+
+                                         or proc-target
+
+C469    (R449) At most one component-spec shall be provided for a component.
+
+C470    (R449) If a component-spec is be provided for a component, no component-spec shall be provided
+        for any component with which it is inheritance associated.
+
+C471    (R449) A component-spec shall be provided for a component unless it has default initialization
+        or is inheritance associated with another component for which a component-spec is provided or
+        that has default initialization.
+
+C472    (R450) The keyword = may be omitted from a component-spec only if the keyword = has been
+        omitted from each preceding component-spec in the constructor.
+
+C473    (R450) Each keyword shall be the name of a component of the type.
+
+C474    (R449) The type name and all components of the type for which a component-spec appears shall
+        be accessible in the scoping unit containing the structure constructor.
+
+C475    (R449) If derived-type-spec is a type name that is the same as a generic name, the component-
+        spec-list shall not be a valid actual-arg-spec-list for a function reference that is resolvable as a
+        generic reference (12.4.4.1).
+
+C476    (R451) A data-target shall correspond to a nonprocedure pointer component; a proc-target shall
+        correspond to a procedure pointer component.
+
+C477    (R451) A data-target shall have the same rank as its corresponding component.
+
+R452    type-alias-stmt                  is    TYPEALIAS :: type-alias-list
+
+R453    type-alias                       is    type-alias-name => declaration-type-spec
+
+C478    (R453) A type-alias-name shall not be the same as the name of any intrinsic type defined in this
+        standard.
+
+C479    (R453) A declaration-type-spec in a type-alias shall not use the CLASS keyword.
+
+C480    (R453) A declaration-type-spec shall specify an intrinsic type or a previously defined derived
+
+
+
+SEP 2002                                       COMMITTEE DRAFT                                         501
+
+
+ISO/IEC 1539-1                              COMMITTEE DRAFT                                          SEP 2002
+
+
+
+        type. Each type-param-value shall be an initialization expression.
+
+R454    enum-alias-def                is    enum-def-stmt
+
+                                                   enumerator-def-stmt
+
+                                                   [ enumerator-def-stmt ] ...
+
+                                                   end-enum-stmt
+
+R455    enum-def-stmt                 is    ENUM, BIND(C) :: type-alias-name
+
+                                      or ENUM [ kind-selector ] [ :: ] type-alias-name
+
+R456    enumerator-def-stmt           is    ENUMERATOR [ :: ] enumerator -list
+
+R457    enumerator                    is    named-constant [ = scalar-int-initialization-expr ]
+
+R458    end-enum-stmt                 is    END ENUM [ type-alias-name ]
+
+C481    (R456) If = appears in an enumerator , a double-colon separator shall appear before the enu-
+        merator -list.
+
+C482    (R458) If END ENUM is followed by a type-alias-name, the type-alias-name shall be the same
+        as that in the corresponding enum-def-stmt .
+
+R459    array-constructor             is    (/ ac-spec /)
+
+                                      or left-square-bracket ac-spec right-square-bracket
+
+R460    ac-spec                       is    type-spec ::
+
+                                      or [type-spec ::] ac-value-list
+
+R461    left-square-bracket           is    [
+
+R462    right-square-bracket          is    ]
+
+R463    ac-value                      is    expr
+
+                                      or ac-implied-do
+
+R464    ac-implied-do                 is    ( ac-value-list , ac-implied-do-control )
+
+R465    ac-implied-do-control         is    ac-do-variable = scalar-int-expr , scalar-int-expr
+
+                                                 [ , scalar-int-expr ]
+
+R466    ac-do-variable                is    scalar-int-variable
+
+C483    (R466) ac-do-variable shall be a named variable.
+
+C484    (R460) If type-spec is omitted, each ac-value expression in the array-constructor shall have the
+        same type and kind type parameters.
+
+C485    (R460) If type-spec specifies an intrinsic type, each ac-value expression in the array-constructor
+        shall be of an intrinsic type that is in type conformance with a variable of type type-spec as
+        specified in Table 7.8.
+
+C486    (R460) If type-spec specifies a derived type, all ac-value expressions in the array-constructor
+        shall be of that derived type and shall have the same kind type parameter values as specified by
+        type-spec.
+
+C487    (R464) The ac-do-variable of an ac-implied-do that is in another ac-implied-do shall not appear
+        as the ac-do-variable of the containing ac-implied-do.
+
+Section 5:
+R501    type-declaration-stmt         is    declaration-type-spec [ [ , attr-spec ] ... :: ] entity-decl -list
+
+R502    declaration-type-spec         is    type-spec
+
+                                      or CLASS ( derived-type-spec )
+
+                                      or CLASS ( * )
+
+C501    (R502) In a declaration-type-spec, every type-param-value that is not a colon or an asterisk shall
+        be a specification-expr .
+
+C502    (R502) In a declaration-type-spec that uses the CLASS keyword, derived-type-spec shall specify
+        an extensible type.
+
+R503    type-spec                     is    INTEGER [ kind-selector ]
+
+
+
+
+502                                 COMMITTEE DRAFT                                                  SEP 2002
+
+
+SEP 2002                          COMMITTEE DRAFT                                           ISO/IEC 1539-1
+
+
+
+                                          or REAL [ kind-selector ]
+
+                                          or DOUBLE PRECISION
+
+                                          or COMPLEX [ kind-selector ]
+
+                                          or CHARACTER [ char-selector ]
+
+                                          or LOGICAL [ kind-selector ]
+
+                                          or TYPE ( derived-type-spec )
+
+                                          or TYPE ( type-alias-name )
+
+C503    (R503) A type-alias-name shall be the name of a type alias.
+
+R504    attr-spec                         is    access-spec
+
+                                          or ALLOCATABLE
+
+                                          or ASYNCHRONOUS
+
+                                          or DIMENSION ( array-spec )
+
+                                          or EXTERNAL
+
+                                          or INTENT ( intent-spec )
+
+                                          or INTRINSIC
+
+                                          or language-binding-spec
+
+                                          or OPTIONAL
+
+                                          or PARAMETER
+
+                                          or POINTER
+
+                                          or PROTECTED
+
+                                          or SAVE
+
+                                          or TARGET
+
+                                          or VALUE
+
+                                          or VOLATILE
+
+R505    entity-decl                       is    object-name [( array-spec )] [ * char-length ] [ initialization ]
+
+                                          or function-name [ * char-length ]
+
+C504    (R505) If a type-param-value in a char-length in an entity-decl is not a colon or an asterisk, it
+        shall be a specification-expr .
+
+R506    object-name                       is    name
+
+C505    (R506) The object-name shall be the name of a data object.
+
+R507    kind-selector                     is    ( [ KIND = ] scalar-int-initialization-expr )
+
+R508    initialization                    is    = initialization-expr
+
+                                          or => null-init
+
+R509    null-init                         is    function-reference
+
+C506    (R509) The function-reference shall be a reference to the NULL intrinsic function with no
+        arguments.
+
+C507    (R501) The same attr-spec shall not appear more than once in a given type-declaration-stmt .
+
+C508    An entity shall not be explicitly given any attribute more than once in a scoping unit.
+
+C509    (R501) An entity declared with the CLASS keyword shall be a dummy argument or have the
+        ALLOCATABLE or POINTER attribute.
+
+C510    (R501) An array that has the POINTER or ALLOCATABLE attribute shall be specified with
+        an array-spec that is a deferred-shape-spec-list (5.1.2.5.3).
+
+C511    (R501) An array-spec for an object-name that is a function result that does not have the AL-
+        LOCATABLE or POINTER attribute shall be an explicit-shape-spec-list.
+
+C512    (R501) If the POINTER attribute is specified, the ALLOCATABLE, TARGET, EXTERNAL,
+        or INTRINSIC attribute shall not be specified.
+
+C513    (R501) If the TARGET attribute is specified, the POINTER, EXTERNAL, INTRINSIC, or
+
+
+
+
+SEP 2002                                        COMMITTEE DRAFT                                              503
+
+
+ISO/IEC 1539-1                               COMMITTEE DRAFT                                   SEP 2002
+
+
+
+        PARAMETER attribute shall not be specified.
+
+C514    (R501) The PARAMETER attribute shall not be specified for a dummy argument, a pointer,
+        an allocatable entity, a function, or an object in a common block.
+
+C515    (R501) The INTENT, VALUE, and OPTIONAL attributes may be specified only for dummy
+        arguments.
+
+C516    (R501) The INTENT attribute shall not be specified for a dummy argument that is a dummy
+        procedure.
+
+C517    (R501) The SAVE attribute shall not be specified for an object that is in a common block, a
+        dummy argument, a procedure, a function result, an automatic data object, or an object with
+        the PARAMETER attribute.
+
+C518    An entity shall not have both the EXTERNAL attribute and the INTRINSIC attribute.
+
+C519    (R501) An entity in an entity-decl -list shall not have the EXTERNAL or INTRINSIC attribute
+        specified unless it is a function.
+
+C520    (R505) The * char-length option is permitted only if the type specified is character.
+
+C521    (R505) The function-name shall be the name of an external function, an intrinsic function, a
+        function dummy procedure, or a statement function.
+
+C522    (R501) The initialization shall appear if the statement contains a PARAMETER attribute
+        (5.1.2.10).
+
+C523    (R501) If initialization appears, a double-colon separator shall appear before the entity-decl -list.
+
+C524    (R505)initialization shall not appear if object-name is a dummy argument, a function result, an
+        object in a named common block unless the type declaration is in a block data program unit,
+        an object in blank common, an allocatable variable, an external name, an intrinsic name, or an
+        automatic object.
+
+C525    (R505) If => appears in initialization, the object shall have the POINTER attribute. If =
+        appears in initialization, the object shall not have the POINTER attribute.
+
+C526    (R503) The value of scalar-int-initialization-expr in kind-selector shall be nonnegative and shall
+        specify a representation method that exists on the processor.
+
+C527    (R501) If the VOLATILE attribute is specified, the PARAMETER, INTRINSIC, EXTERNAL,
+        or INTENT(IN) attribute shall not be specified.
+
+C528    (R501) If the VALUE attribute is specified, the PARAMETER, EXTERNAL, POINTER,
+        ALLOCATABLE, DIMENSION, VOLATILE, INTENT(INOUT), or INTENT(OUT) attribute
+        shall not be specified.
+
+C529    (R501) If the VALUE attribute is specified for a dummy argument of type character, the length
+        parameter shall be omitted or shall be specified by an initialization expression with the value
+        one.
+
+C530    (R501) The ALLOCATABLE, POINTER, or OPTIONAL attribute shall not be specified for a
+        dummy argument of a procedure that has a proc-language-binding-spec.
+
+C531    (R504) A language-binding-spec shall appear only in the specification part of a module.
+
+C532    (R501) If a language-binding-spec is specified, the entity declared shall be an interoperable
+        variable (15.2).
+
+C533    (R501) If a language-binding-spec with a NAME= specifier appears, the entity-decl -list shall
+        consist of a single entity-decl .
+
+C534    (R504) The PROTECTED attribute is permitted only in the specification part of a module.
+
+C535    (R501) The PROTECTED attribute is permitted only for a procedure pointer or named variable
+        that is not in a common block.
+
+C536    (R501) If the PROTECTED attribute is specified, the EXTERNAL, INTRINSIC, or PARAM-
+        ETER attribute shall not be specified.
+
+C537    A nonpointer object that has the PROTECTED attribute and is accessed by use association
+        shall not appear in a variable definition context (16.5.7) or as the data-target or proc-target in
+        a pointer-assignment-stmt .
+
+
+
+504                                 COMMITTEE DRAFT                                            SEP 2002
+
+
+SEP 2002                                COMMITTEE DRAFT                                            ISO/IEC 1539-1
+
+
+
+C538      A pointer object that has the PROTECTED attribute and is accessed by use association shall
+          not appear as
+
+        (1)    A pointer-object in a pointer-assignment-stmt or nullify-stmt ,
+
+        (2)    An allocate-object in an allocate-stmt or deallocate-stmt , or
+
+        (3)    An actual argument in a reference to a procedure if the associated dummy argument is a
+               pointer with the INTENT(OUT) or INTENT(INOUT) attribute.
+
+R510      char-selector                      is    length-selector
+
+                                             or ( LEN = type-param-value ,
+
+                                                        KIND = scalar-int-initialization-expr )
+
+                                             or ( type-param-value ,
+
+                                                        [ KIND = ] scalar-int-initialization-expr )
+
+                                             or ( KIND = scalar-int-initialization-expr
+
+                                                        [ , LEN =type-param-value ] )
+
+R511      length-selector                    is    ( [ LEN = ] type-param-value )
+
+                                             or * char-length [ , ]
+
+R512      char-length                        is    ( type-param-value )
+
+                                             or scalar-int-literal-constant
+
+C539      (R510) The value of scalar-int-initialization-expr shall be nonnegative and shall specify a rep-
+          resentation method that exists on the processor.
+
+C540      (R512) The scalar-int-literal-constant shall not include a kind-param.
+
+C541      (R510 R511 R512) A type-param-value of * may be used only in the following ways:
+
+C542      A function name shall not be declared with an asterisk type-param-value unless it is of type CHAR-
+
+          ACTER and is the name of the result of an external function or the name of a dummy function.
+
+C543      A function name declared with an asterisk type-param-value shall not be an array, a pointer, recursive, or pure.
+
+C544      (R511) The optional comma in a length-selector is permitted only in a declaration-type-spec in a type-declaration-
+
+          stmt .
+
+C545      (R511) The optional comma in a length-selector is permitted only if no double-colon separator appears in the
+
+          type-declaration-stmt .
+
+C546      (R510) The length specified for a character statement function or for a statement function dummy argument of
+
+          type character shall be an initialization expression.
+
+R513      access-spec                        is    PUBLIC
+
+                                             or PRIVATE
+
+C547      (R513) An access-spec shall appear only in the specification-part of a module.
+
+R514      language-binding-spec              is    BIND (C [, NAME = scalar-char-initialization-expr ])
+
+C548      (R514) The scalar-char-initialization-expr shall be of default character kind.
+
+R515      array-spec                         is    explicit-shape-spec-list
+
+                                             or assumed-shape-spec-list
+
+                                             or deferred-shape-spec-list
+
+                                             or assumed-size-spec
+
+C549      (R515)The maximum rank is seven.
+
+R516      explicit-shape-spec                is    [ lower-bound : ] upper-bound
+
+R517      lower-bound                        is    specification-expr
+
+R518      upper-bound                        is    specification-expr
+
+C550      (R516) An explicit-shape array whose bounds are not initialization expressions shall be a dummy
+          argument, a function result, or an automatic array of a procedure.
+
+R519      assumed-shape-spec                 is    [ lower-bound ] :
+
+R520      deferred-shape-spec                is    :
+
+
+
+
+SEP 2002                                           COMMITTEE DRAFT                                                    505
+
+
+ISO/IEC 1539-1                                COMMITTEE DRAFT                                       SEP 2002
+
+
+
+R521    assumed-size-spec               is    [ explicit-shape-spec-list , ] [ lower-bound : ] *
+
+C551    An assumed-size-spec shall not appear except as the declaration of the array bounds of a dummy
+        data argument.
+
+C552    An assumed-size array with INTENT (OUT) shall not be of a type for which default initialization
+        is specified.
+
+R522    intent-spec                     is    IN
+
+                                        or OUT
+
+                                        or INOUT
+
+C553    (R522) A nonpointer object with the INTENT (IN) attribute shall not appear in a variable
+        definition context (16.5.7).
+
+C554    (R522) A pointer object with the INTENT (IN) attribute shall not appear as
+
+C555    (R504) (R1216) If the name of a generic intrinsic procedure is explicitly declared to have the
+        INTRINSIC attribute, and it is also the generic name in one or more generic interfaces (12.3.2.1)
+        accessible in the same scoping unit, the procedures in the interfaces and the specific intrinsic
+        procedures shall all be functions or all be subroutines, and the characteristics of the specific
+        intrinsic procedures and the procedures in the interfaces shall differ as specified in 16.2.3.
+
+R523    access-stmt                     is    access-spec [ [ :: ] access-id -list ]
+
+R524    access-id                       is    use-name
+
+                                        or generic-spec
+
+C556    (R523) An access-stmt shall appear only in the specification-part of a module. Only one ac-
+        cessibility statement with an omitted access-id -list is permitted in the specification-part of a
+        module.
+
+C557    (R524) Each use-name shall be the name of a named variable, procedure, derived type, named
+        constant, or namelist group.
+
+R525    allocatable-stmt                is    ALLOCATABLE [ :: ]
+
+                                                object-name [ ( deferred-shape-spec-list ) ]
+
+                                                [ , object-name [ ( deferred-shape-spec-list ) ] ] ...
+
+R526    asynchronous-stmt               is    ASYNCHRONOUS [ :: ] object-name-list
+
+R527    bind-stmt                       is    language-binding-spec [ :: ] bind-entity-list
+
+R528    bind-entity                     is    entity-name
+
+                                        or / common-block-name /
+
+C558    (R527) If any bind-entity in a bind-stmt is an entity-name, the bind-stmt shall appear in the
+        specification part of a module and the entity shall be an interoperable variable (15.2.4, 15.2.5).
+
+C559    (R527) If the language-binding-spec has a NAME= specifier, the bind-entity-list shall consist of
+        a single bind-entity.
+
+C560    (R527) If a bind-entity is a common block, each variable of the common block shall be interop-
+        erable (15.2.4, 15.2.5).
+
+R529    data-stmt                       is    DATA data-stmt-set [ [ , ] data-stmt-set ] ...
+
+R530    data-stmt-set                   is    data-stmt-object -list / data-stmt-value-list /
+
+R531    data-stmt-object                is    variable
+
+                                        or data-implied-do
+
+R532    data-implied-do                 is    ( data-i-do-object -list , data-i-do-variable =
+
+                                                scalar-int-expr , scalar-int-expr [ , scalar-int-expr ] )
+
+R533    data-i-do-object                is    array-element
+
+                                        or scalar-structure-component
+
+                                        or data-implied-do
+
+R534    data-i-do-variable              is    scalar-int-variable
+
+C561    (R531) In a variable that is a data-stmt-object , any subscript, section subscript, substring start-
+
+
+
+
+506                                 COMMITTEE DRAFT                                                 SEP 2002
+
+
+SEP 2002                          COMMITTEE DRAFT                                        ISO/IEC 1539-1
+
+
+
+        ing point, and substring ending point shall be an initialization expression.
+
+C562    (R531) A variable whose designator is included in a data-stmt-object -list or a data-i-do-object -
+        list shall not be: a dummy argument, made accessible by use association or host association, in
+        a named common block unless the DATA statement is in a block data program unit, in a blank
+        common block, a function name, a function result name, an automatic object, or an allocatable
+        variable.
+
+C563    (R531) A data-i-do-object or a variable that appears as a data-stmt-object shall not be an object
+        designator in which a pointer appears other than as the entire rightmost part-ref .
+
+C564    (R534)data-i-do-variable shall be a named variable.
+
+C565    (R532) A scalar-int-expr of a data-implied-do shall involve as primaries only constants, subob-
+        jects of constants, or DO variables of the containing data-implied-dos, and each operation shall
+        be intrinsic.
+
+C566    (R533) The array-element shall be a variable.
+
+C567    (R533) The scalar-structure-component shall be a variable.
+
+C568    (R533) The scalar-structure-component shall contain at least one part-ref that contains a sub-
+        script -list.
+
+C569    (R533) In an array-element or a scalar-structure-component that is a data-i-do-object , any sub-
+        script shall be an expression whose primaries are either constants, subobjects of constants, or
+        DO variables of this data-implied-do or the containing data-implied-dos, and each operation shall
+        be intrinsic.
+
+R535    data-stmt-value               is    [ data-stmt-repeat * ] data-stmt-constant
+
+R536    data-stmt-repeat              is    scalar-int-constant
+
+                                      or scalar-int-constant-subobject
+
+C570    (R536) The data-stmt-repeat shall be positive or zero. If the data-stmt-repeat is a named con-
+        stant, it shall have been declared previously in the scoping unit or made accessible by use
+        association or host association.
+
+R537    data-stmt-constant            is    scalar-constant
+
+                                      or scalar-constant-subobject
+
+                                      or signed-int-literal-constant
+
+                                      or signed-real-literal-constant
+
+                                      or null-init
+
+                                      or structure-constructor
+
+C571    (R537) If a DATA statement constant value is a named constant or a structure constructor, the
+        named constant or derived type shall have been declared previously in the scoping unit or made
+        accessible by use or host association.
+
+C572    (R537) If a data-stmt-constant is a structure-constructor , it shall be an initialization expression.
+
+R538    int-constant-subobject        is    constant-subobject
+
+C573    (R538) int-constant-subobject shall be of type integer.
+
+R539    constant-subobject            is    designator
+
+C574    (R539) constant-subobject shall be a subobject of a constant.
+
+C575    (R539) Any subscript, substring starting point, or substring ending point shall be an initializa-
+        tion expression.
+
+R540    dimension-stmt                is    DIMENSION [ :: ] array-name ( array-spec )
+
+                                              [ , array-name ( array-spec ) ] ...
+
+R541    intent-stmt                   is    INTENT ( intent-spec ) [ :: ] dummy-arg-name-list
+
+R542    optional-stmt                 is    OPTIONAL [ :: ] dummy-arg-name-list
+
+R543    parameter-stmt                is    PARAMETER ( named-constant-def -list )
+
+R544    named-constant-def            is    named-constant = initialization-expr
+
+R545    pointer-stmt                  is    POINTER [ :: ] pointer-decl -list
+
+
+
+SEP 2002                                    COMMITTEE DRAFT                                             507
+
+
+ISO/IEC 1539-1                             COMMITTEE DRAFT                                      SEP 2002
+
+
+
+R546    pointer-decl                 is    object-name [ ( deferred-shape-spec-list ) ]
+
+                                     or proc-entity-name
+
+C576    (R546) A proc-entity-name shall also be declared in a procedure-declaration-stmt .
+
+R547    protected-stmt               is    PROTECTED [ :: ] entity-name-list
+
+R548    save-stmt                    is    SAVE [ [ :: ] saved-entity-list ]
+
+R549    saved-entity                 is    object-name
+
+                                     or proc-pointer-name
+
+                                     or / common-block-name /
+
+R550    proc-pointer-name            is    name
+
+C577    (R550) A proc-pointer-name shall be the name of a procedure pointer.
+
+C578    (R548) If a SAVE statement with an omitted saved entity list occurs in a scoping unit, no other
+        explicit occurrence of the SAVE attribute or SAVE statement is permitted in the same scoping
+        unit.
+
+R551    target-stmt                  is    TARGET [ :: ] object-name [ ( array-spec ) ]
+
+                                             [ , object-name [ ( array-spec ) ] ] ...
+
+R552    value-stmt                   is    VALUE [ :: ] dummy-arg-name-list
+
+R553    volatile-stmt                is    VOLATILE [ :: ] object-name-list
+
+R554    implicit-stmt                is    IMPLICIT implicit-spec-list
+
+                                     or IMPLICIT NONE
+
+R555    implicit-spec                is    declaration-type-spec ( letter-spec-list )
+
+R556    letter-spec                  is    letter [ ­ letter ]
+
+C579    (R554) If IMPLICIT NONE is specified in a scoping unit, it shall precede any PARAMETER
+        statements that appear in the scoping unit and there shall be no other IMPLICIT statements
+        in the scoping unit.
+
+C580    (R556) If the minus and second letter appear, the second letter shall follow the first letter
+        alphabetically.
+
+R557    namelist-stmt                is    NAMELIST
+
+                                             / namelist-group-name / namelist-group-object -list
+
+                                             [ [ , ] / namelist-group-name /
+
+                                             namelist-group-object -list ] . . .
+
+C581    (R557) The namelist-group-name shall not be a name made accessible by use association.
+
+R558    namelist-group-object        is    variable-name
+
+C582    (R558) A namelist-group-object shall not be an assumed-size array.
+
+C583    (R557) A namelist-group-object shall not have the PRIVATE attribute if the namelist-group-
+        name has the PUBLIC attribute.
+
+R559    equivalence-stmt             is    EQUIVALENCE equivalence-set -list
+
+R560    equivalence-set              is    ( equivalence-object , equivalence-object -list )
+
+R561    equivalence-object           is    variable-name
+
+                                     or array-element
+
+                                     or substring
+
+C584    (R561) An equivalence-object shall not be a designator with a base object that is a dummy
+        argument, a pointer, an allocatable variable, a derived-type object that has an allocatable ulti-
+        mate component, an object of a nonsequence derived type, an object of a derived type that has
+        a pointer at any level of component selection, an automatic object, a function name, an entry
+        name, a result name, a variable with the BIND attribute, a variable in a common block that
+        has the BIND attribute, or a named constant.
+
+C585    (R561) An equivalence-object shall not be a designator that has more than one part-ref .
+
+C586    (R561) An equivalence-object shall not have the TARGET attribute.
+
+
+
+508                              COMMITTEE DRAFT                                                SEP 2002
+
+
+SEP 2002                            COMMITTEE DRAFT                                       ISO/IEC 1539-1
+
+
+
+C587    (R561) Each subscript or substring range expression in an equivalence-object shall be an integer
+        initialization expression (7.1.7).
+
+C588    (R560) If an equivalence-object is of type default integer, default real, double precision real,
+        default complex, default logical, or numeric sequence type, all of the objects in the equivalence
+        set shall be of these types.
+
+C589    (R560) If an equivalence-object is of type default character or character sequence type, all of the
+        objects in the equivalence set shall be of these types.
+
+C590    (R560) If an equivalence-object is of a sequence derived type that is not a numeric sequence or
+        character sequence type, all of the objects in the equivalence set shall be of the same type with
+        the same type parameter values.
+
+C591    (R560) If an equivalence-object is of an intrinsic type other than default integer, default real,
+        double precision real, default complex, default logical, or default character, all of the objects in
+        the equivalence set shall be of the same type with the same kind type parameter value.
+
+C592    (R561) If an equivalence-object has the PROTECTED attribute, all of the objects in the equiv-
+        alence set shall have the PROTECTED attribute.
+
+C593    (R561) The name of an equivalence-object shall not be a name made accessible by use association.
+
+C594    (R561) A substring shall not have length zero.
+
+R562    common-stmt                     is    COMMON
+
+                                                [ / [ common-block-name ] / ] common-block-object -list
+
+                                                [ [ , ] / [ common-block-name ] /
+
+                                                common-block-object -list ] ...
+
+R563    common-block-object             is    variable-name [ ( explicit-shape-spec-list ) ]
+
+                                        or proc-pointer-name
+
+C595    (R563) Only one appearance of a given variable-name or proc-pointer-name is permitted in all
+        common-block-object -list s within a scoping unit.
+
+C596    (R563) A common-block-object shall not be a dummy argument, an allocatable variable, a
+        derived-type object with an ultimate component that is allocatable, an automatic object, a
+        function name, an entry name, a variable with the BIND attribute, or a result name.
+
+C597    (R563) If a common-block-object is of a derived type, it shall be a sequence type (4.5.1) with no
+        default initialization.
+
+C598    (R563) A variable-name or proc-pointer-name shall not be a name made accessible by use
+        association.
+
+Section 6:
+R601    variable                        is    designator
+
+C601    (R601) designator shall not be a constant or a subobject of a constant.
+
+R602    variable-name                   is    name
+
+C602    (R602) A variable-name shall be the name of a variable.
+
+R603    designator                      is    object-name
+
+                                        or array-element
+
+                                        or array-section
+
+                                        or structure-component
+
+                                        or substring
+
+R604    logical-variable                is    variable
+
+C603    (R604) logical-variable shall be of type logical.
+
+R605    default-logical-variable        is    variable
+
+C604    (R605) default-logical-variable shall be of type default logical.
+
+R606    char-variable                   is    variable
+
+C605    (R606) char-variable shall be of type character.
+
+
+
+
+SEP 2002                                      COMMITTEE DRAFT                                              509
+
+
+ISO/IEC 1539-1                                COMMITTEE DRAFT                                SEP 2002
+
+
+
+R607    default-char-variable           is    variable
+
+C606    (R607) default-char-variable shall be of type default character.
+
+R608    int-variable                    is    variable
+
+C607    (R608) int-variable shall be of type integer.
+
+R609    substring                       is    parent-string ( substring-range )
+
+R610    parent-string                   is    scalar-variable-name
+
+                                        or array-element
+
+                                        or scalar-structure-component
+
+                                        or scalar-constant
+
+R611    substring-range                 is    [ scalar-int-expr ] : [ scalar-int-expr ]
+
+C608    (R610) parent-string shall be of type character.
+
+R612    data-ref                        is    part-ref [ % part-ref ] ...
+
+R613    part-ref                        is    part-name [ ( section-subscript -list ) ]
+
+C609    (R612) In a data-ref , each part-name except the rightmost shall be of derived type.
+
+C610    (R612) In a data-ref , each part-name except the leftmost shall be the name of a component of
+        the derived-type definition of the declared type of the preceding part-name.
+
+C611    (R612) The leftmost part-name shall be the name of a data object.
+
+C612    (R613) In a part-ref containing a section-subscript -list, the number of section-subscript s shall
+        equal the rank of part-name.
+
+C613    (R612) In a data-ref , there shall not be more than one part-ref with nonzero rank. A part-name
+        to the right of a part-ref with nonzero rank shall not have the ALLOCATABLE or POINTER
+        attribute.
+
+R614    structure-component             is    data-ref
+
+C614    (R614) In a structure-component , there shall be more than one part-ref and the rightmost
+        part-ref shall be of the form part-name.
+
+R615    type-param-inquiry              is    designator % type-param-name
+
+C615    (R615) The type-param-name shall be the name of a type parameter of the declared type of the
+        object designated by the designator .
+
+R616    array-element                   is    data-ref
+
+C616    (R616) In an array-element , every part-ref shall have rank zero and the last part-ref shall
+        contain a subscript -list.
+
+R617    array-section                   is    data-ref [ ( substring-range ) ]
+
+C617    (R617) In an array-section, exactly one part-ref shall have nonzero rank, and either the final
+        part-ref shall have a section-subscript -list with nonzero rank or another part-ref shall have
+        nonzero rank.
+
+C618    (R617) In an array-section with a substring-range, the rightmost part-name shall be of type
+        character.
+
+R618    subscript                       is    scalar-int-expr
+
+R619    section-subscript               is    subscript
+
+                                        or subscript-triplet
+
+                                        or vector-subscript
+
+R620    subscript-triplet               is    [ subscript ] : [ subscript ] [ : stride ]
+
+R621    stride                          is    scalar-int-expr
+
+R622    vector-subscript                is    int-expr
+
+C619    (R622) A vector-subscript shall be an integer array expression of rank one.
+
+C620    (R620) The second subscript shall not be omitted from a subscript-triplet in the last dimension
+        of an assumed-size array.
+
+R623    allocate-stmt                   is    ALLOCATE ( [ type-spec :: ] allocation-list
+
+
+
+510                                   COMMITTEE DRAFT                                        SEP 2002
+
+
+SEP 2002                           COMMITTEE DRAFT                                        ISO/IEC 1539-1
+
+
+
+                                               [, alloc-opt -list ] )
+
+R624    alloc-opt                      is    STAT = stat-variable
+
+                                       or ERRMSG = errmsg-variable
+
+                                       or SOURCE = source-variable
+
+R625    stat-variable                  is    scalar-int-variable
+
+R626    errmsg-variable                is    scalar-default-char-variable
+
+R627    allocation                     is    allocate-object [ ( allocate-shape-spec-list ) ]
+
+R628    allocate-object                is    variable-name
+
+                                       or structure-component
+
+R629    allocate-shape-spec            is    [ allocate-lower-bound : ] allocate-upper-bound
+
+R630    allocate-lower-bound           is    scalar-int-expr
+
+R631    allocate-upper-bound           is    scalar-int-expr
+
+R632    source-variable                is    variable
+
+C621    (R628) Each allocate-object shall be a nonprocedure pointer or an allocatable variable.
+
+C622    (R623) If any allocate-object in the statement has a deferred type parameter, either type-spec or
+        SOURCE= shall appear.
+
+C623    (R623) If a type-spec appears, it shall specify a type with which each allocate-object is type
+        compatible.
+
+C624    (R623) If any allocate-object is unlimited polymorphic, either type-spec or SOURCE= shall
+        appear.
+
+C625    (R623) A type-param-value in a type-spec shall be an asterisk if and only if each allocate-object
+        is a dummy argument for which the corresponding type parameter is assumed.
+
+C626    (R623) If a type-spec appears, the kind type parameter values of each allocate-object shall be
+        the same as the corresponding type parameter values of the type-spec.
+
+C627    (R627) An allocate-shape-spec-list shall appear if and only if the allocate-object is an array.
+
+C628    (R627) The number of allocate-shape-specs in an allocate-shape-spec-list shall be the same as
+        the rank of the allocate-object .
+
+C629    (R624) No alloc-opt shall appear more than once in a given alloc-opt -list.
+
+C630    (R623) If SOURCE= appears, type-spec shall not appear and allocation-list shall contain only
+        one allocate-object , which shall be type compatible (5.1.1.8) with source-variable.
+
+C631    (R623) The source-variable shall be a scalar or have the same rank as allocate-object .
+
+C632    (R623) Corresponding kind type parameters of allocate-object and source-variable shall have the
+        same values.
+
+R633    nullify-stmt                   is    NULLIFY ( pointer-object -list )
+
+R634    pointer-object                 is    variable-name
+
+                                       or structure-component
+
+                                       or proc-pointer-name
+
+C633    (R634) Each pointer-object shall have the POINTER attribute.
+
+R635    deallocate-stmt                is    DEALLOCATE ( allocate-object -list [ , dealloc-opt -list ] )
+
+C634    (R635) Each allocate-object shall be a nonprocedure pointer or an allocatable variable.
+
+R636    dealloc-opt                    is    STAT = stat-variable
+
+                                       or ERRMSG = errmsg-variable
+
+C635    (R636) No dealloc-opt shall appear more than once in a given dealloc-opt -list.
+
+Section 7:
+R701    primary                        is    constant
+
+                                       or designator
+
+                                       or array-constructor
+
+
+
+
+SEP 2002                                     COMMITTEE DRAFT                                            511
+
+
+ISO/IEC 1539-1                               COMMITTEE DRAFT                            SEP 2002
+
+
+
+                                       or structure-constructor
+
+                                       or function-reference
+
+                                       or type-param-inquiry
+
+                                       or type-param-name
+
+                                       or ( expr )
+
+C701    (R701) The type-param-name shall be the name of a type parameter.
+
+C702    (R701) The designator shall not be a whole assumed-size array.
+
+R702    level-1-expr                   is    [ defined-unary-op ] primary
+
+R703    defined-unary-op                is    . letter [ letter ] ... .
+
+C703    (R703) A defined-unary-op shall not contain more than 63 letters and shall not be the same as
+        any intrinsic-operator or logical-literal-constant .
+
+R704    mult-operand                   is    level-1-expr [ power-op mult-operand ]
+
+R705    add-operand                    is    [ add-operand mult-op ] mult-operand
+
+R706    level-2-expr                   is    [ [ level-2-expr ] add-op ] add-operand
+
+R707    power-op                       is    **
+
+R708    mult-op                        is    *
+
+                                       or /
+
+R709    add-op                         is    +
+
+                                       or ­
+
+R710    level-3-expr                   is    [ level-3-expr concat-op ] level-2-expr
+
+R711    concat-op                      is    //
+
+R712    level-4-expr                   is    [ level-3-expr rel-op ] level-3-expr
+
+R713    rel-op                         is    .EQ.
+
+                                       or .NE.
+
+                                       or .LT.
+
+                                       or .LE.
+
+                                       or .GT.
+
+                                       or .GE.
+
+                                       or ==
+
+                                       or /=
+
+                                       or <
+
+                                       or <=
+
+                                       or >
+
+                                       or >=
+
+R714    and-operand                    is    [ not-op ] level-4-expr
+
+R715    or-operand                     is    [ or-operand and-op ] and-operand
+
+R716    equiv-operand                  is    [ equiv-operand or-op ] or-operand
+
+R717    level-5-expr                   is    [ level-5-expr equiv-op ] equiv-operand
+
+R718    not-op                         is    .NOT.
+
+R719    and-op                         is    .AND.
+
+R720    or-op                          is    .OR.
+
+R721    equiv-op                       is    .EQV.
+
+                                       or .NEQV.
+
+R722    expr                           is    [ expr defined-binary-op ] level-5-expr
+
+R723    defined-binary-op               is    . letter [ letter ] ... .
+
+C704    (R723) A defined-binary-op shall not contain more than 63 letters and shall not be the same as
+        any intrinsic-operator or logical-literal-constant .
+
+
+
+512                                COMMITTEE DRAFT                                      SEP 2002
+
+
+SEP 2002                               COMMITTEE DRAFT                                    ISO/IEC 1539-1
+
+
+
+R724    logical-expr                     is    expr
+
+C705    (R724) logical-expr shall be of type logical.
+
+R725    char-expr                        is    expr
+
+C706    (R725) char-expr shall be of type character.
+
+R726    default-char-expr                is    expr
+
+C707    (R726) default-char-expr shall be of type default character.
+
+R727    int-expr                         is    expr
+
+C708    (R727) int-expr shall be of type integer.
+
+R728    numeric-expr                     is    expr
+
+C709    (R728) numeric-expr shall be of type integer, real, or complex.
+
+R729    specification-expr                is    scalar-int-expr
+
+C710    (R729) The scalar-int-expr shall be a restricted expression.
+
+R730    initialization-expr              is    expr
+
+C711    (R730) initialization-expr shall be an initialization expression.
+
+R731    char-initialization-expr         is    char-expr
+
+C712    (R731) char-initialization-expr shall be an initialization expression.
+
+R732    int-initialization-expr          is    int-expr
+
+C713    (R732) int-initialization-expr shall be an initialization expression.
+
+R733    logical-initialization-expr      is    logical-expr
+
+C714    (R733) logical-initialization-expr shall be an initialization expression.
+
+R734    assignment-stmt                  is    variable = expr
+
+C715    (R734) The variable in an assignment-stmt shall not be a whole assumed-size array.
+
+R735    pointer-assignment-stmt          is    data-pointer-object [ (bounds-spec-list ) ] => data-target
+
+                                         or data-pointer-object (bounds-remapping-list ) => data-target
+
+                                         or proc-pointer-object => proc-target
+
+R736    data-pointer-object              is    variable-name
+
+                                         or variable % data-pointer-component-name
+
+C716    (R735) If data-target is polymorphic (5.1.1.8), data-pointer-object shall be polymorphic.
+
+C717    (R735) A data-pointer-object shall be type compatible (5.1.1.8) with data-target , and the corre-
+        sponding kind type parameters shall be equal.
+
+C718    (R735) If bounds-spec-list is specified, the number of bounds-specs shall equal the rank of data-
+        pointer-object .
+
+C719    (R735) If bounds-remapping-list is specified, the number of bounds-remappings shall equal the
+        rank of data-pointer-object .
+
+C720    (R735) If bounds-remapping-list is specified, data-target shall have rank one; otherwise, the
+        ranks of data-pointer-object and data-target shall be the same.
+
+C721    (R736) A variable-name shall have the POINTER attribute.
+
+C722    (R736) A data-pointer-component-name shall be the name of a component of variable that is a
+        data pointer.
+
+R737    bounds-spec                      is    lower-bound :
+
+R738    bounds-remapping                 is    lower-bound : upper-bound
+
+R739    data-target                      is    variable
+
+                                         or expr
+
+C723    (R739) A variable shall have either the TARGET or POINTER attribute, and shall not be an
+        array section with a vector subscript.
+
+C724    (R739) An expr shall be a reference to a function whose result is a data pointer.
+
+R740    proc-pointer-object              is    proc-pointer-name
+
+
+
+
+SEP 2002                                       COMMITTEE DRAFT                                               513
+
+
+ISO/IEC 1539-1                              COMMITTEE DRAFT                                      SEP 2002
+
+
+
+                                      or variable % procedure-component-name
+
+C725    (R740) A procedure-component-name shall be the name of a procedure pointer component of
+        variable.
+
+R741    proc-target                   is    expr
+
+                                      or procedure-name
+
+C726    (R741) An expr shall be a reference to a function whose result is a procedure pointer.
+
+C727    (R741) A procedure-name shall be the name of an external, module, or dummy procedure, a
+        specific intrinsic function listed in 13.6 and not marked with a bullet (·), or a procedure pointer.
+
+C728    (R741) The proc-target shall not be a nonintrinsic elemental procedure.
+
+R742    where-stmt                    is    WHERE ( mask-expr ) where-assignment-stmt
+
+R743    where-construct               is    where-construct-stmt
+
+                                                       [ where-body-construct ] ...
+
+                                                [ masked-elsewhere-stmt
+
+                                                       [ where-body-construct ] ... ] ...
+
+                                                [ elsewhere-stmt
+
+                                                       [ where-body-construct ] ... ]
+
+                                                end-where-stmt
+
+R744    where-construct-stmt          is    [where-construct-name:] WHERE ( mask-expr )
+
+R745    where-body-construct          is    where-assignment-stmt
+
+                                      or where-stmt
+
+                                      or where-construct
+
+R746    where-assignment-stmt         is    assignment-stmt
+
+R747    mask-expr                     is    logical-expr
+
+R748    masked-elsewhere-stmt         is    ELSEWHERE (mask-expr ) [where-construct-name]
+
+R749    elsewhere-stmt                is    ELSEWHERE [where-construct-name]
+
+R750    end-where-stmt                is    END WHERE [where-construct-name]
+
+C729    (R746) A where-assignment-stmt that is a defined assignment shall be elemental.
+
+C730    (R743) If the where-construct-stmt is identified by a where-construct-name, the corresponding
+        end-where-stmt shall specify the same where-construct-name. If the where-construct-stmt is
+        not identified by a where-construct-name, the corresponding end-where-stmt shall not specify
+        a where-construct-name. If an elsewhere-stmt or a masked-elsewhere-stmt is identified by a
+        where-construct-name, the corresponding where-construct-stmt shall specify the same where-
+        construct-name.
+
+C731    (R745) A statement that is part of a where-body-construct shall not be a branch target statement.
+
+R751    forall-construct              is    forall-construct-stmt
+
+                                                    [forall-body-construct ] ...
+
+                                                    end-forall-stmt
+
+R752    forall-construct-stmt         is    [forall-construct-name :] FORALL forall-header
+
+R753    forall-header                 is    (forall-triplet-spec-list [, scalar-mask-expr ] )
+
+R754    forall-triplet-spec           is    index-name = subscript : subscript [ : stride]
+
+R755    forall-body-construct         is    forall-assignment-stmt
+
+                                      or where-stmt
+
+                                      or where-construct
+
+                                      or forall-construct
+
+                                      or forall-stmt
+
+R756    forall-assignment-stmt        is    assignment-stmt
+
+                                      or pointer-assignment-stmt
+
+
+
+
+514                               COMMITTEE DRAFT                                                SEP 2002
+
+
+SEP 2002                          COMMITTEE DRAFT                                     ISO/IEC 1539-1
+
+
+
+R757    end-forall-stmt               is    END FORALL [forall-construct-name ]
+
+C732    (R757) If the forall-construct-stmt has a forall-construct-name, the end-forall-stmt shall have
+        the same forall-construct-name. If the end-forall-stmt has a forall-construct-name, the forall-
+        construct-stmt shall have the same forall-construct-name.
+
+C733    (R753) The scalar-mask-expr shall be scalar and of type logical.
+
+C734    (R753) Any procedure referenced in the scalar-mask-expr , including one referenced by a defined
+        operation, shall be a pure procedure (12.6).
+
+C735    (R754) The index-name shall be a named scalar variable of type integer.
+
+C736    (R754) A subscript or stride in a forall-triplet-spec shall not contain a reference to any index-
+        name in the forall-triplet-spec-list in which it appears.
+
+C737    (R755) A statement in a forall-body-construct shall not define an index-name of the forall-
+        construct .
+
+C738    (R755) Any procedure referenced in a forall-body-construct , including one referenced by a defined
+        operation, assignment, or finalization, shall be a pure procedure.
+
+C739    (R755) A forall-body-construct shall not be a branch target.
+
+R758    forall-stmt                   is    FORALL forall-header forall-assignment-stmt
+
+Section 8:
+R801    block                         is    [ execution-part-construct ] ...
+
+R802    if-construct                  is    if-then-stmt
+
+                                                    block
+
+                                                [ else-if-stmt
+
+                                                    block ] ...
+
+                                                [ else-stmt
+
+                                                    block ]
+
+                                                end-if-stmt
+
+R803    if-then-stmt                  is    [ if-construct-name : ] IF ( scalar-logical-expr ) THEN
+
+R804    else-if-stmt                  is    ELSE IF ( scalar-logical-expr ) THEN [ if-construct-name ]
+
+R805    else-stmt                     is    ELSE [ if-construct-name ]
+
+R806    end-if-stmt                   is    END IF [ if-construct-name ]
+
+C801    (R802) If the if-then-stmt of an if-construct specifies an if-construct-name, the corresponding
+        end-if-stmt shall specify the same if-construct-name. If the if-then-stmt of an if-construct does
+        not specify an if-construct-name, the corresponding end-if-stmt shall not specify an if-construct-
+        name. If an else-if-stmt or else-stmt specifies an if-construct-name, the corresponding if-then-
+        stmt shall specify the same if-construct-name.
+
+R807    if-stmt                       is    IF ( scalar-logical-expr ) action-stmt
+
+C802    (R807) The action-stmt in the if-stmt shall not be an if-stmt , end-program-stmt , end-function-
+        stmt , or end-subroutine-stmt .
+
+R808    case-construct                is    select-case-stmt
+
+                                                [ case-stmt
+
+                                                    block ] ...
+
+                                                end-select-stmt
+
+R809    select-case-stmt              is    [ case-construct-name : ] SELECT CASE ( case-expr )
+
+R810    case-stmt                     is    CASE case-selector [case-construct-name]
+
+R811    end-select-stmt               is    END SELECT [ case-construct-name ]
+
+C803    (R808) If the select-case-stmt of a case-construct specifies a case-construct-name, the corre-
+        sponding end-select-stmt shall specify the same case-construct-name. If the select-case-stmt
+        of a case-construct does not specify a case-construct-name, the corresponding end-select-stmt
+        shall not specify a case-construct-name. If a case-stmt specifies a case-construct-name, the
+
+
+
+
+SEP 2002                                    COMMITTEE DRAFT                                            515
+
+
+ISO/IEC 1539-1                             COMMITTEE DRAFT                                  SEP 2002
+
+
+
+        corresponding select-case-stmt shall specify the same case-construct-name.
+
+R812    case-expr                    is    scalar-int-expr
+
+                                     or scalar-char-expr
+
+                                     or scalar-logical-expr
+
+R813    case-selector                is    ( case-value-range-list )
+
+                                     or DEFAULT
+
+C804    (R808) No more than one of the selectors of one of the CASE statements shall be DEFAULT.
+
+R814    case-value-range             is    case-value
+
+                                     or case-value :
+
+                                     or : case-value
+
+                                     or case-value : case-value
+
+R815    case-value                   is    scalar-int-initialization-expr
+
+                                     or scalar-char-initialization-expr
+
+                                     or scalar-logical-initialization-expr
+
+C805    (R808) For a given case-construct , each case-value shall be of the same type as case-expr . For
+        character type, the kind type parameters shall be the same; character length differences are
+        allowed.
+
+C806    (R808) A case-value-range using a colon shall not be used if case-expr is of type logical.
+
+C807    (R808) For a given case-construct , the case-value-ranges shall not overlap; that is, there shall
+        be no possible value of the case-expr that matches more than one case-value-range.
+
+R816    associate-construct          is    associate-stmt
+
+                                               block
+
+                                               end-associate-stmt
+
+R817    associate-stmt               is    [ associate-construct-name : ] ASSOCIATE
+
+                                             (association-list )
+
+R818    association                  is    associate-name => selector
+
+R819    selector                     is    expr
+
+                                     or variable
+
+C808    (R818) If selector is not a variable or is a variable that has a vector subscript, associate-name
+        shall not appear in a variable definition context (16.5.7).
+
+R820    end-associate-stmt           is    END ASSOCIATE [ associate-construct-name ]
+
+C809    (R820) If the associate-stmt of an associate-construct specifies an associate-construct-name,
+        the corresponding end-associate-stmt shall specify the same associate-construct-name. If the
+        associate-stmt of an associate-construct does not specify an associate-construct-name, the cor-
+        responding end-associate-stmt shall not specify an associate-construct-name.
+
+R821    select-type-construct        is    select-type-stmt
+
+                                               [ type-guard-stmt
+
+                                                    block ] ...
+
+                                               end-select-type-stmt
+
+R822    select-type-stmt             is    [ select-construct-name : ] SELECT TYPE
+
+                                             ( [ associate-name => ] selector )
+
+C810    (R822) If selector is not a named variable, associate-name => shall appear.
+
+C811    (R822) If selector is not a variable or is a variable that has a vector subscript, associate-name
+        shall not appear in a variable definition context (16.5.7).
+
+C812    (R822) The selector in a select-type-stmt shall be polymorphic.
+
+R823    type-guard-stmt              is    TYPE IS ( extensible-type-name ) [ select-construct-name ]
+
+                                     or CLASS IS ( extensible-type-name ) [ select-construct-name ]
+
+
+
+
+516                              COMMITTEE DRAFT                                            SEP 2002
+
+
+SEP 2002                            COMMITTEE DRAFT                                       ISO/IEC 1539-1
+
+
+
+                                        or CLASS DEFAULT [ select-construct-name ]
+
+C813    (R823) If selector is not unlimited polymorphic, the extensible-type-name shall be the name of
+        an extension of the declared type of selector .
+
+C814    (R823) For a given select-type-construct , the same extensible-type-name shall not be specified in
+        more than one TYPE IS type-guard-stmt and shall not be specified in more than one CLASS IS
+        type-guard-stmt .
+
+C815    (R823) For a given select-type-construct , there shall be at most one CLASS DEFAULT type-
+        guard-stmt .
+
+R824    end-select-type-stmt            is    END SELECT [ select-construct-name ]
+
+C816    (R821) If the select-type-stmt of a select-type-construct specifies a select-construct-name, the
+        corresponding end-select-type-stmt shall specify the same select-construct-name. If the select-
+        type-stmt of a select-type-construct does not specify a select-construct-name, the corresponding
+        end-select-type-stmt shall not specify a select-construct-name. If a type-guard-stmt specifies a
+        select-construct-name, the corresponding select-type-stmt shall specify the same select-construct-
+        name.
+
+R825    do-construct                    is    block-do-construct
+
+                                        or nonblock-do-construct
+
+R826    block-do-construct              is    do-stmt
+
+                                                  do-block
+
+                                                  end-do
+
+R827    do-stmt                         is    label-do-stmt
+
+                                        or nonlabel-do-stmt
+
+R828    label-do-stmt                   is    [ do-construct-name : ] DO label [ loop-control ]
+
+R829    nonlabel-do-stmt                is    [ do-construct-name : ] DO [ loop-control ]
+
+R830    loop-control                    is    [ , ] do-variable = scalar-int-expr , scalar-int-expr
+
+                                                [ , scalar-int-expr ]
+
+                                        or [ , ] WHILE ( scalar-logical-expr )
+
+R831    do-variable                     is    scalar-int-variable
+
+C817    (R831) The do-variable shall be a named scalar variable of type integer.
+
+R832    do-block                        is    block
+
+R833    end-do                          is    end-do-stmt
+
+                                        or continue-stmt
+
+R834    end-do-stmt                     is    END DO [ do-construct-name ]
+
+C818    (R826) If the do-stmt of a block-do-construct specifies a do-construct-name, the corresponding
+        end-do shall be an end-do-stmt specifying the same do-construct-name. If the do-stmt of a
+        block-do-construct does not specify a do-construct-name, the corresponding end-do shall not
+        specify a do-construct-name.
+
+C819    (R826) If the do-stmt is a nonlabel-do-stmt , the corresponding end-do shall be an end-do-stmt .
+
+C820    (R826) If the do-stmt is a label-do-stmt , the corresponding end-do shall be identified with the
+        same label .
+
+R835    nonblock-do-construct           is    action-term-do-construct
+
+                                        or outer-shared-do-construct
+
+R836    action-term-do-construct        is    label-do-stmt
+
+                                                  do-body
+
+                                                  do-term-action-stmt
+
+R837    do-body                         is    [ execution-part-construct ] ...
+
+R838    do-term-action-stmt             is    action-stmt
+
+C821    (R838) A do-term-action-stmt shall not be a continue-stmt , a goto-stmt , a return-stmt , a stop-
+
+
+
+
+SEP 2002                                      COMMITTEE DRAFT                                          517
+
+
+ISO/IEC 1539-1                               COMMITTEE DRAFT                                     SEP 2002
+
+
+
+        stmt , an exit-stmt , a cycle-stmt , an end-function-stmt , an end-subroutine-stmt , an end-program-
+        stmt , or an arithmetic-if-stmt .
+
+C822    (R835) The do-term-action-stmt shall be identified with a label and the corresponding label-do-
+        stmt shall refer to the same label.
+
+R839    outer-shared-do-construct      is    label-do-stmt
+
+                                                 do-body
+
+                                                 shared-term-do-construct
+
+R840    shared-term-do-construct       is    outer-shared-do-construct
+
+                                       or inner-shared-do-construct
+
+R841    inner-shared-do-construct      is    label-do-stmt
+
+                                                 do-body
+
+                                                 do-term-shared-stmt
+
+R842    do-term-shared-stmt            is    action-stmt
+
+C823    (R842) A do-term-shared-stmt shall not be a goto-stmt , a return-stmt , a stop-stmt , an exit-
+        stmt , a cycle-stmt , an end-function-stmt , an end-subroutine-stmt , an end-program-stmt , or an
+        arithmetic-if-stmt .
+
+C824    (R840) The do-term-shared-stmt shall be identified with a label and all of the label-do-stmt s of
+        the shared-term-do-construct shall refer to the same label.
+
+R843    cycle-stmt                     is    CYCLE [ do-construct-name ]
+
+C825    (R843) If a cycle-stmt refers to a do-construct-name, it shall be within the range of that do-
+        construct ; otherwise, it shall be within the range of at least one do-construct .
+
+R844    exit-stmt                      is    EXIT [ do-construct-name ]
+
+C826    (R844) If an exit-stmt refers to a do-construct-name, it shall be within the range of that do-
+        construct ; otherwise, it shall be within the range of at least one do-construct .
+
+R845    goto-stmt                      is    GO TO label
+
+C827    (R845) The label shall be the statement label of a branch target statement that appears in the
+        same scoping unit as the goto-stmt .
+
+R846    computed-goto-stmt             is    GO TO ( label -list ) [ , ] scalar-int-expr
+
+C828    (R846 Each label in label -list shall be the statement label of a branch target statement that
+        appears in the same scoping unit as the computed-goto-stmt .
+
+R847    arithmetic-if-stmt             is    IF ( scalar-numeric-expr ) label , label , label
+
+C829    (R847) Each label shall be the label of a branch target statement that appears in the same
+        scoping unit as the arithmetic-if-stmt .
+
+C830    (R847) The scalar-numeric-expr shall not be of type complex.
+
+R848    continue-stmt                  is    CONTINUE
+
+R849    stop-stmt                      is    STOP [ stop-code ]
+
+R850    stop-code                      is    scalar-char-constant
+
+                                       or digit [ digit [ digit [ digit [ digit ] ] ] ]
+
+C831    (R850) scalar-char-constant shall be of type default character.
+
+Section 9:
+R901    io-unit                        is    file-unit-number
+
+                                       or *
+
+                                       or internal-file-variable
+
+R902    file-unit-number                is    scalar-int-expr
+
+R903    internal-file-variable          is    default-char-variable
+
+C901    (R903) The default-char-variable shall not be an array section with a vector subscript.
+
+R904    open-stmt                      is    OPEN ( connect-spec-list )
+
+
+
+
+518                                 COMMITTEE DRAFT                                              SEP 2002
+
+
+SEP 2002                         COMMITTEE DRAFT                                      ISO/IEC 1539-1
+
+
+
+R905    connect-spec                 is    [ UNIT = ] file-unit-number
+
+                                     or ACCESS = scalar-default-char-expr
+
+                                     or ACTION = scalar-default-char-expr
+
+                                     or ASYNCHRONOUS = scalar-default-char-expr
+
+                                     or BLANK = scalar-default-char-expr
+
+                                     or DECIMAL = scalar-default-char-expr
+
+                                     or DELIM = scalar-default-char-expr
+
+                                     or ERR = label
+
+                                     or FILE = file-name-expr
+
+                                     or FORM = scalar-default-char-expr
+
+                                     or IOMSG = iomsg-variable
+
+                                     or IOSTAT = scalar-int-variable
+
+                                     or PAD = scalar-default-char-expr
+
+                                     or POSITION = scalar-default-char-expr
+
+                                     or RECL = scalar-int-expr
+
+                                     or ROUND = scalar-default-char-expr
+
+                                     or SIGN = scalar-default-char-expr
+
+                                     or STATUS = scalar-default-char-expr
+
+R906    file-name-expr                is    scalar-default-char-expr
+
+R907    iomsg-variable               is    scalar-default-char-variable
+
+C902    (R905) No specifier shall appear more than once in a given connect-spec-list.
+
+C903    (R905) A file-unit-number shall be specified; if the optional characters UNIT= are omitted, the
+        file-unit-number shall be the first item in the connect-spec-list.
+
+C904    (R905) The label used in the ERR= specifier shall be the statement label of a branch target
+        statement that appears in the same scoping unit as the OPEN statement.
+
+R908    close-stmt                   is    CLOSE ( close-spec-list )
+
+R909    close-spec                   is    [ UNIT = ] file-unit-number
+
+                                     or IOSTAT = scalar-int-variable
+
+                                     or IOMSG = iomsg-variable
+
+                                     or ERR = label
+
+                                     or STATUS = scalar-default-char-expr
+
+C905    (R909) No specifier shall appear more than once in a given close-spec-list.
+
+C906    (R909) A file-unit-number shall be specified; if the optional characters UNIT= are omitted, the
+        file-unit-number shall be the first item in the close-spec-list.
+
+C907    (R909) The label used in the ERR= specifier shall be the statement label of a branch target
+        statement that appears in the same scoping unit as the CLOSE statement.
+
+R910    read-stmt                    is    READ ( io-control-spec-list ) [ input-item-list ]
+
+                                     or READ format [ , input-item-list ]
+
+R911    write-stmt                   is    WRITE ( io-control-spec-list ) [ output-item-list ]
+
+R912    print-stmt                   is    PRINT format [ , output-item-list ]
+
+R913    io-control-spec              is    [ UNIT = ] io-unit
+
+                                     or [ FMT = ] format
+
+                                     or [ NML = ] namelist-group-name
+
+                                     or ADVANCE = scalar-default-char-expr
+
+                                     or ASYNCHRONOUS = scalar-char-initialization-expr
+
+                                     or BLANK = scalar-default-char-expr
+
+                                     or DECIMAL = scalar-default-char-expr
+
+
+
+SEP 2002                                   COMMITTEE DRAFT                                        519
+
+
+ISO/IEC 1539-1                             COMMITTEE DRAFT                                 SEP 2002
+
+
+
+                                      or DELIM = scalar-default-char-expr
+
+                                      or END = label
+
+                                      or EOR = label
+
+                                      or ERR = label
+
+                                      or ID = scalar-int-variable
+
+                                      or IOMSG = iomsg-variable
+
+                                      or IOSTAT = scalar-int-variable
+
+                                      or PAD = scalar-default-char-expr
+
+                                      or POS = scalar-int-expr
+
+                                      or REC = scalar-int-expr
+
+                                      or ROUND = scalar-default-char-expr
+
+                                      or SIGN = scalar-default-char-expr
+
+                                      or SIZE = scalar-int-variable
+
+C908    (R913) No specifier shall appear more than once in a given io-control-spec-list.
+
+C909    (R913) An io-unit shall be specified; if the optional characters UNIT= are omitted, the io-unit
+        shall be the first item in the io-control-spec-list.
+
+C910    (R913) A DELIM= or SIGN= specifier shall not appear in a read-stmt .
+
+C911    (R913) A BLANK=, PAD=, END=, EOR=, or SIZE= specifier shall not appear in a write-stmt .
+
+C912    (R913) The label in the ERR=, EOR=, or END= specifier shall be the statement label of a
+        branch target statement that appears in the same scoping unit as the data transfer statement.
+
+C913    (R913) A namelist-group-name shall be the name of a namelist group.
+
+C914    (R913) A namelist-group-name shall not appear if an input-item-list or an output-item-list
+        appears in the data transfer statement.
+
+C915    (R913) An io-control-spec-list shall not contain both a format and a namelist-group-name.
+
+C916    (R913) If format appears without a preceding FMT=, it shall be the second item in the io-
+        control-spec-list and the first item shall be io-unit .
+
+C917    (R913) If namelist-group-name appears without a preceding NML=, it shall be the second item
+        in the io-control-spec-list and the first item shall be io-unit .
+
+C918    (R913) If io-unit is not a file-unit-number , the io-control-spec-list shall not contain a REC=
+        specifier or a POS= specifier.
+
+C919    (R913) If the REC= specifier appears, an END= specifier shall not appear, a namelist-group-
+        name shall not appear, and the format , if any, shall not be an asterisk.
+
+C920    (R913) An ADVANCE= specifier may appear only in a formatted sequential or stream in-
+        put/output statement with explicit format specification (10.1) whose control information list
+        does not contain an internal-file-variable as the io-unit .
+
+C921    (R913) If an EOR= specifier appears, an ADVANCE= specifier also shall appear.
+
+C922    (R913) If a SIZE= specifier appears, an ADVANCE= specifier also shall appear.
+
+C923    (R913) The scalar-char-initialization-expr in an ASYNCHRONOUS= specifier shall be of type
+        default character and shall have the value YES or NO.
+
+C924    (R913) An ASYNCHRONOUS= specifier with a value YES shall not appear unless io-unit is a
+        file-unit-number .
+
+C925    (R913) If an ID= specifier appears, an ASYNCHRONOUS= specifier with the value YES shall
+        also appear.
+
+C926    (R913) If a POS= specifier appears, the io-control-spec-list shall not contain a REC= specifier.
+
+C927    (R913) If a DECIMAL=, BLANK=, PAD=, SIGN=, or ROUND= specifier appears, a format
+        or namelist-group-name shall also appear.
+
+C928    (R913) If a DELIM= specifier appears, either format shall be an asterisk or namelist-group-name
+        shall appear.
+
+
+
+
+520                               COMMITTEE DRAFT                                          SEP 2002
+
+
+SEP 2002                         COMMITTEE DRAFT                                        ISO/IEC 1539-1
+
+
+
+R914    format                        is    default-char-expr
+
+                                      or label
+
+                                      or *
+
+C929    (R914) The label shall be the label of a FORMAT statement that appears in the same scoping
+        unit as the statement containing the FMT= specifier.
+
+R915    input-item                    is    variable
+
+                                      or io-implied-do
+
+R916    output-item                   is    expr
+
+                                      or io-implied-do
+
+R917    io-implied-do                 is    ( io-implied-do-object -list , io-implied-do-control )
+
+R918    io-implied-do-object          is    input-item
+
+                                      or output-item
+
+R919    io-implied-do-control         is    do-variable = scalar-int-expr ,
+
+                                              scalar-int-expr [ , scalar-int-expr ]
+
+C930    (R915) A variable that is an input-item shall not be a whole assumed-size array.
+
+C931    (R915) A variable that is an input-item shall not be a procedure pointer.
+
+C932    (R919) The do-variable shall be a named scalar variable of type integer.
+
+C933    (R918) In an input-item-list, an io-implied-do-object shall be an input-item. In an output-item-
+        list, an io-implied-do-object shall be an output-item.
+
+C934    (R916) An expression that is an output-item shall not have a value that is a procedure pointer.
+
+R920    dtv-type-spec                 is    TYPE( derived-type-spec )
+
+                                      or CLASS( derived-type-spec )
+
+C935    (R920) If derived-type-spec specifies an extensible type, the CLASS keyword shall be used;
+        otherwise, the TYPE keyword shall be used.
+
+C936    (R920) All nonkind type parameters of derived-type-spec shall be assumed.
+
+R921    wait-stmt                     is    WAIT (wait-spec-list )
+
+R922    wait-spec                     is    [ UNIT = ] file-unit-number
+
+                                      or END = label
+
+                                      or EOR = label
+
+                                      or ERR = label
+
+                                      or ID = scalar-int-variable
+
+                                      or IOMSG = iomsg-variable
+
+                                      or IOSTAT = scalar-int-variable
+
+C937    (R922) No specifier shall appear more than once in a given wait-spec-list.
+
+C938    (R922) A file-unit-number shall be specified; if the optional characters UNIT= are omitted, the
+        file-unit-number shall be the first item in the wait-spec-list.
+
+C939    (R922) The label in the ERR=, EOR=, or END= specifier shall be the statement label of a
+        branch target statement that appears in the same scoping unit as the WAIT statement.
+
+R923    backspace-stmt                is    BACKSPACE file-unit-number
+
+                                      or BACKSPACE ( position-spec-list )
+
+R924    endfile-stmt                   is    ENDFILE file-unit-number
+
+                                      or ENDFILE ( position-spec-list )
+
+R925    rewind-stmt                   is    REWIND file-unit-number
+
+                                      or REWIND ( position-spec-list )
+
+R926    position-spec                 is    [ UNIT = ] file-unit-number
+
+                                      or IOMSG = iomsg-variable
+
+                                      or IOSTAT = scalar-int-variable
+
+
+
+
+SEP 2002                                    COMMITTEE DRAFT                                           521
+
+
+ISO/IEC 1539-1                             COMMITTEE DRAFT                                      SEP 2002
+
+
+
+                                     or ERR = label
+
+C940    (R926) No specifier shall appear more than once in a given position-spec-list.
+
+C941    (R926) A file-unit-number shall be specified; if the optional characters UNIT= are omitted, the
+        file-unit-number shall be the first item in the position-spec-list.
+
+C942    (R926) The label in the ERR= specifier shall be the statement label of a branch target statement
+        that appears in the same scoping unit as the file positioning statement.
+
+R927    flush-stmt                    is    FLUSH file-unit-number
+
+                                     or FLUSH ( flush-spec-list )
+
+R928    flush-spec                    is    [UNIT =] file-unit-number
+
+                                     or IOSTAT = scalar-int-variable
+
+                                     or IOMSG = iomsg-variable
+
+                                     or ERR = label
+
+C943    (R928) No specifier shall appear more than once in a given flush-spec-list.
+
+C944    (R928) A file-unit-number shall be specified; if the optional characters UNIT= are omitted from
+        the unit specifier, the file-unit-number shall be the first item in the flush-spec-list.
+
+C945    (R928) The label in the ERR= specifier shall be the statement label of a branch target statement
+        that appears in the same scoping unit as the flush statement.
+
+R929    inquire-stmt                 is    INQUIRE ( inquire-spec-list )
+
+                                     or INQUIRE ( IOLENGTH = scalar-int-variable )
+
+                                             output-item-list
+
+R930    inquire-spec                 is    [ UNIT = ] file-unit-number
+
+                                     or FILE = file-name-expr
+
+                                     or ACCESS = scalar-default-char-variable
+
+                                     or ACTION = scalar-default-char-variable
+
+                                     or ASYNCHRONOUS = scalar-default-char-variable
+
+                                     or BLANK = scalar-default-char-variable
+
+                                     or DECIMAL = scalar-default-char-variable
+
+                                     or DELIM = scalar-default-char-variable
+
+                                     or DIRECT = scalar-default-char-variable
+
+                                     or ERR = label
+
+                                     or EXIST = scalar-default-logical-variable
+
+                                     or FORM = scalar-default-char-variable
+
+                                     or FORMATTED = scalar-default-char-variable
+
+                                     or ID = scalar-int-variable
+
+                                     or IOMSG = iomsg-variable
+
+                                     or IOSTAT = scalar-int-variable
+
+                                     or NAME = scalar-default-char-variable
+
+                                     or NAMED = scalar-default-logical-variable
+
+                                     or NEXTREC = scalar-int-variable
+
+                                     or NUMBER = scalar-int-variable
+
+                                     or OPENED = scalar-default-logical-variable
+
+                                     or PAD = scalar-default-char-variable
+
+                                     or PENDING = scalar-default-logical-variable
+
+                                     or POS = scalar-int-variable
+
+                                     or POSITION = scalar-default-char-variable
+
+                                     or READ = scalar-default-char-variable
+
+                                     or READWRITE = scalar-default-char-variable
+
+
+
+522                              COMMITTEE DRAFT                                                SEP 2002
+
+
+SEP 2002                           COMMITTEE DRAFT                                          ISO/IEC 1539-1
+
+
+
+                                         or RECL = scalar-int-variable
+
+                                         or ROUND = scalar-default-char-variable
+
+                                         or SEQUENTIAL = scalar-default-char-variable
+
+                                         or SIGN = scalar-default-char-variable
+
+                                         or SIZE = scalar-int-variable
+
+                                         or STREAM = scalar-default-char-variable
+
+                                         or UNFORMATTED = scalar-default-char-variable
+
+                                         or WRITE = scalar-default-char-variable
+
+C946     (R930) No specifier shall appear more than once in a given inquire-spec-list.
+
+C947     (R930) An inquire-spec-list shall contain one FILE= specifier or one UNIT= specifier, but not
+         both.
+
+C948     (R930) In the inquire by unit form of the INQUIRE statement, if the optional characters UNIT=
+         are omitted, the file-unit-number shall be the first item in the inquire-spec-list.
+
+C949     (R930) If an ID= specifier appears, a PENDING= specifier shall also appear.
+
+Section 10:
+R1001 format-stmt                        is    FORMAT format-specification
+
+R1002 format-specification                is    ( [ format-item-list ] )
+
+C1001    (R1001) The format-stmt shall be labeled.
+
+C1002    (R1002) The comma used to separate format-items in a format-item-list may be omitted
+
+R1003 format-item                        is    [ r ] data-edit-desc
+
+                                         or control-edit-desc
+
+                                         or char-string-edit-desc
+
+                                         or [ r ] ( format-item-list )
+
+R1004 r                                  is    int-literal-constant
+
+C1003    (R1004) r shall be positive.
+
+C1004    (R1004) r shall not have a kind parameter specified for it.
+
+R1005 data-edit-desc                     is    I w [ . m ]
+
+                                         or B w [ . m ]
+
+                                         or O w [ . m ]
+
+                                         or Z w [ . m ]
+
+                                         or F w . d
+
+                                         or E w . d [ E e ]
+
+                                         or EN w . d [ E e ]
+
+                                         or ES w . d [ E e ]
+
+                                         or G w . d [ E e ]
+
+                                         or L w
+
+                                         or A [ w ]
+
+                                         or D w . d
+
+                                         or DT [ char-literal-constant ] [ ( v -list ) ]
+
+R1006 w                                  is    int-literal-constant
+
+R1007 m                                  is    int-literal-constant
+
+R1008 d                                  is    int-literal-constant
+
+R1009 e                                  is    int-literal-constant
+
+R1010 v                                  is    signed-int-literal-constant
+
+C1005    (R1009) e shall be positive.
+
+C1006    (R1006) w shall be zero or positive for the I, B, O, Z, and F edit descriptors. w shall be positive
+
+
+
+
+SEP 2002                                       COMMITTEE DRAFT                                         523
+
+
+ISO/IEC 1539-1                                    COMMITTEE DRAFT                              SEP 2002
+
+
+
+         for all other edit descriptors.
+
+C1007    (R1005) w , m, d , e, and v shall not have kind parameters specified for them.
+
+C1008    (R1005) The char-literal-constant in the DT edit descriptor shall not have a kind parameter
+         specified for it.
+
+R1011 control-edit-desc                     is    position-edit-desc
+
+                                            or [ r ] /
+
+                                            or :
+
+                                            or sign-edit-desc
+
+                                            or k P
+
+                                            or blank-interp-edit-desc
+
+                                            or round-edit-desc
+
+                                            or decimal-edit-desc
+
+R1012 k                                     is    signed-int-literal-constant
+
+C1009    (R1012) k shall not have a kind parameter specified for it.
+
+R1013 position-edit-desc                    is    T n
+
+                                            or TL n
+
+                                            or TR n
+
+                                            or n X
+
+R1014 n                                     is    int-literal-constant
+
+C1010    (R1014) n shall be positive.
+
+C1011    (R1014) n shall not have a kind parameter specified for it.
+
+R1015 sign-edit-desc                        is    SS
+
+                                            or SP
+
+                                            or S
+
+R1016 blank-interp-edit-desc                is    BN
+
+                                            or BZ
+
+R1017 round-edit-desc                       is    RU
+
+                                            or RD
+
+                                            or RZ
+
+                                            or RN
+
+                                            or RC
+
+                                            or RP
+
+R1018 decimal-edit-desc                     is    DC
+
+                                            or DP
+
+R1019 char-string-edit-desc                 is    char-literal-constant
+
+C1012    (R1019) The char-literal-constant shall not have a kind parameter specified for it.
+
+Section 11:
+R1101 main-program                          is    [ program-stmt ]
+
+                                                         [ specification-part ]
+
+                                                         [ execution-part ]
+
+                                                         [ internal-subprogram-part ]
+
+                                                         end-program-stmt
+
+R1102 program-stmt                          is    PROGRAM program-name
+
+R1103 end-program-stmt                      is    END [ PROGRAM [ program-name ] ]
+
+C1101    (R1101) In a main-program, the execution-part shall not contain a RETURN statement or an
+         ENTRY statement.
+
+
+
+
+524                                 COMMITTEE DRAFT                                            SEP 2002
+
+
+SEP 2002                          COMMITTEE DRAFT                                    ISO/IEC 1539-1
+
+
+
+C1102    (R1101) The program-name may be included in the end-program-stmt only if the optional
+         program-stmt is used and, if included, shall be identical to the program-name specified in the
+         program-stmt .
+
+C1103    (R1101) An automatic object shall not appear in the specification-part (R204) of a main program.
+
+R1104 module                          is    module-stmt
+
+                                                [ specification-part ]
+
+                                                [ module-subprogram-part ]
+
+                                                end-module-stmt
+
+R1105 module-stmt                     is    MODULE module-name
+
+R1106 end-module-stmt                 is    END [ MODULE [ module-name ] ]
+
+R1107 module-subprogram-part          is    contains-stmt
+
+                                                module-subprogram
+
+                                                [ module-subprogram ] ...
+
+R1108 module-subprogram               is    function-subprogram
+
+                                      or subroutine-subprogram
+
+C1104    (R1104) If the module-name is specified in the end-module-stmt , it shall be identical to the
+         module-name specified in the module-stmt .
+
+C1105    (R1104) A module specification-part shall not contain a stmt-function-stmt , an entry-stmt , or a
+         format-stmt .
+
+C1106    (R1104) An automatic object shall not appear in the specification-part of a module.
+
+C1107    (R1104) If an object of a type for which component-initialization is specified (R435) appears
+         in the specification-part of a module and does not have the ALLOCATABLE or POINTER
+         attribute, the object shall have the SAVE attribute.
+
+R1109 use-stmt                        is    USE [ [ , module-nature ] :: ] module-name [ , rename-list ]
+
+                                      or USE [ [ , module-nature ] :: ] module-name ,
+
+                                              ONLY : [ only-list ]
+
+R1110 module-nature                   is    INTRINSIC
+
+                                      or NON INTRINSIC
+
+R1111 rename                          is    local-name => use-name
+
+                                      or OPERATOR (local-defined-operator ) =>
+
+                                              OPERATOR (use-defined-operator )
+
+R1112 only                            is    generic-spec
+
+                                      or only-use-name
+
+                                      or rename
+
+R1113 only-use-name                   is    use-name
+
+C1108    (R1109) If module-nature is INTRINSIC, module-name shall be the name of an intrinsic module.
+
+C1109    (R1109) If module-nature is NON INTRINSIC, module-name shall be the name of a nonintrinsic
+         module.
+
+C1110    (R1111) OPERATOR(use-defined-operator ) shall not identify a generic-binding.
+
+C1111    (R1112) The generic-spec shall not identify a generic-binding.
+
+C1112    (R1112) Each generic-spec shall be a public entity in the module.
+
+C1113    (R1113) Each use-name shall be the name of a public entity in the module.
+
+R1114 local-defined-operator           is    defined-unary-op
+
+                                      or defined-binary-op
+
+R1115 use-defined-operator             is    defined-unary-op
+
+                                      or defined-binary-op
+
+C1114    (R1115) Each use-defined-operator shall be a public entity in the module.
+
+
+
+
+SEP 2002                                    COMMITTEE DRAFT                                          525
+
+
+ISO/IEC 1539-1                               COMMITTEE DRAFT                                  SEP 2002
+
+
+
+R1116 block-data                       is    block-data-stmt
+
+                                                 [ specification-part ]
+
+                                                 end-block-data-stmt
+
+R1117 block-data-stmt                  is    BLOCK DATA [ block-data-name ]
+
+R1118 end-block-data-stmt              is    END [ BLOCK DATA [ block-data-name ] ]
+
+C1115    (R1116) The block-data-name may be included in the end-block-data-stmt only if it was provided
+         in the block-data-stmt and, if included, shall be identical to the block-data-name in the block-
+         data-stmt .
+
+C1116    (R1116) A block-data specification-part may contain only USE statements, type declaration
+         statements, IMPLICIT statements, PARAMETER statements, derived-type definitions, and
+         the following specification statements: COMMON, DATA, DIMENSION, EQUIVALENCE, IN-
+         TRINSIC, POINTER, SAVE, and TARGET.
+
+C1117    (R1116) A type declaration statement in a block-data specification-part shall not contain AL-
+         LOCATABLE, EXTERNAL, or BIND attribute specifiers.
+
+Section 12:
+R1201 interface-block                  is    interface-stmt
+
+                                                 [ interface-specification ] ...
+
+                                                 end-interface-stmt
+
+R1202 interface-specification           is    interface-body
+
+                                       or procedure-stmt
+
+R1203 interface-stmt                   is    INTERFACE [ generic-spec ]
+
+                                       or ABSTRACT INTERFACE
+
+R1204 end-interface-stmt               is    END INTERFACE [ generic-spec ]
+
+R1205 interface-body                   is    function-stmt
+
+                                                 [ specification-part ]
+
+                                                 end-function-stmt
+
+                                       or subroutine-stmt
+
+                                                 [ specification-part ]
+
+                                                 end-subroutine-stmt
+
+C1201    (R1201) An interface-block in a subprogram shall not contain an interface-body for a procedure
+         defined by that subprogram.
+
+C1202    (R1201) The generic-spec may be included in the end-interface-stmt only if it was provided in the
+         interface-stmt . If the end-interface-stmt includes generic-name, the interface-stmt shall specify
+         the same generic-name. If the end-interface-stmt includes ASSIGNMENT(=), the interface-
+         stmt shall specify ASSIGNMENT(=).            If the end-interface-stmt includes dtio-generic-spec,
+         the interface-stmt shall specify the same dtio-generic-spec. If the end-interface-stmt includes
+         OPERATOR(defined-operator ), the interface-stmt shall specify the same defined-operator . If
+         one defined-operator is .LT., .LE., .GT., .GE., .EQ., or .NE., the other is permitted to be the
+         corresponding operator <, <=, >, >=, ==, or /=.
+
+C1203    (R1203) If the interface-stmt is ABSTRACT INTERFACE, then the function-name in the
+         function-stmt or the subroutine-name in the subroutine-stmt shall not be the same as a keyword
+         that specifies an intrinsic type.
+
+C1204    (R1202) A procedure-stmt is allowed only in an interface block that has a generic-spec.
+
+C1205    (R1205) An interface-body of a pure procedure shall specify the intents of all dummy arguments
+         except pointer, alternate return, and procedure arguments.
+
+C1206    (R1205) An interface-body shall not contain an entry-stmt , data-stmt , format-stmt , or stmt-
+
+         function-stmt .
+
+R1206 procedure-stmt                   is    [ MODULE ] PROCEDURE procedure-name-list
+
+
+
+
+526                                COMMITTEE DRAFT                                            SEP 2002
+
+
+SEP 2002                          COMMITTEE DRAFT                                           ISO/IEC 1539-1
+
+
+
+R1207 generic-spec                    is    generic-name
+
+                                      or OPERATOR ( defined-operator )
+
+                                      or ASSIGNMENT ( = )
+
+                                      or dtio-generic-spec
+
+R1208 dtio-generic-spec               is    READ (FORMATTED)
+
+                                      or READ (UNFORMATTED)
+
+                                      or WRITE (FORMATTED)
+
+                                      or WRITE (UNFORMATTED)
+
+C1207    (R1206) A procedure-name shall have an explicit interface and shall refer to an accessible pro-
+         cedure pointer, external procedure, dummy procedure, or module procedure.
+
+C1208    (R1206) If MODULE appears in a procedure-stmt , each procedure-name in that statement shall
+         be accessible in the current scope as a module procedure.
+
+C1209    (R1206) A procedure-name shall not specify a procedure that is specified previously in any
+         procedure-stmt in any accessible interface with the same generic identifier.
+
+R1209 import-stmt                     is    IMPORT [[ :: ] import-name-list
+
+C1210    (R1209) The IMPORT statement is allowed only in an interface-body.
+
+C1211    (R1209) Each import-name shall be the name of an entity in the host scoping unit.
+
+R1210 external-stmt                   is    EXTERNAL [ :: ] external-name-list
+
+R1211 procedure-declaration-stmt      is    PROCEDURE ( [ proc-interface ] )
+
+                                              [ [ , proc-attr-spec ] ... :: ] proc-decl -list
+
+R1212 proc-interface                  is    interface-name
+
+                                      or declaration-type-spec
+
+R1213 proc-attr-spec                  is    access-spec
+
+                                      or proc-language-binding-spec
+
+                                      or INTENT ( intent-spec )
+
+                                      or OPTIONAL
+
+                                      or POINTER
+
+                                      or SAVE
+
+R1214 proc-decl                       is    procedure-entity-name[ => null-init ]
+
+R1215 interface-name                  is    name
+
+C1212    (R1215) The name shall be the name of an abstract interface or of a procedure that has an
+         explicit interface. If name is declared by a procedure-declaration-stmt it shall be previously
+         declared. If name denotes an intrinsic procedure it shall be one that is listed in 13.6 and not
+         marked with a bullet (·).
+
+C1213    (R1215) The name shall not be the same as a keyword that specifies an intrinsic type.
+
+C1214    If a procedure entity has the INTENT attribute or SAVE attribute, it shall also have the
+         POINTER attribute.
+
+C1215    (R1211) If a proc-interface describes an elemental procedure, each procedure-entity-name shall
+         specify an external procedure.
+
+C1216    (R1214) If => appears in proc-decl , the procedure entity shall have the POINTER attribute.
+
+C1217    (R1211) If proc-language-binding-spec with a NAME= is specified, then proc-decl -list shall con-
+         tain exactly one proc-decl , which shall neither have the POINTER attribute nor be a dummy
+         procedure.
+
+C1218    (R1211) If proc-language-binding-spec is specified, the proc-interface shall appear, it shall be an
+         interface-name, and interface-name shall be declared with a proc-language-binding-spec.
+
+R1216 intrinsic-stmt                  is    INTRINSIC [ :: ] intrinsic-procedure-name-list
+
+C1219    (R1216) Each intrinsic-procedure-name shall be the name of an intrinsic procedure.
+
+R1217 function-reference              is    procedure-designator ( [ actual-arg-spec-list ] )
+
+
+
+SEP 2002                                    COMMITTEE DRAFT                                           527
+
+
+ISO/IEC 1539-1                                   COMMITTEE DRAFT                                      SEP 2002
+
+
+
+C1220    (R1217) The procedure-designator shall designate a function.
+
+C1221    (R1217) The actual-arg-spec-list shall not contain an alt-return-spec.
+
+R1218 call-stmt                            is    CALL procedure-designator [ ( [ actual-arg-spec-list ] ) ]
+
+C1222    (R1218) The procedure-designator shall designate a subroutine.
+
+R1219 procedure-designator                 is    procedure-name
+
+                                           or data-ref % procedure-component-name
+
+                                           or data-ref % binding-name
+
+C1223    (R1219) A procedure-name shall be the name of a procedure or procedure pointer.
+
+C1224    (R1219) A procedure-component-name shall be the name of a procedure pointer component of
+         the declared type of data-ref .
+
+C1225    (R1219) A binding-name shall be the name of a procedure binding (4.5.1.5) of the declared type
+         of data-ref .
+
+R1220 actual-arg-spec                      is    [ keyword = ] actual-arg
+
+R1221 actual-arg                           is    expr
+
+                                           or variable
+
+                                           or procedure-name
+
+                                           or alt-return-spec
+
+R1222 alt-return-spec                      is    * label
+
+C1226    (R1220) The keyword = shall not appear if the interface of the procedure is implicit in the
+         scoping unit.
+
+C1227    (R1220) The keyword = may be omitted from an actual-arg-spec only if the keyword = has been
+         omitted from each preceding actual-arg-spec in the argument list.
+
+C1228    (R1220) Each keyword shall be the name of a dummy argument in the explicit interface of the
+         procedure.
+
+C1229    (R1221) A nonintrinsic elemental procedure shall not be used as an actual argument.
+
+C1230    (R1221) A procedure-name shall be the name of an external procedure, a dummy procedure, a
+         module procedure, a procedure pointer, or a specific intrinsic function that is listed in 13.6 and
+         not marked with a bullet(·).
+
+C1231    (R1221) In a reference to a pure procedure, a procedure-name actual-arg shall be the name of a
+         pure procedure (12.6).
+
+C1232    (R1222) The label used in the alt-return-spec shall be the statement label of a branch target statement that
+
+         appears in the same scoping unit as the call-stmt .
+
+C1233    (R1221) If an actual argument is an array section or an assumed-shape array, and the corre-
+         sponding dummy argument has either the VOLATILE or ASYNCHRONOUS attribute, that
+         dummy argument shall be an assumed-shape array.
+
+C1234    (R1221) If an actual argument is a pointer array, and the corresponding dummy argument
+         has either the VOLATILE or ASYNCHRONOUS attribute, that dummy argument shall be an
+         assumed-shape array or a pointer array.
+
+R1223 function-subprogram                  is    function-stmt
+
+                                                      [ specification-part ]
+
+                                                      [ execution-part ]
+
+                                                      [ internal-subprogram-part ]
+
+                                                      end-function-stmt
+
+R1224 function-stmt                        is    [ prefix ] FUNCTION function-name
+
+                                                   ( [ dummy-arg-name-list ] )
+
+                                                   [, proc-language-binding-spec] [ RESULT ( result-name ) ]
+
+C1235    (R1224) If RESULT is specified, result-name shall not be the same as function-name and shall
+         not be the same as the entry-name in any ENTRY statement in the subprogram.
+
+
+
+
+528                                    COMMITTEE DRAFT                                                SEP 2002
+
+
+SEP 2002                           COMMITTEE DRAFT                                        ISO/IEC 1539-1
+
+
+
+C1236    (R1224) If RESULT is specified, the function-name shall not appear in any specification state-
+         ment in the scoping unit of the function subprogram.
+
+R1225 proc-language-binding-spec       is    language-binding-spec
+
+C1237    (R1225) A proc-language-binding-spec with a NAME= specifier shall not be specified in the
+         function-stmt or subroutine-stmt of an interface body for an abstract interface or a dummy
+         procedure.
+
+C1238    (R1225) A proc-language-binding-spec shall not be specified for an internal procedure.
+
+C1239    (R1225) If proc-language-binding-spec is specified for a procedure, each of the procedure's dummy
+         arguments shall be a nonoptional interoperable variable (15.2.4, 15.2.5) or an interoperable
+         procedure (15.2.6). If proc-language-binding-spec is specified for a function, the function result
+         shall be an interoperable variable.
+
+R1226 dummy-arg-name                   is    name
+
+C1240    (R1226) A dummy-arg-name shall be the name of a dummy argument.
+
+R1227 prefix                            is    prefix-spec [ prefix-spec ] ...
+
+R1228 prefix-spec                       is    declaration-type-spec
+
+                                       or RECURSIVE
+
+                                       or PURE
+
+                                       or ELEMENTAL
+
+C1241    (R1227) A prefix shall contain at most one of each prefix-spec.
+
+C1242    (R1227) A prefix shall not specify both ELEMENTAL and RECURSIVE.
+
+C1243    (R1227) A prefix shall not specify ELEMENTAL if proc-language-binding-spec appears in the
+         function-stmt or subroutine-stmt .
+
+R1229 end-function-stmt                is    END [ FUNCTION [ function-name ] ]
+
+C1244    (R1229) FUNCTION shall appear in the end-function-stmt of an internal or module function.
+
+C1245    (R1223) An internal function subprogram shall not contain an ENTRY statement.
+
+C1246    (R1223) An internal function subprogram shall not contain an internal-subprogram-part .
+
+C1247    (R1229) If a function-name appears in the end-function-stmt , it shall be identical to the function-
+         name specified in the function-stmt .
+
+R1230 subroutine-subprogram            is    subroutine-stmt
+
+                                                  [ specification-part ]
+
+                                                  [ execution-part ]
+
+                                                  [ internal-subprogram-part ]
+
+                                                  end-subroutine-stmt
+
+R1231 subroutine-stmt                  is    [ prefix ] SUBROUTINE subroutine-name
+
+                                                [ ( [ dummy-arg -list ] ) ] [, proc-language-binding-spec ]
+
+C1248    (R1231) The prefix of a subroutine-stmt shall not contain a declaration-type-spec.
+
+R1232 dummy-arg                        is    dummy-arg-name
+
+                                       or *
+
+R1233 end-subroutine-stmt              is    END [ SUBROUTINE [ subroutine-name ] ]
+
+C1249    (R1233) SUBROUTINE shall appear in the end-subroutine-stmt of an internal or module sub-
+         routine.
+
+C1250    (R1230) An internal subroutine subprogram shall not contain an ENTRY statement.
+
+C1251    (R1230) An internal subroutine subprogram shall not contain an internal-subprogram-part .
+
+C1252    (R1233) If a subroutine-name appears in the end-subroutine-stmt , it shall be identical to the
+         subroutine-name specified in the subroutine-stmt .
+
+R1234 entry-stmt                       is    ENTRY entry-name [ ( [ dummy-arg -list ] )
+
+                                                [, proc-language-binding-spec ]
+
+                                                [ RESULT ( result-name ) ] ]
+
+
+
+SEP 2002                                     COMMITTEE DRAFT                                                   529
+
+
+ISO/IEC 1539-1                                    COMMITTEE DRAFT                                            SEP 2002
+
+
+
+                                            or ENTRY entry-name
+
+                                                    , proc-language-binding-spec [ RESULT ( result-name ) ]
+
+C1253    (R1234) If RESULT is specified, the entry-name shall not appear in any specification or type-
+         declaration statement in the scoping unit of the function program.
+
+C1254    (R1234) An entry-stmt may appear only in an external-subprogram or module-subprogram. An
+         entry-stmt shall not appear within an executable-construct .
+
+C1255    (R1234) RESULT may appear only if the entry-stmt is in a function subprogram.
+
+C1256    (R1234) Within the subprogram containing the entry-stmt , the entry-name shall not appear
+         as a dummy argument in the FUNCTION or SUBROUTINE statement or in another ENTRY
+         statement nor shall it appear in an EXTERNAL, INTRINSIC, or PROCEDURE statement.
+
+C1257    (R1234) A dummy-arg may be an alternate return indicator only if the ENTRY statement is in a subroutine
+
+         subprogram.
+
+C1258    (R1234) If RESULT is specified, result-name shall not be the same as the function-name in the
+         FUNCTION statement and shall not be the same as the entry-name in any ENTRY statement
+         in the subprogram.
+
+R1235 return-stmt                           is    RETURN [ scalar-int-expr ]
+
+C1259    (R1235) The return-stmt shall be in the scoping unit of a function or subroutine subprogram.
+
+C1260    (R1235) The scalar-int-expr is allowed only in the scoping unit of a subroutine subprogram.
+
+R1236 contains-stmt                         is    CONTAINS
+
+R1237 stmt-function-stmt                    is    function-name ( [ dummy-arg-name-list ] ) = scalar-expr
+
+C1261    (R1237) The primaries of the scalar-expr shall be constants (literal and named), references to variables, references
+
+         to functions and function dummy procedures, and intrinsic operations. If scalar-expr contains a reference to a
+
+         function or a function dummy procedure, the reference shall not require an explicit interface, the function shall
+
+         not require an explicit interface unless it is an intrinsic, the function shall not be a transformational intrinsic,
+
+         and the result shall be scalar. If an argument to a function or a function dummy procedure is an array, it shall
+
+         be an array name. If a reference to a statement function appears in scalar-expr , its definition shall have been
+
+         provided earlier in the scoping unit and shall not be the name of the statement function being defined.
+
+C1262    (R1237) Named constants in scalar-expr shall have been declared earlier in the scoping unit or made accessible
+
+         by use or host association. If array elements appear in scalar-expr , the array shall have been declared as an array
+
+         earlier in the scoping unit or made accessible by use or host association.
+
+C1263    (R1237) If a dummy-arg-name, variable, function reference, or dummy function reference is typed by the implicit
+
+         typing rules, its appearance in any subsequent type declaration statement shall confirm this implied type and
+
+         the values of any implied type parameters.
+
+C1264    (R1237) The function-name and each dummy-arg-name shall be specified, explicitly or implicitly, to be scalar.
+
+C1265    (R1237) A given dummy-arg-name may appear only once in any dummy-arg-name-list.
+
+C1266    (R1237) Each variable reference in scalar-expr may be either a reference to a dummy argument of the statement
+
+         function or a reference to a variable accessible in the same scoping unit as the statement function statement.
+
+C1267    The specification-part of a pure function subprogram shall specify that all dummy arguments
+         have INTENT (IN) except procedure arguments and arguments with the POINTER attribute.
+
+C1268    The specification-part of a pure subroutine subprogram shall specify the intents of all dummy ar-
+         guments except procedure arguments, alternate return indicators, and arguments with the POINTER
+         attribute.
+
+C1269    A local variable declared in the specification-part or internal-subprogram-part of a pure subpro-
+         gram shall not have the SAVE attribute.
+
+C1270    The specification-part of a pure subprogram shall specify that all dummy arguments that are
+         procedure arguments are pure.
+
+C1271    If a procedure that is neither an intrinsic procedure nor a statement function is used in a context
+         that requires it to be pure, then its interface shall be explicit in the scope of that use. The
+         interface shall specify that the procedure is pure.
+
+C1272    All internal subprograms in a pure subprogram shall be pure.
+
+
+
+530                                    COMMITTEE DRAFT                                                       SEP 2002
+
+
+SEP 2002                            COMMITTEE DRAFT                                    ISO/IEC 1539-1
+
+
+
+C1273    In a pure subprogram any designator with a base object that is in common or accessed by
+         host or use association, is a dummy argument of a pure function, is a dummy argument with
+         INTENT (IN) of a pure subroutine, or an object that is storage associated with any such variable,
+         shall not be used in the following contexts:
+
+C1274    Any procedure referenced in a pure subprogram, including one referenced via a defined operation,
+         assignment, or finalization, shall be pure.
+
+C1275    A pure subprogram shall not contain a print-stmt , open-stmt , close-stmt , backspace-stmt , endfile-
+         stmt , rewind-stmt , flush-stmt , wait-stmt , or inquire-stmt .
+
+C1276    A pure subprogram shall not contain a read-stmt or write-stmt whose io-unit is a file-unit-number
+         or *.
+
+C1277    A pure subprogram shall not contain a stop-stmt .
+
+C1278    All dummy arguments of an elemental procedure shall be scalar dummy data objects and shall
+         not have the POINTER or ALLOCATABLE attribute.
+
+C1279    The result variable of an elemental function shall be scalar and shall not have the POINTER or
+         ALLOCATABLE attribute.
+
+C1280    In the scoping unit of an elemental subprogram, an object designator with a dummy argument
+         as the base object shall not appear in a specification-expr except as the argument to one of the
+         intrinsic functions BIT SIZE, KIND, LEN, or the numeric inquiry functions (13.5.6).
+
+Section 13:
+
+Section 14:
+
+Section 15:
+C1501    (R423) A derived type with the BIND attribute shall not be a SEQUENCE type.
+
+C1502    (R423) A derived type with the BIND attribute shall not have type parameters.
+
+C1503    (R423) A derived type with the BIND attribute shall not have the EXTENSIBLE or EXTENDS
+         attribute.
+
+C1504    (R423) A derived type with the BIND attribute shall not have a type-bound-procedure-part .
+
+C1505    (R423) Each component of a derived type with the BIND attribute shall be a nonpointer,
+         nonallocatable data component with interoperable type and type parameters.
+
+Section 16:
