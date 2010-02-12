@@ -23,7 +23,7 @@
 
 # Init autoconf
 
-AC_INIT([OpenFortranParser],[0.7])
+AC_INIT([OpenFortranParser],[0.8])
 AC_PREREQ(2.58)
 AC_CONFIG_AUX_DIR(./config)
 
@@ -31,8 +31,8 @@ OFP_ROOT_DIR="`pwd`"
 
 # Set the version of OFP that we are installing
 OFP_MAJOR_VERSION="0"
-OFP_MINOR_VERSION="7"
-OFP_SUB_VERSION="2"
+OFP_MINOR_VERSION="8"
+OFP_SUB_VERSION="0"
 
 # Initialize variables
 OFP_CFLAGS="$CFLAGS"
