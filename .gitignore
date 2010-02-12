@@ -1,0 +1,9 @@
+config.log
+config.status
+make.inc
+FortranParser08_FortranParser03.java
+build/*.jar
+lib/
+*.cache/
+.classpath
+.project
