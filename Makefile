@@ -52,6 +52,7 @@ clean:
 	$(CD) $(OFP_TOOLS_DIR); $(MAKE) clean
 	$(CD) $(OFP_C_DIR); $(MAKE) clean
 	$(CD) $(OFP_JNI_DIR); $(MAKE) clean
+	rm -f ./build/$(OFP_JARFILE)
 
 distclean:
 	$(CD) $(OFP_FRONT_DIR); $(MAKE) allclean
