@@ -30,23 +30,34 @@ parser grammar FortranParser03;
 options {
    language=Java;
    superClass=FortranParser;
-///////
-// tokenVocab must be declared for F2003
-//@F2003@   tokenVocab=FortranLexer;
+//////////////
+// NOTE: tokenVocab causes an antlr warning if used in conjuction
+// with F2008.  The warning should be ignored as an inconsistent tokens
+// file will be generated otherwise.
    tokenVocab=FortranLexer;
 }
 
-///////
-// header must be declared for F2003 grammar
+//////////////
+// This header must be declared for F2003 grammar; otherwise
+// it should be commented out (if F2008 grammar is used
+// with F2003 as the base).  Note that this means that
+// the java package statement,
+//
+//      package fortran.ofp.parser.java
+//
+// must be copied into the generated java file, FortranParser03.java,
+// by hand.  If the header is defined (see below), antlr v3.2 will
+// emit an error.  However, the error can be safely ignored and
+// rerunning make will build the OFP jar file correctly.
+//
+@header {
+package fortran.ofp.parser.java;
+}
 //
 //@F2003@@header {
 //@F2003@   package fortran.ofp.parser.java;
 //@F2003@   import fortran.ofp.parser.java.IActionEnums;
 //@F2003@}
-@header {
-   package fortran.ofp.parser.java;
-   import fortran.ofp.parser.java.IActionEnums;
-}
 
 @members {
 
