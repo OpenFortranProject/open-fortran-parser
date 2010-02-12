@@ -70,7 +70,11 @@ $(CLASSDIR)/GenRuleStackTrace.class: GenRuleStackTrace.java
 $(CLASSDIR)/DetectIncludeStmt.class: DetectIncludeStmt.java
 	$(JAVAC) $(JFLAGS) $<
 
+#
+# contains hack to rebuild jarfile to make sure it contains all of tool classes
+#
 RuleStackTrace.java: GenRuleStackTrace.java $(PARDIR)/java/IFortranParserAction.java 
+	cd $(BUILDDIR) ; $(JAR) cf $(JARFILE) fortran/
 	$(JAVA) $(OFP_CLASSPATH) fortran.tools.GenRuleStackTrace
 	$(MAKE) $(CLASSDIR)/RuleStackTrace.class
 
