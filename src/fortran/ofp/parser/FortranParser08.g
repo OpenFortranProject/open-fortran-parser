@@ -52,24 +52,24 @@ main_program
    boolean hasExecutionPart = false;
    boolean hasInternalSubprogramPart = false;
 }
-	:		{
+    :       {
                action.main_program__begin();
             }
 
-		( program_stmt {hasProgramStmt = true;} )?
+        ( program_stmt {hasProgramStmt = true;} )?
 
-		specification_part
+        specification_part
 
-		( execution_part {hasExecutionPart = true;} )?
+        ( execution_part {hasExecutionPart = true;} )?
 
-		( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
+        ( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
 
-		end_program_stmt
-			{
+        end_program_stmt
+            {
                action.main_program(hasProgramStmt, hasExecutionPart, 
                                    hasInternalSubprogramPart);
             }
-	;
+    ;
 
 
 /***
@@ -213,7 +213,7 @@ action_stmt
    |   goto_stmt
    |   if_stmt
    |   inquire_stmt  
-//   |   lock_stmt                     // NEW_TO_2008
+   |   lock_stmt                     // NEW_TO_2008
    |   nullify_stmt
    |   open_stmt
    |   pointer_assignment_stmt
@@ -248,10 +248,10 @@ action_stmt
 allstop_stmt
 @init {Token lbl = null; boolean hasStopCode = false;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.tk;})? T_ALL T_STOP (stop_code {hasStopCode=true;})? 
+    :    (label {lbl=$label.tk;})? T_ALL T_STOP (stop_code {hasStopCode=true;})? 
             end_of_stmt
-			{ action.allstop_stmt(lbl, $T_ALL, $T_STOP, $end_of_stmt.tk, hasStopCode); }
-	;
+            { action.allstop_stmt(lbl, $T_ALL, $T_STOP, $end_of_stmt.tk, hasStopCode); }
+    ;
 
 
 /*
@@ -268,7 +268,7 @@ sync_all_stmt
     :    (label {lbl=$label.tk;})? T_SYNC T_ALL
              (sync_stat_list {hasSyncStatList=true;})?
              end_of_stmt
-			 { action.sync_all_stmt(lbl, $T_SYNC, $T_ALL, $end_of_stmt.tk, hasSyncStatList); }
+             { action.sync_all_stmt(lbl, $T_SYNC, $T_ALL, $end_of_stmt.tk, hasSyncStatList); }
     ;
 
 
@@ -284,12 +284,69 @@ sync_all_stmt
 sync_stat
     :    T_IDENT T_EQUALS expr    // expr is a stat-variable or an errmsg-variable
              /* {'STAT','ERRMSG'} exprs are variables */
-			 { action.sync_stat($T_IDENT); }
-	;
+             { action.sync_stat($T_IDENT); }
+    ;
 
 sync_stat_list
 @init{int count=0;}
-    :  		{action.sync_stat_list__begin();}
-		sync_stat {count++;} ( T_COMMA sync_stat {count++;} )*
-      		{action.sync_stat_list(count);}
+    :       {action.sync_stat_list__begin();}
+        sync_stat {count++;} ( T_COMMA sync_stat {count++;} )*
+            {action.sync_stat_list(count);}
     ;
+
+
+/*
+ * R863-F08 lock-stmt
+ *    is LOCK ( lock-variable [, lock-stat-list ] )
+ */
+ 
+////////////
+// R863-F08
+//
+lock_stmt
+@init {Token lbl = null; boolean hasLockStatList = false;}
+@after{checkForInclude();}
+    :    (label {lbl=$label.tk;})? T_LOCK lock_variable
+             (lock_stat_list {hasLockStatList=true;})?
+             end_of_stmt
+             { action.lock_stmt(lbl, $T_LOCK, $end_of_stmt.tk, hasLockStatList); }
+    ;
+
+/*
+ * R864-F08 lock-stat
+ *    is ACQUIRED_LOCK = scalar-logical-variable
+ *    or sync-stat
+ */
+ 
+////////////
+// R864-F08
+//
+// TODO - replace expr with scalar_logical_variable
+lock_stat 
+   :   T_ACQUIRED_LOCK T_EQUALS expr    // expr is a scalar-logical-variable
+          { action.lock_stat($T_ACQUIRED_LOCK); }
+   |   sync_stat
+   ;
+
+lock_stat_list
+@init{int count=0;}
+    :       {action.lock_stat_list__begin();}
+        lock_stat {count++;} ( T_COMMA lock_stat {count++;} )*
+            {action.lock_stat_list(count);}
+    ;
+
+
+/*
+ * R866-F08 lock-variable
+ *    is scalar-variable
+ */
+ 
+////////////
+// R866-F08
+//
+// TODO - make expr a scalar-variable
+lock_variable
+   :   expr    // expr is a scalar-variable
+          { action.lock_variable(); }
+   ;
+

@@ -471,7 +471,8 @@ T_CHARACTER     :       'CHARACTER'     ;
 T_LOGICAL       :       'LOGICAL'       ;
 
 T_ABSTRACT      :       'ABSTRACT'      ;
-T_ALL           :       'ALL'           ;
+T_ACQUIRED_LOCK :       'ACQUIRED_LOCK' ;   /* F2008 token */
+T_ALL           :       'ALL'           ;   /* F2008 token (also in F2003?) */
 T_ALLOCATABLE   :       'ALLOCATABLE'   ;
 T_ALLOCATE      :       'ALLOCATE'      ;
 T_ASSIGNMENT    :       'ASSIGNMENT'    ;
@@ -528,6 +529,7 @@ T_INTENT        :       'INTENT'        ;
 T_INTERFACE     :       'INTERFACE'     ;
 T_INTRINSIC     :       'INTRINSIC'     ;
 T_INQUIRE       :       'INQUIRE'       ;
+T_LOCK          :       'LOCK'          ;   /* F2008 token */
 T_MODULE        :       'MODULE'        ;
 T_NAMELIST      :       'NAMELIST'      ;
 T_NONE          :       'NONE'          ;
@@ -564,12 +566,13 @@ T_SELECTTYPE    :       'SELECTTYPE'    ;
 T_SEQUENCE      :       'SEQUENCE'      ;
 T_STOP          :       'STOP'          ;
 T_SUBROUTINE    :       'SUBROUTINE'    ;
-T_SYNC          :       'SYNC'          ;
+T_SYNC          :       'SYNC'          ;   /* F2008 token */
 T_TARGET        :       'TARGET'        ;
 T_THEN          :       'THEN'          ;
 T_TO            :       'TO'            ;
 T_TYPE          :       'TYPE'          ;
 T_UNFORMATTED   :       'UNFORMATTED'   ;
+T_UNLOCK        :       'UNLOCK'        ;   /* F2008 token */
 T_USE           :       'USE'           ;
 T_VALUE         :       'VALUE'         ;
 T_VOLATILE      :       'VOLATILE'      ;
@@ -585,7 +588,6 @@ T_WITH          :       'WITH';
 T_TEAM          :       'TEAM';
 T_TOPOLOGY      :       'TOPOLOGY';
 T_EVENT         :       'EVENT';
-T_LOCK          :       'LOCK';
 T_LOCKSET       :       'LOCKSET';
 // end Rice additions ----------------------------
 

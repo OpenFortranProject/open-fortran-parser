@@ -3643,59 +3643,114 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-    /** R858-F08
-     * sync_all_stmt
-     *	:	(label)? T_SYNC T_ALL (sync_stat_list)? T_EOS
-     *
-     * @param label Optional statement label
-     * @param syncKeyword T_SYNC token.
-     * @param allKeyword T_ALL token.
-     * @param eos T_EOS token.
-     * @param hasStopCode True if the sync-stat-list is present, false otherwise
+   /** R858-F08
+    * sync_all_stmt
+    *   :   (label)? T_SYNC T_ALL (sync_stat_list)? T_EOS
+    *
+    * @param label Optional statement label
+    * @param syncKeyword T_SYNC token
+    * @param allKeyword T_ALL token
+    * @param eos T_EOS token
+    * @param hasSyncStatList True if sync_stat_list is present, false otherwise
      */
-	public void sync_all_stmt(Token label, Token syncKeyword, Token allKeyword, 
-			                           Token eos, boolean hasSyncStatList) {
-		printRuleHeader(858008, "sync-all-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(hasSyncStatList, "hasSyncStatList");
-		printRuleTrailer();
-	}
+   public void sync_all_stmt(Token label, Token syncKeyword, Token allKeyword, 
+                             Token eos, boolean hasSyncStatList) {
+      printRuleHeader(858008, "sync-all-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasSyncStatList, "hasSyncStatList");
+      printRuleTrailer();
+   }
 
-    /** R859-F08
-     * sync_stat
-     *	:	T_IDENT			// {'STAT','ERRMSG'} are variables}
-     *		T_EQUALS expr   // expr is a stat-variable or an errmsg-variable
-     *
-     * @param syncStat Identifier representing {'STAT','ERRMSG'}
-     */
-    public void sync_stat(Token syncStat) {
-        printRuleHeader(859008, "sync-stat");
-        printParameter(syncStat, "syncStat");
-        printRuleTrailer();
-    }
+   /** R859-F08
+    * sync_stat
+    *   :   T_IDENT			// {'STAT','ERRMSG'} are variables}
+    *       T_EQUALS expr   // expr is a stat-variable or an errmsg-variable
+    *
+    * @param syncStat Identifier representing {'STAT','ERRMSG'}
+    */
+   public void sync_stat(Token syncStat) {
+      printRuleHeader(859008, "sync-stat");
+      printParameter(syncStat, "syncStat");
+      printRuleTrailer();
+   }
 	
-	/** R859-F08 list
-	 * sync_stat_list
-     */
-	public void sync_stat_list__begin() {
-		printRuleHeader(859008, "sync-stat-list__begin", "list-begin");
-		printRuleTrailer();	
-	}
-	public void sync_stat_list(int count) {
-		printRuleHeader(859008, "sync-stat-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R859-F08 list
+    * sync_stat_list
+    */
+   public void sync_stat_list__begin() {
+      printRuleHeader(859008, "sync-stat-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void sync_stat_list(int count) {
+      printRuleHeader(859008, "sync-stat-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/**
-	 * Unknown rule.
-	 * scalar_char_constant
-	 *
-	 */
-	public void scalar_char_constant() {
-		printRuleHeader(unknownRule, "scalar-char-constant");
-		printRuleTrailer();
-	}
+   /**
+    * R863-F08 lock-stmt
+    *    (label)? T_LOCK lock_variable (lock_stat_list)? T_EOS
+    *
+    * @param label Optional statement label
+    * @param lockKeyword T_LOCK token
+    * @param eos T_EOS token
+    * @param hasLockStatList True if lock_stat_list is present, false otherwise
+    */
+   public void
+   lock_stmt(Token label, Token lockKeyword, Token eos, boolean hasLockStatList) {
+      printRuleHeader(863008, "lock-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasLockStatList, "hasLockStatList");
+      printRuleTrailer();
+   }
+
+   /** R864-F08
+    * lock_stat
+    *   :   T_ACQUIRED_LOCK T_EQUALS scalar_logical_variable
+    *   |   sync_stat
+    *
+    * @param acquiredKeyword T_ACQUIRED_LOCK token
+    */
+   public void lock_stat(Token acquiredKeyword) {
+      printRuleHeader(864008, "lock-stat");
+      printParameter(acquiredKeyword, "acquiredKeyword");
+      printRuleTrailer();
+   }
+
+   /** R864-F08 list
+    * lock_stat_list
+    *   :   lock_stat ( T_COMMA lock_stat )*
+    * 
+    * @param count The number of items in the list.
+    */
+   public void lock_stat_list__begin() {
+      printRuleHeader(864008, "lock-stat-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void lock_stat_list(int count) {
+      printRuleHeader(864008, "lock-stat-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+
+   /**
+    * R866-F08 lock-variable
+    *    is scalar-variable
+    */
+   public void lock_variable() {
+      printRuleHeader(866008, "lock-variable");
+      printRuleTrailer();
+   }
+
+   /**
+    * Unknown rule.
+    * scalar_char_constant
+    *
+    */
+   public void scalar_char_constant() {
+      printRuleHeader(unknownRule, "scalar-char-constant");
+      printRuleTrailer();
+   }
 
 	/**
 	 * R901

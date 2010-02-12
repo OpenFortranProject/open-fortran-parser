@@ -3208,36 +3208,75 @@ public abstract interface IFortranParserAction {
 	public abstract void allstop_stmt(Token label, Token allKeyword, Token stopKeyword, 
 			                          Token eos, boolean hasStopCode);
 
-    /** R858-F08
-     * sync_all_stmt
-     *	:	(label)? T_SYNC T_ALL (sync_stat_list)? T_EOS
-     *
-     * @param label Optional statement label
-     * @param syncKeyword T_SYNC token.
-     * @param allKeyword T_ALL token.
-     * @param eos T_EOS token.
-     * @param hasStopCode True if the sync-stat-list is present, false otherwise
-     */
-	public abstract void sync_all_stmt(Token label, Token syncKeyword, Token allKeyword, 
-			                           Token eos, boolean hasSyncStatList);
+   /** R858-F08
+    * sync_all_stmt
+    *	:	(label)? T_SYNC T_ALL (sync_stat_list)? T_EOS
+    *
+    * @param label Optional statement label
+    * @param syncKeyword T_SYNC token.
+    * @param allKeyword T_ALL token.
+    * @param eos T_EOS token.
+    * @param hasSyncStatList True if the sync_stat_list is present, false otherwise
+    */
+   public abstract void sync_all_stmt(Token label, Token syncKeyword, Token allKeyword, 
+                                      Token eos, boolean hasSyncStatList);
 
-	/** R859-F08
-	 * sync_stat
-	 *	:	T_IDENT			// {'STAT','ERRMSG'} are variables}
-	 *		T_EQUALS expr   // expr is a stat-variable or an errmsg-variable
-	 *
-	 * @param syncStat Identifier representing {'STAT','ERRMSG'}
-	 */
-	public abstract void sync_stat(Token syncStat);
+   /** R859-F08
+    * sync_stat
+    *    :    T_IDENT            // {'STAT','ERRMSG'} are variables}
+    *        T_EQUALS expr   // expr is a stat-variable or an errmsg-variable
+    *
+    * @param syncStat Identifier representing {'STAT','ERRMSG'}
+    */
+   public abstract void sync_stat(Token syncStat);
 
-	/** R859-F08 list
-	 * sync_stat_list
-	 * 	:    sync_stat ( T_COMMA sync_stat )*
-	 * 
-	 * @param count The number of items in the list.
-	 */
-	public abstract void sync_stat_list__begin();
-	public abstract void sync_stat_list(int count);
+   /** R859-F08 list
+    * sync_stat_list
+    *     :    sync_stat ( T_COMMA sync_stat )*
+    * 
+    * @param count The number of items in the list.
+    */
+   public abstract void sync_stat_list__begin();
+   public abstract void sync_stat_list(int count);
+
+
+   /**
+    * R863-F08 lock-stmt
+    *    (label)? T_LOCK lock_variable (lock_stat_list)? T_EOS
+    *
+    * @param label Optional statement label
+    * @param lockKeyword T_LOCK token
+    * @param eos T_EOS token
+    * @param hasLockStatList True if lock_stat_list is present, false otherwise
+    */
+   public abstract void
+   lock_stmt(Token label, Token lockKeyword, Token eos, boolean hasLockStatList);
+
+   /** R864-F08
+    * lock_stat
+    *   :   T_ACQUIRED_LOCK T_EQUALS scalar_logical_variable
+    *   |   sync_stat
+    *
+    * @param acquiredKeyword T_ACQUIRED_LOCK token
+    */
+    public abstract void lock_stat(Token acquiredKeyword);
+
+   /** R864-F08 list
+    * lock_stat_list
+    *   :   lock_stat ( T_COMMA lock_stat )*
+    * 
+    * @param count The number of items in the list.
+    */
+   public abstract void lock_stat_list__begin();
+   public abstract void lock_stat_list(int count);
+
+
+   /**
+    * R866-F08 lock-variable
+    *    is scalar-variable
+    */
+   public abstract void lock_variable();
+
 
 	/**
 	 * Unknown rule.

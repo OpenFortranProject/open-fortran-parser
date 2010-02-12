@@ -2462,6 +2462,17 @@ R858-F08  sync-all-stmt         is SYNC ALL [ ( [ sync-stat-list ] ) ]
 R859-F08  sync-stat             is STAT = stat-variable
                                 or ERRMSG = errmsg-variable
 
+R863-F08  lock-stmt             is LOCK ( lock-variable [, lock-stat-list ] )
+
+R864-F08  lock-stat             is ACQUIRED_LOCK = scalar-logical-variable
+                                or sync-stat
+
+R865-F08  unlock-stmt           is UNLOCK ( lock-variable [, sync-stat-list ] )
+
+R866-F08  lock-variable         is scalar-variable
+
+C852-F08  (R866-F08) A lock-variable shall be a lock variable (6.2.2).
+
 C831    (R850) scalar-char-constant shall be of type default character.
 
 Section 9:
