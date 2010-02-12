@@ -52,6 +52,10 @@ same.  First, cd to the OFP top level directory and do the following:
 
 2. Run 'make' to build the OFP libraries.
 
+   IMPORTANT NOTE: Because of a bug (we think) in antlr-3.2, the first time
+   you run make it will fail.  As a work around, just type make again and 
+   everything should build properly.
+
 4. Run 'make install' to install the OFP files under the location
    specified with the prefix configure option.  Note that you must have
    the necessary privileges to write to the install directory.
