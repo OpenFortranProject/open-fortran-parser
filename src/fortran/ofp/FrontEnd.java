@@ -23,7 +23,7 @@ import java.io.*;
 
 // the concrete parser classes
 import fortran.ofp.parser.java.FortranParser03;
-//import fortran.ofp.parser.java.FortranParser08;
+import fortran.ofp.parser.java.FortranParser08;
 
 import fortran.ofp.parser.java.FortranLexer;
 import fortran.ofp.parser.java.FortranLexicalPrepass;
@@ -59,7 +59,7 @@ public class FrontEnd implements Callable<Boolean> {
             .determineSourceForm(filename)));
       this.tokens = new FortranTokenStream(lexer);
       
-      this.parser = new FortranParser03(tokens);
+      this.parser = new FortranParser08(tokens);
       this.parser.initialize(args, type, filename);
 
       this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
