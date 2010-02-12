@@ -3,6 +3,8 @@ FortranLexer.java
 FortranLexicalPrepass.java
 FortranParser.java
 FortranParser03.java
+FortranParser08.java
+FortranParser08_FortranParser03.java
 FortranParserActionFactory.java
 FortranParserActionNull.java
 FortranParserActionPrint.java

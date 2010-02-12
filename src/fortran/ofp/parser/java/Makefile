@@ -36,6 +36,8 @@ CLASS_FILES = $(CLASSDIR)/FortranToken.class \
               $(CLASSDIR)/FortranLexer.class \
               $(CLASSDIR)/FortranParser.class \
               $(CLASSDIR)/FortranParser03.class \
+              $(CLASSDIR)/FortranParser08.class \
+              $(CLASSDIR)/FortranParser08_FortranParser03.class \
               $(CLASSDIR)/FortranStream.class \
               $(CLASSDIR)/FortranTokenStream.class \
               $(CLASSDIR)/FortranLexicalPrepass.class \
@@ -45,10 +47,16 @@ CLASS_FILES = $(CLASSDIR)/FortranToken.class \
               $(CLASSDIR)/FortranParserActionNull.class \
               $(CLASSDIR)/FortranParserActionFactory.class \
               $(CLASSDIR)/FortranParserActionPrint.class
-GENERATED_JAVA_FILES=FortranLexer.java FortranParser03.java
+GENERATED_JAVA_FILES = FortranLexer.java \
+                       FortranParser03.java \
+                       FortranParser08.java \
+                       FortranParser08_FortranParser03.java
 GENERATED_CLASS_FILES=$(CLASSDIR)/FortranLexer*DFA*.class \
                       $(CLASSDIR)/*$$*.class
-GENERATED_TOKEN_FILES=FortranLexer.tokens FortranParser03.tokens
+GENERATED_TOKEN_FILES = FortranLexer.tokens \
+                        FortranParser03.tokens \
+                        FortranParser08.tokens \
+                        FortranParser08_FortranParser03.tokens
 
 all: FortranParserActionNull.java $(GENERATED_JAVA_FILES) $(CLASS_FILES) $(BUILDDIR)/$(JARFILE)
 
@@ -70,6 +78,9 @@ FortranLexer.tokens: ../FortranLexer.g
 FortranParser03.java: ../FortranParser03.g FortranLexer.tokens
 	$(JAVA) org.antlr.Tool -fo ./ $<
 
+FortranParser08.java: ../FortranParser08.g FortranLexer.tokens
+	$(JAVA) org.antlr.Tool -fo ./ $<
+
 FortranParserActionNull.java: IFortranParserAction.java
 	$(PERL) makNull.pl 
 
@@ -80,6 +91,12 @@ $(CLASSDIR)/FortranParser.class: FortranParser.java
 	$(JAVAC) $(JFLAGS) $<
 
 $(CLASSDIR)/FortranParser03.class: FortranParser03.java FortranLexer.tokens
+	$(JAVAC) $(JFLAGS) $<
+
+$(CLASSDIR)/FortranParser08.class: FortranParser08.java FortranLexer.tokens
+	$(JAVAC) $(JFLAGS) $<
+
+$(CLASSDIR)/FortranParser08_FortranParser03.class: FortranParser08_FortranParser03.java FortranLexer.tokens
 	$(JAVAC) $(JFLAGS) $<
 
 $(CLASSDIR)/FortranStream.class: FortranStream.java
