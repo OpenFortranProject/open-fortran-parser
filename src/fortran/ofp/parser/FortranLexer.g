@@ -50,7 +50,7 @@ import fortran.ofp.parser.java.FortranToken;
 
     public Token emit() {
         FortranToken t = new FortranToken(input, state.type, state.channel,
-                                      state.tokenStartCharIndex, getCharIndex()-1);
+                                          state.tokenStartCharIndex, getCharIndex()-1);
         t.setLine(state.tokenStartLine);
         t.setText(state.text);
         t.setCharPositionInLine(state.tokenStartCharPositionInLine);
@@ -421,10 +421,15 @@ T_PLUS          : '+'   ;
 T_POWER         : '**'  ;
 T_SLASH         : '/'   ;
 T_SLASH_EQ      : '/='  ;
-T_SLASH_SLASH   : '//'   ;
+T_SLASH_SLASH   : '//'  ;
 T_RBRACKET      : ']'   ;
 T_RPAREN        : ')'   ;
 T_UNDERSCORE    : '_'   ;
+
+// begin Rice additions --------------------------
+// Laks 2009.01.13: add token at for team
+T_AT			: '@'   ;
+// end Rice additions ----------------------------
 
 T_EQ            : '.EQ.' ;
 T_NE            : '.NE.' ;
@@ -466,6 +471,7 @@ T_CHARACTER     :       'CHARACTER'     ;
 T_LOGICAL       :       'LOGICAL'       ;
 
 T_ABSTRACT      :       'ABSTRACT'      ;
+T_ALL           :       'ALL'           ;
 T_ALLOCATABLE   :       'ALLOCATABLE'   ;
 T_ALLOCATE      :       'ALLOCATE'      ;
 T_ASSIGNMENT    :       'ASSIGNMENT'    ;
@@ -558,6 +564,7 @@ T_SELECTTYPE    :       'SELECTTYPE'    ;
 T_SEQUENCE      :       'SEQUENCE'      ;
 T_STOP          :       'STOP'          ;
 T_SUBROUTINE    :       'SUBROUTINE'    ;
+T_SYNC          :       'SYNC'          ;
 T_TARGET        :       'TARGET'        ;
 T_THEN          :       'THEN'          ;
 T_TO            :       'TO'            ;
@@ -570,6 +577,17 @@ T_WAIT          :       'WAIT'          ;
 T_WHERE         :       'WHERE'         ;
 T_WHILE         :       'WHILE'         ;
 T_WRITE         :       'WRITE'         ;
+
+// begin Rice additions --------------------------
+// Laks 2009.01.20: add "with team construct"
+T_WITHTEAM      :       'WITHTEAM';
+T_WITH          :       'WITH';
+T_TEAM          :       'TEAM';
+T_TOPOLOGY      :       'TOPOLOGY';
+T_EVENT         :       'EVENT';
+T_LOCK          :       'LOCK';
+T_LOCKSET       :       'LOCKSET';
+// end Rice additions ----------------------------
 
 T_ENDASSOCIATE  :       'ENDASSOCIATE'  ;
 T_ENDBLOCK      :       'ENDBLOCK'      ;
