@@ -3625,23 +3625,24 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	}
 
 
-    /** R856-F08
-     * allstop_stmt
-     *	:	(label)? T_ALL T_STOP (stop_code)? T_EOS
-     *
-     * @param label Optional statement label
-     * @param allKeyword T_ALL token.
-     * @param stopKeyword T_STOP token.
-     * @param eos T_EOS token.
-     * @param hasStopCode True if the stop-code is present, false otherwise
-     */
-	public void allstop_stmt(Token label, Token allKeyword, Token stopKeyword, 
-			                 Token eos, boolean hasStopCode) {
-		printRuleHeader(856008, "allstop-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(hasStopCode, "hasStopCode");
-		printRuleTrailer();
-	}
+   /** R856-F08
+    * errorstop_stmt
+    *   :   (label)? T_ERROR T_STOP (stop_code)? T_EOS
+    *
+    * @param label Optional statement label
+    * @param errorKeyword T_ALL token.
+    * @param stopKeyword T_STOP token.
+    * @param eos T_EOS token.
+    * @param hasStopCode True if the stop-code is present, false otherwise
+    */
+   public void errorstop_stmt(Token label, Token errorKeyword, Token stopKeyword, 
+                              Token eos, boolean hasStopCode)
+   {
+      printRuleHeader(856008, "allstop-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasStopCode, "hasStopCode");
+      printRuleTrailer();
+   }
 
    /** R858-F08
     * sync_all_stmt
@@ -3687,9 +3688,62 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleTrailer();
    }
 
-   /**
-    * R863-F08 lock-stmt
-    *    (label)? T_LOCK lock_variable (lock_stat_list)? T_EOS
+   /** R860-F08
+    * sync-images-stmt
+    *    is SYNC IMAGES ( image-set [, sync-stat-list ] )
+    *
+    * @param label Optional statement label
+    * @param syncKeyword T_SYNC token.
+    * @param imagesKeyword T_IMAGES token.
+    * @param eos T_EOS token.
+    * @param hasSyncStatList True if the sync_stat_list is present, false otherwise
+    */
+   public void sync_images_stmt(Token label, Token syncKeyword, Token imagesKeyword, 
+                                Token eos, boolean hasSyncStatList) {
+      printRuleHeader(860008, "sync-images-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasSyncStatList, "hasSyncStatList");
+      printRuleTrailer();
+   }
+
+
+   /** R861-F08
+    * image-set
+    *    is int-expr
+    *    or *
+    #
+    * @param asterisk Optional asterisk token T_ASTERISK
+    * @param hasIntExpr True if int_expr is present, false otherwise
+    */
+   public void image_set(Token asterisk, boolean hasIntExpr) {
+      printRuleHeader(861008, "image-set");
+      if (asterisk!=null) printParameter(asterisk, "asterisk");
+      printParameter(hasIntExpr, "hasIntExpr");
+      printRuleTrailer();
+   }
+
+
+   /** R862-F08
+    * sync_memory_stmt
+    *   :   (label)? T_SYNC T_MEMORY (sync_stat_list)? T_EOS
+    *
+    * @param label Optional statement label
+    * @param syncKeyword T_SYNC token
+    * @param memoryKeyword T_MEMORY token
+    * @param eos T_EOS token
+    * @param hasSyncStatList True if sync_stat_list is present, false otherwise
+     */
+   public void sync_memory_stmt(Token label, Token syncKeyword, Token memoryKeyword, 
+                                Token eos, boolean hasSyncStatList) {
+      printRuleHeader(862008, "sync-memory-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasSyncStatList, "hasSyncStatList");
+      printRuleTrailer();
+   }
+
+   /** R863-F08
+    * lock-stmt
+    *   :   (label)? T_LOCK lock_variable (lock_stat_list)? T_EOS
     *
     * @param label Optional statement label
     * @param lockKeyword T_LOCK token
@@ -3730,6 +3784,23 @@ public class FortranParserActionPrint implements IFortranParserAction {
    public void lock_stat_list(int count) {
       printRuleHeader(864008, "lock-stat-list", "list");
       printParameter(count, "count");
+      printRuleTrailer();
+   }
+
+   /** R865-F08
+    * unlock-stmt
+    *   :   (label)? T_UNLOCK lock_variable (sync_stat_list)? T_EOS
+    *
+    * @param label Optional statement label
+    * @param unlockKeyword T_UNLOCK token
+    * @param eos T_EOS token
+    * @param hasSyncStatList True if sync_stat_list is present, false otherwise
+    */
+   public void
+   unlock_stmt(Token label, Token unlockKeyword, Token eos, boolean hasSyncStatList) {
+      printRuleHeader(865008, "unlock-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasSyncStatList, "hasSyncStatList");
       printRuleTrailer();
    }
 
