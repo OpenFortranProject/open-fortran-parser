@@ -132,7 +132,6 @@ main_program
 /*
  * R214-F08 action-stmt
  *    is allocate-stmt
- *    or allstop-stmt                  // NEW_TO_2008
  *    or assignment-stmt
  *    or backspace-stmt
  *    or call-stmt
@@ -145,6 +144,7 @@ main_program
  *    or end-program-stmt
  *    or end-subroutine-stmt
  *    or endfile-stmt
+ *    or errorstop-stmt                // NEW_TO_2008
  *    or exit-stmt
  *    or flush-stmt
  *    or forall-stmt
@@ -194,7 +194,6 @@ action_stmt
 // them in the lexer so that the lexer doesn't have to add them to it's parsing.
 //  02.05.07
    :   allocate_stmt
-   |   allstop_stmt              // NEW_TO_2008
    |   assignment_stmt
    |   backspace_stmt
    |   call_stmt
@@ -207,6 +206,7 @@ action_stmt
 //   |   end_program_stmt
 //   |   end_subroutine_stmt
    |   endfile_stmt
+   |   errorstop_stmt                // NEW_TO_2008
    |   exit_stmt
    |   flush_stmt
    |   forall_stmt
@@ -223,9 +223,9 @@ action_stmt
    |   rewind_stmt
    |   stop_stmt
    |   sync_all_stmt                 // NEW_TO_2008
-//   |   sync_images_stmt              // NEW_TO_2008
-//   |   sync_memory_stmt              // NEW_TO_2008
-//   |   unlock_stmt                   // NEW_TO_2008
+   |   sync_images_stmt              // NEW_TO_2008
+   |   sync_memory_stmt              // NEW_TO_2008
+   |   unlock_stmt                   // NEW_TO_2008
    |   wait_stmt
    |   where_stmt
    |   write_stmt
@@ -238,19 +238,19 @@ action_stmt
 
 
 /*
- * R856-F08 allstop-stmt
- *    is ALL STOP [ stop-code ]
+ * R856-F08 errorstop-stmt
+ *    is ERROR STOP [ stop-code ]
  */
 
 ////////////
 // R856-F08
 //
-allstop_stmt
+errorstop_stmt
 @init {Token lbl = null; boolean hasStopCode = false;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.tk;})? T_ALL T_STOP (stop_code {hasStopCode=true;})? 
+    :    (label {lbl=$label.tk;})? T_ERROR T_STOP (stop_code {hasStopCode=true;})? 
             end_of_stmt
-            { action.allstop_stmt(lbl, $T_ALL, $T_STOP, $end_of_stmt.tk, hasStopCode); }
+            { action.errorstop_stmt(lbl, $T_ERROR, $T_STOP, $end_of_stmt.tk, hasStopCode); }
     ;
 
 
@@ -265,11 +265,13 @@ allstop_stmt
 sync_all_stmt
 @init {Token lbl = null; boolean hasSyncStatList = false;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.tk;})? T_SYNC T_ALL
-             (sync_stat_list {hasSyncStatList=true;})?
-             end_of_stmt
+   :   (label {lbl=$label.tk;})? T_SYNC T_ALL
+       (T_LPAREN T_RPAREN)? end_of_stmt
              { action.sync_all_stmt(lbl, $T_SYNC, $T_ALL, $end_of_stmt.tk, hasSyncStatList); }
-    ;
+   |   (label {lbl=$label.tk;})? T_SYNC T_ALL
+       T_LPAREN sync_stat_list T_RPAREN end_of_stmt
+             { action.sync_all_stmt(lbl, $T_SYNC, $T_ALL, $end_of_stmt.tk, true); }
+   ;
 
 
 /*
@@ -293,6 +295,62 @@ sync_stat_list
         sync_stat {count++;} ( T_COMMA sync_stat {count++;} )*
             {action.sync_stat_list(count);}
     ;
+
+
+/*
+ * R860-F08 sync-images-stmt
+ *    is SYNC IMAGES ( image-set [, sync-stat-list ] )
+ */
+ 
+////////////
+// R860-F08
+//
+sync_images_stmt
+@init {Token lbl = null; boolean hasSyncStatList = false;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})? T_SYNC T_IMAGES
+       T_LPAREN image_set (T_COMMA sync_stat_list {hasSyncStatList=true;})? T_RPAREN
+       end_of_stmt
+             { action.sync_images_stmt(lbl, $T_SYNC, $T_IMAGES, $end_of_stmt.tk, hasSyncStatList); }
+   ;
+
+
+/*
+ * R861-F08 image-set
+ *    is int-expr
+ *    or *
+ */
+ 
+////////////
+// R861-F08
+//
+image_set
+@init {Token asterisk = null; boolean hasIntExpr = false;}
+   :   expr 
+             { hasIntExpr = true; action.image_set(asterisk, hasIntExpr); }
+   |   T_ASTERISK
+             { asterisk = $T_ASTERISK; action.image_set(asterisk, hasIntExpr); }
+   ;
+
+
+/*
+ * R862-F08 sync-memory-stmt
+ *    is SYNC MEMORY [([ sync-stat-list ])]
+ */
+ 
+////////////
+// R862-F08
+//
+sync_memory_stmt
+@init {Token lbl = null; boolean hasSyncStatList = false;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})? T_SYNC T_MEMORY
+       (T_LPAREN T_RPAREN)? end_of_stmt
+             { action.sync_memory_stmt(lbl, $T_SYNC, $T_MEMORY, $end_of_stmt.tk, hasSyncStatList); }
+   |   (label {lbl=$label.tk;})? T_SYNC T_MEMORY
+       T_LPAREN sync_stat_list T_RPAREN end_of_stmt
+             { action.sync_memory_stmt(lbl, $T_SYNC, $T_MEMORY, $end_of_stmt.tk, true); }
+   ;
 
 
 /*
@@ -333,6 +391,24 @@ lock_stat_list
     :       {action.lock_stat_list__begin();}
         lock_stat {count++;} ( T_COMMA lock_stat {count++;} )*
             {action.lock_stat_list(count);}
+    ;
+
+
+/*
+ * R865-F08 unlock-stmt
+ *    is UNLOCK ( lock-variable [, lock-stat-list ] )
+ */
+ 
+////////////
+// R865-F08
+//
+unlock_stmt
+@init {Token lbl = null; boolean hasSyncStatList = false;}
+@after{checkForInclude();}
+    :    (label {lbl=$label.tk;})? T_UNLOCK lock_variable
+             (sync_stat_list {hasSyncStatList=true;})?
+             end_of_stmt
+             { action.unlock_stmt(lbl, $T_UNLOCK, $end_of_stmt.tk, hasSyncStatList); }
     ;
 
 
