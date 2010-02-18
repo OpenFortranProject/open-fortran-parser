@@ -1,4 +1,4 @@
-program test_parser
    SYNC ALL
-end program
+   sync all ( )
+end
 
