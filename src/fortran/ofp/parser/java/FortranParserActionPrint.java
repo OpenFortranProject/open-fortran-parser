@@ -1216,41 +1216,50 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/** R504, R503-F2008
-	 * entity_decl
-	 *  : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
-	 *            ( T_LBRACKET co_array_spec T_RBRACKET )?
-	 *            ( T_ASTERISK char_length )? ( initialization )? 
-	 */
-	public void entity_decl(Token id) {
-		printRuleHeader(504, "entity-decl");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R503-F08, R504-F03
+    * entity_decl
+    * @param id The identifier token
+    * @param hasArraySpec True if array-spec is present, false otherwise
+    * @param hasCoarraySpec True if coarray-spec is present, false otherwise
+    * @param hasCharLength True if char-length is present, false otherwise
+    */
+   public void
+   entity_decl(Token id, boolean hasArraySpec, boolean hasCoarraySpec, boolean hasCharLength)
+   {
+      printRuleHeader(503008, "entity-decl");
+      printParameter(id, "id");
+      printParameter(hasArraySpec, "hasArraySpec");
+      printParameter(hasCoarraySpec, "hasCoarraySpec");
+      printParameter(hasCharLength, "hasCharLength");
+      printRuleTrailer();
+   }
 
-	/** R504 list
-	 * entity_decl_list
-	 * 	:    entity_decl ( T_COMMA entity_decl )*
-	 */
-	public void entity_decl_list__begin() {
-		printRuleHeader(504, "entity-decl-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void entity_decl_list(int count) {
-		printRuleHeader(504, "entity-decl-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R503-F08 list
+    * entity_decl_list
+    *   :   entity_decl ( T_COMMA entity_decl )*
+    */
+   public void entity_decl_list__begin()
+   {
+      printRuleHeader(503008, "entity-decl-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void entity_decl_list(int count)
+   {
+      printRuleHeader(503008, "entity-decl-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R506
-	 * initialization
-	 */
-	public void initialization(boolean hasExpr, boolean hasNullInit) {
-		printRuleHeader(506, "initialization");
-		printParameter(hasExpr, "hasExpr");
-		printParameter(hasNullInit, "hasNullInit");
-		printRuleTrailer();
-	}
+   /** R506
+    * initialization
+    */
+   public void initialization(boolean hasExpr, boolean hasNullInit)
+   {
+      printRuleHeader(506, "initialization");
+      printParameter(hasExpr, "hasExpr");
+      printParameter(hasNullInit, "hasNullInit");
+      printRuleTrailer();
+   }
 
 	/** R507
 	 * null_init
@@ -1297,6 +1306,66 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
+   /** R509-F08
+    * coarray_spec
+    *   :   deferred_coshape_spec_list
+    *   |   explicit_coshape_spec
+    * @param hasDeferredSpec True if deferred_coshape_spec_list is present, false otherwise
+    * @param hasExplicitSpec True if explicit_coshape_spec is present, false otherwise
+    */
+   public void coarray_spec(boolean hasDeferredSpec, boolean hasExplicitSpec)
+   {
+      printRuleHeader(509008, "coarray-spec");
+      printParameter(hasDeferredSpec, "hasDeferredSpec");
+      printParameter(hasExplicitSpec, "hasExplicitSpec");
+      printRuleTrailer();
+   }
+
+   /** R510-F08
+    * deferred_coshape_spec
+    * @param colon The colon token.
+    */
+   public void deferred_coshape_spec(Token colon)
+   {
+      printRuleHeader(510008, "deferred-coshape-spec");
+      if (printKeywords) printParameter(colon, "colon");
+      printRuleTrailer();
+   }		
+
+   /** R510-F08 list
+    * deferred_coshape_spec_list__begin
+    */
+   public void deferred_coshape_spec_list__begin()
+   {
+      printRuleHeader(510008, "deferred-coshape-spec-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void deferred_coshape_spec_list(int count)
+   {
+      printRuleHeader(510008, "deferred-coshape-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+
+   /** R511-F08
+    * explicit_coshape_spec
+    */
+   public void explicit_coshape_spec()
+   {
+      printRuleHeader(511008, "explicit-coshape-spec");
+      printRuleTrailer();
+   }
+
+   /**
+    * explicit_coshape_spec_suffix
+    *
+    */
+   public void explicit_coshape_spec_suffix()
+   {
+      printRuleHeader(unknownRule, "explicit-coshape-spec-suffix");
+      printRuleTrailer();
+   }
+
 	/** R511 list
 	 * explicit_shape_spec
 	 * explicit_shape_spec_list
@@ -1316,16 +1385,6 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/**
-	 * R511-F2008
-	 * co_array_spec
-	 *
-	 */
-	public void co_array_spec() {
-		printRuleHeader(511, "co-array-spec");
-		printRuleTrailer();
-	}
-
 	/** R517
 	 * intent_spec
 	 * @param intentKeyword1 The first of two possible intent keyword tokens
@@ -1338,49 +1397,6 @@ public class FortranParserActionPrint implements IFortranParserAction {
 									int intent) {
 		printRuleHeader(517, "intent-spec");
 		printParameter(intent, "intent");
-		printRuleTrailer();
-	}
-
-	/**
-	 * R519-F2008
-	 * deferred_co_shape_spec
-	 *
-	 */
-	public void deferred_co_shape_spec() {
-		printRuleHeader(519, "deferred-co-shape-spec");
-		printRuleTrailer();
-	}		
-
-	/** R519-F2008 list
-	 * deferred_co_space_spec_list
-	 */
-	public void deferred_co_shape_spec_list__begin() {
-		printRuleHeader(519, "deferred-co-shape-spec-list__begin", 
-			"list-begin-F2008");
-		printRuleTrailer();
-	}
-	public void deferred_co_shape_spec_list(int count) {
-		printRuleHeader(519, "deferred-co-shape-spec-list", "list-F2008");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
-
-	/**
-	 * R520-F2008
-	 * explicit_co_shape_spec
-	 *
-	 */
-	public void explicit_co_shape_spec() {
-		printRuleHeader(520, "explicit-co-shape-spec");
-		printRuleTrailer();
-	}
-
-	/**
-	 * explicit_co_shape_spec_suffix
-	 *
-	 */
-	public void explicit_co_shape_spec_suffix() {
-		printRuleHeader(unknownRule, "explicit-co-shape-spec-suffix");
 		printRuleTrailer();
 	}
 
@@ -1633,62 +1649,61 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/** R544-F2008
-	 * dimension_decl
-	 */
-	public void dimension_decl(Token id, boolean hasArraySpec, 
-										boolean hasCoArraySpec) {
-		printRuleHeader(544008, "dimension-decl");
-		printParameter(id, "id");
-		printParameter(hasArraySpec, "hasArraySpec");
-		printParameter(hasCoArraySpec, "hasCoArraySpec");
-		printRuleTrailer();
-	}
+   /** R535-subrule
+    * dimension_decl
+    */
+   public void dimension_decl(Token id)
+   {
+      printRuleHeader(535, "dimension-decl");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R509-F2008
-	 * dimension_spec
-	 *
-	 * @param dimensionKeyword T_DIMENSION token.
-	 */
-	public void dimension_spec(Token dimensionKeyword) {
-		printRuleHeader(f08Rule, "dimension-spec");
-		printParameter(dimensionKeyword, "dimensionKeyword");
-		printRuleTrailer();
-	}
+   /**
+    * R509-F2008
+    * dimension_spec
+    *
+    * @param dimensionKeyword T_DIMENSION token.
+    */
+   // TODO - this needs to be put back
+   //	public void dimension_spec(Token dimensionKeyword) {
+   //		printRuleHeader(f08Rule, "dimension-spec");
+   //		printParameter(dimensionKeyword, "dimensionKeyword");
+   //		printRuleTrailer();
+   //	}
 
-	/** R536
-	 * intent_stmt
-     */
-	public void intent_stmt(Token label, Token keyword, Token eos) {
-		printRuleHeader(536, "intent-stmt");
-		if (label!=null) printParameter(label, "label");
-		if (printKeywords) printParameter(keyword, "keyword");
-		if (printKeywords) printParameter(eos, "eos");
-		printRuleTrailer();
-	}
+   /** R536
+    * intent_stmt
+    */
+   public void intent_stmt(Token label, Token keyword, Token eos) {
+      printRuleHeader(536, "intent-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
 
-	/** R537
-	 * optional_stmt
-     */
-	public void optional_stmt(Token label, Token keyword, Token eos) {
-		printRuleHeader(536, "optional-stmt");
-		if (label!=null) printParameter(label, "label");
-		if (printKeywords) printParameter(keyword, "keyword");
-		if (printKeywords) printParameter(eos, "eos");
-		printRuleTrailer();
-	}
+   /** R537
+    * optional_stmt
+    */
+   public void optional_stmt(Token label, Token keyword, Token eos) {
+      printRuleHeader(536, "optional-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
 
-	/** R538
-	 * parameter_stmt
-     */
-	public void parameter_stmt(Token label, Token keyword, Token eos) {
-		printRuleHeader(538, "parameter-stmt");
-		if (label!=null) printParameter(label, "label");
-		if (printKeywords) printParameter(keyword, "keyword");
-		if (printKeywords) printParameter(eos, "eos");
-		printRuleTrailer();
-	}
+   /** R538
+    * parameter_stmt
+    */
+   public void parameter_stmt(Token label, Token keyword, Token eos) {
+      printRuleHeader(538, "parameter-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
 
 	/** R539 list
 	 * named_constant_def_list
@@ -2447,42 +2462,41 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/**
-	 * R636-F2008
-	 * allocate_co_array_spec
-	 *
-	 */
-	public void allocate_co_array_spec() {
-		printRuleHeader(f08Rule, "allocate-co-array-spec");
-		printRuleTrailer();
-	}
+   /** R636-08
+    * allocate_coarray_spec
+    */
+   public void allocate_coarray_spec()
+   {
+      printRuleHeader(636008, "allocate-coarray-spec");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R637-F2008
-	 * allocate_co_shape_spec
-	 *
-	 * @param hasExpr Flag specifying whether optional expression was given or 
-	 * not.  True if given; false if not.
-	 */
-	public void allocate_co_shape_spec(boolean hasExpr) {
-		printRuleHeader(f08Rule, "allocate-co-shape-spec");
-		printParameter(hasExpr, "hasExpr");
-		printRuleTrailer();
-	}
+   /** R637-F08
+    * allocate_coshape_spec
+    * @param hasExpr Flag specifying whether optional expression was given or 
+    * not.  True if given; false if not.
+    */
+   public void allocate_coshape_spec(boolean hasExpr)
+   {
+      printRuleHeader(637008, "allocate-coshape-spec");
+      printParameter(hasExpr, "hasExpr");
+      printRuleTrailer();
+   }
 
-	/** R637-F2008 list
-	 * allocate_co_shape_spec_list
-     */
-	public void allocate_co_shape_spec_list__begin() {
-		printRuleHeader(637, "allocate-co-shape-spec-list__begin", 
-							 "list-begin-F2008");
-		printRuleTrailer();	
-	}
-	public void allocate_co_shape_spec_list(int count) {
-		printRuleHeader(637, "allocate-co-shape-spec-list", "list-F2008");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R637-F08 list
+    * allocate_coshape_spec_list
+    */
+   public void allocate_coshape_spec_list__begin()
+   {
+      printRuleHeader(637008, "allocate-coshape-spec-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void allocate_coshape_spec_list(int count)
+   {
+      printRuleHeader(637008, "allocate-coshape-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
 	/** R701
 	 * primary
@@ -3823,114 +3837,106 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleTrailer();
    }
 
-	/**
-	 * R901
-	 * io_unit
-	 *
-	 */
-	public void io_unit() {
-		printRuleHeader(901, "io-unit");
-		printRuleTrailer();
-	}
+   /** R901
+    * io_unit
+    */
+   public void io_unit() {
+      printRuleHeader(901, "io-unit");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R902
-	 * file_unit_number
-	 *
-	 */
-	public void file_unit_number() {
-		printRuleHeader(902, "file-unit-number");
-		printRuleTrailer();
-	}
+   /** R902
+    * file_unit_number
+    */
+   public void file_unit_number() {
+      printRuleHeader(902, "file-unit-number");
+      printRuleTrailer();
+   }
 
-	/** R904
-	 * open_stmt
-	 * @param label The label.
-	 * @param openKeyword T_OPEN token.
-	 * @param eos T_EOS token.
-	 */
-	public void open_stmt(Token label, Token openKeyword, Token eos) {
-		printRuleHeader(904, "open-stmt");
-		if (label!=null) printParameter(label, "label");
-		printRuleTrailer();
-	}
+   /** R904
+    * open_stmt
+    * @param label The label.
+    * @param openKeyword T_OPEN token.
+    * @param eos T_EOS token.
+    */
+   public void open_stmt(Token label, Token openKeyword, Token eos) {
+      printRuleHeader(904, "open-stmt");
+      if (label!=null) printParameter(label, "label");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R905
-	 * connect_spec
-	 *
-	 * @param id T_IDENT token for second alternative; otherwise null.
-	 */
-	public void connect_spec(Token id) {
-		printRuleHeader(721, "equiv-op");
-		if(id != null) printParameter(id, "connect-spec");
-		printRuleTrailer();
-	}		
+   /** R905
+    * connect_spec
+    * @param id T_IDENT token for second alternative; otherwise null.
+    */
+   public void connect_spec(Token id) {
+      printRuleHeader(721, "equiv-op");
+      if(id != null) printParameter(id, "connect-spec");
+      printRuleTrailer();
+   }		
 
-	/** R905 list
-	 * connect_spec_list
-     */
-	public void connect_spec_list__begin() {
-		printRuleHeader(905, "connect-spec-list__begin", "list-begin");
-		printRuleTrailer();	
-	}
-	public void connect_spec_list(int count) {
-		printRuleHeader(905, "connect-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R905 list
+    * connect_spec_list
+    */
+   public void connect_spec_list__begin() {
+      printRuleHeader(905, "connect-spec-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void connect_spec_list(int count) {
+      printRuleHeader(905, "connect-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R908
-	 * close_stmt
-	 * @param label The label.
-	 * @param closeKeyword T_CLOSE token.
-	 * @param eos T_EOS token.
-	 */
-	public void close_stmt(Token label, Token closeKeyword, Token eos) {
-		printRuleHeader(908, "close-stmt");
-		if (label!=null) printParameter(label, "label");
-		printRuleTrailer();
-	}
+   /** R908
+    * close_stmt
+    * @param label The label.
+    * @param closeKeyword T_CLOSE token.
+    * @param eos T_EOS token.
+    */
+   public void close_stmt(Token label, Token closeKeyword, Token eos) {
+      printRuleHeader(908, "close-stmt");
+      if (label!=null) printParameter(label, "label");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R909
-	 * close_spec
-	 *
-	 * @param closeSpec T_IDENT for second alternative; null otherwise.
-	 */
-	public void close_spec(Token closeSpec) {
-		printRuleHeader(721, "equiv-op");
-		if(closeSpec != null) printParameter(closeSpec, "closeSpec");
-		printRuleTrailer();
-	}		
+   /** R909
+    * close_spec
+    * @param closeSpec T_IDENT for second alternative; null otherwise.
+    */
+   public void close_spec(Token closeSpec) {
+      printRuleHeader(721, "equiv-op");
+      if(closeSpec != null) printParameter(closeSpec, "closeSpec");
+      printRuleTrailer();
+   }		
 
-	/** R909 list
-	 * close_spec_list
-     */
-	public void close_spec_list__begin() {
-		printRuleHeader(909, "close-spec-list__begin", "list-begin");
-		printRuleTrailer();	
-	}
-	public void close_spec_list(int count) {
-		printRuleHeader(909, "close-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R909 list
+    * close_spec_list
+    */
+   public void close_spec_list__begin() {
+      printRuleHeader(909, "close-spec-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void close_spec_list(int count) {
+      printRuleHeader(909, "close-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R910
-	 * read_stmt
-	 * @param label The label.
-	 * @param readKeyword T_READ token.
-	 * @param eos T_EOS token.
-	 * @param hasInputItemList True if has an input item list.
-	 */
-	public void read_stmt(Token label, Token readKeyword, Token eos, 
-								 boolean hasInputItemList) {
-		printRuleHeader(910, "read-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(hasInputItemList, "hasInputItemList");
-		printRuleTrailer();
-	}
+   /** R910
+    * read_stmt
+    * @param label The label.
+    * @param readKeyword T_READ token.
+    * @param eos T_EOS token.
+    * @param hasInputItemList True if has an input item list.
+    */
+   public void read_stmt(Token label, Token readKeyword, Token eos, 
+                         boolean hasInputItemList) {
+      printRuleHeader(910, "read-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasInputItemList, "hasInputItemList");
+      printRuleTrailer();
+   }
 
 	/** R911
 	 * write_stmt
@@ -5203,9 +5209,9 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	 * end_of_file
 	 */
 	public void end_of_file(String filename) {
-		printRuleHeader(generatedRule, "end-of-file");
-		printParameter(filename, "filename");
-		printRuleTrailer();
+           printRuleHeader(generatedRule, "end-of-file");
+           printParameter(filename, "filename");
+           printRuleTrailer();
 	}
 
 	/**
@@ -5214,4 +5220,63 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	public void cleanUp() {
 		/* Do nothing.  */
 	}
+
+   //-------------------------------------------------------------------------
+   // RICE CO-ARRAY FORTRAN RULES
+   // ---------------------------
+   // All Rice's rules and actions will prefixed with "rice_" keyword
+   //-------------------------------------------------------------------------
+
+   /**
+    * rice_image_selector
+    * @param idTeam The token for the id of the team.
+    */
+   public void rice_image_selector(Token idTeam)
+   {
+      printRuleHeader(generatedRule, "rice-image-selector");
+      printParameter(idTeam, "idTeam");
+      printRuleTrailer();
+   }
+
+   /**
+    * rice_allocate_coarray_spec
+    * @param selection 0 (T_ASTERISK) or 1 (T_AT T_IDENT) or -1
+    * @param id AT identifier
+    */
+   public void rice_allocate_coarray_spec(int selection, Token id)
+   {
+      printRuleHeader(generatedRule, "rice-allocate-coarray-spec");
+      printParameter(selection, "selection");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
+
+   /**
+    * rice_co_with_team_stmt
+    * @param label The label.
+    * @param id Team identifier.
+    */
+   public void rice_co_with_team_stmt(Token label, Token id)
+   {
+      printRuleHeader(generatedRule, "rice-co-with-team-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
+
+   /**
+    * rice_end_with_team_stmt
+    * @param label The label.
+    * @param id Team identifier.
+    * @param eos T_EOS token.
+    */
+   public void rice_end_with_team_stmt(Token label, Token id, Token eos)
+   {
+      printRuleHeader(generatedRule, "rice-end-with-team-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(id, "id");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
+
 }
