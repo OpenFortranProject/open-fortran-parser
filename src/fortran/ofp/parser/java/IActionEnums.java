@@ -117,26 +117,28 @@ public interface IActionEnums {
 	static final public int AttrSpec_PRIVATE=AttrSpecBase+4;
 	static final public int AttrSpec_ALLOCATABLE=AttrSpecBase+5;
 	static final public int AttrSpec_ASYNCHRONOUS=AttrSpecBase+6;
-	static final public int AttrSpec_DIMENSION=AttrSpecBase+7;
-	static final public int AttrSpec_EXTERNAL=AttrSpecBase+8;
-	static final public int AttrSpec_INTENT=AttrSpecBase+9;
-	static final public int AttrSpec_INTRINSIC=AttrSpecBase+10;
-	static final public int AttrSpec_BINDC=AttrSpecBase+11;
-	static final public int AttrSpec_OPTIONAL=AttrSpecBase+12;
-	static final public int AttrSpec_PARAMETER=AttrSpecBase+13;
-	static final public int AttrSpec_POINTER=AttrSpecBase+14;
-	static final public int AttrSpec_PROTECTED=AttrSpecBase+15;
-	static final public int AttrSpec_SAVE=AttrSpecBase+16;
-	static final public int AttrSpec_TARGET=AttrSpecBase+17;
-	static final public int AttrSpec_VALUE=AttrSpecBase+18;
-	static final public int AttrSpec_VOLATILE=AttrSpecBase+19;
-	static final public int AttrSpec_PASS=AttrSpecBase+20;
-	static final public int AttrSpec_NOPASS=AttrSpecBase+21;
-	static final public int AttrSpec_NON_OVERRIDABLE=AttrSpecBase+22;
-	static final public int AttrSpec_DEFERRED=AttrSpecBase+23;
+	static final public int AttrSpec_CODIMENSION=AttrSpecBase+7;
+	static final public int AttrSpec_CONTIGUOUS=AttrSpecBase+8;
+	static final public int AttrSpec_DIMENSION=AttrSpecBase+9;
+	static final public int AttrSpec_EXTERNAL=AttrSpecBase+10;
+	static final public int AttrSpec_INTENT=AttrSpecBase+11;
+	static final public int AttrSpec_INTRINSIC=AttrSpecBase+12;
+	static final public int AttrSpec_BINDC=AttrSpecBase+13;
+	static final public int AttrSpec_OPTIONAL=AttrSpecBase+14;
+	static final public int AttrSpec_PARAMETER=AttrSpecBase+15;
+	static final public int AttrSpec_POINTER=AttrSpecBase+16;
+	static final public int AttrSpec_PROTECTED=AttrSpecBase+17;
+	static final public int AttrSpec_SAVE=AttrSpecBase+18;
+	static final public int AttrSpec_TARGET=AttrSpecBase+19;
+	static final public int AttrSpec_VALUE=AttrSpecBase+20;
+	static final public int AttrSpec_VOLATILE=AttrSpecBase+21;
+	static final public int AttrSpec_PASS=AttrSpecBase+22;
+	static final public int AttrSpec_NOPASS=AttrSpecBase+23;
+	static final public int AttrSpec_NON_OVERRIDABLE=AttrSpecBase+24;
+	static final public int AttrSpec_DEFERRED=AttrSpecBase+25;
 	// TODO are T_KIND and T_LEN correct?
-	static final public int AttrSpec_KIND=AttrSpecBase+24;
-	static final public int AttrSpec_LEN=AttrSpecBase+25;
+	static final public int AttrSpec_KIND=AttrSpecBase+26;
+	static final public int AttrSpec_LEN=AttrSpecBase+27;
 
 	static final public int BindingStatementType_specific=
 		BindingStatementTypeBase+0;
@@ -158,20 +160,22 @@ public interface IActionEnums {
 	static final public int TypeAttrSpec_abstract=TypeAttrSpecBase+2;
 	static final public int TypeAttrSpec_bind=TypeAttrSpecBase+3;
 
-	static final public int ComponentAttrSpec_pointer=
-		ComponentAttrSpecBase+0;
-	static final public int ComponentAttrSpec_dimension_paren=
-		ComponentAttrSpecBase+1;
-	static final public int ComponentAttrSpec_dimension_bracket=
-		ComponentAttrSpecBase+2;
-	static final public int ComponentAttrSpec_allocatable=
-		ComponentAttrSpecBase+3;
 	static final public int ComponentAttrSpec_access_spec=
+		ComponentAttrSpecBase+0;
+	static final public int ComponentAttrSpec_allocatable=
+		ComponentAttrSpecBase+1;
+	static final public int ComponentAttrSpec_codimension=
+		ComponentAttrSpecBase+2;
+	static final public int ComponentAttrSpec_contiguous=
+		ComponentAttrSpecBase+3;
+	static final public int ComponentAttrSpec_dimension=
 		ComponentAttrSpecBase+4;
-	static final public int ComponentAttrSpec_kind=
+	static final public int ComponentAttrSpec_pointer=
 		ComponentAttrSpecBase+5;
-	static final public int ComponentAttrSpec_len=
+	static final public int ComponentAttrSpec_kind=
 		ComponentAttrSpecBase+6;
+	static final public int ComponentAttrSpec_len=
+		ComponentAttrSpecBase+7;
 
 	static final public int ProcComponentAttrSpec_pointer=
 		ProcComponentAttrSpecBase+0;
