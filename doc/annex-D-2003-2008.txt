@@ -370,17 +370,17 @@ R313    label                          is    digit [ digit [ digit [ digit [ dig
 
 C304    (R313) At least one digit in a label shall be nonzero.
 
-Section 4:
-R401    type-param-value               is    scalar-int-expr
+/**
+ * Section/Clause 4: Types
+ */
 
-                                       or *
+R401-03   type-param-value            is scalar-int-expr
+                                      or *
+                                      or :
 
-                                       or :
+C401-03   (R401) The type-param-value for a kind type parameter shall be an initialization expression.
 
-C401    (R401) The type-param-value for a kind type parameter shall be an initialization expression.
-
-C402    (R401) A colon may be used as a type-param-value only in the declaration of an entity or
-        component that has the POINTER or ALLOCATABLE attribute.
+C402-03   (R401) A colon may be used as a type-param-value only in the declaration of an entity or component that has the POINTER or ALLOCATABLE attribute.
 
 R402    signed-int-literal-constant    is    [ sign ] int-literal-constant
 
@@ -594,26 +594,23 @@ R431    data-component-def-stmt      is    declaration-type-spec [ [ , component
 
                                              component-decl -list
 
-R432    component-attr-spec          is    POINTER
-
-                                     or DIMENSION ( component-array-spec )
-
-                                     or ALLOCATABLE
-
-
-
-
-498                                COMMITTEE DRAFT                                              SEP 2002
-
-
-SEP 2002                            COMMITTEE DRAFT                                       ISO/IEC 1539-1
-
-
-
+R432-03   component-attr-spec         is POINTER
+                                      or DIMENSION ( component-array-spec )
+                                      or ALLOCATABLE
                                       or access-spec
 
-R433    component-decl                is    component-name [ ( component-array-spec ) ]
+R437-08   component-attr-spec         is access-spec
+                                      or ALLOCATABLE
+                                      or CODIMENSION lbracket coarray-spec rbracket  // NEW_TO_2008
+                                      or CONTIGUOUS  // NEW_TO_2008
+                                      or DIMENSION ( component-array-spec )
+                                      or POINTER
 
+R433-03   component-decl              is    component-name [ ( component-array-spec ) ]
+                                                [ * char-length ] [ component-initialization ]
+
+R438-08   component-decl              is    component-name [ ( component-array-spec ) ]
+                                                [ lbracket coarray-spec rbracket ]
                                                 [ * char-length ] [ component-initialization ]
 
 R434    component-array-spec          is    explicit-shape-spec-list
@@ -948,84 +945,80 @@ C486    (R460) If type-spec specifies a derived type, all ac-value expressions i
 C487    (R464) The ac-do-variable of an ac-implied-do that is in another ac-implied-do shall not appear
         as the ac-do-variable of the containing ac-implied-do.
 
-Section 5:
-R501    type-declaration-stmt         is    declaration-type-spec [ [ , attr-spec ] ... :: ] entity-decl -list
 
-R502    declaration-type-spec         is    type-spec
+/**
+ * Section/Clause 5: Attribute declarations and specifications
+ */
 
+R501-03   type-declaration-stmt       is    declaration-type-spec [ [ , attr-spec ] ... :: ]
+                                            entity-decl-list
+
+R501-08   type-declaration-stmt       is    declaration-type-spec [ [ , attr-spec ] ... :: ]
+                                            entity-decl-list
+
+R502-03   declaration-type-spec       is    type-spec
                                       or CLASS ( derived-type-spec )
-
                                       or CLASS ( * )
 
-C501    (R502) In a declaration-type-spec, every type-param-value that is not a colon or an asterisk shall
-        be a specification-expr .
+C501-03   (R502) In a declaration-type-spec, every type-param-value that is not a colon or an asterisk shall be a specification-expr.
 
-C502    (R502) In a declaration-type-spec that uses the CLASS keyword, derived-type-spec shall specify
-        an extensible type.
+C502-03   (R502) In a declaration-type-spec that uses the CLASS keyword, derived-type-spec shall specify an extensible type.
 
-R503    type-spec                     is    INTEGER [ kind-selector ]
+R503-03   type-spec                   is INTEGER [ kind-selector ]
+                                      or REAL [ kind-selector ]
+                                      or DOUBLE PRECISION
+                                      or COMPLEX [ kind-selector ]
+                                      or CHARACTER [ char-selector ]
+                                      or LOGICAL [ kind-selector ]
+                                      or TYPE ( derived-type-spec )
+                                      or TYPE ( type-alias-name )
 
+C503-03   (R503) A type-alias-name shall be the name of a type alias.
 
+R504-03   attr-spec                   is access-spec
+                                      or ALLOCATABLE
+                                      or ASYNCHRONOUS
+                                      or DIMENSION ( array-spec )
+                                      or EXTERNAL
+                                      or INTENT ( intent-spec )
+                                      or INTRINSIC
+                                      or language-binding-spec
+                                      or OPTIONAL
+                                      or PARAMETER
+                                      or POINTER
+                                      or PROTECTED
+                                      or SAVE
+                                      or TARGET
+                                      or VALUE
+                                      or VOLATILE
 
+R502-08   attr-spec                   is access-spec
+                                      or ALLOCATABLE
+                                      or ASYNCHRONOUS
+                                      or CODIMENSION lbracket coarray-spec rbracket  // NEW_TO_2008
+                                      or CONTIGUOUS                                  // NEW_TO_2008
+                                      or DIMENSION ( array-spec )
+                                      or EXTERNAL
+                                      or INTENT ( intent-spec )
+                                      or INTRINSIC
+                                      or language-binding-spec
+                                      or OPTIONAL
+                                      or PARAMETER
+                                      or POINTER
+                                      or PROTECTED
+                                      or SAVE
+                                      or TARGET
+                                      or VALUE
+                                      or VOLATILE
 
-502                                 COMMITTEE DRAFT                                                  SEP 2002
+R503-08   entity-decl                 is object-name [( array-spec )]
+                                           [ lracket coarray-spec rbracket ]
+                                           [ * char-length ] [ initialization ]
+                                      or function-name [ * char-length ]
 
-
-SEP 2002                          COMMITTEE DRAFT                                           ISO/IEC 1539-1
-
-
-
-                                          or REAL [ kind-selector ]
-
-                                          or DOUBLE PRECISION
-
-                                          or COMPLEX [ kind-selector ]
-
-                                          or CHARACTER [ char-selector ]
-
-                                          or LOGICAL [ kind-selector ]
-
-                                          or TYPE ( derived-type-spec )
-
-                                          or TYPE ( type-alias-name )
-
-C503    (R503) A type-alias-name shall be the name of a type alias.
-
-R504    attr-spec                         is    access-spec
-
-                                          or ALLOCATABLE
-
-                                          or ASYNCHRONOUS
-
-                                          or DIMENSION ( array-spec )
-
-                                          or EXTERNAL
-
-                                          or INTENT ( intent-spec )
-
-                                          or INTRINSIC
-
-                                          or language-binding-spec
-
-                                          or OPTIONAL
-
-                                          or PARAMETER
-
-                                          or POINTER
-
-                                          or PROTECTED
-
-                                          or SAVE
-
-                                          or TARGET
-
-                                          or VALUE
-
-                                          or VOLATILE
-
-R505    entity-decl                       is    object-name [( array-spec )] [ * char-length ] [ initialization ]
-
-                                          or function-name [ * char-length ]
+R505-08   entity-decl                 is object-name [( array-spec )]
+                                           [ * char-length ] [ initialization ]
+                                      or function-name [ * char-length ]
 
 C504    (R505) If a type-param-value in a char-length in an entity-decl is not a colon or an asterisk, it
         shall be a specification-expr .
@@ -1062,16 +1055,6 @@ C512    (R501) If the POINTER attribute is specified, the ALLOCATABLE, TARGET, E
         or INTRINSIC attribute shall not be specified.
 
 C513    (R501) If the TARGET attribute is specified, the POINTER, EXTERNAL, INTRINSIC, or
-
-
-
-
-SEP 2002                                        COMMITTEE DRAFT                                              503
-
-
-ISO/IEC 1539-1                               COMMITTEE DRAFT                                   SEP 2002
-
-
 
         PARAMETER attribute shall not be specified.
 
@@ -1149,14 +1132,6 @@ C537    A nonpointer object that has the PROTECTED attribute and is accessed by 
         a pointer-assignment-stmt .
 
 
-
-504                                 COMMITTEE DRAFT                                            SEP 2002
-
-
-SEP 2002                                COMMITTEE DRAFT                                            ISO/IEC 1539-1
-
-
-
 C538      A pointer object that has the PROTECTED attribute and is accessed by use association shall
           not appear as
 
@@ -1167,19 +1142,26 @@ C538      A pointer object that has the PROTECTED attribute and is accessed by u
         (3)    An actual argument in a reference to a procedure if the associated dummy argument is a
                pointer with the INTENT(OUT) or INTENT(INOUT) attribute.
 
-R510      char-selector                      is    length-selector
+R509-08   coarray-spec                   is   deferred-coshape-spec-list
+                                         or   explicit-coshape-spec
 
-                                             or ( LEN = type-param-value ,
+R510-08   deferred-coshape-spec          is   :
 
-                                                        KIND = scalar-int-initialization-expr )
+R511-08   explicit-coshape-spec          is   [ [ lower-cobound : ] upper-cobound, ]...
+                                               [ lower-cobound : ] *
 
-                                             or ( type-param-value ,
+R512-08   lower-cobound                  is   specification-expr
 
-                                                        [ KIND = ] scalar-int-initialization-expr )
+R513-08   upper-cobound                  is   specification-expr
 
-                                             or ( KIND = scalar-int-initialization-expr
 
-                                                        [ , LEN =type-param-value ] )
+R510-03   char-selector                  is    length-selector
+                                         or    ( LEN = type-param-value ,
+                                              KIND = scalar-int-initialization-expr )
+                                         or ( type-param-value ,
+                                              [ KIND = ] scalar-int-initialization-expr )
+                                         or ( KIND = scalar-int-initialization-expr
+                                               [ , LEN =type-param-value ] )
 
 R511      length-selector                    is    ( [ LEN = ] type-param-value )
 
@@ -1585,7 +1567,11 @@ C597    (R563) If a common-block-object is of a derived type, it shall be a sequ
 C598    (R563) A variable-name or proc-pointer-name shall not be a name made accessible by use
         association.
 
-Section 6:
+
+/**
+ * Section/Clause 6: Use of data objects
+ */               
+
 R601    variable                        is    designator
 
 C601    (R601) designator shall not be a constant or a subobject of a constant.
@@ -1706,20 +1692,13 @@ R622    vector-subscript                is    int-expr
 
 C619    (R622) A vector-subscript shall be an integer array expression of rank one.
 
-C620    (R620) The second subscript shall not be omitted from a subscript-triplet in the last dimension
-        of an assumed-size array.
+C620    (R620) The second subscript shall not be omitted from a subscript-triplet in the last dimension of an assumed-size array.
+
+R624-08   image-selector              is    lbracket cosubscript-list rbracket
+
+R625-08   cosubscript                 is    scalar-int-expr
 
 R623    allocate-stmt                   is    ALLOCATE ( [ type-spec :: ] allocation-list
-
-
-
-510                                   COMMITTEE DRAFT                                        SEP 2002
-
-
-SEP 2002                           COMMITTEE DRAFT                                        ISO/IEC 1539-1
-
-
-
                                                [, alloc-opt-list ] )
 
 R624-F03  alloc-opt                    is STAT = stat-variable
@@ -1742,7 +1721,23 @@ R630    allocate-lower-bound           is    scalar-int-expr
 
 R631    allocate-upper-bound           is    scalar-int-expr
 
-R632    source-variable                is    variable
+R632-03   source-variable              is   variable
+
+R632-08   allocate-object              is   variable-name
+                                       or   structure-component
+
+R633-08   allocate-shape-spec          is   [ lower-bound-expr : ] upper-bound-expr
+
+R634-08   lower-bound-expr             is   scalar-int-expr
+
+R635-08   upper-bound-expr             is   scalar-int-expr
+
+R636-08   allocate-coarray-spec        is   [ allocate-coshape-spec-list , ]
+                                            [ lower-bound-expr : ] *
+
+R637-08   allocate-coshape-spec        is   [ lower-bound-expr : ] upper-bound-expr
+
+
 
 C621    (R628) Each allocate-object shall be a nonprocedure pointer or an allocatable variable.
 
@@ -2135,7 +2130,10 @@ C739    (R755) A forall-body-construct shall not be a branch target.
 
 R758    forall-stmt                   is    FORALL forall-header forall-assignment-stmt
 
-Section 8:
+/**
+ * Section/Clause 8: Execution control
+ */
+
 R801    block                         is    [ execution-part-construct ] ...
 
 R802    if-construct                  is    if-then-stmt
@@ -2166,10 +2164,20 @@ C801    (R802) If the if-then-stmt of an if-construct specifies an if-construct-
         name. If an else-if-stmt or else-stmt specifies an if-construct-name, the corresponding if-then-
         stmt shall specify the same if-construct-name.
 
-R807    if-stmt                       is    IF ( scalar-logical-expr ) action-stmt
+R807-03   if-stmt                     is IF ( scalar-logical-expr ) action-stmt
 
-C802    (R807) The action-stmt in the if-stmt shall not be an if-stmt , end-program-stmt , end-function-
-        stmt , or end-subroutine-stmt .
+C802-03 (R807) The action-stmt in the if-stmt shall not be an if-stmt, end-program-stmt, end-function-stmt, or end-subroutine-stmt.
+
+R807-08   block-construct             is block-stmt
+                                         [ specification-part ]
+                                         block
+                                         end-block-stmt
+
+R808-08   block-stmt                  is [ block-construct-name : ] BLOCK
+
+R809-08   end-block-stmt              is END BLOCK [ block-construct-name ]
+
+
 
 R808    case-construct                is    select-case-stmt
 
