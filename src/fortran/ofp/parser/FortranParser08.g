@@ -130,6 +130,41 @@ main_program
 
 
 /*
+ * R213-F08 executable-construct
+ *    is action-stmt
+ *    or associate-construct
+ *    or block-construct               // NEW_TO_2008
+ *    or case-construct
+ *    or critical-construct            // NEW_TO_2008
+ *    or do-construct
+ *    or forall-construct
+ *    or if-construct
+ *    or select-type-construct
+ *    or where-construct
+ */
+
+////////////
+// R214-F08
+//
+executable_construct
+@after {
+    action.executable_construct();
+}
+   :   action_stmt
+   |   associate_construct
+//   |   block_construct                 // NEW_TO_2008
+   |   case_construct
+//   |   or critical_construct           // NEW_TO_2008
+   |   do_construct
+   |   forall_construct
+   |   if_construct
+   |   select_type_construct
+   |   where_construct
+   |   rice_with_team_construct
+   ;
+
+
+/*
  * R214-F08 action-stmt
  *    is allocate-stmt
  *    or assignment-stmt
@@ -236,6 +271,314 @@ action_stmt
    |   pause_stmt                    // ADDED?
    ;
 
+/**
+ * Section/Clause 4: Types
+ */
+
+
+/*
+ * R437-F08 component-attr-spec
+ *    is access-spec
+ *    or ALLOCATABLE
+ *    or CODIMENSION lbracket coarray-spec rbracket  // NEW_TO_2008
+ *    or CONTIGUOUS                                  // NEW_TO_2008
+ *    or DIMENSION ( component-array-spec )
+ *    or POINTER
+ */
+
+////////////
+// R437-F08, R441-F03
+//
+// R441, R442-F2008
+// TODO it appears there is a bug in the standard for a parameterized type,
+//      it needs to accept KIND, LEN keywords, see NOTE 4.24 and 4.25
+component_attr_spec
+   :   access_spec
+          {action.component_attr_spec(null, IActionEnums.ComponentAttrSpec_access_spec);}
+   |   T_ALLOCATABLE
+          {action.component_attr_spec($T_ALLOCATABLE, IActionEnums.ComponentAttrSpec_allocatable);}
+   |   T_CODIMENSION T_LBRACKET coarray_spec T_RBRACKET          // NEW_TO_2008 
+          {action.component_attr_spec($T_CODIMENSION, IActionEnums.ComponentAttrSpec_codimension);}
+   |   T_CONTIGUOUS                                              // NEW_TO_2008 
+          {action.component_attr_spec($T_CONTIGUOUS, IActionEnums.ComponentAttrSpec_contiguous);}
+   |   T_DIMENSION T_LPAREN component_array_spec T_RPAREN
+          {action.component_attr_spec($T_DIMENSION, IActionEnums.ComponentAttrSpec_dimension);}
+   |   T_POINTER
+          {action.component_attr_spec($T_POINTER, IActionEnums.ComponentAttrSpec_pointer);}
+    // are T_KIND and T_LEN correct?
+//   |   T_KIND
+//          {action.component_attr_spec($T_KIND, 
+//                  IActionEnums.ComponentAttrSpec_kind);}
+//   |   T_LEN
+//          {action.component_attr_spec($T_LEN, 
+//                  IActionEnums.ComponentAttrSpec_len);}
+	;
+
+/*
+ * R438-F08 component-decl
+ *    is component-name [ ( component-array-spec ) ]
+ *                      [ lbracket coarray-spec rbracket ]  // NEW_TO_2008
+ *                      [ * char-length ] [ component-initialization ]
+ */
+
+/**
+ * Section/Clause 5: Attribute declarations and specifications
+ */
+
+/*
+ * R502-F08 attr-spec
+ *    is access-spec
+ *    or ALLOCATABLE
+ *    or ASYNCHRONOUS
+ *    or CODIMENSION lbracket coarray-spec rbracket  // NEW_TO_2008
+ *    or CONTIGUOUS                                  // NEW_TO_2008
+ *    or DIMENSION ( array-spec )
+ *    or EXTERNAL
+ *    or INTENT ( intent-spec )
+ *    or INTRINSIC
+ *    or language-binding-spec
+ *    or OPTIONAL
+ *    or PARAMETER
+ *    or POINTER
+ *    or PROTECTED
+ *    or SAVE
+ *    or TARGET
+ *    or VALUE
+ *    or VOLATILE
+ */
+
+////////////
+// R502-F08, R503-F03
+//
+attr_spec
+   :   access_spec
+           {action.attr_spec(null, IActionEnums.AttrSpec_access);}
+   |   T_ALLOCATABLE
+           {action.attr_spec($T_ALLOCATABLE, IActionEnums.AttrSpec_ALLOCATABLE);}
+   |   T_ASYNCHRONOUS
+           {action.attr_spec($T_ASYNCHRONOUS, IActionEnums.AttrSpec_ASYNCHRONOUS);}
+   |   T_CODIMENSION T_LBRACKET coarray_spec T_RBRACKET  // NEW_TO_2008
+           {action.attr_spec($T_CODIMENSION, IActionEnums.AttrSpec_CODIMENSION);}
+   |   T_CONTIGUOUS                                      // NEW_TO_2008
+           {action.attr_spec($T_CONTIGUOUS, IActionEnums.AttrSpec_CONTIGUOUS);}
+   |   T_DIMENSION T_LPAREN array_spec T_RPAREN
+           {action.attr_spec($T_DIMENSION, IActionEnums.AttrSpec_DIMENSION);}
+   |   T_EXTERNAL
+           {action.attr_spec($T_EXTERNAL, IActionEnums.AttrSpec_EXTERNAL);}
+   |   T_INTENT T_LPAREN intent_spec T_RPAREN
+           {action.attr_spec($T_INTENT, IActionEnums.AttrSpec_INTENT);}
+   |   T_INTRINSIC
+           {action.attr_spec($T_INTRINSIC, IActionEnums.AttrSpec_INTRINSIC);}
+   |   language_binding_spec		
+           {action.attr_spec(null, IActionEnums.AttrSpec_language_binding);}
+   |   T_OPTIONAL
+           {action.attr_spec($T_OPTIONAL, IActionEnums.AttrSpec_OPTIONAL);}
+   |   T_PARAMETER
+           {action.attr_spec($T_PARAMETER, IActionEnums.AttrSpec_PARAMETER);}
+   |   T_POINTER
+           {action.attr_spec($T_POINTER, IActionEnums.AttrSpec_POINTER);}
+   |   T_PROTECTED
+           {action.attr_spec($T_PROTECTED, IActionEnums.AttrSpec_PROTECTED);}
+   |   T_SAVE
+           {action.attr_spec($T_SAVE, IActionEnums.AttrSpec_SAVE);}
+   |   T_TARGET
+           {action.attr_spec($T_TARGET, IActionEnums.AttrSpec_TARGET);}
+   |   T_VALUE
+           {action.attr_spec($T_VALUE, IActionEnums.AttrSpec_VALUE);}
+   |   T_VOLATILE
+           {action.attr_spec($T_VOLATILE, IActionEnums.AttrSpec_VOLATILE);}
+// TODO are T_KIND and T_LEN correct?
+    |   T_KIND
+           {action.attr_spec($T_KIND, IActionEnums.AttrSpec_KIND);}
+    |   T_LEN
+           {action.attr_spec($T_LEN, IActionEnums.AttrSpec_LEN);}
+	;
+
+/*
+ * R503-F08 entity-decl
+ *    is object-name [( array-spec )]
+ *         [ lracket coarray-spec rbracket ]
+ *         [ * char-length ] [ initialization ]
+ *    or function-name [ * char-length ]
+ */
+
+////////////
+// R503-F08, R504-F03
+//
+// T_IDENT inlined for object_name and function_name
+// T_IDENT ( T_ASTERISK char_length )? takes character and function
+// TODO Pass more info to action....
+entity_decl
+@init{boolean hasArraySpec=false; boolean hasCoarraySpec=false; boolean hasCharLength=false;}
+    : T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;})?
+              ( T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=true;})?
+              ( T_ASTERISK char_length {hasCharLength=true;})? ( initialization )?
+		{action.entity_decl($T_IDENT, hasArraySpec, hasCoarraySpec, hasCharLength);}
+    ;
+
+/*
+ * R509-F08 coarray-spec
+ *    is deferred-coshape-spec-list
+ *    or explicit-coshape-spec
+ */
+
+////////////
+// R509-F08
+//
+coarray_spec
+@init
+{
+   boolean hasDeferred = false;
+   boolean hasExplicit = false;
+}
+@after {
+    action.coarray_spec(hasDeferred, hasExplicit);
+}
+   :   deferred_coshape_spec_list  {hasDeferred=true;}
+   |   explicit_coshape_spec       {hasExplicit=true;}
+   ;
+
+/*
+ * R510-F08 deferred-coshape-spec
+ *    is :
+ */
+
+////////////
+// R510-F08
+//
+deferred_coshape_spec
+   :   T_COLON
+           { action.deferred_coshape_spec($T_COLON); }
+   ;
+
+deferred_coshape_spec_list
+@init{int count=0;}
+   :       {action.deferred_coshape_spec_list__begin();}
+       T_COLON {count++;}( T_COMMA T_COLON {count++;})?
+           {action.deferred_coshape_spec_list(count);}
+   ;
+
+/*
+ * R511-08 explicit-coshape-spec
+ *    is [ [ lower-cobound : ] upper-cobound, ]...
+ *           [ lower-cobound : ] *
+ */
+
+////////////
+// R511-F08
+//
+explicit_coshape_spec
+@after {
+    action.explicit_coshape_spec();
+}
+   :   T_XYZ expr explicit_coshape_spec_suffix
+   |   T_ASTERISK
+   ;
+
+// TODO add more info to action
+explicit_coshape_spec_suffix
+@after {
+    action.explicit_coshape_spec_suffix();
+}
+   :   T_COLON T_ASTERISK
+   |   T_COMMA explicit_coshape_spec
+   |   T_COLON expr explicit_coshape_spec
+   ;
+
+
+/**
+ * Section/Clause 6: Use of data objects
+ */               
+
+/*
+ * R624-F08 image-selector
+ *    is lbracket cosubscript-list rbracket
+ */
+
+////////////
+// R624-F08
+//
+//image_selector
+//   :   T_LBRACKET cosubscript_list T_RBRACKET
+//           { action.image_selector($T_LBRACKET, $T_RBRACKET); }
+//   ;
+
+/*
+ * R625-F08 cosubscript
+ *    is scalar-int-expr
+ */
+
+////////////
+// R625-F08
+//
+//cosubscript
+//   :   scalar_int_expr
+
+//cosubscript_list
+//@init{int count=0;}
+//   :       {action.cosubscript_list__begin();}
+//       cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
+//           {action.cosubscript_list(count);}
+//   ;
+
+/*
+ * R636-F08 allocate-coarray-spec
+ *    is   [ allocate-coshape-spec-list , ] [ lower-bound-expr : ] *
+ */
+
+////////////
+// R637-F08
+//
+//allocate_coarray_spec
+//    :   /* ( allocate_coshape_spec_list T_COMMA )? ( expr T_COLON )? */ 
+//            T_ASTERISK
+//            { action.allocate_coarray_spec(); }
+//    ;
+
+/*
+ * R637-F08 allocate-coshape-spec
+ *    is   [ lower-bound-expr : ] upper-bound-expr
+ */
+
+////////////
+// R637-F08
+//
+//allocate_coshape_spec
+//@init { boolean hasExpr = false; }
+//    :    expr ( T_COLON expr { hasExpr = true; })?
+//            { action.allocate_coshape_spec(hasExpr); }
+//    ;
+
+//allocate_coshape_spec_list
+//@init{ int count=0;}
+//    :  		{action.allocate_coshape_spec_list__begin();}
+//		allocate_coshape_spec {count++;} 
+//            ( T_COMMA allocate_coshape_spec {count++;} )*
+//      		{action.allocate_coshape_spec_list(count);}
+//    ;
+
+/*
+ * Section/Clause 8: Execution control
+ */
+
+/*
+ * R807-F08 block-construct
+ *    is block-stmt
+ *       [ specification-part ]
+ *       block
+ *       end-block-stmt
+ */
+
+/*
+ * R808-F08 block-stmt
+ *    is [ block-construct-name : ] BLOCK
+ */
+
+/*
+ * R809-F08 end-block-stmt
+ *    is END BLOCK [ block-construct-name ]
+ */
+
 
 /*
  * R856-F08 errorstop-stmt
@@ -291,10 +634,10 @@ sync_stat
 
 sync_stat_list
 @init{int count=0;}
-    :       {action.sync_stat_list__begin();}
-        sync_stat {count++;} ( T_COMMA sync_stat {count++;} )*
-            {action.sync_stat_list(count);}
-    ;
+   :       {action.sync_stat_list__begin();}
+       sync_stat {count++;} ( T_COMMA sync_stat {count++;} )*
+           {action.sync_stat_list(count);}
+   ;
 
 
 /*
@@ -426,3 +769,64 @@ lock_variable
           { action.lock_variable(); }
    ;
 
+
+//----------------------------------------------------------------------------
+// RICE CO-ARRAY FORTRAN RULES
+// ---------------------------
+// All Rice's rules and actions will prefixed with "rice_" keyword
+//----------------------------------------------------------------------------
+
+// Laks 2009.01.13: add declaration of rice caf
+rice_coshape_spec:
+	T_ASTERISK
+	;
+	
+// Laks 2009.01.15: add rice caf reference
+rice_image_selector
+@init {
+    Token idTeam=null;
+}
+	:	T_LBRACKET expr (T_AT T_IDENT {idTeam=$T_IDENT;})? T_RBRACKET
+            { action.rice_image_selector(idTeam);	}
+	;
+
+// Laks 2009.01.15: add rice caf allocation
+// the allocation is either using asterisk (with means all ranks) or team
+rice_allocate_coarray_spec:
+		T_ASTERISK	{ action.rice_allocate_coarray_spec(0,null); }
+	|
+		T_AT T_IDENT { action.rice_allocate_coarray_spec(1,$T_IDENT); }
+	|
+		{ action.rice_allocate_coarray_spec(-1,null); }
+	;
+
+// Laks 2009.02.03: in order to make "with team" more structured, we need to force
+// it into a construct block instead of statement. A disadvantage of this approach is
+// lack of flexibility and users are forced to use "end with team"
+rice_with_team_construct
+	: rice_co_with_team_stmt block rice_end_with_team_stmt
+	;
+	
+// Laks 2009.01.20: the default team construct	
+// statement to specify the default team
+rice_co_with_team_stmt
+@init{Token lbl = null;}
+	:	
+	(label {lbl=$label.tk;})? (T_WITHTEAM | T_WITH T_TEAM) T_IDENT
+	end_of_stmt
+	{
+	  action.rice_co_with_team_stmt(lbl, $T_IDENT);
+	}
+	;
+	
+
+// R824
+// T_IDENT inlined for select_construct_name
+rice_end_with_team_stmt
+@init{Token lbl = null; Token id = null;}
+	: 
+	 (label {lbl=$label.tk;})? T_END (T_WITHTEAM | T_WITH T_TEAM) 
+            ( T_IDENT {id=$T_IDENT;})? end_of_stmt
+			{action.rice_end_with_team_stmt(lbl, id, 
+                $end_of_stmt.tk);}
+	;
