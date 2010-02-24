@@ -916,7 +916,6 @@ data_component_def_stmt
     ;
 
 // R441, R442-F2008
-// TODO putback F2008
 // TODO it appears there is a bug in the standard for a parameterized type,
 //      it needs to accept KIND, LEN keywords, see NOTE 4.24 and 4.25
 component_attr_spec
@@ -925,11 +924,7 @@ component_attr_spec
 				IActionEnums.ComponentAttrSpec_pointer);}
 	|	T_DIMENSION T_LPAREN component_array_spec T_RPAREN
 			{action.component_attr_spec($T_DIMENSION, 
-				IActionEnums.ComponentAttrSpec_dimension_paren);}
-	|	T_DIMENSION /* (T_LPAREN component_array_spec T_RPAREN)? */ 
-            T_LBRACKET co_array_spec T_RBRACKET
-			{action.component_attr_spec($T_DIMENSION, 
-				IActionEnums.ComponentAttrSpec_dimension_bracket);}
+				IActionEnums.ComponentAttrSpec_dimension);}
 	|	T_ALLOCATABLE
 			{action.component_attr_spec($T_ALLOCATABLE, 
 				IActionEnums.ComponentAttrSpec_allocatable);}
@@ -954,6 +949,7 @@ component_attr_spec_list
 
 // R442, R443-F2008
 // T_IDENT inlined as component_name
+// Remove F2008
 component_decl
 @init { 
     boolean hasComponentArraySpec = false; 
@@ -963,7 +959,7 @@ component_decl
 }
     :   T_IDENT ( T_LPAREN component_array_spec T_RPAREN 
             {hasComponentArraySpec=true;})?
-            ( T_LBRACKET co_array_spec T_RBRACKET {hasCoArraySpec=true;})?
+            /* ( T_LBRACKET co_array_spec T_RBRACKET {hasCoArraySpec=true;})? */
             ( T_ASTERISK char_length {hasCharLength=true;})? 
             ( component_initialization {hasComponentInitialization =true;})?
 			{ action.component_decl($T_IDENT, hasComponentArraySpec, 
@@ -1414,15 +1410,15 @@ attr_spec
 	;
 
 
-// R504, R503-F2008
+// R504
 // T_IDENT inlined for object_name and function_name
 // T_IDENT ( T_ASTERISK char_length )? (second alt) subsumed in first alt
 // TODO Pass more info to action....
 entity_decl
+@init{boolean hasArraySpec=false; boolean hasCoarraySpec=false; boolean hasCharLength=false;}
     : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
-              ( T_LBRACKET co_array_spec T_RBRACKET )?
               ( T_ASTERISK char_length )? ( initialization )?
-		{action.entity_decl($T_IDENT);}
+		{action.entity_decl($T_IDENT, hasArraySpec, hasCoarraySpec, hasCharLength);}
     ;
 
 entity_decl_list
@@ -1514,53 +1510,6 @@ explicit_shape_spec_list
 			{action.explicit_shape_spec_list(count);}
     ;
 
-/*
- * F2008 co-array grammar addition
- */
-
-// R511-F2008
-co_array_spec
-@after {
-    action.co_array_spec();
-}
-	:	deferred_co_shape_spec_list
-	|	explicit_co_shape_spec
-	;
-
-// R519-F2008
-deferred_co_shape_spec
-	:	T_COLON
-            { action.deferred_co_shape_spec(); }
-	;
-
-deferred_co_shape_spec_list
-@init{int count=0;}
-	:		{action.deferred_co_shape_spec_list__begin();}
-		T_COLON {count++;}( T_COMMA T_COLON {count++;})?
-			{action.deferred_co_shape_spec_list(count);}
-	;
-
-// R520-F2008
-// TODO putback F2008
-// TODO add T_ASTERISK token to action?
-explicit_co_shape_spec
-@after {
-    action.explicit_co_shape_spec();
-}
-	:	T_XYZ expr explicit_co_shape_spec_suffix
-	|	T_ASTERISK
-	;
-
-// TODO add more info to action
-explicit_co_shape_spec_suffix
-@after {
-    action.explicit_co_shape_spec_suffix();
-}
-	:	T_COLON T_ASTERISK
-	|	T_COMMA explicit_co_shape_spec
-	|	T_COLON expr explicit_co_shape_spec
-	;
-
 // R512 lower_bound was specification_expr inlined as expr
 
 // R513 upper_bound was specification_expr inlined as expr
@@ -1623,10 +1572,11 @@ allocatable_stmt
 
 // R527-F2008
 // T_IDENT inlined for object_name
+// TODO -remove F2008
 allocatable_decl
 @init{boolean hasArraySpec=false; boolean hasCoArraySpec=false;}
     : T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
-              ( T_LBRACKET co_array_spec T_RBRACKET {hasCoArraySpec=true;} )?
+              /* ( T_LBRACKET co_array_spec T_RBRACKET {hasCoArraySpec=true;} )? */
 		{action.allocatable_decl($T_IDENT, hasArraySpec, hasCoArraySpec);}
     ;
 
@@ -1821,22 +1771,11 @@ dimension_stmt
                 count); }
     ;
 
-// R544-F2008
-// ERR_CHK 509-F2008 at least one of the array specs must exist
+// R535-subrule
 dimension_decl
-@init{boolean hasArraySpec=false; boolean hasCoArraySpec=false;}
-    :   T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;})? 
-            ( T_LBRACKET co_array_spec T_RBRACKET {hasCoArraySpec=true;})?
-			{action.dimension_decl($T_IDENT, hasArraySpec, hasCoArraySpec);}
-    ;
-
-// R509-F2008
-// ERR_CHK 509-F2008 at least one of the array specs must exist
-dimension_spec
-    :   T_DIMENSION ( T_LPAREN array_spec T_RPAREN )? 
-            ( T_LBRACKET co_array_spec T_RBRACKET )?
-            { action.dimension_spec($T_DIMENSION); }
-    ;
+   :   T_IDENT T_LPAREN array_spec T_RPAREN
+           {action.dimension_decl($T_IDENT);}
+   ;
 
 // R536
 // generic_name_list substituted for dummy_arg_name_list
@@ -1959,10 +1898,11 @@ target_stmt
     ;
 
 // R556-F2008
+// TODO - remove F2008
 target_decl
 @init{boolean hasArraySpec=false; boolean hasCoArraySpec=false;}
     : T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
-              ( T_LBRACKET co_array_spec T_RBRACKET {hasCoArraySpec=true;} )?
+              /* ( T_LBRACKET coarray_spec T_RBRACKET {hasCoArraySpec=true;} )? */
 			{action.target_decl($T_IDENT,hasArraySpec,hasCoArraySpec);}
     ;
 
@@ -2541,6 +2481,7 @@ alloc_opt_list
 // R627 inlined source_expr was expr
 
 // R628, R631-F2008
+// TODO - remove F2008
 allocation
 @init {
     boolean hasAllocateShapeSpecList = false; 
@@ -2549,8 +2490,8 @@ allocation
     : allocate_object
     	( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} 
             T_RPAREN )?
-		( T_LBRACKET allocate_co_array_spec {hasAllocateCoArraySpec=true;} 
-            T_RBRACKET )?
+		/* ( T_LBRACKET allocate_coarray_spec {hasAllocateCoArraySpec=true;} 
+            T_RBRACKET )? */
 			{ action.allocation(hasAllocateShapeSpecList, 
                 hasAllocateCoArraySpec); }
     ;
@@ -2652,29 +2593,6 @@ dealloc_opt_list
     :  		{action.dealloc_opt_list__begin();}
 		dealloc_opt {count++;} ( T_COMMA dealloc_opt {count++;} )*
       		{action.dealloc_opt_list(count);}
-    ;
-
-// R636-F2008
-// TODO putback F2008
-allocate_co_array_spec
-    :   /* ( allocate_co_shape_spec_list T_COMMA )? ( expr T_COLON )? */ 
-            T_ASTERISK
-            { action.allocate_co_array_spec(); }
-    ;
-
-// R637-F2008
-allocate_co_shape_spec
-@init { boolean hasExpr = false; }
-    :    expr ( T_COLON expr { hasExpr = true; })?
-            { action.allocate_co_shape_spec(hasExpr); }
-    ;
-
-allocate_co_shape_spec_list
-@init{ int count=0;}
-    :  		{action.allocate_co_shape_spec_list__begin();}
-		allocate_co_shape_spec {count++;} 
-            ( T_COMMA allocate_co_shape_spec {count++;} )*
-      		{action.allocate_co_shape_spec_list(count);}
     ;
 
 /*
