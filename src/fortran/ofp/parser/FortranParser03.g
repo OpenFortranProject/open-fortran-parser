@@ -1428,7 +1428,17 @@ entity_decl_list
     		{action.entity_decl_list(count);}
     ;
 
-// R505 object_name inlined as T_IDENT
+/*
+ * R505-F03 object-name
+ *    is name
+ */
+
+////////////
+// R505-F03, R504-F08
+//
+object_name returns [Token tk]
+   :   T_IDENT   {tk = $T_IDENT;}
+   ;
 
 // R506
 // ERR_CHK 506 initialization_expr replaced by expr
@@ -1558,27 +1568,35 @@ access_id_list
       		{action.access_id_list(count);}
     ;
 
-// R520, R526-F2008
-// T_IDENT inlined for object_name
+////////////
+// R520-F03, R526-F08
+//     - form of F08 used with allocatable_decl_list
+//
 allocatable_stmt
-@init {Token lbl = null; int count=1;}
+@init {Token lbl = null;}
 @after{checkForInclude();}
-    : (label {lbl=$label.tk;})? T_ALLOCATABLE ( T_COLON_COLON )? 
-            allocatable_decl ( T_COMMA allocatable_decl {count++;})* 
-                end_of_stmt
-			{ action.allocatable_stmt(lbl, $T_ALLOCATABLE, $end_of_stmt.tk, 
-                    count); }
-    ;
+   :   (label {lbl=$label.tk;})?
+       T_ALLOCATABLE ( T_COLON_COLON )? allocatable_decl_list end_of_stmt
+           {action.allocatable_stmt(lbl, $T_ALLOCATABLE, $end_of_stmt.tk);}
+   ;
 
-// R527-F2008
-// T_IDENT inlined for object_name
-// TODO -remove F2008
+////////////
+// R527-F08
+//     - form of F08 used with [ coarray-spec ] option removed
+//
 allocatable_decl
-@init{boolean hasArraySpec=false; boolean hasCoArraySpec=false;}
-    : T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
-              /* ( T_LBRACKET co_array_spec T_RBRACKET {hasCoArraySpec=true;} )? */
-		{action.allocatable_decl($T_IDENT, hasArraySpec, hasCoArraySpec);}
-    ;
+@init{Token objName=null; boolean hasArraySpec=false; boolean hasCoArraySpec=false;}
+   :   object_name {objName=$object_name.tk;}
+          ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
+              {action.allocatable_decl(objName, hasArraySpec, hasCoArraySpec);}
+   ;
+
+allocatable_decl_list
+@init{int count=0;}
+   :       {action.allocatable_decl_list__begin();}
+       allocatable_decl {count++;} ( T_COMMA allocatable_decl {count++;} )?
+           {action.allocatable_decl_list(count);}
+   ;
 
 // R521
 // generic_name_list substituted for object_name_list
@@ -2300,27 +2318,22 @@ data_ref
 			{action.data_ref(numPartRefs);}
 	;
 
-// R613, R613-F2008
+// R613
 // T_IDENT inlined for part_name
 // with k=2, this path is chosen over T_LPAREN substring_range T_RPAREN
 // TODO error: if a function call, should match id rather than 
 // (section_subscript_list)
 // a = foo(b) is ambiguous YUK...
-// TODO putback F2008
 part_ref
 options {k=2;}
 @init{boolean hasSSL = false;
       boolean hasImageSelector = false;
      }
-	:	( T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
-		( image_selector {hasImageSelector=true;})?
-			{hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
-//	|	 T_IDENT image_selector
-//			{hasImageSelector=true; action.part_ref($T_IDENT, hasSSL, 
-//                hasImageSelector);}
-	|	T_IDENT
-			{action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
-    ;
+   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+           {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   |   T_IDENT
+           {action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   ;
 
 // R614 structure_component inlined as data_ref
 
@@ -2420,17 +2433,6 @@ vector_subscript
 // R622 inlined vector_subscript as expr in R619
 // ERR_CHK 622 int_expr replaced by expr
 
-// R624-F2008
-image_selector
-@init {
-    int exprCount = 0;
-}
-	:	T_LBRACKET expr ( T_COMMA expr { exprCount++; })* T_RBRACKET
-            { action.image_selector(exprCount); }
-	;
-
-// R625-F2008 co_subscript was scalar_int_expr inlined as expr in R624-F2004
-
 // R623
 // modified to remove backtracking by looking for the token inserted during
 // the lexical prepass if a :: was found (which required alt1 below).
@@ -2480,29 +2482,23 @@ alloc_opt_list
 // and R636
 // R627 inlined source_expr was expr
 
-// R628, R631-F2008
-// TODO - remove F2008
+////////////
+// R628-F03, R631-F08
+//     - F08 specific syntax removed
+//
 allocation
-@init {
-    boolean hasAllocateShapeSpecList = false; 
-    boolean hasAllocateCoArraySpec = false;
-}
-    : allocate_object
-    	( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} 
-            T_RPAREN )?
-		/* ( T_LBRACKET allocate_coarray_spec {hasAllocateCoArraySpec=true;} 
-            T_RBRACKET )? */
-			{ action.allocation(hasAllocateShapeSpecList, 
-                hasAllocateCoArraySpec); }
-    ;
-
+@init{boolean hasAllocateShapeSpecList = false; boolean hasAllocateCoarraySpec = false;}
+   :   allocate_object
+       ( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} T_RPAREN )?
+           {action.allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);}
+   ;
 
 allocation_list
 @init{ int count=0;}
-    :  		{action.allocation_list__begin();}
-		allocation {count++;} ( T_COMMA allocation {count++;} )*
-      		{action.allocation_list(count);}
-    ;
+   :       {action.allocation_list__begin();}
+       allocation {count++;} ( T_COMMA allocation {count++;} )*
+           {action.allocation_list(count);}
+   ;
 
 // R629
 // T_IDENT inlined for variable_name
