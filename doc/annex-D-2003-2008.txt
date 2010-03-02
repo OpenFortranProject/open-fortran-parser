@@ -1016,14 +1016,16 @@ R503-08   entity-decl                 is object-name [( array-spec )]
                                            [ * char-length ] [ initialization ]
                                       or function-name [ * char-length ]
 
-R505-08   entity-decl                 is object-name [( array-spec )]
+R505-03   entity-decl                 is object-name [( array-spec )]
                                            [ * char-length ] [ initialization ]
                                       or function-name [ * char-length ]
 
 C504    (R505) If a type-param-value in a char-length in an entity-decl is not a colon or an asterisk, it
         shall be a specification-expr .
 
-R506    object-name                       is    name
+R506-08   object-name                     is   name
+
+R506-03   object-name                     is   name
 
 C505    (R506) The object-name shall be the name of a data object.
 
@@ -1277,13 +1279,18 @@ C556    (R523) An access-stmt shall appear only in the specification-part of a m
 C557    (R524) Each use-name shall be the name of a named variable, procedure, derived type, named
         constant, or namelist group.
 
-R525    allocatable-stmt                is    ALLOCATABLE [ :: ]
-
+R525-03   allocatable-stmt              is   ALLOCATABLE [ :: ]
                                                 object-name [ ( deferred-shape-spec-list ) ]
-
                                                 [ , object-name [ ( deferred-shape-spec-list ) ] ] ...
 
-R526    asynchronous-stmt               is    ASYNCHRONOUS [ :: ] object-name-list
+R526-08   allocatable-stmt              is   ALLOCATABLE [ :: ] allocatable-decl-list
+
+R527-08   allocatable-decl              is   object-name [ ( array-spec ) ]
+                                                [ lbracket ( coarray-spec ) ]
+
+R526-03   asynchronous-stmt             is    ASYNCHRONOUS [ :: ] object-name-list
+
+R528-08   asynchronous-stmt             is    ASYNCHRONOUS [ :: ] object-name-list
 
 R527    bind-stmt                       is    language-binding-spec [ :: ] bind-entity-list
 
@@ -1634,9 +1641,14 @@ R611    substring-range                 is    [ scalar-int-expr ] : [ scalar-int
 
 C608    (R610) parent-string shall be of type character.
 
-R612    data-ref                        is    part-ref [ % part-ref ] ...
+R612-03   data-ref                      is    part-ref [ % part-ref ] ...
 
-R613    part-ref                        is    part-name [ ( section-subscript -list ) ]
+R611-08   data-ref                      is    part-ref [ % part-ref ] ...
+
+R613-03   part-ref                      is    part-name [ ( section-subscript-list ) ]
+
+R612-08   part-ref                      is    part-name [ ( section-subscript-list ) ]
+                                              [ image-selector ]
 
 C609    (R612) In a data-ref , each part-name except the rightmost shall be of derived type.
 
@@ -1694,22 +1706,28 @@ C619    (R622) A vector-subscript shall be an integer array expression of rank o
 
 C620    (R620) The second subscript shall not be omitted from a subscript-triplet in the last dimension of an assumed-size array.
 
-R624-08   image-selector              is    lbracket cosubscript-list rbracket
+R624-08   image-selector              is   lbracket cosubscript-list rbracket
 
-R625-08   cosubscript                 is    scalar-int-expr
+R625-08   cosubscript                 is   scalar-int-expr
 
-R623    allocate-stmt                   is    ALLOCATE ( [ type-spec :: ] allocation-list
+R623-03   allocate-stmt               is   ALLOCATE ( [ type-spec :: ] allocation-list
                                                [, alloc-opt-list ] )
 
-R624-F03  alloc-opt                    is STAT = stat-variable
-                                       or ERRMSG = errmsg-variable
-                                       or SOURCE = source-variable
+R626-08   allocate-stmt               is   ALLOCATE ( [ type-spec :: ] allocation-list
+                                               [, alloc-opt-list ] )
 
-R625    stat-variable                  is    scalar-int-variable
+R624-03  alloc-opt                    is   STAT = stat-variable
+                                      or   ERRMSG = errmsg-variable
+                                      or   SOURCE = source-variable
 
-R626    errmsg-variable                is    scalar-default-char-variable
+R625    stat-variable                 is   scalar-int-variable
 
-R627    allocation                     is    allocate-object [ ( allocate-shape-spec-list ) ]
+R626    errmsg-variable               is   scalar-default-char-variable
+
+R627-03   allocation                  is   allocate-object [ ( allocate-shape-spec-list ) ]
+
+R631-08   allocation                  is   allocate-object [ ( allocate-shape-spec-list ) ]
+                                              [ lbracket allocate-coarray-spec rbracket ]
 
 R628    allocate-object                is    variable-name
 
