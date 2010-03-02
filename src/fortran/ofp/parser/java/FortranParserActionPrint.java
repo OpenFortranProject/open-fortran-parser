@@ -1280,110 +1280,63 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();	
 	}
 
-	/** R509
-	 * language_binding_spec 
-	 */
-	public void language_binding_spec(Token keyword, Token id, 
-												 boolean hasName) {
-		printRuleHeader(509, "language-binding-spec");
-		if (printKeywords) printParameter(keyword, "keyword");
-		printParameter(id, "language");
-		printParameter(hasName, "hasName");
-		printRuleTrailer();	
-	}
+   /** R509
+    * language_binding_spec 
+    */
+   public void language_binding_spec(Token keyword, Token id, boolean hasName) {
+      printRuleHeader(509, "language-binding-spec");
+      if (printKeywords) printParameter(keyword, "keyword");
+      printParameter(id, "language");
+      printParameter(hasName, "hasName");
+      printRuleTrailer();	
+   }
 
-	/** R510
-	 * array_spec
-	 */
-	public void array_spec(int count) {
-		printRuleHeader(510, "array-spec");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
-	public void array_spec_element(int type) {
-		printRuleHeader(510, "array-spec-element");
-		printParameter(type, "type");
-		printRuleTrailer();
-	}
+   /** R510
+    * array_spec
+    */
+   public void array_spec(int count) {
+      printRuleHeader(510, "array-spec");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+   public void array_spec_element(int type) {
+      printRuleHeader(510, "array-spec-element");
+      printParameter(type, "type");
+      printRuleTrailer();
+   }
 
    /** R509-F08
     * coarray_spec
     *   :   deferred_coshape_spec_list
     *   |   explicit_coshape_spec
-    * @param hasDeferredSpec True if deferred_coshape_spec_list is present, false otherwise
-    * @param hasExplicitSpec True if explicit_coshape_spec is present, false otherwise
+    * NOTE: rule changed to use array_spec_element so we need count
+    * @param count The number of items in the list of coarray specifications.
     */
-   public void coarray_spec(boolean hasDeferredSpec, boolean hasExplicitSpec)
+   public void coarray_spec(int count)
    {
       printRuleHeader(509008, "coarray-spec");
-      printParameter(hasDeferredSpec, "hasDeferredSpec");
-      printParameter(hasExplicitSpec, "hasExplicitSpec");
-      printRuleTrailer();
-   }
-
-   /** R510-F08
-    * deferred_coshape_spec
-    * @param colon The colon token.
-    */
-   public void deferred_coshape_spec(Token colon)
-   {
-      printRuleHeader(510008, "deferred-coshape-spec");
-      if (printKeywords) printParameter(colon, "colon");
-      printRuleTrailer();
-   }		
-
-   /** R510-F08 list
-    * deferred_coshape_spec_list__begin
-    */
-   public void deferred_coshape_spec_list__begin()
-   {
-      printRuleHeader(510008, "deferred-coshape-spec-list__begin", "list-begin");
-      printRuleTrailer();
-   }
-   public void deferred_coshape_spec_list(int count)
-   {
-      printRuleHeader(510008, "deferred-coshape-spec-list", "list");
       printParameter(count, "count");
       printRuleTrailer();
    }
 
-   /** R511-F08
-    * explicit_coshape_spec
+   /** R511 list
+    * explicit_shape_spec
+    * explicit_shape_spec_list
     */
-   public void explicit_coshape_spec()
-   {
-      printRuleHeader(511008, "explicit-coshape-spec");
+   public void explicit_shape_spec(boolean hasUpperBound) {
+      printRuleHeader(511, "explicit-shape-spec");
+      printParameter(hasUpperBound, "hasUpperBound");
       printRuleTrailer();
    }
-
-   /**
-    * explicit_coshape_spec_suffix
-    *
-    */
-   public void explicit_coshape_spec_suffix()
-   {
-      printRuleHeader(unknownRule, "explicit-coshape-spec-suffix");
+   public void explicit_shape_spec_list__begin() {
+      printRuleHeader(511, "explicit-shape-spec-list__begin", "list-begin");
       printRuleTrailer();
    }
-
-	/** R511 list
-	 * explicit_shape_spec
-	 * explicit_shape_spec_list
-	 */
-	public void explicit_shape_spec(boolean hasUpperBound) {
-		printRuleHeader(511, "explicit-shape-spec");
-		printParameter(hasUpperBound, "hasUpperBound");
-		printRuleTrailer();
-	}
-	public void explicit_shape_spec_list__begin() {
-		printRuleHeader(511, "explicit-shape-spec-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void explicit_shape_spec_list(int count) {
-		printRuleHeader(511, "explicit-shape-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   public void explicit_shape_spec_list(int count) {
+      printRuleHeader(511, "explicit-shape-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
 	/** R517
 	 * intent_spec
@@ -1411,64 +1364,73 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/**
-	 * R519
-	 * access_id
-	 *
-	 */
-	public void access_id() {
-		printRuleHeader(519, "access-id");
-		printRuleTrailer();
-	}
+   /** R519
+    * access_id
+    *
+    */
+   public void access_id() {
+      printRuleHeader(519, "access-id");
+      printRuleTrailer();
+   }
 
-	/** R519 list
-	 * access_id_list
-     */
-	public void access_id_list__begin() {
-		printRuleHeader(519, "access-id-list__begin", "list-begin");
-		printRuleTrailer();	
-	}
-	public void access_id_list(int count) {
-		printRuleHeader(519, "access-id-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R519 list
+    * access_id_list
+    */
+   public void access_id_list__begin() {
+      printRuleHeader(519, "access-id-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void access_id_list(int count) {
+      printRuleHeader(519, "access-id-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R520
-	 * allocatable_stmt
-	 */
-	public void allocatable_stmt(Token label, Token keyword, Token eos, 
-										  int count) {
-		printRuleHeader(520, "allocatable-stmt");
-		if (label != null) printParameter(label, "label");
-		if (printKeywords) printParameter(keyword, "keyword");
-		if (printKeywords) printParameter(eos, "eos");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R520-F03
+    * allocatable_stmt
+    */
+   public void allocatable_stmt(Token label, Token keyword, Token eos) {
+      printRuleHeader(520, "allocatable-stmt");
+      if (label != null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
 
-	/** R527-F2008
-	 * allocatable_decl
-	 */
-	public void allocatable_decl(Token id, boolean hasArraySpec, 
-										  boolean hasCoArraySpec) {
-		printRuleHeader(527008, "allocatable-decl");
-		printParameter(id, "object_name");
-		printParameter(hasArraySpec, "hasArraySpec");
-		printParameter(hasCoArraySpec, "hasCoArraySpec");
-		printRuleTrailer();
-	}
+   /** R527-F08
+    * allocatable_decl
+    */
+   public void allocatable_decl(Token id, boolean hasArraySpec, boolean hasCoArraySpec) {
+      printRuleHeader(527008, "allocatable-decl");
+      printParameter(id, "object_name");
+      printParameter(hasArraySpec, "hasArraySpec");
+      printParameter(hasCoArraySpec, "hasCoArraySpec");
+      printRuleTrailer();
+   }
 	
-	/** R521
-	 * asynchronous_stmt
-	 */
-	public void asynchronous_stmt(Token label, Token keyword, Token eos) {
-		printRuleHeader(447, "asynchronous-stmt");
-		if (label != null) printParameter(label, "label");
-		if (printKeywords) printParameter(keyword, "keyword");
-		if (printKeywords) printParameter(eos, "eos");
-		printRuleTrailer();
-	}
+   /** R527-F08 list
+    * allocatable_decl_list
+    */
+   public void allocatable_decl_list__begin() {
+      printRuleHeader(527008, "allocatable-decl-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void allocatable_decl_list(int count) {
+      printRuleHeader(527008, "allocatable-decl-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+
+   /** R521
+    * asynchronous_stmt
+    */
+   public void asynchronous_stmt(Token label, Token keyword, Token eos) {
+      printRuleHeader(447, "asynchronous-stmt");
+      if (label != null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
 
 	/** R522
 	 * bind_stmt
@@ -2277,51 +2239,71 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/**
-	 * R624-F2008
-	 * image_selector
-	 *
-	 * @param exprCount Count of the optional expressions for co-dimensions.
-	 */
-	public void image_selector(int exprCount) {
-		printRuleHeader(f08Rule, "final-binding");
-		printRuleTrailer();
-	}
+   /**
+    * R624-F2008
+    * image_selector
+    *
+    * @param leftBracket The '[' token
+    * @param rightBracket The ']' token
+    */
+   public void image_selector(Token leftBracket, Token rightBracket)
+   {
+      printRuleHeader(624008, "image-selector");
+      printRuleTrailer();
+   }
 
-	/** R623
-	 * allocate_stmt
-	 */
-	public void allocate_stmt(Token label, Token allocateKeyword, 
-									  Token eos, boolean hasTypeSpec, 
-									  boolean hasAllocOptList) {
-		printRuleHeader(623, "allocate-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(hasTypeSpec, "hasTypeSpec");
-		printParameter(hasAllocOptList, "hasAllocOptList");
-		printRuleTrailer();
-	}
+   /** R623
+    * allocate_stmt
+    */
+   public void allocate_stmt(Token label, Token allocateKeyword, Token eos,
+                             boolean hasTypeSpec, boolean hasAllocOptList)
+   {
+      printRuleHeader(623, "allocate-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasTypeSpec, "hasTypeSpec");
+      printParameter(hasAllocOptList, "hasAllocOptList");
+      printRuleTrailer();
+   }
 
-	/** R624
-	 * alloc_opt
-	 */
-	public void alloc_opt(Token allocOpt) {
-		printRuleHeader(624, "alloc-opt");
-		printParameter(allocOpt, "allocOpt");
-		printRuleTrailer();
-	}
+   /** R624
+    * alloc_opt
+    */
+   public void alloc_opt(Token allocOpt)
+   {
+      printRuleHeader(624, "alloc-opt");
+      printParameter(allocOpt, "allocOpt");
+      printRuleTrailer();
+   }
 	
-	/** R624 list
-	 * alloc_opt_list
-     */
-	public void alloc_opt_list__begin() {
-		printRuleHeader(624, "alloc-opt-list__begin", "list-begin");
-		printRuleTrailer();	
-	}
-	public void alloc_opt_list(int count) {
-		printRuleHeader(624, "alloc-opt-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R624 list
+    * alloc_opt_list
+    */
+   public void alloc_opt_list__begin()
+   {
+      printRuleHeader(624, "alloc-opt-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void alloc_opt_list(int count)
+   {
+      printRuleHeader(624, "alloc-opt-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+
+   /** R625-08
+    * cosubscript_list
+    */
+   public void cosubscript_list__begin()
+   {
+      printRuleHeader(625, "cosubscript-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void cosubscript_list(int count)
+   {
+      printRuleHeader(625, "cosubscript-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
 	/** R628, R631-F2008
 	 * allocation
