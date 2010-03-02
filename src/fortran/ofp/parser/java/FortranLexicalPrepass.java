@@ -748,6 +748,11 @@ public class FortranLexicalPrepass {
    }// end matchAttrStmt()
 
 
+   /*
+    * This matches closing paren or bracket even if the match is the wrong type,
+    * i.e., '( ]'.  This shouldn't really matter as the parser proper will work it
+    * out and give an error if the match is incorrect.
+    */
    private int matchClosingParen(int lineStart, int offset) {
       int lookAhead = 0;
       int tmpTokenType;
@@ -774,7 +779,7 @@ public class FortranLexicalPrepass {
              tmpTokenType == FortranLexer.EOF) &&
             nestingLevel != 0) {
             System.err.println("Error: matchClosingParen(): Missing " +
-                               "closing paren on line " + 
+                               "closing paren (or bracket) on line " + 
                                tokens.getToken(lookAhead-1).getLine() + ":");
             System.err.println("nestingLevel: " + nestingLevel);
             System.err.println("lookAhead is: " + lookAhead);
@@ -1952,7 +1957,7 @@ public class FortranLexicalPrepass {
       int newLineStart;
       int assignType = 0;
 
-      if(lineEnd < (lineStart+3)) {
+      if (lineEnd < (lineStart+3)) {
          return false;
       }
 
@@ -1961,22 +1966,34 @@ public class FortranLexicalPrepass {
 
       // need to see if we have an assignment token, either as the second 
       // token, or the first token after a given ()
-      if(tokens.currLineLA(newLineStart+2) == FortranLexer.T_EQUALS ||
-         tokens.currLineLA(newLineStart+2) == FortranLexer.T_EQ_GT) {
+      if (tokens.currLineLA(newLineStart+2) == FortranLexer.T_EQUALS ||
+          tokens.currLineLA(newLineStart+2) == FortranLexer.T_EQ_GT) {
          // it must be an assignment stmt.  convert the line to idents
          identOffset = lineStart;
          assignType = tokens.currLineLA(newLineStart+2);
-      } else if(tokens.currLineLA(newLineStart+2) == FortranLexer.T_LPAREN) {
+      } else if (tokens.currLineLA(newLineStart+2) == FortranLexer.T_LPAREN ||
+                 tokens.currLineLA(newLineStart+2) == FortranLexer.T_LBRACKET) {
          int rparenOffset = -1;
 
          rparenOffset = matchClosingParen(newLineStart, newLineStart+2);
-         if(tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQUALS ||
-            tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQ_GT) {
+         if (tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQUALS ||
+             tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQ_GT) {
             // matched an assignment statement (including ptr assignment)
             // convert everything on line to identifier
             identOffset = lineStart;
             assignType = tokens.currLineLA(rparenOffset+1);
-         } 
+
+         } else if (tokens.currLineLA(rparenOffset+1) == FortranLexer.T_LBRACKET) {
+            // data_ref could have a final image_selector
+            rparenOffset = matchClosingParen(newLineStart, rparenOffset+1);
+            if (tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQUALS ||
+                tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQ_GT) {
+               // matched an assignment statement (including ptr assignment)
+               // convert everything on line to identifier
+               identOffset = lineStart;
+               assignType = tokens.currLineLA(rparenOffset+1);
+            }
+         }
       }
 
       // fixup the line if we found a valid ptr assignment and return true;
@@ -2012,7 +2029,7 @@ public class FortranLexicalPrepass {
 //                             tokens.currLineLA(lineStart+1));
          return false;
       }
-   }// end matchAssignStmt()
+   } // end matchAssignStmt()
 
 
    private int matchGenericSpec(int lineStart, int lineEnd) {
