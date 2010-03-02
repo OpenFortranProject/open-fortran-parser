@@ -1088,17 +1088,9 @@ public abstract interface IFortranParserAction {
     *   :   deferred_coshape_spec_list
     *   |   explicit_coshape_spec
     *
-    *@param hasDeferredSpec True if deferred_coshape_spec_list is present, false otherwise
-    *@param hasExplicitSpec True if explicit_coshape_spec is present, false otherwise
+    * @param count The number of items in the list of coarray specifications.
     */
-   public abstract void coarray_spec(boolean hasDeferredSpec, boolean hasExplicitSpec);
-
-   /** R510-F08
-    * deferred_coshape_spec
-    *
-    * @param colon The colon token.
-    */
-   public abstract void deferred_coshape_spec(Token colon);
+   public abstract void coarray_spec(int count);
 
    /** R510
     * array_spec
@@ -1154,25 +1146,6 @@ public abstract interface IFortranParserAction {
     */
    public abstract void access_stmt(Token label, Token eos, boolean hasList);
 
-   /** R510-F08 list
-    * deferred_coshape_spec_list
-    *   :   T_COLON ( T_COMMA T_COLON )*
-    * 
-    * @param count The number of items in the list.
-    */
-   public abstract void deferred_coshape_spec_list__begin();
-   public abstract void deferred_coshape_spec_list(int count);
-
-   /** R511-F08
-    * explicit_coshape_spec
-    */
-   public abstract void explicit_coshape_spec();
-
-   /**
-    * explicit_coshape_spec_suffix
-    */
-   public abstract void explicit_coshape_spec_suffix();
-
    /** R519
     * access_id
     */
@@ -1195,12 +1168,11 @@ public abstract interface IFortranParserAction {
     * @param label The label.
     * @param keyword The allocatable keyword token.
     * @param eos End of statement token.
-    * @param count Number of allocatable declarations.
     */
    public abstract void
-   allocatable_stmt(Token label, Token keyword, Token eos, int count);
+      allocatable_stmt(Token label, Token keyword, Token eos);
 
-   /** R527-F2008
+   /** R527-F08
     * allocatable_decl
     *   :   T_IDENT ( T_LPAREN array_spec T_RPAREN )?
     *               ( T_LBRACKET co_array_spec T_RBRACKET )?
@@ -1212,6 +1184,15 @@ public abstract interface IFortranParserAction {
    public abstract void
    allocatable_decl(Token id, boolean hasArraySpec, boolean hasCoArraySpec);
 	
+   /** R527-F08 list
+    * allocatable_decl_list
+    *   :   allocatable_decl ( T_COMMA allocatable_decl )*
+    * 
+    * @param count The number of items in the list.
+    */
+   public abstract void allocatable_decl_list__begin();
+   public abstract void allocatable_decl_list(int count);
+
    /** R521
     * asynchronous_stmt
     *   :   (label)? T_ASYNCHRONOUS ( T_COLON_COLON )?  generic_name_list T_EOS
@@ -1879,10 +1860,12 @@ public abstract interface IFortranParserAction {
 
    /** R624-F2008
     * image_selector
+    *   :   T_LBRACKET cosubscript_list T_RBRACKET
     *
-    * @param exprCount Count of the optional expressions for co-dimensions.
+    * @param leftBracket The '[' token
+    * @param rightBracket The ']' token
     */
-   public abstract void image_selector(int exprCount);
+   public abstract void image_selector(Token leftBracket, Token rightBracket);
 
    /** R624
     * alloc_opt
@@ -1901,6 +1884,15 @@ public abstract interface IFortranParserAction {
     */
    public abstract void alloc_opt_list__begin();
    public abstract void alloc_opt_list(int count);
+
+
+   /** R625-F08
+    * cosubscript_list
+    * @param count The number of items in the list.
+    */
+
+   public abstract void cosubscript_list__begin();
+   public abstract void cosubscript_list(int count);
 
    /** R628, R631-F2008
     * allocation
