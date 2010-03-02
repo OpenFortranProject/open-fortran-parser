@@ -410,11 +410,11 @@ attr_spec
 // TODO Pass more info to action....
 entity_decl
 @init{boolean hasArraySpec=false; boolean hasCoarraySpec=false; boolean hasCharLength=false;}
-    : T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;})?
-              ( T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=true;})?
-              ( T_ASTERISK char_length {hasCharLength=true;})? ( initialization )?
-		{action.entity_decl($T_IDENT, hasArraySpec, hasCoarraySpec, hasCharLength);}
-    ;
+   :   T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
+               ( T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=true;} )?
+               ( T_ASTERISK char_length {hasCharLength=true;} )? ( initialization )?
+           {action.entity_decl($T_IDENT, hasArraySpec, hasCoarraySpec, hasCharLength);}
+   ;
 
 /*
  * R509-F08 coarray-spec
@@ -425,18 +425,17 @@ entity_decl
 ////////////
 // R509-F08
 //
+// deferred-coshape-spec-list and explicit-coshape-spec rules are ambiguous so
+// we use the same method as for array-spec.  Enough information is provided so
+// that the coarray_spec can be figured out by the ctions.  Note, that this
+// means the parser can't determine all incorrect syntax as many rules are
+// combined into one.  It is the action's responsiblity to enforce correct syntax.
+//
 coarray_spec
-@init
-{
-   boolean hasDeferred = false;
-   boolean hasExplicit = false;
-}
-@after {
-    action.coarray_spec(hasDeferred, hasExplicit);
-}
-   :   deferred_coshape_spec_list  {hasDeferred=true;}
-   |   explicit_coshape_spec       {hasExplicit=true;}
-   ;
+@init{int count=0;}
+   :   array_spec_element {count++;} (T_COMMA array_spec_element {count++;})*
+			{action.coarray_spec(count);}
+	;
 
 /*
  * R510-F08 deferred-coshape-spec
@@ -446,17 +445,8 @@ coarray_spec
 ////////////
 // R510-F08
 //
-deferred_coshape_spec
-   :   T_COLON
-           { action.deferred_coshape_spec($T_COLON); }
-   ;
-
-deferred_coshape_spec_list
-@init{int count=0;}
-   :       {action.deferred_coshape_spec_list__begin();}
-       T_COLON {count++;}( T_COMMA T_COLON {count++;})?
-           {action.deferred_coshape_spec_list(count);}
-   ;
+// deferred_coshape_spec is replaced by array_spec (see R509-F08)
+//
 
 /*
  * R511-08 explicit-coshape-spec
@@ -467,28 +457,56 @@ deferred_coshape_spec_list
 ////////////
 // R511-F08
 //
-explicit_coshape_spec
-@after {
-    action.explicit_coshape_spec();
-}
-   :   T_XYZ expr explicit_coshape_spec_suffix
-   |   T_ASTERISK
-   ;
+// explicit_coshape_spec is replaced by array_spec (see R509-F08)
+//
 
-// TODO add more info to action
-explicit_coshape_spec_suffix
-@after {
-    action.explicit_coshape_spec_suffix();
-}
-   :   T_COLON T_ASTERISK
-   |   T_COMMA explicit_coshape_spec
-   |   T_COLON expr explicit_coshape_spec
-   ;
+/*
+ * R527-F08 allocatable-decl
+ *    is object-name [ ( array-spec ) ] [ lbracket ( coarray-spec ) ]
+ */
 
+////////////
+// R527-F08
+//
+allocatable_decl
+@init{Token objName=null; boolean hasArraySpec=false; boolean hasCoArraySpec=false;}
+   :   object_name {objName=$object_name.tk;}
+          ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
+          ( T_LBRACKET coarray_spec T_RBRACKET {hasCoArraySpec=true;} )?
+              {action.allocatable_decl(objName, hasArraySpec, hasCoArraySpec);}
+   ;
 
 /**
  * Section/Clause 6: Use of data objects
  */               
+
+
+/*
+ * R612-F08 part-ref
+ *    is part-name [ ( section-subscript-list ) ] [ image-selector]
+ */
+
+
+////////////
+// R612-F08
+// R613-F03
+//
+// T_IDENT inlined for part_name
+// with k=2, this path is chosen over T_LPAREN substring_range T_RPAREN
+// TODO error: if a function call, should match id rather than 
+// (section_subscript_list)
+// a = foo(b) is ambiguous YUK...
+part_ref
+options {k=2;}
+@init{boolean hasSSL = false; boolean hasImageSelector = false;}
+   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+       (image_selector {hasImageSelector=true;})?
+           {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   |   (T_IDENT T_LBRACKET) => T_IDENT image_selector
+           {hasImageSelector=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   |   T_IDENT
+           {action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   ;
 
 /*
  * R624-F08 image-selector
@@ -498,10 +516,10 @@ explicit_coshape_spec_suffix
 ////////////
 // R624-F08
 //
-//image_selector
-//   :   T_LBRACKET cosubscript_list T_RBRACKET
-//           { action.image_selector($T_LBRACKET, $T_RBRACKET); }
-//   ;
+image_selector
+   :   T_LBRACKET cosubscript_list T_RBRACKET
+           {action.image_selector($T_LBRACKET, $T_RBRACKET);}
+   ;
 
 /*
  * R625-F08 cosubscript
@@ -511,15 +529,33 @@ explicit_coshape_spec_suffix
 ////////////
 // R625-F08
 //
-//cosubscript
-//   :   scalar_int_expr
+cosubscript
+   :   scalar_int_expr
+   ;
 
-//cosubscript_list
-//@init{int count=0;}
-//   :       {action.cosubscript_list__begin();}
-//       cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
-//           {action.cosubscript_list(count);}
-//   ;
+cosubscript_list
+@init{int count=0;}
+   :       {action.cosubscript_list__begin();}
+       cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
+           {action.cosubscript_list(count);}
+   ;
+
+/*
+ * R631-08 allocation
+ *    is allocate-object [ ( allocate-shape-spec-list ) ]
+ *                       [ lbracket allocate-coarray-spec rbracket ]  // NEW_TO_2008
+ */
+
+////////////
+// R631-F08, R628-F03
+//
+allocation
+@init{boolean hasAllocateShapeSpecList = false; boolean hasAllocateCoarraySpec = false;}
+   :   allocate_object
+       ( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} T_RPAREN )?
+       ( T_LBRACKET allocate_coarray_spec {hasAllocateCoarraySpec=true;} T_RBRACKET )?
+           {action.allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);}
+   ;
 
 /*
  * R636-F08 allocate-coarray-spec
@@ -529,11 +565,11 @@ explicit_coshape_spec_suffix
 ////////////
 // R637-F08
 //
-//allocate_coarray_spec
-//    :   /* ( allocate_coshape_spec_list T_COMMA )? ( expr T_COLON )? */ 
-//            T_ASTERISK
-//            { action.allocate_coarray_spec(); }
-//    ;
+allocate_coarray_spec
+   :   /* ( allocate_coshape_spec_list T_COMMA )? ( expr T_COLON )? */
+       T_ASTERISK
+           { action.allocate_coarray_spec(); }
+   ;
 
 /*
  * R637-F08 allocate-coshape-spec
@@ -543,19 +579,18 @@ explicit_coshape_spec_suffix
 ////////////
 // R637-F08
 //
-//allocate_coshape_spec
-//@init { boolean hasExpr = false; }
-//    :    expr ( T_COLON expr { hasExpr = true; })?
-//            { action.allocate_coshape_spec(hasExpr); }
-//    ;
+allocate_coshape_spec
+@init { boolean hasExpr = false; }
+   :   expr ( T_COLON expr { hasExpr = true; })?
+           { action.allocate_coshape_spec(hasExpr); }
+   ;
 
-//allocate_coshape_spec_list
-//@init{ int count=0;}
-//    :  		{action.allocate_coshape_spec_list__begin();}
-//		allocate_coshape_spec {count++;} 
-//            ( T_COMMA allocate_coshape_spec {count++;} )*
-//      		{action.allocate_coshape_spec_list(count);}
-//    ;
+allocate_coshape_spec_list
+@init{ int count=0;}
+   :       {action.allocate_coshape_spec_list__begin();}
+       allocate_coshape_spec {count++;} ( T_COMMA allocate_coshape_spec {count++;} )*
+           {action.allocate_coshape_spec_list(count);}
+   ;
 
 /*
  * Section/Clause 8: Execution control
@@ -765,8 +800,21 @@ unlock_stmt
 //
 // TODO - make expr a scalar-variable
 lock_variable
-   :   expr    // expr is a scalar-variable
+   :   scalar_variable
           { action.lock_variable(); }
+   ;
+
+
+//----------------------------------------------------------------------------
+// additional rules following standard and useful for error checking
+//----------------------------------------------------------------------------
+
+scalar_int_expr
+   :   expr
+   ;
+
+scalar_variable
+   :   expr
    ;
 
 
@@ -783,12 +831,10 @@ rice_coshape_spec:
 	
 // Laks 2009.01.15: add rice caf reference
 rice_image_selector
-@init {
-    Token idTeam=null;
-}
-	:	T_LBRACKET expr (T_AT T_IDENT {idTeam=$T_IDENT;})? T_RBRACKET
-            { action.rice_image_selector(idTeam);	}
-	;
+@init {Token idTeam=null;}
+   :   T_LBRACKET expr (T_AT T_IDENT {idTeam=$T_IDENT;})? T_RBRACKET
+           { action.rice_image_selector(idTeam);	}
+   ;
 
 // Laks 2009.01.15: add rice caf allocation
 // the allocation is either using asterisk (with means all ranks) or team
