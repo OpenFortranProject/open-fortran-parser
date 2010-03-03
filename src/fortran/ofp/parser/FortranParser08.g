@@ -122,12 +122,101 @@ main_program
  *       [ declaration-construct ] ... 
  */
 
-
 /*
  * C201-F08   (R208) An execution-part shall not contain an end-function-stmt,
  *  end-mp-subprogram-stmt, end-program-stmt, or end-subroutine-stmt.
  */
 
+/*
+ * R207-F08 declaration-construct
+ *    is derived-type-def
+ *    or entry-stmt
+ *    or enum-def                      // NEW_NAME_2008 (was enum-alias-def)
+ *    or format-stmt
+ *    or interface-block
+ *    or parameter-stmt
+ *    or procedure-declaration-stmt
+ *    or other-specification-stmt      // NEW_NAME_2008 (was specification-stmt)
+ *    or type-declaration-stmt
+ *    or stmt-function-stmt
+ */
+
+////////////
+// R207-F08
+//
+// ERR_CHK 207 implicit_stmt must precede all occurences of rules following it in text below
+// TODO - what does this mean - has been removed from grammar so must be done when reducing
+declaration_construct
+@after {
+    action.declaration_construct();
+}
+   :   entry_stmt
+   |   parameter_stmt
+   |   format_stmt
+   |   implicit_stmt  
+       // implicit_stmt must precede all occurences of the below
+   |   derived_type_def
+   |   enum_def
+   |   interface_block
+   |   procedure_declaration_stmt
+   |   other_specification_stmt
+   |   type_declaration_stmt
+   |   stmt_function_stmt
+   ;
+
+/*
+ * R212-F08 other-specification-stmt   // NEW_NAME_2008 (was specification-stmt)
+ *    is access-stmt
+ *    or allocatable-stmt
+ *    or asynchronous-stmt
+ *    or bind-stmt
+ *    or codimension-stmt              // NEW_TO_2008
+ *    or common-stmt
+ *    or data-stmt
+ *    or dimension-stmt
+ *    or equivalence-stmt
+ *    or external-stmt
+ *    or intent-stmt
+ *    or intrinsic-stmt
+ *    or namelist-stmt
+ *    or optional-stmt
+ *    or pointer-stmt
+ *    or protected-stmt
+ *    or save-stmt
+ *    or target-stmt
+ *    or volatile-stmt
+ *    or value-stmt
+ */
+
+////////////
+// R212-F08
+//
+other_specification_stmt
+@after {
+    action.specification_stmt();
+    checkForInclude();
+}
+   :   access_stmt
+   |   allocatable_stmt
+   |   asynchronous_stmt
+   |   bind_stmt
+   |   codimension_stmt                // NEW_TO_2008
+   |   common_stmt
+   |   data_stmt
+   |   dimension_stmt
+   |   equivalence_stmt
+   |   external_stmt
+   |   intent_stmt
+   |   intrinsic_stmt
+   |   namelist_stmt
+   |   optional_stmt
+   |   pointer_stmt
+   |   protected_stmt
+   |   save_stmt
+   |   target_stmt
+   |   volatile_stmt
+   |   value_stmt
+   ;
 
 /*
  * R213-F08 executable-construct
@@ -152,9 +241,9 @@ executable_construct
 }
    :   action_stmt
    |   associate_construct
-//   |   block_construct                 // NEW_TO_2008
+   |   block_construct                 // NEW_TO_2008
    |   case_construct
-//   |   or critical_construct           // NEW_TO_2008
+   |   critical_construct              // NEW_TO_2008
    |   do_construct
    |   forall_construct
    |   if_construct
@@ -271,10 +360,10 @@ action_stmt
    |   pause_stmt                    // ADDED?
    ;
 
+
 /**
  * Section/Clause 4: Types
  */
-
 
 /*
  * R437-F08 component-attr-spec
@@ -320,6 +409,29 @@ component_attr_spec
  *                      [ lbracket coarray-spec rbracket ]  // NEW_TO_2008
  *                      [ * char-length ] [ component-initialization ]
  */
+
+////////////
+// R438-F08, R433-F03
+//
+// R442-F2008, R441-F03
+// R443-F2008, F442-F03
+// T_IDENT inlined as component_name
+component_decl
+@init { 
+    boolean hasComponentArraySpec = false; 
+	boolean hasCoarraySpec = false;
+	boolean hasCharLength = false;
+	boolean hasComponentInitialization = false;
+}
+   :   T_IDENT (T_LPAREN component_array_spec T_RPAREN {hasComponentArraySpec=true;})?
+               (T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=true;})?
+               (T_ASTERISK char_length {hasCharLength=true;})? 
+               (component_initialization {hasComponentInitialization =true;})?
+           {action.component_decl($T_IDENT, hasComponentArraySpec, 
+                                  hasCoarraySpec, hasCharLength,
+                                  hasComponentInitialization);}
+   ;
+
 
 /**
  * Section/Clause 5: Attribute declarations and specifications
@@ -469,17 +581,69 @@ coarray_spec
 // R527-F08
 //
 allocatable_decl
-@init{Token objName=null; boolean hasArraySpec=false; boolean hasCoArraySpec=false;}
+@init{Token objName=null; boolean hasArraySpec=false; boolean hasCoarraySpec=false;}
    :   object_name {objName=$object_name.tk;}
           ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
-          ( T_LBRACKET coarray_spec T_RBRACKET {hasCoArraySpec=true;} )?
-              {action.allocatable_decl(objName, hasArraySpec, hasCoArraySpec);}
+          ( T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=true;} )?
+              {action.allocatable_decl(objName, hasArraySpec, hasCoarraySpec);}
    ;
+
+/*
+ * R531-F08 codimension-stmt
+ *    is CODIMENSION [ :: ] codimension-decl-list
+ */
+
+////////////
+// R531-F08
+//
+codimension_stmt
+@init {Token lbl = null;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})?
+       T_CODIMENSION ( T_COLON_COLON )? codimension_decl_list end_of_stmt
+          { action.codimension_stmt(lbl, $T_CODIMENSION, $end_of_stmt.tk); }
+   ;
+   
+/*
+ * R532-08 codimension-decl
+ *    is coarray-name lbracket coarray-spec rbracket
+ */
+
+////////////
+// R532-F08
+//
+codimension_decl
+   :   T_IDENT T_LBRACKET coarray_spec T_RBRACKET
+           {action.codimension_decl($T_IDENT, $T_LBRACKET, $T_RBRACKET);}
+   ;
+
+codimension_decl_list
+@init{int count=0;}
+   :       {action.codimension_decl_list__begin();}
+       codimension_decl {count++;} ( T_COMMA codimension_decl {count++;} )*
+           {action.codimension_decl_list(count);}
+   ;
+
+/*
+ * R557-F08 target-decl
+ *    is   object-name [ ( array-spec ) ]
+ *                     [ lbracket coarray-spec rbracket ]
+ */
+
+////////////
+// R557-F08
+//
+target_decl
+@init{boolean hasArraySpec=false; boolean hasCoarraySpec=false;}
+   :   T_IDENT (T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
+               (T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=true;} )?
+          {action.target_decl($T_IDENT,hasArraySpec,hasCoarraySpec);}
+   ;
+
 
 /**
  * Section/Clause 6: Use of data objects
  */               
-
 
 /*
  * R612-F08 part-ref
@@ -604,16 +768,99 @@ allocate_coshape_spec_list
  *       end-block-stmt
  */
 
+////////////
+// R807-F08
+//
+block_construct
+@init {boolean hasSpecPart = false;}
+   :   block_stmt
+// TODO
+//          (specification_part {hasSpecPart=true;})*
+          block
+       end_block_stmt
+           {action.block_construct(hasSpecPart);}
+   ;
+
 /*
  * R808-F08 block-stmt
  *    is [ block-construct-name : ] BLOCK
  */
+
+////////////
+// R808-F08
+//
+block_stmt
+@init {Token lbl = null; Token name = null;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})?
+       (T_IDENT T_COLON {name=$T_IDENT;})?
+       T_BLOCK end_of_stmt
+           {action.block_stmt(lbl, name, $T_BLOCK, $end_of_stmt.tk);}
+   ;
 
 /*
  * R809-F08 end-block-stmt
  *    is END BLOCK [ block-construct-name ]
  */
 
+////////////
+// R809-F08
+//
+end_block_stmt
+@init {Token lbl = null; Token name = null;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})?
+       T_END T_BLOCK (T_IDENT {name=$T_IDENT;})? end_of_stmt
+           {action.end_block_stmt(lbl, name, $T_END, $T_BLOCK, $end_of_stmt.tk);}
+   ;
+
+/*
+ * R810-F08 critical-construct
+ *    is critical-stmt
+ *          block
+ *       end-critical-stmt
+ */
+
+////////////
+// R810-F08
+//
+critical_construct
+   :   critical_stmt block end_critical_stmt
+           {action.critical_construct();}
+   ;
+
+/*
+ * R811-F08 critical-stmt
+ *    is [ critical-construct-name : ] CRITICAL
+ */
+
+////////////
+// R811-F08
+//
+critical_stmt
+@init {Token lbl = null; Token name = null;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})?
+       (T_IDENT T_COLON {name=$T_IDENT;})?
+       T_CRITICAL end_of_stmt
+           {action.critical_stmt(lbl, name, $T_CRITICAL, $end_of_stmt.tk);}
+   ;
+
+/*
+ * R812-F08 end-critical-stmt
+ *    is END CRITICAL [ critical-construct-name ]
+ */
+
+////////////
+// R812-F08
+//
+end_critical_stmt
+@init {Token lbl = null; Token name = null;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})?
+       T_END T_CRITICAL (T_IDENT {name=$T_IDENT;})? end_of_stmt
+           {action.end_critical_stmt(lbl, name, $T_END, $T_CRITICAL, $end_of_stmt.tk);}
+   ;
 
 /*
  * R856-F08 errorstop-stmt
@@ -626,11 +873,10 @@ allocate_coshape_spec_list
 errorstop_stmt
 @init {Token lbl = null; boolean hasStopCode = false;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.tk;})? T_ERROR T_STOP (stop_code {hasStopCode=true;})? 
-            end_of_stmt
-            { action.errorstop_stmt(lbl, $T_ERROR, $T_STOP, $end_of_stmt.tk, hasStopCode); }
-    ;
-
+   :   (label {lbl=$label.tk;})? T_ERROR T_STOP (stop_code {hasStopCode=true;})? 
+       end_of_stmt
+          { action.errorstop_stmt(lbl, $T_ERROR, $T_STOP, $end_of_stmt.tk, hasStopCode); }
+   ;
 
 /*
  * R858-F08 sync-all-stmt
