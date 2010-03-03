@@ -949,21 +949,19 @@ component_attr_spec_list
 
 // R442, R443-F2008
 // T_IDENT inlined as component_name
-// Remove F2008
 component_decl
 @init { 
     boolean hasComponentArraySpec = false; 
-	boolean hasCoArraySpec = false;
+	boolean hasCoarraySpec = false;
 	boolean hasCharLength = false;
 	boolean hasComponentInitialization = false;
 }
-    :   T_IDENT ( T_LPAREN component_array_spec T_RPAREN 
+   :   T_IDENT ( T_LPAREN component_array_spec T_RPAREN 
             {hasComponentArraySpec=true;})?
-            /* ( T_LBRACKET co_array_spec T_RBRACKET {hasCoArraySpec=true;})? */
             ( T_ASTERISK char_length {hasCharLength=true;})? 
             ( component_initialization {hasComponentInitialization =true;})?
 			{ action.component_decl($T_IDENT, hasComponentArraySpec, 
-                                    hasCoArraySpec, hasCharLength,
+                                    hasCoarraySpec, hasCharLength,
                                     hasComponentInitialization);}
     ;
 
@@ -1785,8 +1783,7 @@ dimension_stmt
 @after{checkForInclude();}
 	:	(label {lbl=$label.tk;})? T_DIMENSION ( T_COLON_COLON )? 
         dimension_decl ( T_COMMA dimension_decl {count++;})* end_of_stmt
-			{ action.dimension_stmt(lbl, $T_DIMENSION, $end_of_stmt.tk, 
-                count); }
+			{ action.dimension_stmt(lbl, $T_DIMENSION, $end_of_stmt.tk, count); }
     ;
 
 // R535-subrule
@@ -1905,24 +1902,30 @@ saved_entity_list
 
 // R545 proc_pointer_name was name inlined as T_IDENT
 
-// R546, R555-F2008
+// R546, R555-F08
 // T_IDENT inlined for object_name
 target_stmt
 @init {Token lbl = null;int count=1;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.tk;})? T_TARGET ( T_COLON_COLON )? target_decl 
-            ( T_COMMA target_decl {count++;} )* end_of_stmt
-			{action.target_stmt(lbl,$T_TARGET,$end_of_stmt.tk,count);}
+   :   (label {lbl=$label.tk;})?
+       T_TARGET ( T_COLON_COLON )? target_decl_list end_of_stmt
+			{action.target_stmt(lbl,$T_TARGET,$end_of_stmt.tk);}
+   ;
+
+// R557-F08
+target_decl
+@init{boolean hasArraySpec=false; boolean hasCoarraySpec=false;}
+    : T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
+			{action.target_decl($T_IDENT,hasArraySpec,hasCoarraySpec);}
     ;
 
-// R556-F2008
-// TODO - remove F2008
-target_decl
-@init{boolean hasArraySpec=false; boolean hasCoArraySpec=false;}
-    : T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
-              /* ( T_LBRACKET coarray_spec T_RBRACKET {hasCoArraySpec=true;} )? */
-			{action.target_decl($T_IDENT,hasArraySpec,hasCoArraySpec);}
-    ;
+// R557-F08
+target_decl_list
+@init{ int count=0;}
+   :       {action.target_decl_list__begin();}
+       target_decl {count++;} ( T_COMMA target_decl {count++;} )*
+           {action.target_decl_list(count);}
+   ;
 
 // R547
 // generic_name_list substituted for dummy_arg_name_list
