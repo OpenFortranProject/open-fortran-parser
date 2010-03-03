@@ -613,12 +613,12 @@ public abstract interface IFortranParserAction {
     *
     * @param id Component identifier.
     * @param hasComponentArraySpec True if has component array spec.
-    * @param hasCoArraySpec True if has coarray spec.
+    * @param hasCoarraySpec True if has coarray spec.
     * @param hasCharLength True if has char length.
     * @param hasComponentInitialization True if has component initialization.
     */
    public abstract void
-   component_decl(Token id, boolean hasComponentArraySpec, boolean hasCoArraySpec,
+   component_decl(Token id, boolean hasComponentArraySpec, boolean hasCoarraySpec,
                   boolean hasCharLength, boolean hasComponentInitialization);
 
    /** R442 list
@@ -1179,10 +1179,10 @@ public abstract interface IFortranParserAction {
     * 
     * @param id The name of the object
     * @param hasArraySpec True if an array_spec is present.
-    * @param hasCoArraySpec True if a co_array_spec is present.
+    * @param hasCoarraySpec True if a co_array_spec is present.
     */
    public abstract void
-   allocatable_decl(Token id, boolean hasArraySpec, boolean hasCoArraySpec);
+   allocatable_decl(Token id, boolean hasArraySpec, boolean hasCoarraySpec);
 	
    /** R527-F08 list
     * allocatable_decl_list
@@ -1208,7 +1208,7 @@ public abstract interface IFortranParserAction {
     *   :   (label)? language_binding_spec (T_COLON_COLON)? bind_entity_list T_EOS
     *
     * @param label Optional statement label
-    * @param eos End of statement token.
+    * @param eos End of statement token
     */
    public abstract void bind_stmt(Token label, Token eos);
 
@@ -1229,6 +1229,35 @@ public abstract interface IFortranParserAction {
     */
    public abstract void bind_entity_list__begin();
    public abstract void bind_entity_list(int count);
+
+   /** R531-F08
+    * codimension-stmt
+    *    :   CODIMENSION [ :: ] codimension-decl-list
+    *
+    * @param label Optional statement label
+    * @param keyword The CODIMENSION keyword token
+    * @param eos End of statement token
+    */
+   public abstract void codimension_stmt(Token label, Token keyword, Token eos);
+
+   /** R532-F08
+    * codimension-decl
+    *    :   coarray-name lbracket coarray-spec rbracket
+    *
+    * @param coarrayName The coarray-name token
+    * @param lbracket The T_LBRACKET token
+    * @param rbracket The T_RBRACKET token
+    */
+   public abstract void codimension_decl(Token coarrayName, Token lbracket, Token rbracket);
+
+   /** R532-F08 list
+    * codimension_decl_list
+    *   :   codimension_decl ( T_COMMA codimension_decl )*
+    * 
+    * @param count The number of items in the list.
+    */
+   public abstract void codimension_decl_list__begin();
+   public abstract void codimension_decl_list(int count);
 
    /** R524
     * data_stmt
@@ -1461,30 +1490,36 @@ public abstract interface IFortranParserAction {
     */
    public abstract void saved_entity(Token id, boolean isCommonBlockName);
 
-   /** R546
+   /** R556-F08
     * target_stmt
-    *   :   (label)? T_TARGET ( T_COLON_COLON )? target_decl 
-    *       ( T_COMMA target_decl)* T_EOS
+    *   :   (label)? T_TARGET ( T_COLON_COLON )? target_decl_list
     * 
     * @param label The label.
-    * @param keyword The SAVE keyword token.
+    * @param keyword The TARGET keyword token.
     * @param eos End of statement token.
-    * @param count The number of target declarations.
     */
-   public abstract void
-   target_stmt(Token label, Token keyword, Token eos, int count);
+   public abstract void target_stmt(Token label, Token keyword, Token eos);
 
-   /** R556-F2008
+   /** R557-F08
     * target_decl
     *   :   T_IDENT (T_LPAREN array_spec T_RPAREN)?
-    *       (T_LBRACKET co_array_spec T_RBRACKET)?
+    *               (T_LBRACKET co_array_spec T_RBRACKET)?
     *
-    * @param id Identifier.
+    * @param objName The name of the object
     * @param hasArraySpec True if has an array spec.
-    * @param hasCoArraySpec True if has a co array spec.
+    * @param hasCoarraySpec True if has a co array spec.
     */
    public abstract void
-   target_decl(Token id, boolean hasArraySpec, boolean hasCoArraySpec);
+   target_decl(Token objName, boolean hasArraySpec, boolean hasCoarraySpec);
+
+   /** R557-F08 list
+    * target_decl_list
+    *   :   target_decl ( T_COMMA target_decl )*
+    * 
+    * @param count The number of items in the list.
+    */
+   public abstract void target_decl_list__begin();
+   public abstract void target_decl_list(int count);
 
    /** R547
     * value_stmt
@@ -1906,10 +1941,10 @@ public abstract interface IFortranParserAction {
     * be interpreted as an upper-bound-expr.
     * 
     * @param hasAllocateShapeSpecList True if allocate-shape-spec-list is present.
-    * @param hasAllocateCoArraySpec True if allocate-co-array-spec is present.
+    * @param hasAllocateCoarraySpec True if allocate-co-array-spec is present.
     */
    public abstract void
-   allocation(boolean hasAllocateShapeSpecList, boolean hasAllocateCoArraySpec);
+   allocation(boolean hasAllocateShapeSpecList, boolean hasAllocateCoarraySpec);
 
    /** R628 list
     * allocation_list
@@ -2538,6 +2573,75 @@ public abstract interface IFortranParserAction {
     */
    public abstract void if_stmt__begin();
    public abstract void if_stmt(Token label, Token ifKeyword);
+
+   /** R807-F08
+    * block-construct
+    *    is block-stmt
+    *          [ specification-part ]
+    *          block
+    *       end-block-stmt
+    *
+    * @param hasSpecPart True if specification-part is present
+    */
+   public abstract void block_construct(boolean hasSpecPart);
+
+   /** R808-F08
+    * block-stmt
+    *    is [ block-construct-name : ] BLOCK
+    *
+    * @param label The label
+    * @param id The optional block-construct-name identifier
+    * @param keyword The T_BLOCK token
+    * @param eos The T_EOS token
+    */
+   public abstract void
+   block_stmt(Token label, Token id, Token keyword, Token eos);
+
+   /** R809-F08
+    * end-block-stmt
+    *    is END BLOCK [ block-construct-name ]
+    *
+    * @param label The label
+    * @param id The optional block-construct-name identifier
+    * @param endKeyword The T_END token
+    * @param blockKeyword The T_BLOCK token
+    * @param eos The T_EOS token
+    */
+   public abstract void
+   end_block_stmt(Token label, Token id,
+                  Token endKeyword, Token blockKeyword, Token eos);
+
+   /** R810-F08
+    * critical-construct
+    *    is critical-stmt block end-critical-stmt
+    */
+   public abstract void critical_construct();
+
+   /** R811-F08
+    * critical-stmt
+    *    is [ critical-construct-name : ] CRITICAL
+    *
+    * @param label The label
+    * @param id The optional critical-construct-name identifier
+    * @param keyword The T_CRITICAL token
+    * @param eos The T_EOS token
+    */
+   public abstract void
+   critical_stmt(Token label, Token id, Token keyword, Token eos);
+
+   /** R812-F08
+    * end-critical-stmt
+    *    is END CRITICAL [ critical-construct-name ]
+    *
+    * @param label The label
+    * @param id The optional critical-construct-name identifier
+    * @param endKeyword The T_END token
+    * @param criticalKeyword The T_CRITICAL token
+    * @param eos The T_EOS token
+    */
+   public abstract void
+   end_critical_stmt(Token label, Token id,
+                     Token endKeyword, Token criticalKeyword, Token eos);
 
    /** R808
     * case_construct
