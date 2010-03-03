@@ -1294,9 +1294,12 @@ R528-08   asynchronous-stmt             is    ASYNCHRONOUS [ :: ] object-name-li
 
 R527    bind-stmt                       is    language-binding-spec [ :: ] bind-entity-list
 
-R528    bind-entity                     is    entity-name
+R528-03   bind-entity                   is   entity-name
+                                        or   / common-block-name /
 
-                                        or / common-block-name /
+R531-08   codimension-stmt              is   CODIMENSION [ :: ] codimension-decl-list
+
+R532-08   codimension-decl              is   coarray-name lbracket coarray-spec rbracket
 
 C558    (R527) If any bind-entity in a bind-stmt is an entity-name, the bind-stmt shall appear in the
         specification part of a module and the entity shall be an interoperable variable (15.2.4, 15.2.5).
@@ -1454,9 +1457,13 @@ C578    (R548) If a SAVE statement with an omitted saved entity list occurs in a
         explicit occurrence of the SAVE attribute or SAVE statement is permitted in the same scoping
         unit.
 
-R551    target-stmt                  is    TARGET [ :: ] object-name [ ( array-spec ) ]
-
+R551-03   target-stmt                is   TARGET [ :: ] object-name [ ( array-spec ) ]
                                              [ , object-name [ ( array-spec ) ] ] ...
+
+R556-08   target-stmt                is   TARGET [ :: ] target-decl-list
+
+R557-08   target-decl                is   object-name [ ( array-spec ) ]
+                                          [ lbracket coarray-spec rbracket ]
 
 R552    value-stmt                   is    VALUE [ :: ] dummy-arg-name-list
 
@@ -2148,11 +2155,12 @@ C739    (R755) A forall-body-construct shall not be a branch target.
 
 R758    forall-stmt                   is    FORALL forall-header forall-assignment-stmt
 
+
 /**
  * Section/Clause 8: Execution control
  */
 
-R801    block                         is    [ execution-part-construct ] ...
+R801-03   block                       is    [ execution-part-construct ] ...
 
 R802    if-construct                  is    if-then-stmt
 
@@ -2195,15 +2203,18 @@ R808-08   block-stmt                  is [ block-construct-name : ] BLOCK
 
 R809-08   end-block-stmt              is END BLOCK [ block-construct-name ]
 
+R810-08   critical-construct          is   critical-stmt
+                                              block
+                                              end-critical-stmt
 
+R811-08   critical-stmt               is   [ critical-construct-name : ] CRITICAL
 
-R808    case-construct                is    select-case-stmt
+R812-08   end-critical-stmt           is   END CRITICAL [ critical-construct-name ]
 
-                                                [ case-stmt
-
-                                                    block ] ...
-
-                                                end-select-stmt
+R808-03   case-construct              is   select-case-stmt
+                                              [ case-stmt
+                                                 block ] ...
+                                              end-select-stmt
 
 R809    select-case-stmt              is    [ case-construct-name : ] SELECT CASE ( case-expr )
 
@@ -2215,17 +2226,6 @@ C803    (R808) If the select-case-stmt of a case-construct specifies a case-cons
         sponding end-select-stmt shall specify the same case-construct-name. If the select-case-stmt
         of a case-construct does not specify a case-construct-name, the corresponding end-select-stmt
         shall not specify a case-construct-name. If a case-stmt specifies a case-construct-name, the
-
-
-
-
-SEP 2002                                    COMMITTEE DRAFT                                            515
-
-
-ISO/IEC 1539-1                             COMMITTEE DRAFT                                  SEP 2002
-
-
-
         corresponding select-case-stmt shall specify the same case-construct-name.
 
 R812    case-expr                    is    scalar-int-expr
