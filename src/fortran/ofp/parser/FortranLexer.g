@@ -492,6 +492,7 @@ T_COMMON        :       'COMMON'        ;
 T_CONTAINS      :       'CONTAINS'      ;
 T_CONTIGUOUS    :       'CONTIGUOUS'    ;
 T_CONTINUE      :       'CONTINUE'      ;
+T_CRITICAL      :       'CRITICAL'      ;
 T_CYCLE         :       'CYCLE'         ;
 T_DATA          :       'DATA'          ;
 T_DEFAULT       :       'DEFAULT'       ;
@@ -596,19 +597,25 @@ T_EVENT         :       'EVENT';
 T_LOCKSET       :       'LOCKSET';
 // end Rice additions ----------------------------
 
+// these tokens (without blank characters) are from 3.3.2.2
+//
+
 T_ENDASSOCIATE  :       'ENDASSOCIATE'  ;
 T_ENDBLOCK      :       'ENDBLOCK'      ;
 T_ENDBLOCKDATA  :       'ENDBLOCKDATA'  ;
+T_ENDCRITICAL   :       'ENDCRITICAL'   ;
 T_ENDDO         :       'ENDDO'         ;
 T_ENDENUM       :       'ENDENUM'       ;
-T_ENDFORALL     :       'ENDFORALL'     ;
 T_ENDFILE       :       'ENDFILE'       ;
+T_ENDFORALL     :       'ENDFORALL'     ;
 T_ENDFUNCTION   :       'ENDFUNCTION'   ;
 T_ENDIF         :       'ENDIF'         ;
-T_ENDINTERFACE  :       'ENDINTERFACE'  ;
 T_ENDMODULE     :       'ENDMODULE'     ;
+T_ENDINTERFACE  :       'ENDINTERFACE'  ;
+T_ENDPROCEDURE  :       'ENDPROCEDURE'  ;
 T_ENDPROGRAM    :       'ENDPROGRAM'    ;
 T_ENDSELECT     :       'ENDSELECT'     ;
+T_ENDSUBMODULE  :       'ENDSUBMODULE'  ;
 T_ENDSUBROUTINE :       'ENDSUBROUTINE' ;
 T_ENDTYPE       :       'ENDTYPE'       ;
 T_ENDWHERE      :       'ENDWHERE'      ;
