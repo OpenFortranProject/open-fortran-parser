@@ -772,9 +772,13 @@ allocate_coshape_spec_list
 // R807-F08
 //
 block_construct
+//options {backtrack=true;}
 @init {boolean hasSpecPart = false;}
    :   block_stmt
-// TODO
+// TODO - FIXME
+// This is going to be hard because of recursions.  Probably should make it
+// non optional (see use in F03) and maybe start with a smaller subset to see
+// where the problem arises.
 //          (specification_part {hasSpecPart=true;})*
           block
        end_block_stmt
@@ -812,6 +816,9 @@ end_block_stmt
    :   (label {lbl=$label.tk;})?
        T_END T_BLOCK (T_IDENT {name=$T_IDENT;})? end_of_stmt
            {action.end_block_stmt(lbl, name, $T_END, $T_BLOCK, $end_of_stmt.tk);}
+   |   (label {lbl=$label.tk;})?
+       T_ENDBLOCK (T_IDENT {name=$T_IDENT;})? end_of_stmt
+           {action.end_block_stmt(lbl, name, $T_ENDBLOCK, null, $end_of_stmt.tk);}
    ;
 
 /*
