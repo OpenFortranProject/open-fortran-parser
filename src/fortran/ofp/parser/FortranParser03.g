@@ -4464,15 +4464,13 @@ block_data_stmt
 		action.block_data_stmt__begin();
 	}
 @after{checkForInclude();}
-	:	(label {lbl=$label.tk;})? T_BLOCK T_DATA (T_IDENT {id=$T_IDENT;})? 
-            end_of_stmt
-			{action.block_data_stmt(lbl, $T_BLOCK, $T_DATA, id, 
-                $end_of_stmt.tk);}
-	|   (label {lbl=$label.tk;})? T_BLOCKDATA  (T_IDENT {id=$T_IDENT;})? 
-            end_of_stmt
-			{action.block_data_stmt(lbl, $T_BLOCKDATA, null, id, 
-                $end_of_stmt.tk);}
-	;
+   :   (label {lbl=$label.tk;})?
+       T_BLOCK T_DATA (T_IDENT {id=$T_IDENT;})? end_of_stmt
+           {action.block_data_stmt(lbl, $T_BLOCK, $T_DATA, id, $end_of_stmt.tk);}
+   |   (label {lbl=$label.tk;})?
+       T_BLOCKDATA  (T_IDENT {id=$T_IDENT;})? end_of_stmt
+           {action.block_data_stmt(lbl, $T_BLOCKDATA, null, id, $end_of_stmt.tk);}
+   ;
 
 // R1118
 end_block_data_stmt
