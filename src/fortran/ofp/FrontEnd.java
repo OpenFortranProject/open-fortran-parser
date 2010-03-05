@@ -122,6 +122,7 @@ public class FrontEnd implements Callable<Boolean> {
          } while (firstToken == FortranLexer.LINE_COMMENT
                || firstToken == FortranLexer.T_EOS);
 
+
          // mark the location of the first token we're looking at
          start = tokens.mark();
 
@@ -138,8 +139,9 @@ public class FrontEnd implements Callable<Boolean> {
                   && tokens.LA(lookAhead) != FortranLexer.T_PROCEDURE) {
                // try matching a module
                error = parseModule(tokens, parser, start);
-            } else if (firstToken == FortranLexer.T_BLOCK
-                  || firstToken == FortranLexer.T_BLOCKDATA) {
+            } else if ( firstToken == FortranLexer.T_BLOCKDATA
+                    || (firstToken == FortranLexer.T_BLOCK
+                        && tokens.LA(lookAhead) == FortranLexer.T_DATA)) {
                // try matching block data
                error = parseBlockData(tokens, parser, start);
             } else if (tokens.lookForToken(FortranLexer.T_SUBROUTINE) == true) {
