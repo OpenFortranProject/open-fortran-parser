@@ -409,28 +409,38 @@ public class FortranLexicalPrepass {
       identOffset = -1;
 
       tokenType = tokens.currLineLA(lineStart+1);
-      if(tokenType == FortranLexer.T_END) {
-         if(lineEnd > 2) {
-            if(tokens.currLineLA(lineStart+2) == FortranLexer.T_BLOCK)
-               identOffset = lineStart+3;
-            else if(tokens.currLineLA(lineStart+2) == 
-                    FortranLexer.T_INTERFACE) {
+      if (tokenType == FortranLexer.T_END) {
+         if (lineEnd > 2) {
+            if (tokens.currLineLA(lineStart+2) == FortranLexer.T_BLOCK &&
+                tokens.currLineLA(lineStart+3) == FortranLexer.T_DATA) {
+                  // end-block-data-stmt
+                  identOffset = lineStart+3;
+            }
+            else if (tokens.currLineLA(lineStart+2) == FortranLexer.T_INTERFACE) {
                // have to accept a generic_spec
                identOffset = matchGenericSpec(lineStart+2, lineEnd);
-            } else
+            }
+            else {
                // identifier is after the T_END and T_<construct>
                identOffset = lineStart+2;
+            }
          } 
 
          // we have to fixup the END DO if it's labeled
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_DO)
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_DO) {
             isEndDo = true;
-
+         }
          matchedEnd = true;
-      } else if(tokenType == FortranLexer.T_ENDBLOCK) {
-         // T_DATA must follow
-         identOffset = lineStart+2;
-         
+      }
+      else if (tokenType == FortranLexer.T_ENDBLOCK) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_DATA) {
+            // end-block-data-stmt
+            identOffset = lineStart+2;
+         }
+         else {
+            // end-block-stmt
+            identOffset = lineStart+1;
+         }
          matchedEnd = true;
       } else if(tokenType == FortranLexer.T_ENDINTERFACE) {
          identOffset = matchGenericSpec(lineStart+1, lineEnd);
@@ -464,19 +474,29 @@ public class FortranLexicalPrepass {
    }// end matchModule()
 
 
-   private boolean matchBlockData(int lineStart, int lineEnd) {
-      // there should be a minimum of 2 tokens 
-      // T_BLOCK T_DATA (T_IDENT)? T_EOS
-      // T_BLOCKDATA (T_IDENT)? T_EOS
-      // do a quick check
-      if(lineEnd < (lineStart+2))
+   /**
+    * Match block-stmt or block-data-stmt
+    */
+   private boolean matchBlockOrBlockData(int lineStart, int lineEnd)
+   {
+      // there should be a minimum of 2 tokens so do a quick check
+      //    (T_IDENT T_COLON)? T_BLOCK
+      //    T_BLOCK T_DATA (T_IDENT)? T_EOS
+      //    T_BLOCKDATA (T_IDENT)? T_EOS
+      //
+      if (lineEnd < (lineStart+2)) {
          return false;
+      }
 
-      if(tokens.currLineLA(lineStart+1) == FortranLexer.T_BLOCK) {
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_DATA) {
+      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_BLOCK) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_EOS) {
+            // successfully matched a block-stmt
+            return true;
+         }
+         else if (tokens.currLineLA(lineStart+2) == FortranLexer.T_DATA) {
             // T_BLOCK T_DATA (T_IDENT)? T_EOS
-            if((lineEnd >= (lineStart+3)) &&
-               lexer.isKeyword(tokens.currLineLA(lineStart+3)) == true) {
+            if ((lineEnd >= (lineStart+3)) &&
+                lexer.isKeyword(tokens.currLineLA(lineStart+3)) == true) {
                // lookAhead 3 is index 2
                tokens.getToken(lineStart+2).setType(FortranLexer.T_IDENT);
             }
@@ -486,18 +506,35 @@ public class FortranLexicalPrepass {
 
          // unsuccessfully matched a block data stmt
          return false;
-      } else if(tokens.currLineLA(lineStart+1) == FortranLexer.T_BLOCKDATA) {
-         if(lexer.isKeyword(tokens.currLineLA(lineStart+2)) == true) {
+      }
+      else if (tokens.currLineLA(lineStart+1) == FortranLexer.T_BLOCK) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_DATA) {
+            // T_BLOCK T_DATA (T_IDENT)? T_EOS
+            if ((lineEnd >= (lineStart+3)) &&
+                lexer.isKeyword(tokens.currLineLA(lineStart+3)) == true) {
+               // lookAhead 3 is index 2
+               tokens.getToken(lineStart+2).setType(FortranLexer.T_IDENT);
+            }
+            // successfully matched a block data stmt
+            return true;
+         }
+
+         // unsuccessfully matched a block data stmt
+         return false;
+      } else if (tokens.currLineLA(lineStart+1) == FortranLexer.T_BLOCKDATA) {
+         if (lexer.isKeyword(tokens.currLineLA(lineStart+2)) == true) {
             // lookAhead 2 is index 1
             tokens.getToken(lineStart+1).setType(FortranLexer.T_IDENT);
          }
          // successfully matched a block data stmt
          return true;
-      } else {
+      }
+      else {
          // unsuccessfully matched a block data stmt
          return false;
       }
-   }// end matchBlockData()
+
+   } // end matchBlockOrBlockData()
 
 
    private boolean matchUseStmt(int lineStart, int lineEnd) {
@@ -2097,63 +2134,79 @@ public class FortranLexicalPrepass {
    }// end matchGenericBinding()
 
 
-   private boolean matchLine(int lineStart, int lineEnd) {
-
-      // determine what this line should be, knowing that it MUST
-      // start with a keyword!
-      if(matchDataDecl(lineStart, lineEnd) == true){
+   /**
+    * Determine what this line should be, knowing that it MUST
+    * start with a keyword!
+    */
+   private boolean matchLine(int lineStart, int lineEnd)
+   {
+      if (matchDataDecl(lineStart, lineEnd) == true) {
          return true;
-		}
-      else if(matchDerivedTypeStmt(lineStart, lineEnd) == true)
+      }
+      else if (matchDerivedTypeStmt(lineStart, lineEnd) == true) {
          return true;
+      }
 
       switch(tokens.currLineLA(lineStart+1)) {
 
-		// If there is a function, not a subroutine, then it should have been 
-		// caught by matchDataDecl.
-		case FortranLexer.T_PURE:
-		case FortranLexer.T_RECURSIVE:
-		case FortranLexer.T_ELEMENTAL:
-		case FortranLexer.T_SUBROUTINE:
-			return matchSub(lineStart, lineEnd);
+      // If there is a function, not a subroutine, then it should have been 
+      // caught by matchDataDecl.
+      case FortranLexer.T_PURE:
+      case FortranLexer.T_RECURSIVE:
+      case FortranLexer.T_ELEMENTAL:
+      case FortranLexer.T_SUBROUTINE:
+         return matchSub(lineStart, lineEnd);
 
-		// End stuff.
+      // End stuff.
       case FortranLexer.T_END:
       case FortranLexer.T_ENDASSOCIATE:
+      case FortranLexer.T_ENDBLOCK:
       case FortranLexer.T_ENDBLOCKDATA:
+      case FortranLexer.T_ENDCRITICAL:
       case FortranLexer.T_ENDDO:
       case FortranLexer.T_ENDENUM:
-      case FortranLexer.T_ENDFORALL:
       case FortranLexer.T_ENDFILE:
+      case FortranLexer.T_ENDFORALL:
       case FortranLexer.T_ENDFUNCTION:
       case FortranLexer.T_ENDIF:
       case FortranLexer.T_ENDINTERFACE:
       case FortranLexer.T_ENDMODULE:
+      case FortranLexer.T_ENDPROCEDURE:
       case FortranLexer.T_ENDPROGRAM:
       case FortranLexer.T_ENDSELECT:
+      case FortranLexer.T_ENDSUBMODULE:
       case FortranLexer.T_ENDSUBROUTINE:
       case FortranLexer.T_ENDTYPE:
       case FortranLexer.T_ENDWHERE:
-      case FortranLexer.T_ENDBLOCK:
          return matchEnd(lineStart, lineEnd);
+
       case FortranLexer.T_PROCEDURE:
-         if(matchProcStmt(lineStart, lineEnd) == true)
+         if (matchProcStmt(lineStart, lineEnd) == true) {
             return true;
-         else
+         }
+         else {
             return matchProcDeclStmt(lineStart, lineEnd);
+         }
+         
       case FortranLexer.T_MODULE:
          // module procedure stmt.
-         if(matchProcStmt(lineStart, lineEnd) == true)
+         if (matchProcStmt(lineStart, lineEnd) == true) {
             return true;
-         else
+         }
+         else {
             return matchModule(lineStart, lineEnd);
+         }
+
       case FortranLexer.T_BLOCK:
       case FortranLexer.T_BLOCKDATA:
-         return matchBlockData(lineStart, lineEnd);
+         return matchBlockOrBlockData(lineStart, lineEnd);
+
       case FortranLexer.T_USE:
          return matchUseStmt(lineStart, lineEnd);
+
       case FortranLexer.T_PROGRAM:
          return matchProgramStmt(lineStart, lineEnd);
+
       case FortranLexer.T_STOP:
       case FortranLexer.T_NULLIFY:
       case FortranLexer.T_RETURN:
@@ -2172,18 +2225,26 @@ public class FortranLexicalPrepass {
             match, so we simply need to return the failure.  The caller must 
             handle this.  */
          return matchActionStmt(lineStart, lineEnd);
+
       case FortranLexer.T_IF:
-         if(matchIfConstStmt(lineStart, lineEnd) == true)
+         if (matchIfConstStmt(lineStart, lineEnd) == true) {
             return true;
-         else
+         }
+         else {
             return matchOneLineStmt(lineStart, lineEnd);
+         }
+
       case FortranLexer.T_ELSE:
-         if(matchElseStmt(lineStart, lineEnd) == true)
+         if (matchElseStmt(lineStart, lineEnd) == true) {
             return true;
-         else
+         }
+         else {
             return matchSingleTokenStmt(lineStart, lineEnd);
+         }
+
       case FortranLexer.T_DO:
          return matchDoStmt(lineStart, lineEnd);
+
       case FortranLexer.T_CLOSE:
       case FortranLexer.T_OPEN:
       case FortranLexer.T_READ:
@@ -2194,6 +2255,7 @@ public class FortranLexicalPrepass {
       case FortranLexer.T_FORMAT:
       case FortranLexer.T_PRINT:
          return matchIOStmt(lineStart, lineEnd);
+
       case FortranLexer.T_INTENT:
       case FortranLexer.T_DIMENSION:
       case FortranLexer.T_ASYNCHRONOUS:
@@ -2216,11 +2278,12 @@ public class FortranLexicalPrepass {
       case FortranLexer.T_PARAMETER:
       case FortranLexer.T_IMPLICIT:
          return matchAttrStmt(lineStart, lineEnd);
+
       default:
-         /* What's left should either be a single token stmt or failure.  */
+         /* What's left should either be a single token stmt or failure. */
          return matchSingleTokenStmt(lineStart, lineEnd);
       }
-   }// end matchLine()
+   } // end matchLine()
 
 
    private void fixupFixedFormatLine(int lineStart, int lineEnd, 
