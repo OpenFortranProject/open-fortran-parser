@@ -52,23 +52,23 @@ main_program
    boolean hasExecutionPart = false;
    boolean hasInternalSubprogramPart = false;
 }
-    :       {
+   :       {
                action.main_program__begin();
-            }
+           }
 
-        ( program_stmt {hasProgramStmt = true;} )?
+       ( program_stmt {hasProgramStmt = true;} )?
 
-        specification_part
+       specification_part
 
-        ( execution_part {hasExecutionPart = true;} )?
+       ( execution_part {hasExecutionPart = true;} )?
 
-        ( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
+       ( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
 
-        end_program_stmt
-            {
+       end_program_stmt
+           {
                action.main_program(hasProgramStmt, hasExecutionPart, 
                                    hasInternalSubprogramPart);
-            }
+           }
     ;
 
 
@@ -756,6 +756,53 @@ allocate_coshape_spec_list
            {action.allocate_coshape_spec_list(count);}
    ;
 
+
+/*
+ * Section/Clause 7: Expressions and assignment
+ */
+
+/*
+ * R724-F08 logical-expr
+ *    is expr
+ */
+
+////////////
+// R724-F08, R724-F03
+//
+logical_expr
+   :   expr
+   ;
+
+scalar_logical_expr
+   :   expr
+   ;
+
+
+/*
+ * R726-08 int-expr
+ *    is   expr
+ */
+
+////////////
+// R726-F08, R727-F03
+//
+int_expr
+   :   expr
+   ;
+
+scalar_int_expr
+   :   expr
+   ;
+
+
+//----------------------------------------------------------------------------
+// additional rules following standard and useful for error checking
+//----------------------------------------------------------------------------
+
+scalar_variable
+   :   expr
+   ;
+
 /*
  * Section/Clause 8: Execution control
  */
@@ -868,6 +915,29 @@ end_critical_stmt
        T_END T_CRITICAL (T_IDENT {name=$T_IDENT;})? end_of_stmt
            {action.end_critical_stmt(lbl, name, $T_END, $T_CRITICAL, $end_of_stmt.tk);}
    ;
+
+/*
+ * R818-08 loop-control
+ *    is   [ , ] do-variable = scalar-int-expr , scalar-int-expr [ , scalar-int-expr ]
+ *    or   [ , ] WHILE ( scalar-logical-expr )
+ *    or   [ , ] CONCURRENT forall-header
+ */
+
+////////////
+// R818-F08, R830-F03
+//
+loop_control
+@init {boolean hasOptExpr = false;}
+   :   ( T_COMMA )? do_variable T_EQUALS scalar_int_expr T_COMMA scalar_int_expr
+       ( T_COMMA scalar_int_expr {hasOptExpr=true;})?
+           {action.loop_control(null, IActionEnums.DoConstruct_variable, hasOptExpr);}
+   |   ( T_COMMA )? T_WHILE T_LPAREN scalar_logical_expr T_RPAREN 
+           {action.loop_control($T_WHILE, IActionEnums.DoConstruct_while, hasOptExpr);}
+   |   ( T_COMMA )? T_CONCURRENT forall_header
+           {action.loop_control($T_CONCURRENT,
+                                IActionEnums.DoConstruct_concurrent, hasOptExpr);}
+   ;
+
 
 /*
  * R856-F08 errorstop-stmt
@@ -1036,11 +1106,10 @@ lock_stat_list
 unlock_stmt
 @init {Token lbl = null; boolean hasSyncStatList = false;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.tk;})? T_UNLOCK lock_variable
-             (sync_stat_list {hasSyncStatList=true;})?
-             end_of_stmt
-             { action.unlock_stmt(lbl, $T_UNLOCK, $end_of_stmt.tk, hasSyncStatList); }
-    ;
+   :   (label {lbl=$label.tk;})?
+       T_UNLOCK lock_variable (sync_stat_list {hasSyncStatList=true;})? end_of_stmt
+           {action.unlock_stmt(lbl, $T_UNLOCK, $end_of_stmt.tk, hasSyncStatList);}
+   ;
 
 
 /*
@@ -1051,23 +1120,88 @@ unlock_stmt
 ////////////
 // R866-F08
 //
-// TODO - make expr a scalar-variable
 lock_variable
    :   scalar_variable
           { action.lock_variable(); }
    ;
 
 
-//----------------------------------------------------------------------------
-// additional rules following standard and useful for error checking
-//----------------------------------------------------------------------------
+/*
+ * Section/Clause 11: Modules
+ */
 
-scalar_int_expr
-   :   expr
+/*
+ * R1116-F08 submodule
+ *     is submodule-stmt
+ *           [ specification-part ]
+ *           [ module-subprogram-part ]
+ *     end-submodule-stmt
+ */
+
+////////////
+// R1116-F08
+//
+submodule
+@after {
+    action.submodule();
+}
+   :   submodule_stmt
+       specification_part  // non-optional as can be empty
+       ( module_subprogram_part )?
+       end_submodule_stmt
    ;
 
-scalar_variable
-   :   expr
+
+/*
+ * R1117-F08 submodule-stmt
+ *     is SUBMODULE ( parent-identifier ) submodule-name
+ */
+
+////////////
+// R1117-F08
+//
+submodule_stmt
+@init {Token lbl = null; Token t_subname = null;}
+@after{checkForInclude();}
+   :       {action.submodule_stmt__begin();}
+       (label {lbl=$label.tk;})?
+       T_SUBMODULE T_LPAREN parent_identifier T_RPAREN
+       name {t_subname=$name.tk;} end_of_stmt
+           {action.submodule_stmt(lbl, $T_SUBMODULE, t_subname, $end_of_stmt.tk);}
+   ;
+
+
+/*
+ * R1118-F08 parent-identifier
+ *     is ancestor-module-name [ : parent-submodule-name ]
+ */
+
+////////////
+// R1118-F08
+//
+parent_identifier
+@init {Token ancestor = null; Token parent = null;}
+   :   name {ancestor=$name.tk;}
+       ( : T_IDENT {parent=$T_IDENT;} )?
+           {action.parent_identifier(ancestor, parent);}
+   ;
+
+
+/*
+ * R1119-F08 end-submodule-stmt
+ *     is END [ SUBMODULE [ submodule-name ] ]
+ */
+
+////////////
+// R1119-F08
+//
+end_submodule_stmt
+@init {Token lbl = null; Token t_submod = null; Token t_name = null;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})?
+       T_END (T_SUBMODULE (name {t_name=$name.tk;})? {t_submod=$T_SUBMODULE;})?
+       end_of_stmt
+           {action.end_submodule_stmt(lbl, $T_END, t_submod, t_name, $end_of_stmt.tk);}
    ;
 
 
