@@ -1,5 +1,5 @@
    named_block : block
-!      integer :: a
+      integer :: a
       a = 3
    end block named_block
 
