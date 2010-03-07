@@ -489,6 +489,7 @@ T_CLASS         :       'CLASS'         ;
 T_CLOSE         :       'CLOSE'         ;
 T_CODIMENSION   :       'CODIMENSION'   ;
 T_COMMON        :       'COMMON'        ;
+T_CONCURRENT    :       'CONCURRENT'    ;
 T_CONTAINS      :       'CONTAINS'      ;
 T_CONTIGUOUS    :       'CONTIGUOUS'    ;
 T_CONTINUE      :       'CONTINUE'      ;
@@ -571,6 +572,7 @@ T_SELECTCASE    :       'SELECTCASE'    ;
 T_SELECTTYPE    :       'SELECTTYPE'    ;
 T_SEQUENCE      :       'SEQUENCE'      ;
 T_STOP          :       'STOP'          ;
+T_SUBMODULE     :       'SUBMODULE'     ;
 T_SUBROUTINE    :       'SUBROUTINE'    ;
 T_SYNC          :       'SYNC'          ;   /* F2008 token */
 T_TARGET        :       'TARGET'        ;
