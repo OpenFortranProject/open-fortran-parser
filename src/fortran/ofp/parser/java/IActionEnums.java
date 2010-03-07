@@ -26,6 +26,7 @@ package fortran.ofp.parser.java;
 public interface IActionEnums {
 
 	// Here are the offsets.
+        //
 	static final public int LiteralConstantBase=0;
 	static final public int KindParamBase=100;
 	static final public int KindSelectorBase=200;
@@ -43,8 +44,10 @@ public interface IActionEnums {
 	static final public int ProcComponentAttrSpecBase=1400;
 	static final public int GenericSpecBase=1500;
 	static final public int DTIOGenericSpecBase=1600;
+	static final public int DoConstructBase=1700;
 
 	// And here are the "enums"
+        //
 	static final public int LiteralConstant_int_literal_constant=
 		LiteralConstantBase+0;
 	static final public int LiteralConstant_real_literal_constant=
@@ -149,6 +152,10 @@ public interface IActionEnums {
 
 	static final public int ComponentDefType_data=ComponentDefTypeBase+0;
 	static final public int ComponentDefType_procedure=ComponentDefTypeBase+1;
+
+	static final public int DoConstruct_concurrent=DoConstructBase+0;
+	static final public int DoConstruct_variable=DoConstructBase+1;
+	static final public int DoConstruct_while=DoConstructBase+2;
 
 	static final public int TypeParamOrCompDef_typeParam= 
 		TypeParamOrCompDefBase+0;
