@@ -475,6 +475,16 @@ public class FortranLexicalPrepass {
 
 
    /**
+    * Attempt to match a submodule
+    */
+   private boolean matchSubmodule(int lineStart, int lineEnd) {
+      // convert everything after submodule to an identifier 
+      convertToIdents(lineStart+1, lineEnd);
+      return true;
+   } // end matchSubmodule()
+
+
+   /**
     * Match block-stmt or block-data-stmt
     */
    private boolean matchBlockOrBlockData(int lineStart, int lineEnd)
@@ -2196,6 +2206,9 @@ public class FortranLexicalPrepass {
          else {
             return matchModule(lineStart, lineEnd);
          }
+
+      case FortranLexer.T_SUBMODULE:
+         return matchSubmodule(lineStart, lineEnd);
 
       case FortranLexer.T_BLOCK:
       case FortranLexer.T_BLOCKDATA:
