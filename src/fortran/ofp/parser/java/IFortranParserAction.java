@@ -2868,14 +2868,14 @@ public abstract interface IFortranParserAction {
    label_do_stmt(Token label, Token id, Token doKeyword,
                  Token digitString, Token eos, boolean hasLoopControl);
 
-   /** R830
+   /** R818-F03, R830-F03
     * loop_control
     *
-    * @param whileKeyword T_WHILE or null.
-    * @param hasOptExpr Flag specifying if optional expression was given.  
-    * This only applies for alternative 2 of the rule.
+    * @param keyword T_WHILE, T_CONCURRENT, or null.
+    * @param doConstructType The type of do (variable, while, concurrent)
+    * @param hasOptExpr Flag specifying if optional expression was given (if type is variable)
     */
-   public abstract void loop_control(Token whileKeyword, boolean hasOptExpr);
+   public abstract void loop_control(Token keyword, int doConstructType, boolean hasOptExpr);
 
    /** R831
     * do_variable
@@ -3790,6 +3790,51 @@ public abstract interface IFortranParserAction {
    public abstract void only_list__begin();
    public abstract void only_list(int count);
 
+   /** R1116-F08
+    * submodule
+    */
+   public abstract void submodule();
+   
+   /** R1117-F08
+    * submodule_stmt__begin
+    */
+   public abstract void submodule_stmt__begin();
+
+   /** R1117-F08
+    * submodule-stmt
+    *     is SUBMODULE ( parent-identifier ) submodule-name
+    *
+    * @param label The label.
+    * @param submoduleKeyword T_SUBMODULE token if given; null otherwise.
+    * @param name Token for submodule name.
+    * @param eos T_EOS token.
+    */
+   public abstract void
+   submodule_stmt(Token label, Token submoduleKeyword, Token name, Token eos);
+
+   /** R1118-F08
+    * parent-identifier
+    *     is ancestor-module-name [ : parent-submodule-name ]
+    *
+    * @param ancestor The ancestor-module-name token.
+    * @param parent The parent-submodule-name token if given; null otherwise.
+    */
+   public abstract void parent_identifier(Token ancestor, Token parent);
+
+   /** R1119-F08
+    * end-submodule-stmt
+    *     is END [ SUBMODULE [ submodule-name ] ]
+    *
+    * @param label The label.
+    * @param endKeyword T_END token.
+    * @param submoduleKeyword T_SUBMODULE token if given; null otherwise.
+    * @param name T_IDENT token for submodule name if given; null otherwise.
+    * @param eos T_EOS token.
+    */
+   public abstract void
+   end_submodule_stmt(Token label, Token endKeyword,
+                      Token submoduleKeyword, Token name, Token eos);
+
    /** R1116
     * block_data
     */
@@ -4360,5 +4405,3 @@ public abstract interface IFortranParserAction {
    public abstract void rice_end_with_team_stmt(Token label, Token id, Token eos);
 
 }
-
-
