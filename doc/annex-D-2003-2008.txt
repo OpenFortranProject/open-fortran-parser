@@ -1927,58 +1927,55 @@ C704    (R723) A defined-binary-op shall not contain more than 63 letters and sh
 
 
 
-512                                COMMITTEE DRAFT                                      SEP 2002
+R724-03   logical-expr                   is    expr
+R724-08   logical-expr                   is    expr
 
-
-SEP 2002                               COMMITTEE DRAFT                                    ISO/IEC 1539-1
+C705-03   (R724-03) logical-expr shall be of type logical.
+C705-08   (R724-08) logical-expr shall be of type logical.
 
+R725-03   char-expr                      is    expr
 
+C706-03   (R725-03) char-expr shall be of type character.
 
-R724    logical-expr                     is    expr
+R726-03   default-char-expr              is    expr
 
-C705    (R724) logical-expr shall be of type logical.
+C707-03   (R726-03) default-char-expr shall be of type default character.
 
-R725    char-expr                        is    expr
+R726-08   int-expr                       is   expr
+R727-03   int-expr                       is   expr
 
-C706    (R725) char-expr shall be of type character.
+C707-08   (R726-08) int-expr shall be of type integer.
+C708-03   (R727-03) int-expr shall be of type integer.
 
-R726    default-char-expr                is    expr
+R728-03   numeric-expr                   is   expr
 
-C707    (R726) default-char-expr shall be of type default character.
+C709-03   (R728-03) numeric-expr shall be of type integer, real, or complex.
 
-R727    int-expr                         is    expr
+R729-03   specification-expr             is   scalar-int-expr
 
-C708    (R727) int-expr shall be of type integer.
+C710-03   (R729-03) The scalar-int-expr shall be a restricted expression.
 
-R728    numeric-expr                     is    expr
+R730-03   initialization-expr            is   expr
 
-C709    (R728) numeric-expr shall be of type integer, real, or complex.
+C711-03   (R730-03) initialization-expr shall be an initialization expression.
 
-R729    specification-expr                is    scalar-int-expr
+R731-03   char-initialization-expr       is   char-expr
 
-C710    (R729) The scalar-int-expr shall be a restricted expression.
+C712-03   (R731-03) char-initialization-expr shall be an initialization expression.
 
-R730    initialization-expr              is    expr
+R732-03   int-initialization-expr        is   int-expr
 
-C711    (R730) initialization-expr shall be an initialization expression.
+C713-03   (R732-03) int-initialization-expr shall be an initialization expression.
 
-R731    char-initialization-expr         is    char-expr
+R733-03   logical-initialization-expr    is   logical-expr
 
-C712    (R731) char-initialization-expr shall be an initialization expression.
+C714-03   (R733-03) logical-initialization-expr shall be an initialization expression.
 
-R732    int-initialization-expr          is    int-expr
+R734-03   assignment-stmt                is   variable = expr
 
-C713    (R732) int-initialization-expr shall be an initialization expression.
+C715-03   (R734-03) The variable in an assignment-stmt shall not be a whole assumed-size array.
 
-R733    logical-initialization-expr      is    logical-expr
-
-C714    (R733) logical-initialization-expr shall be an initialization expression.
-
-R734    assignment-stmt                  is    variable = expr
-
-C715    (R734) The variable in an assignment-stmt shall not be a whole assumed-size array.
-
-R735    pointer-assignment-stmt          is    data-pointer-object [ (bounds-spec-list ) ] => data-target
+R735-03   pointer-assignment-stmt        is   data-pointer-object [ (bounds-spec-list ) ] => data-target
 
                                          or data-pointer-object (bounds-remapping-list ) => data-target
 
@@ -2359,15 +2356,19 @@ R827    do-stmt                         is    label-do-stmt
 
 R828    label-do-stmt                   is    [ do-construct-name : ] DO label [ loop-control ]
 
-R829    nonlabel-do-stmt                is    [ do-construct-name : ] DO [ loop-control ]
+R829    nonlabel-do-stmt                is   [ do-construct-name : ] DO [ loop-control ]
 
-R830    loop-control                    is    [ , ] do-variable = scalar-int-expr , scalar-int-expr
+R818-08   loop-control                  is   [ , ] do-variable = scalar-int-expr
+                                               , scalar-int-expr [ , scalar-int-expr ]
+                                        or   [ , ] WHILE ( scalar-logical-expr )
+                                        or   [ , ] CONCURRENT forall-header
 
-                                                [ , scalar-int-expr ]
 
+R830-03   loop-control                  is    [ , ] do-variable = scalar-int-expr
+                                                , scalar-int-expr [ , scalar-int-expr ]
                                         or [ , ] WHILE ( scalar-logical-expr )
 
-R831    do-variable                     is    scalar-int-variable
+R831-03   do-variable                   is    scalar-int-variable
 
 C817    (R831) The do-variable shall be a named scalar variable of type integer.
 
@@ -3094,7 +3095,7 @@ R1019 char-string-edit-desc                 is    char-literal-constant
 
 C1012    (R1019) The char-literal-constant shall not have a kind parameter specified for it.
 
-Section 11:
+Section 11: Modules
 
 R1101-F03 main-program               is [ program-stmt ]
                                            [ specification-part ]
@@ -3214,24 +3215,34 @@ R1115 use-defined-operator             is    defined-unary-op
 C1114    (R1115) Each use-defined-operator shall be a public entity in the module.
 
 
+R1116-08 submodule                     is   submodule-stmt
+                                               [ specification-part ]
+                                               [ module-subprogram-part ]
+                                            end-submodule-stmt
+
+R1117-08 submodule-stmt                is SUBMODULE ( parent-identifier ) submodule-name
+
+R1118-08 parent-identifier             is ancestor-module-name [ : parent-submodule-name ]
+
+R1119-08 end-submodule-stmt            is END [ SUBMODULE [ submodule-name ] ]
+
+C1112-08 (R1116-08) A submodule specification-part shall not contain a format-stmt,
+entry-stmt or stmt-function-stmt.
+
+C1113-08 (R1118-08) The ancestor-module-name shall be the name of a nonintrinsic module;
+the parent-submodule-name shall be the name of a descendant of that module.
+
+C1114-08 (R1116-08) If a submodule-name appears in the end-submodule-stmt it shall be 
+identical to the one in the submodule-stmt.
 
 
-SEP 2002                                    COMMITTEE DRAFT                                          525
+R1116-03 block-data                    is   block-data-stmt
+                                               [ specification-part ]
+                                            end-block-data-stmt
 
-
-ISO/IEC 1539-1                               COMMITTEE DRAFT                                  SEP 2002
+R1117-03 block-data-stmt               is    BLOCK DATA [ block-data-name ]
 
-
-
-R1116 block-data                       is    block-data-stmt
-
-                                                 [ specification-part ]
-
-                                                 end-block-data-stmt
-
-R1117 block-data-stmt                  is    BLOCK DATA [ block-data-name ]
-
-R1118 end-block-data-stmt              is    END [ BLOCK DATA [ block-data-name ] ]
+R1118-03 end-block-data-stmt           is    END [ BLOCK DATA [ block-data-name ] ]
 
 C1115    (R1116) The block-data-name may be included in the end-block-data-stmt only if it was provided
          in the block-data-stmt and, if included, shall be identical to the block-data-name in the block-
@@ -3245,7 +3256,9 @@ C1116    (R1116) A block-data specification-part may contain only USE statements
 C1117    (R1116) A type declaration statement in a block-data specification-part shall not contain AL-
          LOCATABLE, EXTERNAL, or BIND attribute specifiers.
 
-Section 12:
+
+Section 12: Procedures
+
 R1201 interface-block                  is    interface-stmt
 
                                                  [ interface-specification ] ...
