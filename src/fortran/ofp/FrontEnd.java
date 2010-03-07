@@ -81,6 +81,12 @@ public class FrontEnd implements Callable<Boolean> {
       return parser.hasErrorOccurred();
    } // end parseModule()
 
+   private static boolean parseSubmodule(FortranTokenStream tokens,
+         IFortranParser parser, int start) throws Exception {
+      parser.submodule();
+      return parser.hasErrorOccurred();
+   } // end parseSubmodule()
+
    private static boolean parseBlockData(FortranTokenStream tokens,
          IFortranParser parser, int start) throws Exception {
       parser.block_data();
@@ -139,6 +145,9 @@ public class FrontEnd implements Callable<Boolean> {
                   && tokens.LA(lookAhead) != FortranLexer.T_PROCEDURE) {
                // try matching a module
                error = parseModule(tokens, parser, start);
+            } else if (firstToken == FortranLexer.T_SUBMODULE) {
+               // try matching a submodule
+               error = parseSubmodule(tokens, parser, start);
             } else if ( firstToken == FortranLexer.T_BLOCKDATA
                     || (firstToken == FortranLexer.T_BLOCK
                         && tokens.LA(lookAhead) == FortranLexer.T_DATA)) {
