@@ -26,6 +26,7 @@ public abstract interface IFortranParser {
 
    public void main_program()            throws RecognitionException;
    public void module()                  throws RecognitionException;
+   public void submodule()               throws RecognitionException;
    public void block_data()              throws RecognitionException;
    public void subroutine_subprogram()   throws RecognitionException;
    public void ext_function_subprogram() throws RecognitionException;
