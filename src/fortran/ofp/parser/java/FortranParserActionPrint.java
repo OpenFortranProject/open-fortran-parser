@@ -3502,19 +3502,21 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/**
-	 * R830
-	 * loop_control
-	 *
-	 * @param whileKeyword T_WHILE or null.
-	 * @param hasOptExpr Flag specifying if optional expression was given.  
-	 * This only applies for alternative 2 of the rule.
-	 */
-	public void loop_control(Token whileKeyword, boolean hasOptExpr) {
-		printRuleHeader(830, "loop-control");
-		printParameter(hasOptExpr, "hasOptExpr");
-		printRuleTrailer();
-	}		
+   /**
+    * R818-F03, R830-F03
+    * loop_control
+    *
+    * @param keyword T_WHILE, T_CONCURRENT, or null.
+    * @param doConstructType The type of do (variable, while, concurrent)
+    * @param hasOptExpr Flag specifying if optional expression was given (if type is variable)
+    */
+   public void loop_control(Token whileKeyword, int doConstructType, boolean hasOptExpr)
+   {
+      printRuleHeader(818008, "loop-control");
+      printParameter(doConstructType, "doConstructType");
+      printParameter(hasOptExpr, "hasOptExpr");
+      printRuleTrailer();
+   }		
 
 	/**
 	 * R831
@@ -4519,56 +4521,57 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/**
-	 * R1104
-	 * module
-	 * 
-	 */
-	public void module() {
-		printRuleHeader(1104, "module");
-		printRuleTrailer();
-	}
+   /** R1104-03
+    * module
+    */
+   public void module()
+   {
+      printRuleHeader(1104, "module");
+      printRuleTrailer();
+   }
 
-	/** R1105
-	 * module_stmt__begin
-	 */
-	public void module_stmt__begin() {
-		printRuleHeader(1105, "module-stmt__begin", "begin");
-		printRuleTrailer();
-	}
+   /** R1105-03
+    * module_stmt__begin
+    */
+   public void module_stmt__begin()
+   {
+      printRuleHeader(1105, "module-stmt__begin", "begin");
+      printRuleTrailer();
+   }
 
-	/** R1105
-	 * module_stmt
-	 *
-	 * @param label The label.
-	 * @param moduleKeyword T_MODULE token.
-	 * @param id The identifier, if present, otherwise null.
-	 * @param eos T_EOS token.
-	 */
-	public void module_stmt(Token label, Token moduleKeyword, Token id, 
-									Token eos) {
-		printRuleHeader(1105, "module-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R1105
+    * module_stmt
+    *
+    * @param label The label.
+    * @param moduleKeyword T_MODULE token.
+    * @param id The identifier, if present, otherwise null.
+    * @param eos T_EOS token.
+    */
+   public void module_stmt(Token label, Token moduleKeyword, Token id, Token eos)
+   {
+      printRuleHeader(1105, "module-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/** R1106
-	 * end_module_stmt
-	 *
-	 * @param label The label.
-	 * @param endKeyword T_END or T_ENDMODULE token.
-	 * @param moduleKeyword T_MODULE token if given; null otherwise.
-	 * @param id The identifier, if present, otherwise null.
-	 * @param eos T_EOS token.
-	 */
-	public void end_module_stmt(Token label, Token endKeyword, 
-										 Token moduleKeyword, Token id, Token eos) {
-		printRuleHeader(1106, "end-module-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R1106
+    * end_module_stmt
+    *
+    * @param label The label.
+    * @param endKeyword T_END or T_ENDMODULE token.
+    * @param moduleKeyword T_MODULE token if given; null otherwise.
+    * @param id The identifier, if present, otherwise null.
+    * @param eos T_EOS token.
+    */
+   public void end_module_stmt(Token label, Token endKeyword,
+                               Token moduleKeyword, Token id, Token eos)
+   {
+      printRuleHeader(1106, "end-module-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
 	/**
 	 * R1107
@@ -4676,53 +4679,115 @@ public class FortranParserActionPrint implements IFortranParserAction {
         printRuleTrailer();
     }
 
-	/** R1112 list
-	 * only_list
-	 */
-	public void only_list__begin() {
-		printRuleHeader(1112, "only-list__begin", "list-begin");
-		printRuleTrailer();	
-	}
-	public void only_list(int count) {
-		printRuleHeader(1112, "only-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R1112 list
+    * only_list
+    */
+   public void only_list__begin() {
+      printRuleHeader(1112, "only-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void only_list(int count) {
+      printRuleHeader(1112, "only-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R1116
-	 * block_data
-	 *
-	 */
-	public void block_data() {
-		printRuleHeader(1116, "block-data");
-		printRuleTrailer();
-	}
+   /** R1116-F08
+    * submodule
+    */
+   public void submodule()
+   {
+      printRuleHeader(111608, "submodule");
+      printRuleTrailer();
+   }
 
-	/** R1117
-	 * block_data_stmt__begin
-	 */
-	public void block_data_stmt__begin() {
-		printRuleHeader(1117, "block-data-stmt__begin", "begin");
-		printRuleTrailer();
-	}
+   /** R1117-F08
+    * submodule_stmt__begin
+    */
+   public void submodule_stmt__begin()
+   {
+      printRuleHeader(111708, "submodule-stmt__begin", "begin");
+      printRuleTrailer();
+   }
 
-	/** R1117
-	 * block_data_stmt
-	 *
-	 * @param label The label.
-	 * @param blockKeyword T_BLOCK or T_BLOCKDATA token.
-	 * @param dataKeyword T_DATA token if given; null otherwise.
-	 * @param id Identifier if it exists. Otherwise, null.
-	 * @param eos T_EOS token.
-	 */
-	public void block_data_stmt(Token label, Token blockKeyword, 
-										 Token dataKeyword, Token id, Token eos) {
-		printRuleHeader(1117, "block-data-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R1117-F08
+    * submodule-stmt
+    *     is SUBMODULE ( parent-identifier ) submodule-name
+    */
+   public void
+   submodule_stmt(Token label, Token submoduleKeyword, Token name, Token eos)
+   {
+      printRuleHeader(111708, "submodule-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (printKeywords) printParameter(submoduleKeyword, "submoduleKeyword");
+      printParameter(name, "name");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
+
+   /** R1118-F08
+    * parent-identifier
+    *     is ancestor-module-name [ : parent-submodule-name ]
+    */
+   public void parent_identifier(Token ancestor, Token parent)
+   {
+      printRuleHeader(111808, "parent-identifier");
+      printParameter(ancestor, "ancestor");
+      printParameter(parent, "parent");
+      printRuleTrailer();
+   }
+
+   /** R1119-F08
+    * end-submodule-stmt
+    *     is END [ SUBMODULE [ submodule-name ] ]
+    */
+   public void end_submodule_stmt(Token label, Token endKeyword,
+                                  Token submoduleKeyword, Token name, Token eos)
+   {
+      printRuleHeader(111908, "end-submodule-stmt");
+      if (label!=null)   printParameter(label, "label");
+      if (printKeywords) printParameter(endKeyword, "endKeyword");
+      if (printKeywords) printParameter(submoduleKeyword, "submoduleKeyword");
+      if (name != null)  printParameter(name, "name");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
+
+   /**
+    * R1116
+    * block_data
+    *
+    */
+   public void block_data() {
+      printRuleHeader(1116, "block-data");
+      printRuleTrailer();
+   }
+
+   /** R1117
+    * block_data_stmt__begin
+    */
+   public void block_data_stmt__begin() {
+      printRuleHeader(1117, "block-data-stmt__begin", "begin");
+      printRuleTrailer();
+   }
+
+   /** R1117
+    * block_data_stmt
+    *
+    * @param label The label.
+    * @param blockKeyword T_BLOCK or T_BLOCKDATA token.
+    * @param dataKeyword T_DATA token if given; null otherwise.
+    * @param id Identifier if it exists. Otherwise, null.
+    * @param eos T_EOS token.
+    */
+   public void block_data_stmt(Token label, Token blockKeyword, 
+                               Token dataKeyword, Token id, Token eos)
+   {
+      printRuleHeader(1117, "block-data-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
 	/** R1118
 	 * end_block_data_stmt
