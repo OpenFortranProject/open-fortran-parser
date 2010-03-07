@@ -67,6 +67,14 @@ package fortran.ofp.parser.java;
       action.start_of_file(this.filename);
    }
 
+   //
+   // submodule is not part of F2003 but is in IFortranParser interface
+   //
+   public final void submodule() throws RecognitionException {
+      System.err.println("SUBMODULE is not part of Fortran 2003");
+	  delegate.has_error_occurred = true;
+    }
+
 }
 
 
@@ -3493,15 +3501,13 @@ label_do_stmt
 // ERR_CHK 830a scalar_int_expr replaced by expr
 // ERR_CHK 830b scalar_logical_expr replaced by expr
 loop_control
-@init {
-    boolean hasOptExpr = false;
-}
-    : ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN 
-            { action.loop_control($T_WHILE, hasOptExpr); }
-    | ( T_COMMA )? do_variable T_EQUALS expr T_COMMA expr 
-        ( T_COMMA expr { hasOptExpr = true; })?
-            { action.loop_control(null, hasOptExpr); }
-    ;
+@init {boolean hasOptExpr = false;}
+   :   ( T_COMMA )? T_WHILE T_LPAREN expr T_RPAREN 
+           {action.loop_control($T_WHILE, IActionEnums.DoConstruct_while, hasOptExpr);}
+   |   ( T_COMMA )? do_variable T_EQUALS expr T_COMMA expr 
+       ( T_COMMA expr { hasOptExpr = true; })?
+           {action.loop_control(null, IActionEnums.DoConstruct_variable, hasOptExpr);}
+   ;
 
 // R831
 do_variable
