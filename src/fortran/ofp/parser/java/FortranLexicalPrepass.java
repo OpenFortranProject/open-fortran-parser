@@ -74,28 +74,27 @@ public class FortranLexicalPrepass {
       int i;
       Token tmpToken;
 
-      for(i = start; i < end; i++) {
+      for (i = start; i < end; i++) {
          // get the token 
          tmpToken = tokens.getToken(i);
 
          // this should not happen, but just in case..
-         if(tmpToken == null) {
+         if (tmpToken == null) {
             System.out.println("convertToIdents(): couldn't retrieve token");
-            System.out.println("start: " + start + " end: " + end + 
-                               " i: " + i);
+            System.out.println("start: " + start + " end: " + end + " i: " + i);
             tokens.printCurrLine();
             System.exit(1);
          }
-         if(lexer.isKeyword(tmpToken) == true) {
-				// Do not convert the ASSIGNMENT(=) or OPERATOR(T_DEFINED_OP)
-            if(isAssignment(i, end) == false &&
-					isOperator(i, end) == false) {
+         if (lexer.isKeyword(tmpToken) == true) {
+            // Do not convert the ASSIGNMENT(=) or OPERATOR(T_DEFINED_OP)
+            if (isAssignment(i, end) == false && isOperator(i, end) == false) {
                tmpToken.setType(FortranLexer.T_IDENT);
-				}
+            }
          }
-      }// end for(number of tokens in line)
+      } // end for(number of tokens in line)
+
       return;
-   }// end convertToIdents()
+   } // end convertToIdents()
 
 
    /**
@@ -1794,7 +1793,7 @@ public class FortranLexicalPrepass {
          firstToken == FortranLexer.T_SELECTTYPE ||
          firstToken == FortranLexer.T_CASE ||
          (firstToken == FortranLexer.T_CLASS &&
-			 tokens.currLineLA(lineStart+2) != FortranLexer.T_DEFAULT) || 
+             tokens.currLineLA(lineStart+2) != FortranLexer.T_DEFAULT) || 
          firstToken == FortranLexer.T_INTERFACE ||
          firstToken == FortranLexer.T_ENTRY ||
          firstToken == FortranLexer.T_IMPORT ||
@@ -1806,11 +1805,11 @@ public class FortranLexicalPrepass {
 
          // if we have a T_SELECT, a T_CASE or T_TYPE must follow, 
          // then ident(s).  also, if have T_CASE T_DEFAULT, idents follow it
-         if(firstToken == FortranLexer.T_SELECT ||
-            (firstToken == FortranLexer.T_CASE && 
-             tokens.currLineLA(lineStart+2) == FortranLexer.T_DEFAULT)) {
+         if (firstToken == FortranLexer.T_SELECT ||
+             (firstToken == FortranLexer.T_CASE && 
+              tokens.currLineLA(lineStart+2) == FortranLexer.T_DEFAULT)) {
             convertToIdents(lineStart+2, lineEnd);
-         } else if(firstToken == FortranLexer.T_INTERFACE) {
+         } else if (firstToken == FortranLexer.T_INTERFACE) {
             int identOffset;
             // need to match the generic spec and then convert to idents.
             identOffset = matchGenericSpec(lineStart+1, lineEnd);
@@ -1818,30 +1817,31 @@ public class FortranLexicalPrepass {
             // if matchGenericSpec fails, we won't convert anything because 
             // there is an error on the line and we'll let the parser deal 
             // with it.
-            if(identOffset != -1)
+            if (identOffset != -1) {
                convertToIdents(identOffset, lineEnd);
-         } else if(firstToken == FortranLexer.T_ENTRY) {
-				// an ENTRY stmt can have a result clause, so we need to 
-				// look for one.  if it does, it must have the parens after the
-				// entry-name, so look for them.
-				// lineStart+3 is the first token after the required entry-name.
-				if(lineStart+3 < lineEnd) {
-					if(tokens.currLineLA(lineStart+3) == FortranLexer.T_LPAREN) {
-						int resultLA;
-						resultLA = matchClosingParen(lineStart+3, lineStart+3);
+            }
+         } else if (firstToken == FortranLexer.T_ENTRY) {
+            // an ENTRY stmt can have a result clause, so we need to 
+            // look for one.  if it does, it must have the parens after the
+            // entry-name, so look for them.
+            // lineStart+3 is the first token after the required entry-name.
+            if (lineStart+3 < lineEnd) {
+               if (tokens.currLineLA(lineStart+3) == FortranLexer.T_LPAREN) {
+                  int resultLA;
+                  resultLA = matchClosingParen(lineStart+3, lineStart+3);
+                  
+                  convertToIdents(lineStart+1, resultLA-1);
 
-						convertToIdents(lineStart+1, resultLA-1);
-
-						// The resultLA is either the LA for T_RESULT or T_EOS.  If 
-						// it is a T_RESULT, we need to convert what follows it.  
-						if(tokens.currLineLA(resultLA) == FortranLexer.T_RESULT) 
-							convertToIdents(resultLA, lineEnd);
-					}
-				} else {
-					// No dummy-arg-list given.
-					convertToIdents(lineStart+1, lineEnd);
-				}
-			} else {
+                  // The resultLA is either the LA for T_RESULT or T_EOS.  If 
+                  // it is a T_RESULT, we need to convert what follows it.  
+                  if(tokens.currLineLA(resultLA) == FortranLexer.T_RESULT) 
+                     convertToIdents(resultLA, lineEnd);
+               }
+            } else {
+               // No dummy-arg-list given.
+               convertToIdents(lineStart+1, lineEnd);
+            }
+         } else {
             // all other cases
             convertToIdents(lineStart+1, lineEnd);
          }
@@ -1862,48 +1862,70 @@ public class FortranLexicalPrepass {
    }// end matchSingleTokenStmt()
 
 
+   /////////
+   // Attempt to match a DO statement.  The lineStart argument has already advance
+   // beyond the statement label if it exists.
+   //
    private boolean matchDoStmt(int lineStart, int lineEnd) {
-      int whileOffset = -1;
-      int equalsOffset;
-      int identOffset;
+      int equalsOffset, commaOffset;
+      int whileOffset, concurrentOffset;
 
-      // see if we can return quickly -- no expression, etc., just the
-      // T_EOS next.
-      if(tokens.currLineLA(lineStart+2) == FortranLexer.T_EOS)
+      // Default is to convert everything except T_DO to identifiers.
+      //
+      int identOffset = lineStart + 1;
+
+      // The keyword may immediately follow the T_DO token
+      //
+      int keywordOffset = lineStart + 2;
+
+      // If there is no loop-control then return immediately
+      //
+      if (tokens.currLineLA(lineStart+2) == FortranLexer.T_EOS ||
+          tokens.currLineLA(lineStart+3) == FortranLexer.T_EOS)
+      {
          return true;
-
-      // see if the next token is a label.  if so, save it so we 
-      // can change the token type for the labeled continue
-      if(tokens.currLineLA(lineStart+2) == FortranLexer.T_DIGIT_STRING)
-         doLabels.push(new FortranToken(tokens.getToken(lineStart+1)));
-
-      // there can be a label after the do and no loop expression.  
-      if(tokens.currLineLA(lineStart+3) == FortranLexer.T_EOS)
-         return true;
-         
-      // see if we have a T_WHILE in the loop control
-      whileOffset = tokens.findToken(lineStart+1, FortranLexer.T_WHILE);
-      // see if we have a while token, and see if it's part of the 
-      // loop control.  if there is a T_EQUALS and T_COMMA, the T_WHILE 
-      // is a T_IDENT and can not a loop in the loop control.  
-      // otherwise, it must be a while loop.
-      equalsOffset = salesScanForToken(lineStart+1, FortranLexer.T_EQUALS);
-      if(equalsOffset != -1) {
-         // we have an equals and a comma, so if there is a while, it
-         // shouldn't be an identifier..
-         identOffset = lineStart+1;
-      } else {
-         // the first T_WHILE (assuming there could be more than one) must
-         // be part of the loop control and is a keyword.  so, start 
-         // converting after it
-         identOffset = whileOffset+1;
       }
 
-      // convert keywords on the line to idents, starting at the identOffset
+      // See if the next token is a label.  If so, save it so we 
+      // can change the token type for the labeled continue.
+      //
+      if (tokens.currLineLA(lineStart+2) == FortranLexer.T_DIGIT_STRING) {
+         doLabels.push(new FortranToken(tokens.getToken(lineStart+1)));
+         identOffset   += 1;
+         keywordOffset += 1;
+      }
+
+      // At this point we know we have a loop-control.
+      //
+
+      // The previous (pre F2008) way of matching do statements no
+      // longer works as a DO CONCURRENT construct has a forall-header
+      // with T_EQUALS and T_COMMA.  So we have to be more selective.
+
+      // Skip over the comma preceeding the keyword if it exists
+      //
+      if (tokens.currLineLA(keywordOffset) == FortranLexer.T_COMMA) {
+         identOffset   += 1;
+         keywordOffset += 1;
+      }
+
+      // The next token must be a variable, T_WHILE, or T_CONCURRENT
+      //
+      if (tokens.currLineLA(keywordOffset) == FortranLexer.T_WHILE ||
+          tokens.currLineLA(keywordOffset) == FortranLexer.T_CONCURRENT)
+      {
+         // check for variable T_EQUALS ...
+         if (tokens.currLineLA(keywordOffset + 1) != FortranLexer.T_EQUALS) {
+            identOffset += 1;
+         }
+      }
+
+      // Convert keywords on the line to idents, starting at the identOffset.
+      //
       convertToIdents(identOffset, lineEnd);
 
       return true;
-   }// end matchDoStmt()
+   } // end matchDoStmt()
 
    
    private boolean matchOneLineStmt(int lineStart, int lineEnd) {
@@ -2511,11 +2533,11 @@ public void performPrepass() {
          // add offset of T_EOS from the start to lineStart to get end
          rawLineEnd += rawLineStart;
 
-			// Check for a generated T_EOF and skip it if it exists.
-			if(tokens.currLineLA(1) == FortranLexer.T_EOF) {
-// 				System.err.println("SKIPPING T_EOF in prepass!!!!!!!!!!!!!!!");
-				lineStart++;
-			}
+         // Check for a generated T_EOF and skip it if it exists.
+         if (tokens.currLineLA(1) == FortranLexer.T_EOF) {
+            // System.err.println("SKIPPING T_EOF in prepass!!!!!!!!!!!!!!!");
+            lineStart++;
+         }
 
          // check for a label and consume it if exists
          if(matchLabel(lineStart, lineLength) == true) {
