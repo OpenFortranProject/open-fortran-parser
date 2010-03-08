@@ -304,16 +304,6 @@ C303    (R309) char-constant shall be of type character.
 
 R310    intrinsic-operator           is    power-op
 
-
-
-
-SEP 2002                                   COMMITTEE DRAFT                                     495
-
-
-ISO/IEC 1539-1                               COMMITTEE DRAFT                                  SEP 2002
-
-
-
                                        or mult-op
 
                                        or add-op
@@ -402,19 +392,7 @@ C403    (R404) A scalar-int-constant-name shall be a named constant of type inte
 
 C404    (R404) The value of kind-param shall be nonnegative.
 
-C405    (R403) The value of kind-param shall specify a representation method that exists on the pro-
-
-
-
-
-496                               COMMITTEE DRAFT                                             SEP 2002
-
-
-SEP 2002                            COMMITTEE DRAFT                                        ISO/IEC 1539-1
-
-
-
-        cessor.
+C405    (R403) The value of kind-param shall specify a representation method that exists on the processor.
 
 R408    boz-literal-constant            is    binary-constant
 
@@ -502,16 +480,6 @@ C412    (R421) The value of kind-param shall specify a representation method tha
         cessor.
 
 R422    logical-literal-constant        is    .TRUE. [     kind-param ]
-
-
-
-
-SEP 2002                                      COMMITTEE DRAFT                                              497
-
-
-ISO/IEC 1539-1                             COMMITTEE DRAFT                                      SEP 2002
-
-
 
                                      or .FALSE. [         kind-param ]
 
@@ -689,15 +657,6 @@ R438    type-bound-procedure-part     is    contains-stmt
 
                                                   proc-binding-stmt
 
-
-
-SEP 2002                                    COMMITTEE DRAFT                                          499
-
-
-ISO/IEC 1539-1                                 COMMITTEE DRAFT                                      SEP 2002
-
-
-
                                                    [ proc-binding-stmt ] ...
 
 R439    binding-private-stmt             is    PRIVATE
@@ -779,15 +738,6 @@ C458    (R442) Within the specification-part of a module, each generic-binding s
 
 R445    binding                          is    procedure-name
 
-
-
-500                               COMMITTEE DRAFT                                                   SEP 2002
-
-
-SEP 2002                          COMMITTEE DRAFT                                          ISO/IEC 1539-1
-
-
-
 C459    (R445) The procedure-name shall be the name of an accessible module procedure or an external
         procedure that has an explicit interface.
 
@@ -868,18 +818,7 @@ C478    (R453) A type-alias-name shall not be the same as the name of any intrin
 
 C479    (R453) A declaration-type-spec in a type-alias shall not use the CLASS keyword.
 
-C480    (R453) A declaration-type-spec shall specify an intrinsic type or a previously defined derived
-
-
-
-SEP 2002                                       COMMITTEE DRAFT                                         501
-
-
-ISO/IEC 1539-1                              COMMITTEE DRAFT                                          SEP 2002
-
-
-
-        type. Each type-param-value shall be an initialization expression.
+C480    (R453) A declaration-type-spec shall specify an intrinsic type or a previously defined derived type. Each type-param-value shall be an initialization expression.
 
 R454    enum-alias-def                is    enum-def-stmt
 
@@ -1231,16 +1170,6 @@ R519      assumed-shape-spec                 is    [ lower-bound ] :
 
 R520      deferred-shape-spec                is    :
 
-
-
-
-SEP 2002                                           COMMITTEE DRAFT                                                    505
-
-
-ISO/IEC 1539-1                                COMMITTEE DRAFT                                       SEP 2002
-
-
-
 R521    assumed-size-spec               is    [ explicit-shape-spec-list , ] [ lower-bound : ] *
 
 C551    An assumed-size-spec shall not appear except as the declaration of the array bounds of a dummy
@@ -1330,19 +1259,7 @@ R533    data-i-do-object                is    array-element
 
 R534    data-i-do-variable              is    scalar-int-variable
 
-C561    (R531) In a variable that is a data-stmt-object , any subscript, section subscript, substring start-
-
-
-
-
-506                                 COMMITTEE DRAFT                                                 SEP 2002
-
-
-SEP 2002                          COMMITTEE DRAFT                                        ISO/IEC 1539-1
-
-
-
-        ing point, and substring ending point shall be an initialization expression.
+C561    (R531) In a variable that is a data-stmt-object , any subscript, section subscript, substring starting point, and substring ending point shall be an initialization expression.
 
 C562    (R531) A variable whose designator is included in a data-stmt-object -list or a data-i-do-object -
         list shall not be: a dummy argument, made accessible by use association or host association, in
@@ -1423,15 +1340,6 @@ R543    parameter-stmt                is    PARAMETER ( named-constant-def -list
 R544    named-constant-def            is    named-constant = initialization-expr
 
 R545    pointer-stmt                  is    POINTER [ :: ] pointer-decl -list
-
-
-
-SEP 2002                                    COMMITTEE DRAFT                                             507
-
-
-ISO/IEC 1539-1                             COMMITTEE DRAFT                                      SEP 2002
-
-
 
 R546    pointer-decl                 is    object-name [ ( deferred-shape-spec-list ) ]
 
@@ -1522,15 +1430,6 @@ C585    (R561) An equivalence-object shall not be a designator that has more tha
 
 C586    (R561) An equivalence-object shall not have the TARGET attribute.
 
-
-
-508                              COMMITTEE DRAFT                                                SEP 2002
-
-
-SEP 2002                            COMMITTEE DRAFT                                       ISO/IEC 1539-1
-
-
-
 C587    (R561) Each subscript or substring range expression in an equivalence-object shall be an integer
         initialization expression (7.1.7).
 
@@ -1615,16 +1514,6 @@ C604    (R605) default-logical-variable shall be of type default logical.
 R606    char-variable                   is    variable
 
 C605    (R606) char-variable shall be of type character.
-
-
-
-
-SEP 2002                                      COMMITTEE DRAFT                                              509
-
-
-ISO/IEC 1539-1                                COMMITTEE DRAFT                                SEP 2002
-
-
 
 R607    default-char-variable           is    variable
 
@@ -1823,16 +1712,6 @@ R701    primary                        is    constant
 
                                        or array-constructor
 
-
-
-
-SEP 2002                                     COMMITTEE DRAFT                                            511
-
-
-ISO/IEC 1539-1                               COMMITTEE DRAFT                            SEP 2002
-
-
-
                                        or structure-constructor
 
                                        or function-reference
@@ -2019,16 +1898,6 @@ C724    (R739) An expr shall be a reference to a function whose result is a data
 
 R740    proc-pointer-object              is    proc-pointer-name
 
-
-
-
-SEP 2002                                       COMMITTEE DRAFT                                               513
-
-
-ISO/IEC 1539-1                              COMMITTEE DRAFT                                      SEP 2002
-
-
-
                                       or variable % procedure-component-name
 
 C725    (R740) A procedure-component-name shall be the name of a procedure pointer component of
@@ -2115,16 +1984,6 @@ R755    forall-body-construct         is    forall-assignment-stmt
 R756    forall-assignment-stmt        is    assignment-stmt
 
                                       or pointer-assignment-stmt
-
-
-
-
-514                               COMMITTEE DRAFT                                                SEP 2002
-
-
-SEP 2002                          COMMITTEE DRAFT                                     ISO/IEC 1539-1
-
-
 
 R757    end-forall-stmt               is    END FORALL [forall-construct-name ]
 
@@ -2309,16 +2168,6 @@ R823    type-guard-stmt              is    TYPE IS ( extensible-type-name ) [ se
 
                                      or CLASS IS ( extensible-type-name ) [ select-construct-name ]
 
-
-
-
-516                              COMMITTEE DRAFT                                            SEP 2002
-
-
-SEP 2002                            COMMITTEE DRAFT                                       ISO/IEC 1539-1
-
-
-
                                         or CLASS DEFAULT [ select-construct-name ]
 
 C813    (R823) If selector is not unlimited polymorphic, the extensible-type-name shall be the name of
@@ -2404,20 +2253,7 @@ R837    do-body                         is    [ execution-part-construct ] ...
 
 R838    do-term-action-stmt             is    action-stmt
 
-C821    (R838) A do-term-action-stmt shall not be a continue-stmt , a goto-stmt , a return-stmt , a stop-
-
-
-
-
-SEP 2002                                      COMMITTEE DRAFT                                          517
-
-
-ISO/IEC 1539-1                               COMMITTEE DRAFT                                     SEP 2002
-
-
-
-        stmt , an exit-stmt , a cycle-stmt , an end-function-stmt , an end-subroutine-stmt , an end-program-
-        stmt , or an arithmetic-if-stmt .
+C821    (R838) A do-term-action-stmt shall not be a continue-stmt , a goto-stmt , a return-stmt , a stop-stmt , an exit-stmt , a cycle-stmt , an end-function-stmt , an end-subroutine-stmt , an end-program-stmt , or an arithmetic-if-stmt .
 
 C822    (R835) The do-term-action-stmt shall be identified with a label and the corresponding label-do-
         stmt shall refer to the same label.
@@ -2526,16 +2362,6 @@ C901    (R903) The default-char-variable shall not be an array section with a ve
 
 R904    open-stmt                      is    OPEN ( connect-spec-list )
 
-
-
-
-518                                 COMMITTEE DRAFT                                              SEP 2002
-
-
-SEP 2002                         COMMITTEE DRAFT                                      ISO/IEC 1539-1
-
-
-
 R905    connect-spec                 is    [ UNIT = ] file-unit-number
 
                                      or ACCESS = scalar-default-char-expr
@@ -2626,15 +2452,6 @@ R913    io-control-spec              is    [ UNIT = ] io-unit
 
                                      or DECIMAL = scalar-default-char-expr
 
-
-
-SEP 2002                                   COMMITTEE DRAFT                                        519
-
-
-ISO/IEC 1539-1                             COMMITTEE DRAFT                                 SEP 2002
-
-
-
                                       or DELIM = scalar-default-char-expr
 
                                       or END = label
@@ -2716,16 +2533,6 @@ C927    (R913) If a DECIMAL=, BLANK=, PAD=, SIGN=, or ROUND= specifier appears, 
 
 C928    (R913) If a DELIM= specifier appears, either format shall be an asterisk or namelist-group-name
         shall appear.
-
-
-
-
-520                               COMMITTEE DRAFT                                          SEP 2002
-
-
-SEP 2002                         COMMITTEE DRAFT                                        ISO/IEC 1539-1
-
-
 
 R914    format                        is    default-char-expr
 
@@ -2815,16 +2622,6 @@ R926    position-spec                 is    [ UNIT = ] file-unit-number
                                       or IOMSG = iomsg-variable
 
                                       or IOSTAT = scalar-int-variable
-
-
-
-
-SEP 2002                                    COMMITTEE DRAFT                                           521
-
-
-ISO/IEC 1539-1                             COMMITTEE DRAFT                                      SEP 2002
-
-
 
                                      or ERR = label
 
@@ -2916,15 +2713,6 @@ R930    inquire-spec                 is    [ UNIT = ] file-unit-number
 
                                      or READWRITE = scalar-default-char-variable
 
-
-
-522                              COMMITTEE DRAFT                                                SEP 2002
-
-
-SEP 2002                           COMMITTEE DRAFT                                          ISO/IEC 1539-1
-
-
-
                                          or RECL = scalar-int-variable
 
                                          or ROUND = scalar-default-char-variable
@@ -3012,19 +2800,7 @@ R1010 v                                  is    signed-int-literal-constant
 
 C1005    (R1009) e shall be positive.
 
-C1006    (R1006) w shall be zero or positive for the I, B, O, Z, and F edit descriptors. w shall be positive
-
-
-
-
-SEP 2002                                       COMMITTEE DRAFT                                         523
-
-
-ISO/IEC 1539-1                                    COMMITTEE DRAFT                              SEP 2002
-
-
-
-         for all other edit descriptors.
+C1006    (R1006) w shall be zero or positive for the I, B, O, Z, and F edit descriptors. w shall be positive for all other edit descriptors.
 
 C1007    (R1005) w , m, d , e, and v shall not have kind parameters specified for them.
 
@@ -3101,31 +2877,20 @@ R1101-F03 main-program               is [ program-stmt ]
                                            [ specification-part ]
                                            [ execution-part ]
                                            [ internal-subprogram-part ]
-                                           end-program-stmt
+                                        end-program-stmt
 
 
 R1101-F08 main-program               is [ program-stmt ]
                                            [ specification-part ]
                                            [ execution-part ]
                                            [ internal-subprogram-part ]
-                                           end-program-stmt
+                                        end-program-stmt
 
 R1102 program-stmt                          is    PROGRAM program-name
 
 R1103 end-program-stmt                      is    END [ PROGRAM [ program-name ] ]
 
-C1101    (R1101) In a main-program, the execution-part shall not contain a RETURN statement or an
-         ENTRY statement.
-
-
-
-
-524                                 COMMITTEE DRAFT                                            SEP 2002
-
-
-SEP 2002                          COMMITTEE DRAFT                                    ISO/IEC 1539-1
-
-
+C1101    (R1101) In a main-program, the execution-part shall not contain a RETURN statement or an ENTRY statement.
 
 C1102    (R1101) The program-name may be included in the end-program-stmt only if the optional
          program-stmt is used and, if included, shall be identical to the program-name specified in the
@@ -3259,6 +3024,7 @@ C1117    (R1116) A type declaration statement in a block-data specification-part
 
 Section 12: Procedures
 
+
 R1201 interface-block                  is    interface-stmt
 
                                                  [ interface-specification ] ...
@@ -3287,42 +3053,20 @@ R1205 interface-body                   is    function-stmt
 
                                                  end-subroutine-stmt
 
-C1201    (R1201) An interface-block in a subprogram shall not contain an interface-body for a procedure
-         defined by that subprogram.
+C1201    (R1201) An interface-block in a subprogram shall not contain an interface-body for a procedure defined by that subprogram.
 
-C1202    (R1201) The generic-spec may be included in the end-interface-stmt only if it was provided in the
-         interface-stmt . If the end-interface-stmt includes generic-name, the interface-stmt shall specify
-         the same generic-name. If the end-interface-stmt includes ASSIGNMENT(=), the interface-
-         stmt shall specify ASSIGNMENT(=).            If the end-interface-stmt includes dtio-generic-spec,
-         the interface-stmt shall specify the same dtio-generic-spec. If the end-interface-stmt includes
-         OPERATOR(defined-operator ), the interface-stmt shall specify the same defined-operator . If
-         one defined-operator is .LT., .LE., .GT., .GE., .EQ., or .NE., the other is permitted to be the
-         corresponding operator <, <=, >, >=, ==, or /=.
+C1202    (R1201) The generic-spec may be included in the end-interface-stmt only if it was provided in the interface-stmt . If the end-interface-stmt includes generic-name, the interface-stmt shall specify the same generic-name. If the end-interface-stmt includes ASSIGNMENT(=), the interface-stmt shall specify ASSIGNMENT(=). If the end-interface-stmt includes dtio-generic-spec, the interface-stmt shall specify the same dtio-generic-spec. If the end-interface-stmt includes OPERATOR(defined-operator ), the interface-stmt shall specify the same defined-operator . If one defined-operator is .LT., .LE., .GT., .GE., .EQ., or .NE., the other is permitted to be the corresponding operator <, <=, >, >=, ==, or /=.
 
 C1203    (R1203) If the interface-stmt is ABSTRACT INTERFACE, then the function-name in the
-         function-stmt or the subroutine-name in the subroutine-stmt shall not be the same as a keyword
-         that specifies an intrinsic type.
+         function-stmt or the subroutine-name in the subroutine-stmt shall not be the same as a keyword that specifies an intrinsic type.
 
 C1204    (R1202) A procedure-stmt is allowed only in an interface block that has a generic-spec.
 
-C1205    (R1205) An interface-body of a pure procedure shall specify the intents of all dummy arguments
-         except pointer, alternate return, and procedure arguments.
+C1205    (R1205) An interface-body of a pure procedure shall specify the intents of all dummy arguments except pointer, alternate return, and procedure arguments.
 
-C1206    (R1205) An interface-body shall not contain an entry-stmt , data-stmt , format-stmt , or stmt-
-
-         function-stmt .
+C1206    (R1205) An interface-body shall not contain an entry-stmt , data-stmt , format-stmt , or stmt-function-stmt .
 
 R1206 procedure-stmt                   is    [ MODULE ] PROCEDURE procedure-name-list
-
-
-
-
-526                                COMMITTEE DRAFT                                            SEP 2002
-
-
-SEP 2002                          COMMITTEE DRAFT                                           ISO/IEC 1539-1
-
-
 
 R1207 generic-spec                    is    generic-name
 
@@ -3340,14 +3084,11 @@ R1208 dtio-generic-spec               is    READ (FORMATTED)
 
                                       or WRITE (UNFORMATTED)
 
-C1207    (R1206) A procedure-name shall have an explicit interface and shall refer to an accessible pro-
-         cedure pointer, external procedure, dummy procedure, or module procedure.
+C1207    (R1206) A procedure-name shall have an explicit interface and shall refer to an accessible procedure pointer, external procedure, dummy procedure, or module procedure.
 
-C1208    (R1206) If MODULE appears in a procedure-stmt , each procedure-name in that statement shall
-         be accessible in the current scope as a module procedure.
+C1208    (R1206) If MODULE appears in a procedure-stmt , each procedure-name in that statement shall be accessible in the current scope as a module procedure.
 
-C1209    (R1206) A procedure-name shall not specify a procedure that is specified previously in any
-         procedure-stmt in any accessible interface with the same generic identifier.
+C1209    (R1206) A procedure-name shall not specify a procedure that is specified previously in any procedure-stmt in any accessible interface with the same generic identifier.
 
 R1209 import-stmt                     is    IMPORT [[ :: ] import-name-list
 
@@ -3381,42 +3122,25 @@ R1214 proc-decl                       is    procedure-entity-name[ => null-init 
 
 R1215 interface-name                  is    name
 
-C1212    (R1215) The name shall be the name of an abstract interface or of a procedure that has an
-         explicit interface. If name is declared by a procedure-declaration-stmt it shall be previously
-         declared. If name denotes an intrinsic procedure it shall be one that is listed in 13.6 and not
-         marked with a bullet (�).
+C1212    (R1215) The name shall be the name of an abstract interface or of a procedure that has an explicit interface. If name is declared by a procedure-declaration-stmt it shall be previously declared. If name denotes an intrinsic procedure it shall be one that is listed in 13.6 and not marked with a bullet (�).
 
 C1213    (R1215) The name shall not be the same as a keyword that specifies an intrinsic type.
 
-C1214    If a procedure entity has the INTENT attribute or SAVE attribute, it shall also have the
-         POINTER attribute.
+C1214    If a procedure entity has the INTENT attribute or SAVE attribute, it shall also have the POINTER attribute.
 
-C1215    (R1211) If a proc-interface describes an elemental procedure, each procedure-entity-name shall
-         specify an external procedure.
+C1215    (R1211) If a proc-interface describes an elemental procedure, each procedure-entity-name shall specify an external procedure.
 
-C1216    (R1214) If => appears in proc-decl , the procedure entity shall have the POINTER attribute.
+C1216    (R1214) If => appears in proc-decl, the procedure entity shall have the POINTER attribute.
 
-C1217    (R1211) If proc-language-binding-spec with a NAME= is specified, then proc-decl -list shall con-
-         tain exactly one proc-decl , which shall neither have the POINTER attribute nor be a dummy
-         procedure.
+C1217    (R1211) If proc-language-binding-spec with a NAME= is specified, then proc-decl -list shall contain exactly one proc-decl , which shall neither have the POINTER attribute nor be a dummy procedure.
 
-C1218    (R1211) If proc-language-binding-spec is specified, the proc-interface shall appear, it shall be an
-         interface-name, and interface-name shall be declared with a proc-language-binding-spec.
+C1218    (R1211) If proc-language-binding-spec is specified, the proc-interface shall appear, it shall be an interface-name, and interface-name shall be declared with a proc-language-binding-spec.
 
 R1216 intrinsic-stmt                  is    INTRINSIC [ :: ] intrinsic-procedure-name-list
 
 C1219    (R1216) Each intrinsic-procedure-name shall be the name of an intrinsic procedure.
 
 R1217 function-reference              is    procedure-designator ( [ actual-arg-spec-list ] )
-
-
-
-SEP 2002                                    COMMITTEE DRAFT                                           527
-
-
-ISO/IEC 1539-1                                   COMMITTEE DRAFT                                      SEP 2002
-
-
 
 C1220    (R1217) The procedure-designator shall designate a function.
 
@@ -3434,11 +3158,9 @@ R1219 procedure-designator                 is    procedure-name
 
 C1223    (R1219) A procedure-name shall be the name of a procedure or procedure pointer.
 
-C1224    (R1219) A procedure-component-name shall be the name of a procedure pointer component of
-         the declared type of data-ref .
+C1224    (R1219) A procedure-component-name shall be the name of a procedure pointer component of the declared type of data-ref .
 
-C1225    (R1219) A binding-name shall be the name of a procedure binding (4.5.1.5) of the declared type
-         of data-ref .
+C1225    (R1219) A binding-name shall be the name of a procedure binding (4.5.1.5) of the declared type of data-ref .
 
 R1220 actual-arg-spec                      is    [ keyword = ] actual-arg
 
@@ -3452,35 +3174,23 @@ R1221 actual-arg                           is    expr
 
 R1222 alt-return-spec                      is    * label
 
-C1226    (R1220) The keyword = shall not appear if the interface of the procedure is implicit in the
-         scoping unit.
+C1226    (R1220) The keyword = shall not appear if the interface of the procedure is implicit in the scoping unit.
 
-C1227    (R1220) The keyword = may be omitted from an actual-arg-spec only if the keyword = has been
-         omitted from each preceding actual-arg-spec in the argument list.
+C1227    (R1220) The keyword = may be omitted from an actual-arg-spec only if the keyword = has been omitted from each preceding actual-arg-spec in the argument list.
 
-C1228    (R1220) Each keyword shall be the name of a dummy argument in the explicit interface of the
-         procedure.
+C1228    (R1220) Each keyword shall be the name of a dummy argument in the explicit interface of the procedure.
 
 C1229    (R1221) A nonintrinsic elemental procedure shall not be used as an actual argument.
 
-C1230    (R1221) A procedure-name shall be the name of an external procedure, a dummy procedure, a
-         module procedure, a procedure pointer, or a specific intrinsic function that is listed in 13.6 and
-         not marked with a bullet(�).
+C1230    (R1221) A procedure-name shall be the name of an external procedure, a dummy procedure, a module procedure, a procedure pointer, or a specific intrinsic function that is listed in 13.6 and not marked with a bullet(�).
 
-C1231    (R1221) In a reference to a pure procedure, a procedure-name actual-arg shall be the name of a
-         pure procedure (12.6).
+C1231    (R1221) In a reference to a pure procedure, a procedure-name actual-arg shall be the name of a pure procedure (12.6).
 
-C1232    (R1222) The label used in the alt-return-spec shall be the statement label of a branch target statement that
+C1232    (R1222) The label used in the alt-return-spec shall be the statement label of a branch target statement that appears in the same scoping unit as the call-stmt .
 
-         appears in the same scoping unit as the call-stmt .
+C1233    (R1221) If an actual argument is an array section or an assumed-shape array, and the corresponding dummy argument has either the VOLATILE or ASYNCHRONOUS attribute, that dummy argument shall be an assumed-shape array.
 
-C1233    (R1221) If an actual argument is an array section or an assumed-shape array, and the corre-
-         sponding dummy argument has either the VOLATILE or ASYNCHRONOUS attribute, that
-         dummy argument shall be an assumed-shape array.
-
-C1234    (R1221) If an actual argument is a pointer array, and the corresponding dummy argument
-         has either the VOLATILE or ASYNCHRONOUS attribute, that dummy argument shall be an
-         assumed-shape array or a pointer array.
+C1234    (R1221) If an actual argument is a pointer array, and the corresponding dummy argument has either the VOLATILE or ASYNCHRONOUS attribute, that dummy argument shall be an assumed-shape array or a pointer array.
 
 R1223 function-subprogram                  is    function-stmt
 
@@ -3498,34 +3208,17 @@ R1224 function-stmt                        is    [ prefix ] FUNCTION function-na
 
                                                    [, proc-language-binding-spec] [ RESULT ( result-name ) ]
 
-C1235    (R1224) If RESULT is specified, result-name shall not be the same as function-name and shall
-         not be the same as the entry-name in any ENTRY statement in the subprogram.
+C1235    (R1224) If RESULT is specified, result-name shall not be the same as function-name and shall not be the same as the entry-name in any ENTRY statement in the subprogram.
 
-
-
-
-528                                    COMMITTEE DRAFT                                                SEP 2002
-
-
-SEP 2002                           COMMITTEE DRAFT                                        ISO/IEC 1539-1
-
-
-
-C1236    (R1224) If RESULT is specified, the function-name shall not appear in any specification state-
-         ment in the scoping unit of the function subprogram.
+C1236    (R1224) If RESULT is specified, the function-name shall not appear in any specification statement in the scoping unit of the function subprogram.
 
 R1225 proc-language-binding-spec       is    language-binding-spec
 
-C1237    (R1225) A proc-language-binding-spec with a NAME= specifier shall not be specified in the
-         function-stmt or subroutine-stmt of an interface body for an abstract interface or a dummy
-         procedure.
+C1237    (R1225) A proc-language-binding-spec with a NAME= specifier shall not be specified in the function-stmt or subroutine-stmt of an interface body for an abstract interface or a dummy procedure.
 
 C1238    (R1225) A proc-language-binding-spec shall not be specified for an internal procedure.
 
-C1239    (R1225) If proc-language-binding-spec is specified for a procedure, each of the procedure's dummy
-         arguments shall be a nonoptional interoperable variable (15.2.4, 15.2.5) or an interoperable
-         procedure (15.2.6). If proc-language-binding-spec is specified for a function, the function result
-         shall be an interoperable variable.
+C1239    (R1225) If proc-language-binding-spec is specified for a procedure, each of the procedure's dummy arguments shall be a nonoptional interoperable variable (15.2.4, 15.2.5) or an interoperable procedure (15.2.6). If proc-language-binding-spec is specified for a function, the function result shall be an interoperable variable.
 
 R1226 dummy-arg-name                   is    name
 
@@ -3545,8 +3238,7 @@ C1241    (R1227) A prefix shall contain at most one of each prefix-spec.
 
 C1242    (R1227) A prefix shall not specify both ELEMENTAL and RECURSIVE.
 
-C1243    (R1227) A prefix shall not specify ELEMENTAL if proc-language-binding-spec appears in the
-         function-stmt or subroutine-stmt .
+C1243    (R1227) A prefix shall not specify ELEMENTAL if proc-language-binding-spec appears in the function-stmt or subroutine-stmt.
 
 R1229 end-function-stmt                is    END [ FUNCTION [ function-name ] ]
 
@@ -3554,10 +3246,9 @@ C1244    (R1229) FUNCTION shall appear in the end-function-stmt of an internal o
 
 C1245    (R1223) An internal function subprogram shall not contain an ENTRY statement.
 
-C1246    (R1223) An internal function subprogram shall not contain an internal-subprogram-part .
+C1246    (R1223) An internal function subprogram shall not contain an internal-subprogram-part.
 
-C1247    (R1229) If a function-name appears in the end-function-stmt , it shall be identical to the function-
-         name specified in the function-stmt .
+C1247    (R1229) If a function-name appears in the end-function-stmt , it shall be identical to the function-name specified in the function-stmt.
 
 R1230 subroutine-subprogram            is    subroutine-stmt
 
@@ -3581,15 +3272,13 @@ R1232 dummy-arg                        is    dummy-arg-name
 
 R1233 end-subroutine-stmt              is    END [ SUBROUTINE [ subroutine-name ] ]
 
-C1249    (R1233) SUBROUTINE shall appear in the end-subroutine-stmt of an internal or module sub-
-         routine.
+C1249    (R1233) SUBROUTINE shall appear in the end-subroutine-stmt of an internal or module subroutine.
 
 C1250    (R1230) An internal subroutine subprogram shall not contain an ENTRY statement.
 
-C1251    (R1230) An internal subroutine subprogram shall not contain an internal-subprogram-part .
+C1251    (R1230) An internal subroutine subprogram shall not contain an internal-subprogram-part.
 
-C1252    (R1233) If a subroutine-name appears in the end-subroutine-stmt , it shall be identical to the
-         subroutine-name specified in the subroutine-stmt .
+C1252    (R1233) If a subroutine-name appears in the end-subroutine-stmt , it shall be identical to the subroutine-name specified in the subroutine-stmt .
 
 R1234 entry-stmt                       is    ENTRY entry-name [ ( [ dummy-arg -list ] )
 
@@ -3597,38 +3286,21 @@ R1234 entry-stmt                       is    ENTRY entry-name [ ( [ dummy-arg -l
 
                                                 [ RESULT ( result-name ) ] ]
 
-
-
-SEP 2002                                     COMMITTEE DRAFT                                                   529
-
-
-ISO/IEC 1539-1                                    COMMITTEE DRAFT                                            SEP 2002
-
-
-
                                             or ENTRY entry-name
 
                                                     , proc-language-binding-spec [ RESULT ( result-name ) ]
 
-C1253    (R1234) If RESULT is specified, the entry-name shall not appear in any specification or type-
-         declaration statement in the scoping unit of the function program.
+C1253    (R1234) If RESULT is specified, the entry-name shall not appear in any specification or type declaration statement in the scoping unit of the function program.
 
-C1254    (R1234) An entry-stmt may appear only in an external-subprogram or module-subprogram. An
-         entry-stmt shall not appear within an executable-construct .
+C1254    (R1234) An entry-stmt may appear only in an external-subprogram or module-subprogram. An entry-stmt shall not appear within an executable-construct .
 
 C1255    (R1234) RESULT may appear only if the entry-stmt is in a function subprogram.
 
-C1256    (R1234) Within the subprogram containing the entry-stmt , the entry-name shall not appear
-         as a dummy argument in the FUNCTION or SUBROUTINE statement or in another ENTRY
-         statement nor shall it appear in an EXTERNAL, INTRINSIC, or PROCEDURE statement.
+C1256    (R1234) Within the subprogram containing the entry-stmt , the entry-name shall not appear as a dummy argument in the FUNCTION or SUBROUTINE statement or in another ENTRY statement nor shall it appear in an EXTERNAL, INTRINSIC, or PROCEDURE statement.
 
-C1257    (R1234) A dummy-arg may be an alternate return indicator only if the ENTRY statement is in a subroutine
+C1257    (R1234) A dummy-arg may be an alternate return indicator only if the ENTRY statement is in a subroutine subprogram.
 
-         subprogram.
-
-C1258    (R1234) If RESULT is specified, result-name shall not be the same as the function-name in the
-         FUNCTION statement and shall not be the same as the entry-name in any ENTRY statement
-         in the subprogram.
+C1258    (R1234) If RESULT is specified, result-name shall not be the same as the function-name in the FUNCTION statement and shall not be the same as the entry-name in any ENTRY statement in the subprogram.
 
 R1235 return-stmt                           is    RETURN [ scalar-int-expr ]
 
@@ -3640,129 +3312,64 @@ R1236 contains-stmt                         is    CONTAINS
 
 R1237 stmt-function-stmt                    is    function-name ( [ dummy-arg-name-list ] ) = scalar-expr
 
-C1261    (R1237) The primaries of the scalar-expr shall be constants (literal and named), references to variables, references
+C1261    (R1237) The primaries of the scalar-expr shall be constants (literal and named), references to variables, references to functions and function dummy procedures, and intrinsic operations. If scalar-expr contains a reference to a function or a function dummy procedure, the reference shall not require an explicit interface, the function shall not require an explicit interface unless it is an intrinsic, the function shall not be a transformational intrinsic, and the result shall be scalar. If an argument to a function or a function dummy procedure is an array, it shall be an array name. If a reference to a statement function appears in scalar-expr , its definition shall have been provided earlier in the scoping unit and shall not be the name of the statement function being defined.
 
-         to functions and function dummy procedures, and intrinsic operations. If scalar-expr contains a reference to a
+C1262    (R1237) Named constants in scalar-expr shall have been declared earlier in the scoping unit or made accessible by use or host association. If array elements appear in scalar-expr , the array shall have been declared as an array earlier in the scoping unit or made accessible by use or host association.
 
-         function or a function dummy procedure, the reference shall not require an explicit interface, the function shall
-
-         not require an explicit interface unless it is an intrinsic, the function shall not be a transformational intrinsic,
-
-         and the result shall be scalar. If an argument to a function or a function dummy procedure is an array, it shall
-
-         be an array name. If a reference to a statement function appears in scalar-expr , its definition shall have been
-
-         provided earlier in the scoping unit and shall not be the name of the statement function being defined.
-
-C1262    (R1237) Named constants in scalar-expr shall have been declared earlier in the scoping unit or made accessible
-
-         by use or host association. If array elements appear in scalar-expr , the array shall have been declared as an array
-
-         earlier in the scoping unit or made accessible by use or host association.
-
-C1263    (R1237) If a dummy-arg-name, variable, function reference, or dummy function reference is typed by the implicit
-
-         typing rules, its appearance in any subsequent type declaration statement shall confirm this implied type and
-
-         the values of any implied type parameters.
+C1263    (R1237) If a dummy-arg-name, variable, function reference, or dummy function reference is typed by the implicit typing rules, its appearance in any subsequent type declaration statement shall confirm this implied type and the values of any implied type parameters.
 
 C1264    (R1237) The function-name and each dummy-arg-name shall be specified, explicitly or implicitly, to be scalar.
 
 C1265    (R1237) A given dummy-arg-name may appear only once in any dummy-arg-name-list.
 
-C1266    (R1237) Each variable reference in scalar-expr may be either a reference to a dummy argument of the statement
+C1266    (R1237) Each variable reference in scalar-expr may be either a reference to a dummy argument of the statement function or a reference to a variable accessible in the same scoping unit as the statement function statement.
 
-         function or a reference to a variable accessible in the same scoping unit as the statement function statement.
+C1267    The specification-part of a pure function subprogram shall specify that all dummy arguments have INTENT (IN) except procedure arguments and arguments with the POINTER attribute.
 
-C1267    The specification-part of a pure function subprogram shall specify that all dummy arguments
-         have INTENT (IN) except procedure arguments and arguments with the POINTER attribute.
+C1268    The specification-part of a pure subroutine subprogram shall specify the intents of all dummy arguments except procedure arguments, alternate return indicators, and arguments with the POINTER attribute.
 
-C1268    The specification-part of a pure subroutine subprogram shall specify the intents of all dummy ar-
-         guments except procedure arguments, alternate return indicators, and arguments with the POINTER
-         attribute.
+C1269    A local variable declared in the specification-part or internal-subprogram-part of a pure subprogram shall not have the SAVE attribute.
 
-C1269    A local variable declared in the specification-part or internal-subprogram-part of a pure subpro-
-         gram shall not have the SAVE attribute.
+C1270    The specification-part of a pure subprogram shall specify that all dummy arguments that are procedure arguments are pure.
 
-C1270    The specification-part of a pure subprogram shall specify that all dummy arguments that are
-         procedure arguments are pure.
-
-C1271    If a procedure that is neither an intrinsic procedure nor a statement function is used in a context
-         that requires it to be pure, then its interface shall be explicit in the scope of that use. The
-         interface shall specify that the procedure is pure.
+C1271    If a procedure that is neither an intrinsic procedure nor a statement function is used in a context that requires it to be pure, then its interface shall be explicit in the scope of that use. The interface shall specify that the procedure is pure.
 
 C1272    All internal subprograms in a pure subprogram shall be pure.
 
+C1273    In a pure subprogram any designator with a base object that is in common or accessed by host or use association, is a dummy argument of a pure function, is a dummy argument with INTENT (IN) of a pure subroutine, or an object that is storage associated with any such variable, shall not be used in the following contexts:
+
+C1274    Any procedure referenced in a pure subprogram, including one referenced via a defined operation, assignment, or finalization, shall be pure.
+
+C1275    A pure subprogram shall not contain a print-stmt , open-stmt , close-stmt , backspace-stmt , endfile-stmt , rewind-stmt , flush-stmt , wait-stmt , or inquire-stmt.
+
+C1276    A pure subprogram shall not contain a read-stmt or write-stmt whose io-unit is a file-unit-number or *.
+
+C1277    A pure subprogram shall not contain a stop-stmt.
+
+C1278    All dummy arguments of an elemental procedure shall be scalar dummy data objects and shall not have the POINTER or ALLOCATABLE attribute.
+
+C1279    The result variable of an elemental function shall be scalar and shall not have the POINTER or ALLOCATABLE attribute.
+
+C1280    In the scoping unit of an elemental subprogram, an object designator with a dummy argument as the base object shall not appear in a specification-expr except as the argument to one of the intrinsic functions BIT SIZE, KIND, LEN, or the numeric inquiry functions (13.5.6).
 
 
-530                                    COMMITTEE DRAFT                                                       SEP 2002
-
-
-SEP 2002                            COMMITTEE DRAFT                                    ISO/IEC 1539-1
+Section 13: Intrinsic procedures and modules
 
 
+Section 14: Exceptions and IEEE arithmetic
 
-C1273    In a pure subprogram any designator with a base object that is in common or accessed by
-         host or use association, is a dummy argument of a pure function, is a dummy argument with
-         INTENT (IN) of a pure subroutine, or an object that is storage associated with any such variable,
-         shall not be used in the following contexts:
 
-C1274    Any procedure referenced in a pure subprogram, including one referenced via a defined operation,
-         assignment, or finalization, shall be pure.
+Section 15: Interoperability with C
 
-C1275    A pure subprogram shall not contain a print-stmt , open-stmt , close-stmt , backspace-stmt , endfile-
-         stmt , rewind-stmt , flush-stmt , wait-stmt , or inquire-stmt .
 
-C1276    A pure subprogram shall not contain a read-stmt or write-stmt whose io-unit is a file-unit-number
-         or *.
-
-C1277    A pure subprogram shall not contain a stop-stmt .
-
-C1278    All dummy arguments of an elemental procedure shall be scalar dummy data objects and shall
-         not have the POINTER or ALLOCATABLE attribute.
-
-C1279    The result variable of an elemental function shall be scalar and shall not have the POINTER or
-         ALLOCATABLE attribute.
-
-C1280    In the scoping unit of an elemental subprogram, an object designator with a dummy argument
-         as the base object shall not appear in a specification-expr except as the argument to one of the
-         intrinsic functions BIT SIZE, KIND, LEN, or the numeric inquiry functions (13.5.6).
-
-Section 13:
-
-Section 14:
-
-Section 15:
 C1501    (R423) A derived type with the BIND attribute shall not be a SEQUENCE type.
 
 C1502    (R423) A derived type with the BIND attribute shall not have type parameters.
 
-C1503    (R423) A derived type with the BIND attribute shall not have the EXTENSIBLE or EXTENDS
-         attribute.
+C1503    (R423) A derived type with the BIND attribute shall not have the EXTENSIBLE or EXTENDS attribute.
 
-C1504    (R423) A derived type with the BIND attribute shall not have a type-bound-procedure-part .
+C1504    (R423) A derived type with the BIND attribute shall not have a type-bound-procedure-part.
 
-C1505    (R423) Each component of a derived type with the BIND attribute shall be a nonpointer,
-         nonallocatable data component with interoperable type and type parameters.
+C1505    (R423) Each component of a derived type with the BIND attribute shall be a nonpointer, nonallocatable data component with interoperable type and type parameters.
 
-Section 16:
-
-
-
-
-
-SEP 2002                                    COMMITTEE DRAFT                                             531
-
-
-ISO/IEC 1539-1        COMMITTEE DRAFT    SEP 2002
-
-
-
-
-
-532               COMMITTEE DRAFT        SEP 2002
-
-
-SEP 2002                             COMMITTEE DRAFT                                 ISO/IEC 1539-1
-
-
+Section 16: Scope, association, and definition
