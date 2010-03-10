@@ -4356,24 +4356,26 @@ end_module_stmt
             {action.end_module_stmt(lbl, $T_END, null, id, $end_of_stmt.tk);}
     ;
 
-// R1107
-// TODO - add count of module_subprograms
+////////////
+// R1107-F03
+//
 module_subprogram_part
-	:	contains_stmt
-		module_subprogram
-		( module_subprogram )*
-            { action.module_subprogram_part(); }
-	;
+@init {int count = 1;}
+   :   contains_stmt
+       module_subprogram
+       ( module_subprogram {count += 1;} )*
+           { action.module_subprogram_part(count); }
+   ;
 
 // R1108
 // modified to factor optional prefix
 module_subprogram
 @init{boolean hasPrefix = false;}
-	:	(prefix {hasPrefix=true;})? function_subprogram
-			{action.module_subprogram(hasPrefix);}
-	|	subroutine_subprogram
-			{action.module_subprogram(hasPrefix);}
-	;
+   :   (prefix {hasPrefix=true;})? function_subprogram
+           {action.module_subprogram(hasPrefix);}
+   |   subroutine_subprogram
+           {action.module_subprogram(hasPrefix);}
+   ;
 
 // R1109
 use_stmt
