@@ -127,6 +127,40 @@ main_program
  *  end-mp-subprogram-stmt, end-program-stmt, or end-subroutine-stmt.
  */
 
+
+/*
+ * R205-F08   implicit-part           is [ implicit-part-stmt ] ...
+ *                                       implicit-stmt
+ */
+
+////////////
+// R206-F08
+//
+// implicit-part replaced with implicit-part-stmt with recursion and
+// predicates because of ambiguity of the F2008 grammar
+//
+// TODO - should be able to make implicit-part work properly with predicates
+
+/*
+ * R206-F08   implicit-part-stmt      is implicit-stmt
+ *                                    or parameter-stmt
+ *                                    or format-stmt
+ *                                    or entry-stmt
+ */
+
+////////////
+// R206-F08
+//
+// TODO - talk to Quinlan
+//
+implicit_part_stmt
+   :   implicit_stmt
+   |   parameter_stmt
+   |   format_stmt
+   |   entry_stmt
+   ;
+
+
 /*
  * R207-F08 declaration-construct
  *    is derived-type-def
@@ -165,6 +199,22 @@ declaration_construct
    ;
 
 /*
+ * R210-F08 internal-subprogram-part
+ *    is contains-stmt
+ *          [ internal-subprogram ] ...  // DIFFERENT_2008 (can have empty contains)
+ */
+
+////////////
+// R210-F08
+//
+internal_subprogram_part
+@init{int count = 0;}
+   :   contains_stmt
+       ( internal_subprogram {count += 1;} )*
+           { action.internal_subprogram_part(count); }
+   ;
+
+/*
  * R212-F08 other-specification-stmt   // NEW_NAME_2008 (was specification-stmt)
  *    is access-stmt
  *    or allocatable-stmt
@@ -192,10 +242,7 @@ declaration_construct
 // R212-F08
 //
 other_specification_stmt
-@after {
-    action.specification_stmt();
-    checkForInclude();
-}
+@after {action.specification_stmt();}
    :   access_stmt
    |   allocatable_stmt
    |   asynchronous_stmt
@@ -236,9 +283,7 @@ other_specification_stmt
 // R214-F08
 //
 executable_construct
-@after {
-    action.executable_construct();
-}
+@after {action.executable_construct();}
    :   action_stmt
    |   associate_construct
    |   block_construct                 // NEW_TO_2008
@@ -308,9 +353,7 @@ executable_construct
 // the original generated rules do not allow the label, so add (label)?
 //
 action_stmt
-@after {
-    action.action_stmt();
-}
+@after {action.action_stmt();}
 // Removed backtracking by inserting extra tokens in the stream by the prepass
 // that signals whether we have an assignment-stmt, a pointer-assignment-stmt,
 // or an arithmetic if.  This approach may work for other parts of backtracking
@@ -325,6 +368,9 @@ action_stmt
    |   continue_stmt
    |   cycle_stmt
    |   deallocate_stmt
+//////////
+// These end functions are not needed because the initiating constructs are called
+// explicitly to avoid ambiguities.
 //   |   end_function_stmt
 //   |   end_mp_subprogram_stmt        // NEW_TO_2008
 //   |   end_program_stmt
@@ -813,24 +859,62 @@ scalar_variable
  *       [ specification-part ]
  *       block
  *       end-block-stmt
+ *
+ * C806-F08 (R807-F08) The specification-part of a BLOCK construct shall not contain a
+ * COMMON, EQUIVALENCE, IMPLICIT, INTENT, NAMELIST, OPTIONAL, statement function, or
+ * VALUE statement.
+ *
+ * C806-F08 means that the implicit-part in specification-part can be removed
  */
 
 ////////////
 // R807-F08
 //
 block_construct
-//options {backtrack=true;}
-@init {boolean hasSpecPart = false;}
+@after{action.block_construct();}
    :   block_stmt
-// TODO - FIXME
-// This is going to be hard because of recursions.  Probably should make it
-// non optional (see use in F03) and maybe start with a smaller subset to see
-// where the problem arises.
-//          (specification_part {hasSpecPart=true;})*
-          block
+         specification_part_and_block
        end_block_stmt
-           {action.block_construct(hasSpecPart);}
    ;
+
+specification_part_and_block
+@init{int numUseStmts=0; int numImportStmts=0;}
+   :   ( use_stmt {numUseStmts++;} )*
+       ( import_stmt {numImportStmts++;} )*
+       declaration_construct_and_block
+           {action.specification_part_and_block(numUseStmts, numImportStmts);}
+   ;
+
+declaration_construct_and_block
+   :   ((label)? T_ENTRY)      => entry_stmt       declaration_construct_and_block
+   |   ((label)? T_ENUM)       => enum_def         declaration_construct_and_block
+   |   ((label)? T_FORMAT)     => format_stmt      declaration_construct_and_block
+   |   ((label)? T_INTERFACE)  => interface_block  declaration_construct_and_block
+   |   ((label)? T_PARAMETER)  => parameter_stmt   declaration_construct_and_block
+   |   ((label)? T_PROCEDURE)  => procedure_declaration_stmt
+                                                   declaration_construct_and_block
+   |   (derived_type_stmt)     => derived_type_def declaration_construct_and_block
+   |   (type_declaration_stmt) => type_declaration_stmt declaration_construct_and_block
+
+   // the following are from other_specification_stmt
+
+   |   ((label)? access_spec)    => access_stmt       declaration_construct_and_block
+   |   ((label)? T_ALLOCATABLE)  => allocatable_stmt  declaration_construct_and_block
+   |   ((label)? T_ASYNCHRONOUS) => asynchronous_stmt declaration_construct_and_block
+   |   ((label)? T_BIND)         => bind_stmt         declaration_construct_and_block
+   |   ((label)? T_CODIMENSION)  => codimension_stmt  declaration_construct_and_block
+   |   ((label)? T_DATA)         => data_stmt         declaration_construct_and_block
+   |   ((label)? T_DIMENSION)    => dimension_stmt    declaration_construct_and_block
+   |   ((label)? T_EXTERNAL)     => external_stmt     declaration_construct_and_block
+   |   ((label)? T_INTRINSIC)    => intrinsic_stmt    declaration_construct_and_block
+   |   ((label)? T_POINTER)      => pointer_stmt      declaration_construct_and_block
+   |   ((label)? T_PROTECTED)    => protected_stmt    declaration_construct_and_block
+   |   ((label)? T_SAVE)         => save_stmt         declaration_construct_and_block
+   |   ((label)? T_TARGET)       => target_stmt       declaration_construct_and_block
+   |   ((label)? T_VOLATILE)     => volatile_stmt     declaration_construct_and_block
+   |   block
+   ;
+
 
 /*
  * R808-F08 block-stmt
@@ -1142,12 +1226,11 @@ lock_variable
 // R1116-F08
 //
 submodule
-@after {
-    action.submodule();
-}
+@init {boolean hasModuleSubprogramPart = false;}
+@after{action.submodule(hasModuleSubprogramPart);}
    :   submodule_stmt
        specification_part  // non-optional as can be empty
-       ( module_subprogram_part )?
+       ( module_subprogram_part {hasModuleSubprogramPart=true;} )?
        end_submodule_stmt
    ;
 
@@ -1202,6 +1285,112 @@ end_submodule_stmt
        T_END (T_SUBMODULE (name {t_name=$name.tk;})? {t_submod=$T_SUBMODULE;})?
        end_of_stmt
            {action.end_submodule_stmt(lbl, $T_END, t_submod, t_name, $end_of_stmt.tk);}
+   ;
+
+
+/*
+ * R1107-F08 module-subprogram-part
+ *     is   contains-stmt
+ *          [ module-subprogram ] ...
+ */
+
+////////////
+// R1107-F08
+//
+module_subprogram_part
+@init {int count = 0;}
+   :   contains_stmt
+       ( module_subprogram {count += 1;} )*
+           { action.module_subprogram_part(count); }
+   ;
+
+/*
+ * R1108-F08 module-subprogram
+ *     is   function-subprogram
+ *     or   subroutine-subprogram
+ *     or   separate-module-subprogram   // NEW_TO_F2008
+ */
+
+////////////
+// R1107-F08
+//
+// modified to factor optional prefix
+//
+module_subprogram
+@init {boolean hasPrefix = false;}
+@after{action.module_subprogram(hasPrefix);}
+   :   (prefix {hasPrefix=true;})? function_subprogram
+   |   subroutine_subprogram
+   |   separate_module_subprogram
+   ;
+
+/*
+ * R1237-F08 separate-module-subprogram
+ *     is   mp-subprogram-stmt          // NEW_TO_F2008
+ *             [ specification-part ]
+ *             [ execution-part ]
+ *             [ internal-subprogram-part ]
+ *          end-mp-subprogram
+ */
+
+////////////
+// R1237-F08
+//
+separate_module_subprogram
+@init{
+   boolean hasExecutionPart = false; boolean hasInternalSubprogramPart = false;
+   action.separate_module_subprogram__begin();
+}
+@after{action.separate_module_subprogram(hasExecutionPart, hasInternalSubprogramPart);}
+   :   mp_subprogram_stmt
+          specification_part  // non-optional as can be empty
+          ( execution_part {hasExecutionPart=true;} )?
+          ( internal_subprogram_part {hasInternalSubprogramPart=true;} )?
+       end_mp_subprogram_stmt
+   ;
+
+
+/*
+ * R1238-F08 mp-subprogram-stmt
+ *     is   MODULE PROCEDURE procedure-name
+ */
+
+////////////
+// R1238-F08
+//
+mp_subprogram_stmt
+@init {Token lbl = null;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})? T_MODULE T_PROCEDURE name end_of_stmt
+          {
+             action.mp_subprogram_stmt(lbl, $T_MODULE,
+                                       $T_PROCEDURE, $name.tk, $end_of_stmt.tk);
+          }
+   ;
+
+
+/*
+ * R1239-F08 end-mp-subprogram-stmt
+ *     is END [ PROCEDURE [ procedure-name ] ]
+ */
+
+////////////
+// R1239-F08
+//
+end_mp_subprogram_stmt
+@init {Token lbl = null; Token t_proc = null; Token t_name = null;}
+@after{checkForInclude();}
+   :   (label {lbl=$label.tk;})?
+       T_END (T_PROCEDURE (name {t_name=$name.tk;})? {t_proc=$T_PROCEDURE;})?
+       end_of_stmt
+           {action.end_mp_subprogram_stmt(lbl, $T_END, t_proc, t_name, $end_of_stmt.tk);}
+   |   (label {lbl=$label.tk;})?
+       T_ENDPROCEDURE (name {t_name=$name.tk;})?
+       end_of_stmt
+           {
+              action.end_mp_subprogram_stmt(lbl, $T_ENDPROCEDURE, null,
+                                            t_name, $end_of_stmt.tk);
+           }
    ;
 
 
