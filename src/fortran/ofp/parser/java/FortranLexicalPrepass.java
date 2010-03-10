@@ -371,16 +371,17 @@ public class FortranLexicalPrepass {
       int tokenType;
       int bindOffset;
 
-		// Move past the pure, elemental, and recursive keywords.
-		while ( isPrefixToken(tokens.currLineLA(lineStart+1)) )
-			lineStart++;
+      // Move past the pure, elemental, and recursive keywords.
+      while ( isPrefixToken(tokens.currLineLA(lineStart+1)) ) {
+         lineStart++;
+      }
 
       tokenType = tokens.currLineLA(lineStart+1);
       // look for a bind statement
 // TODO - fix for T_BIND token
 //      bindOffset = tokens.findToken(lineStart, FortranLexer.T_BIND_LPAREN_C);
       bindOffset = tokens.findToken(lineStart, FortranLexer.T_BIND);
-      if(bindOffset != -1) {
+      if (bindOffset != -1) {
          // use the T_BIND_LPAREN_C token as a marker for the end 
          // of the subroutine name and any args.
          convertToIdents(lineStart+1, bindOffset+lineStart);
@@ -390,7 +391,7 @@ public class FortranLexicalPrepass {
       }
 
       return true;
-   }// end matchSub()
+   } // end matchSub()
 
    
    /**
@@ -441,26 +442,26 @@ public class FortranLexicalPrepass {
             identOffset = lineStart+1;
          }
          matchedEnd = true;
-      } else if(tokenType == FortranLexer.T_ENDINTERFACE) {
+      } else if (tokenType == FortranLexer.T_ENDINTERFACE) {
          identOffset = matchGenericSpec(lineStart+1, lineEnd);
       } else {
-         if(lineEnd > 1) 
+         if (lineEnd > 1) 
             identOffset = lineStart+1;
          matchedEnd = true;
       }
 
-      if(identOffset != -1) {
+      if (identOffset != -1) {
          // only converting one thing, so not necessary to use a method..
          convertToIdents(identOffset, lineEnd);
       } 
 
       // have to fixup a labeled END DO
-      if(isEndDo == true || tokenType == FortranLexer.T_ENDDO) {
+      if (isEndDo == true || tokenType == FortranLexer.T_ENDDO) {
          fixupLabeledEndDo(lineStart, lineEnd);
       }
 
       return matchedEnd;
-   }// end matchEnd()
+   } // end matchEnd()
 
 
    /**
