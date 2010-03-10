@@ -2059,6 +2059,9 @@ R808-08   block-stmt                  is [ block-construct-name : ] BLOCK
 
 R809-08   end-block-stmt              is END BLOCK [ block-construct-name ]
 
+C806-08 (R807-08) The specification-part of a BLOCK construct shall not contain a COMMON,
+EQUIVALENCE, IMPLICIT, INTENT, NAMELIST, OPTIONAL, statement function, or VALUE statement.
+
 R810-08   critical-construct          is   critical-stmt
                                               block
                                               end-critical-stmt
@@ -2898,27 +2901,28 @@ C1102    (R1101) The program-name may be included in the end-program-stmt only i
 
 C1103    (R1101) An automatic object shall not appear in the specification-part (R204) of a main program.
 
-R1104 module                          is    module-stmt
+R1104-03   module                    is   module-stmt
+                                             [ specification-part ]
+                                             [ module-subprogram-part ]
+                                          end-module-stmt
 
-                                                [ specification-part ]
+R1105-03   module-stmt               is   MODULE module-name
 
-                                                [ module-subprogram-part ]
+R1106-03   end-module-stmt           is   END [ MODULE [ module-name ] ]
 
-                                                end-module-stmt
+R1107-03    module-subprogram-part   is   contains-stmt
+                                             module-subprogram
+                                             [ module-subprogram ] ...
 
-R1105 module-stmt                     is    MODULE module-name
+R1107-08    module-subprogram-part   is   contains-stmt
+                                             [ module-subprogram ] ...
 
-R1106 end-module-stmt                 is    END [ MODULE [ module-name ] ]
+R1108-03   module-subprogram         is   function-subprogram
+                                     or   subroutine-subprogram
 
-R1107 module-subprogram-part          is    contains-stmt
-
-                                                module-subprogram
-
-                                                [ module-subprogram ] ...
-
-R1108 module-subprogram               is    function-subprogram
-
-                                      or subroutine-subprogram
+R1108-08   module-subprogram         is   function-subprogram
+                                     or   subroutine-subprogram
+                                     or   separate-module-subprogram   // NEW_F2008
 
 C1104    (R1104) If the module-name is specified in the end-module-stmt , it shall be identical to the
          module-name specified in the module-stmt .
@@ -3311,6 +3315,18 @@ C1260    (R1235) The scalar-int-expr is allowed only in the scoping unit of a su
 R1236 contains-stmt                         is    CONTAINS
 
 R1237 stmt-function-stmt                    is    function-name ( [ dummy-arg-name-list ] ) = scalar-expr
+
+
+R1237-08   separate-module-subprogram       is   mp-subprogram-stmt          // NEW_F2008
+                                                    [ specification-part ]
+                                                    [ execution-part ]
+                                                    [ internal-subprogram-part ]
+                                                 end-mp-subprogram
+
+R1238-08   mp-subprogram-stmt               is   MODULE PROCEDURE procedure-name
+
+R1239-08   end-mp-subprogram-stmt           is END [ PROCEDURE [ procedure-name ] ]
+
 
 C1261    (R1237) The primaries of the scalar-expr shall be constants (literal and named), references to variables, references to functions and function dummy procedures, and intrinsic operations. If scalar-expr contains a reference to a function or a function dummy procedure, the reference shall not require an explicit interface, the function shall not require an explicit interface unless it is an intrinsic, the function shall not be a transformational intrinsic, and the result shall be scalar. If an argument to a function or a function dummy procedure is an array, it shall be an array name. If a reference to a statement function appears in scalar-expr , its definition shall have been provided earlier in the scoping unit and shall not be the name of the statement function being defined.
 
