@@ -24,724 +24,659 @@ import org.antlr.runtime.Token;
 import fortran.ofp.parser.java.IActionEnums;
 
 public class FortranParserActionPrint implements IFortranParserAction {
-	private boolean verbose = true;
-	private boolean printKeywords = false;
-	private int deletedFeature = -1;
-	private int generatedRule = -2;
-	private int unknownRule = -3;
-	private int f08Rule = -4;
+   private boolean verbose = true;
+   private boolean printKeywords = false;
+   private int deletedFeature = -1;
+   private int generatedRule = -2;
+   private int unknownRule = -3;
+   private int f08Rule = -4;
 	
-	FortranParserActionPrint(String[] args, IFortranParser parser, String filename) {
-		super();
-	}
+   FortranParserActionPrint(String[] args, IFortranParser parser, String filename) {
+      super();
+   }
 	
-	private void printRuleHeader(int rule, String name) {
-		printRuleHeader(rule, name, "");
-	}
+   private void printRuleHeader(int rule, String name) {
+      printRuleHeader(rule, name, "");
+   }
 	
-	private void printRuleHeader(int rule, String name, String addendum) {
-		boolean printYear = false;
-		if (verbose) {
-			System.out.print("R");
-			if (rule < 1000) {
-				System.out.print(" ");
-			} else if (rule > 2000) {
-				rule = rule/1000;
-				printYear = true;
-			}
-		}
-		System.out.print(rule);
-		if (printYear) System.out.print("-F2008");
-		if (verbose) {
-			System.out.print(":" + name + ":");
-		} else {
-			if (addendum.length() > 0) System.out.print(":" + addendum);
-		}
-	}
+   private void printRuleHeader(int rule, String name, String addendum) {
+      boolean printYear = false;
+      if (verbose) {
+         System.out.print("R");
+         if (rule < 1000) {
+            System.out.print(" ");
+         } else if (rule > 2000) {
+            rule = rule/1000;
+            printYear = true;
+         }
+      }
+      System.out.print(rule);
+      if (printYear) System.out.print("-F2008");
+      if (verbose) {
+         System.out.print(":" + name + ":");
+      } else {
+         if (addendum.length() > 0) System.out.print(":" + addendum);
+      }
+   }
 	
-	private void printRuleTrailer() {
-		System.out.println();
-	}
+   private void printRuleTrailer() {
+      System.out.println();
+   }
 	
-	private void printParameter(Object param, String name) {
-		System.out.print(" ");
-		if (verbose) System.out.print(name + "=");
-		System.out.print(param);				
-	}
+   private void printParameter(Object param, String name) {
+      System.out.print(" ");
+      if (verbose) System.out.print(name + "=");
+      System.out.print(param);				
+   }
 	
-	private void printParameter(Token param, String name) {
-		System.out.print(" ");
-		if (verbose) {
-			System.out.print(name + "=");
-			System.out.print(param);
-		} else {
-			if (param != null) System.out.print(param.getText());
-			else System.out.print("null");
-		}
-	}
+   private void printParameter(Token param, String name) {
+      System.out.print(" ");
+      if (verbose) {
+         System.out.print(name + "=");
+         System.out.print(param);
+      } else {
+         if (param != null) System.out.print(param.getText());
+         else System.out.print("null");
+      }
+   }
 	
-	public void setVerbose(boolean flag) {
-		verbose = flag;
-	}
+   public void setVerbose(boolean flag) {
+      verbose = flag;
+   }
 	
-	public void setPrintKeywords(boolean flag) {
-		printKeywords = flag;
-	}
+   public void setPrintKeywords(boolean flag) {
+      printKeywords = flag;
+   }
 	
-	public static String toString(int kp) {
-	    switch (kp) {
-		case 0:		return "none";
-		case 1:	return "literal";
-		case 2:		return "id";
-		}
-	    return "";
-	}
+   public static String toString(int kp) {
+      switch (kp) {
+      case 0:  return "none";
+      case 1:  return "literal";
+      case 2:  return "id";
+      }
+      return "";
+   }
 
 
-	/** R102 list
-	 * generic_name (xyz-name)
-	 * generic_name_list (xyz-list R101)
-	 * generic_name_list_part
-	 */
-	public void generic_name_list_part(Token id) {
-		printRuleHeader(102, "generic-name-list-part", "part");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
-	public void generic_name_list__begin() {
-		printRuleHeader(102, "generic-name-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void generic_name_list(int count) {
-		printRuleHeader(102, "generic-name-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R102 list
+    * generic_name (xyz-name)
+    * generic_name_list (xyz-list R101)
+    * generic_name_list_part
+    */
+   public void generic_name_list_part(Token id) {
+      printRuleHeader(102, "generic-name-list-part", "part");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
+   public void generic_name_list__begin() {
+      printRuleHeader(102, "generic-name-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void generic_name_list(int count) {
+      printRuleHeader(102, "generic-name-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R204
-	 * specification_part
-	 */
-	public void specification_part(int numUseStmts, int numImportStmts, 
-											 int numDeclConstructs) {
-		printRuleHeader(204, "specification-part");
-		printParameter(numUseStmts, "numUseStmts");
-		printParameter(numImportStmts, "numImportStmts");
-		printParameter(numDeclConstructs, "numDeclConstructs");
-		printRuleTrailer();
-	}
+   /** R204
+    * specification_part
+    */
+   public void
+   specification_part(int numUseStmts, int numImportStmts, int numDeclConstructs)
+   {
+      printRuleHeader(204, "specification-part");
+      printParameter(numUseStmts, "numUseStmts");
+      printParameter(numImportStmts, "numImportStmts");
+      printParameter(numDeclConstructs, "numDeclConstructs");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R205, R206, R207
-	 * declaration_construct
-	 *
-	 */
-	public void declaration_construct() {
-		printRuleHeader(207, "declaration-construct");
-		printRuleTrailer();
-	}
+   /** R205, R206, R207
+    * declaration_construct
+    */
+   public void declaration_construct() {
+      printRuleHeader(207, "declaration-construct");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R208
-	 * execution_part
-	 *
-	 */
-	public void execution_part() {
-		printRuleHeader(208, "execution-part");
-		printRuleTrailer();
-	}
+   /** R208
+    * execution_part
+    *
+    */
+   public void execution_part() {
+      printRuleHeader(208, "execution-part");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R209
-	 * execution_part_construct
-	 *
-	 */
-	public void execution_part_construct() {
-		printRuleHeader(209, "execution-part-construct");
-		printRuleTrailer();
-	}
+   /** R209
+    * execution_part_construct
+    */
+   public void execution_part_construct() {
+      printRuleHeader(209, "execution-part-construct");
+      printRuleTrailer();
+   }
 
-	/** R210
-	 * internal_subprogram_part
-	 */
-	public void internal_subprogram_part(int count) {
-		printRuleHeader(210, "internal-subprogram-part");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R210
+    * internal_subprogram_part
+    */
+   public void internal_subprogram_part(int count) {
+      printRuleHeader(210, "internal-subprogram-part");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R211
-	 * internal_subprogram
-	 *
-	 */
-	public void internal_subprogram() {
-		printRuleHeader(211, "internal-subprogram");
-		printRuleTrailer();
-	}
+   /** R211
+    * internal_subprogram
+    */
+   public void internal_subprogram() {
+      printRuleHeader(211, "internal-subprogram");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R212
-	 *
-	 * specification_stmt
-	 */
-	public void specification_stmt() {
-		printRuleHeader(212, "specification-stmt");
-		printRuleTrailer();
-	}
+   /** R212
+    * specification_stmt
+    */
+   public void specification_stmt() {
+      printRuleHeader(212, "specification-stmt");
+      printRuleTrailer();
+   }
 
+   /** R213
+    * executable_construct
+    *
+    */
+   public void executable_construct() {
+      printRuleHeader(213, "executable-construct");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R213
-	 * executable_construct
-	 *
-	 */
-	public void executable_construct() {
-		printRuleHeader(213, "executable-construct");
-		printRuleTrailer();
-	}
+   /** R214
+    * action_stmt
+    */
+   public void action_stmt() {
+      printRuleHeader(214, "action-stmt");
+      printRuleTrailer();
+   }
 
+   /** R215
+    * keyword
+    */
+   public void keyword() {
+      printRuleHeader(215, "keyword");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R214
-	 *
-	 * action_stmt
-	 */
-	public void action_stmt() {
-		printRuleHeader(214, "action-stmt");
-		printRuleTrailer();
-	}
+   /** R304
+    * name
+    * @param id T_IDENT token for the name.
+    */
+   public void name(Token id) {
+      printRuleHeader(304, "name");
+      printParameter(id, "name");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R215
-	 * keyword
-	 *
-	 */
-	public void keyword() {
-		printRuleHeader(215, "keyword");
-		printRuleTrailer();
-	}
+   /** R305
+    * constant
+    */
+   public void constant(Token id) {
+      printRuleHeader(305, "constant");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R304
-	 * name
-	 *
-	 * @param id T_IDENT token for the name.
-	 */
-	public void name(Token id) {
-		printRuleHeader(304, "name");
-		printParameter(id, "name");
-		printRuleTrailer();
-	}
+   /**
+    * scalar_constant
+    */
+   public void scalar_constant() {
+      printRuleHeader(generatedRule, "scalar-constant");
+      printRuleTrailer();
+   }
 
-	/** R305
-	 * constant
-	 */
-	public void constant(Token id) {
-		printRuleHeader(305, "constant");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R306
+    * literal_constant
+    */
+   public void literal_constant() {
+      printRuleHeader(306, "literal-constant");
+      printRuleTrailer();
+   }
 
-	/**
-	 * scalar_constant
-	 * 
-	 */
-	public void scalar_constant() {
-		printRuleHeader(generatedRule, "scalar-constant");
-		printRuleTrailer();
-	}
+   /** R308
+    * int_constant
+    */
+   public void int_constant(Token id) {
+      printRuleHeader(308, "int-constant");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R306
-	 * literal_constant
-	 *
-	 */
-	public void literal_constant() {
-		printRuleHeader(306, "literal-constant");
-		printRuleTrailer();
-	}
+   /** R309
+    * 	char_constant
+    */
+   public void char_constant(Token id) {
+      printRuleHeader(309, "char-constant");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/** R308
-	 * int_constant
-	 */
-	public void int_constant(Token id) {
-		printRuleHeader(308, "int-constant");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /**
+    * R310
+    * intrinsic_operator
+    */
+   public void intrinsic_operator() {
+      printRuleHeader(310, "intrinsic-operator");
+      printRuleTrailer();
+   }
 
-	/** R309
-	 * 	char_constant
-	 */
-	public void char_constant(Token id) {
-		printRuleHeader(309, "char-constant");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R311
+    * defined_operator
+    */
+   public void defined_operator(Token definedOp, boolean isExtended) {
+      printRuleHeader(311, "defined-operator");
+      printParameter(definedOp, "definedOp");
+      printParameter(isExtended, "isExtendedIntrinsicOp");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R310
-	 * intrinsic_operator
-	 *
-	 */
-	public void intrinsic_operator() {
-		printRuleHeader(310, "intrinsic-operator");
-		printRuleTrailer();
-	}
+   /** R312
+    * extended_intrinsic_op
+    */
+   public void extended_intrinsic_op() {
+      printRuleHeader(312, "extended-intrinsic-op");
+      printRuleTrailer();
+   }		
 
-	/** R311
-	 * defined_operator
-	 */
-	public void defined_operator(Token definedOp, boolean isExtended) {
-		printRuleHeader(311, "defined-operator");
-		printParameter(definedOp, "definedOp");
-		printParameter(isExtended, "isExtendedIntrinsicOp");
-		printRuleTrailer();
-	}
+   /** R313
+    * label
+    */
+   public void label(Token lbl) {
+      printRuleHeader(313, "label");
+      printParameter(lbl, "lbl");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R312
-	 * extended_intrinsic_op
-	 *
-	 */
-	public void extended_intrinsic_op() {
-		printRuleHeader(312, "extended-intrinsic-op");
-		printRuleTrailer();
-	}		
+   /** R313 list
+    * label
+    * label_list
+    */
+   public void label_list__begin() {
+      printRuleHeader(313, "label-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void label_list(int count) {
+      printRuleHeader(313, "label-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R313
-	 * label
-     */
-	public void label(Token lbl) {
-		printRuleHeader(313, "label");
-		printParameter(lbl, "lbl");
-		printRuleTrailer();
-	}
+   /**
+    * R401
+    * type_spec
+    */
+   public void type_spec() {
+      printRuleHeader(401, "type-spec");
+      printRuleTrailer();
+   }
 
-	/** R313 list
-	 * label
-	 * label_list
-     */
-	public void label_list__begin() {
-		printRuleHeader(313, "label-list__begin", "list-begin");
-		printRuleTrailer();	
-	}
-	public void label_list(int count) {
-		printRuleHeader(313, "label-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R402
+    * type-param-value
+    */
+   public void
+   type_param_value(boolean hasExpr, boolean hasAsterisk, boolean hasColon)
+   {
+      printRuleHeader(402, "type-param-value");
+      printParameter(hasExpr, "hasExpr");
+      printParameter(hasAsterisk, "hasAsterisk");
+      printParameter(hasColon, "hasColon");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R401
-	 * type_spec
-	 *
-	 */
-	public void type_spec() {
-		printRuleHeader(401, "type-spec");
-		printRuleTrailer();
-	}
+   /** R403
+    * intrinsic_type_spec
+    */
+   public void intrinsic_type_spec(Token keyword1, Token keyword2,
+                                   int type, boolean hasKindSelector)
+   {
+      printRuleHeader(403, "intrinsic-type-spec");
+      printParameter(keyword1, "keyword1");
+      printParameter(keyword2, "keyword2");
+      printParameter(type, "type");
+      printParameter(hasKindSelector, "hasKindSelector");
+      printRuleTrailer();
+   }
 
-	/** R402
-	 * type-param-value
-	 */
-	public void type_param_value(boolean hasExpr, boolean hasAsterisk, 
-										  boolean hasColon) {
-		printRuleHeader(402, "type-param-value");
-		printParameter(hasExpr, "hasExpr");
-		printParameter(hasAsterisk, "hasAsterisk");
-		printParameter(hasColon, "hasColon");
-		printRuleTrailer();
-	}
+   /** R404
+    * kind_selector
+    */
+   public void kind_selector(Token token1, Token token2, boolean hasExpression) {
+      printRuleHeader(404, "kind-selector");
+      printParameter(token1, "token1");
+      printParameter(token2, "token2");
+      printParameter(hasExpression, "hasExpression");
+      printRuleTrailer();
+   }
 
+   /** R405
+    * signed_int_literal_constant
+    */
+   public void signed_int_literal_constant(Token sign) {
+      printRuleHeader(405, "signed-int-literal-constant");
+      printParameter(sign, "sign");
+      printRuleTrailer(); 
+   }
 
-	/** R403
-	 * intrinsic_type_spec
-	 */
-	public void intrinsic_type_spec(Token keyword1, Token keyword2, int type, 
-											  boolean hasKindSelector) {
-		printRuleHeader(403, "intrinsic-type-spec");
-		printParameter(keyword1, "keyword1");
-		printParameter(keyword2, "keyword2");
-		printParameter(type, "type");
-		printParameter(hasKindSelector, "hasKindSelector");
-		printRuleTrailer();
-	}
+   /** R406
+    * int_literal_constant
+    */
+   public void int_literal_constant(Token digitString, Token kindParam) {
+      printRuleHeader(406, "int-literal-constant");
+      printParameter(digitString, "digitString");
+      printParameter(kindParam, "kindParam");
+      printRuleTrailer(); 
+   }
 
-	/** R404
-	 * kind_selector
-	 */
-	public void kind_selector(Token token1, Token token2, 
-									  boolean hasExpression) {
-		printRuleHeader(404, "kind-selector");
-		printParameter(token1, "token1");
-		printParameter(token2, "token2");
-		printParameter(hasExpression, "hasExpression");
-		printRuleTrailer();
-	}
+   /** R407
+    * kind_param
+    */
+   public void kind_param(Token kind) {
+      printRuleHeader(407, "kind-param");
+      printRuleTrailer();
+   }
 
-	/** R405
-	 * signed_int_literal_constant
-	 */
-	 public void signed_int_literal_constant(Token sign) {
-		 printRuleHeader(405, "signed-int-literal-constant");
-		 printParameter(sign, "sign");
-		 printRuleTrailer(); 
-	 }
+   /** R411
+    * boz_literal_constant
+    *
+    */
+   public void boz_literal_constant(Token constant) {
+      printRuleHeader(411, "boz-literal-constant");
+      printRuleTrailer();
+   }
 
-	/** R406
-	 * int_literal_constant
-	 */
-	 public void int_literal_constant(Token digitString, Token kindParam) {
-		 printRuleHeader(406, "int-literal-constant");
-		 printParameter(digitString, "digitString");
-		 printParameter(kindParam, "kindParam");
-		 printRuleTrailer(); 
-	 }
+   /** R416
+    * signed_real_literal_constant
+    */
+   public void signed_real_literal_constant(Token sign) {
+      printRuleHeader(416, "signed-real-literal-constant");
+      printParameter(sign, "sign");
+      printRuleTrailer(); 
+   }
 
-	/**
-	 * R407
-	 * kind_param
-	 *
-	 * @param kind T_DIGIT_STRING or T_IDENT token which is the kind_param.
-	 */
-	public void kind_param(Token kind) {
-		printRuleHeader(407, "kind-param");
-		printRuleTrailer();
-	}
+   /** R417
+    * real_literal_constant
+    */
+   public void real_literal_constant(Token realConstant, Token kindParam) {
+      printRuleHeader(417, "real-literal-constant");
+      printParameter(realConstant, "realConstant");
+      printParameter(kindParam, "kindParam");
+      printRuleTrailer(); 
+   }
 
-	/**
-	 * R411
-	 * boz_literal_constant
-	 *
-	 */
-	public void boz_literal_constant(Token constant) {
-		printRuleHeader(411, "boz-literal-constant");
-		printRuleTrailer();
-	}
-
-	/** R416
-	 * signed_real_literal_constant
-	 */
-	 public void signed_real_literal_constant(Token sign) {
-		 printRuleHeader(416, "signed-real-literal-constant");
-		 printParameter(sign, "sign");
-		 printRuleTrailer(); 
-	 }
-
-	/** R417
-	 * real_literal_constant
-	 */
-	 public void real_literal_constant(Token realConstant, 
-                                           Token kindParam) {
-		 printRuleHeader(417, "real-literal-constant");
-                 printParameter(realConstant, "realConstant");
-		 printParameter(kindParam, "kindParam");
-		 printRuleTrailer(); 
-	 }
-
-	/**
-	 * R421
-	 * complex_literal_constant
-	 *
-	 */
-	public void complex_literal_constant() {
-		printRuleHeader(421, "complex-literal-constant");
-		printRuleTrailer();
-	}
+   /** R421
+    * complex_literal_constant
+    */
+   public void complex_literal_constant() {
+      printRuleHeader(421, "complex-literal-constant");
+      printRuleTrailer();
+   }
 	 
-	/** R422
-	 * real_part
-	 */
-	public void real_part(boolean hasIntConstant, boolean hasRealConstant, 
-								 Token id) {
-		printRuleHeader(422, "real-part");
-		printParameter(hasIntConstant, "hasIntConstant");
-		printParameter(hasRealConstant, "hasRealConstant");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R422
+    * real_part
+    */
+   public void real_part(boolean hasIntConstant, boolean hasRealConstant, Token id)
+   {
+      printRuleHeader(422, "real-part");
+      printParameter(hasIntConstant, "hasIntConstant");
+      printParameter(hasRealConstant, "hasRealConstant");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/** R423
-	 * imag_part
-	 */
-	public void imag_part(boolean hasIntConstant, boolean hasRealConstant, 
-								 Token id) {
-		printRuleHeader(423, "imag-part");
-		printParameter(hasIntConstant, "hasIntConstant");
-		printParameter(hasRealConstant, "hasRealConstant");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R423
+    * imag_part
+    */
+   public void imag_part(boolean hasIntConstant, boolean hasRealConstant, Token id)
+   {
+      printRuleHeader(423, "imag-part");
+      printParameter(hasIntConstant, "hasIntConstant");
+      printParameter(hasRealConstant, "hasRealConstant");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/** R424
-	 * char-selector
-	 *
-	 * @param tk1 Either T_KIND or T_LEN if given; otherwise null.
-	 * @param tk2 Either T_KIND or T_LEN if given; otherwise null.
-	 * @param kindOrLen1 Specifies whether the first kind or len
-	 * type-param-value is present
-	 * @param kindOrLen2 Specifies whether the second kind or len
-	 * type-param-value is present
-	 * @param hasAsterisk True if a '*' char-selector is specified
-	 */
-	public void char_selector(Token tk1, Token tk2, int kindOrLen1, 
-									  int kindOrLen2, boolean hasAsterisk) {
-		printRuleHeader(424, "char-selector");
-		printParameter(kindOrLen1, "kindOrLen1");
-		printParameter(kindOrLen2, "kindOrLen2");
-		printParameter(hasAsterisk, "hasAsterisk");
-		printRuleTrailer();
-	}
+   /** R424
+    * char-selector
+    */
+   public void char_selector(Token tk1, Token tk2, int kindOrLen1,
+                             int kindOrLen2, boolean hasAsterisk)
+   {
+      printRuleHeader(424, "char-selector");
+      printParameter(kindOrLen1, "kindOrLen1");
+      printParameter(kindOrLen2, "kindOrLen2");
+      printParameter(hasAsterisk, "hasAsterisk");
+      printRuleTrailer();
+   }
 
-	/** R425
-	 * length-selector
-	 *
-	 * @param lenKeyword T_LEN token if given; null otherwise.
-	 * @param kindOrLen Specifies whether a kind or len
-	 * type-param-value is present
-	 * @param hasAsterisk True if a '*' char-selector is specified
-	 */
-	public void length_selector(Token lenKeyword, int kindOrLen, 
-										 boolean hasAsterisk) {
-		printRuleHeader(425, "length-selector");
-		printParameter(kindOrLen, "kindOrLen");
-		printParameter(hasAsterisk, "hasAsterisk");
-		printRuleTrailer();
-	}
+   /** R425
+    * length-selector
+    */
+   public void length_selector(Token lenKeyword, int kindOrLen, boolean hasAsterisk)
+   {
+      printRuleHeader(425, "length-selector");
+      printParameter(kindOrLen, "kindOrLen");
+      printParameter(hasAsterisk, "hasAsterisk");
+      printRuleTrailer();
+   }
 
-	/** R426
-	 * char_length
-	 */
-	public void char_length(boolean hasTypeParamValue) {
-		printRuleHeader(426, "char-length");
-		printParameter(hasTypeParamValue, "hasTypeParamValue");
-		printRuleTrailer();
-	}
+   /** R426
+    * char_length
+    */
+   public void char_length(boolean hasTypeParamValue) {
+      printRuleHeader(426, "char-length");
+      printParameter(hasTypeParamValue, "hasTypeParamValue");
+      printRuleTrailer();
+   }
 
-	/**
-	 * scalar_int_literal_constant
-	 *
-	 */
-	public void scalar_int_literal_constant() {
-		printRuleHeader(generatedRule, "scalar-int-literal-constant");
-		printRuleTrailer();
-	}
+   /**
+    * scalar_int_literal_constant
+    */
+   public void scalar_int_literal_constant() {
+      printRuleHeader(generatedRule, "scalar-int-literal-constant");
+      printRuleTrailer();
+   }
 
-	/** R427
-	 * char_literal_constant
-	 */
-	public void char_literal_constant(Token digitString, Token id, Token str) {
-		printRuleHeader(427, "char-literal-constant");
-		printParameter(digitString, "digitString-kind-param");
-		printParameter(id, "identifier-kind-param");
-		printParameter(str, "str");
-		printRuleTrailer();	
-	}
+   /** R427
+    * char_literal_constant
+    */
+   public void char_literal_constant(Token digitString, Token id, Token str) {
+      printRuleHeader(427, "char-literal-constant");
+      printParameter(digitString, "digitString-kind-param");
+      printParameter(id, "identifier-kind-param");
+      printParameter(str, "str");
+      printRuleTrailer();	
+   }
 
-	/** R428
-	 * logical_literal_constant
-	 *
-	 * @param logicalValue T_TRUE or T_FALSE token.
-	 * @param isTrue True if logical constant is true, false otherwise
-	 * @param kindParam The kind parameter
-	 */
-	public void logical_literal_constant(Token logicalValue, boolean isTrue, 
-													 Token kindParam) {
-		printRuleHeader(428, "logical-literal-constant");
-		printParameter(isTrue, "isTrue");
-		printParameter(kindParam, "kindParam");
-		printRuleTrailer(); 
-	}
+   /** R428
+    * logical_literal_constant
+    */
+   public void
+   logical_literal_constant(Token logicalValue, boolean isTrue, Token kindParam)
+   {
+      printRuleHeader(428, "logical-literal-constant");
+      printParameter(isTrue, "isTrue");
+      printParameter(kindParam, "kindParam");
+      printRuleTrailer(); 
+   }
 
-	/**
-	 * R429
-	 * derived_type_def
-	 *
-	 */
-	public void derived_type_def() {
-		printRuleHeader(429, "derived-type-def");
-		printRuleTrailer();
-	}
+   /** R429
+    * derived_type_def
+    */
+   public void derived_type_def() {
+      printRuleHeader(429, "derived-type-def");
+      printRuleTrailer();
+   }
 
-	/** R429
-	 * type_param_or_comp_def_stmt
-	 */
-	public void type_param_or_comp_def_stmt(Token eos, int type) {
-		printRuleHeader(429, "type-param-or-comp-def-stmt");
-		printParameter(type, "type");
-		printRuleTrailer();
-	}
+   /** R429
+    * type_param_or_comp_def_stmt
+    */
+   public void type_param_or_comp_def_stmt(Token eos, int type) {
+      printRuleHeader(429, "type-param-or-comp-def-stmt");
+      printParameter(type, "type");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R429
-	 *
-	 * type_param_or_comp_def_stmt_list
-	 */
-	public void type_param_or_comp_def_stmt_list() {
-		printRuleHeader(429, "type-param-or-comp-def-stmt-list");
-		printRuleTrailer();
-	}
+   /** R429
+    * type_param_or_comp_def_stmt_list
+    */
+   public void type_param_or_comp_def_stmt_list() {
+      printRuleHeader(429, "type-param-or-comp-def-stmt-list");
+      printRuleTrailer();
+   }
 
-	/** R430 
-	 * derived_type_stmt
-	 *
-	 */
-	public void derived_type_stmt(Token label, Token keyword, Token id, 
-											Token eos, boolean hasTypeAttrSpecList, 
-											boolean hasGenericNameList) {
-		printRuleHeader(430, "derived-type-stmt");
-		if (label != null) printParameter(label, "label");
-		if (printKeywords) printParameter(keyword, "keyword");
-		printParameter(id, "id");
-		if (printKeywords) printParameter(eos, "eos");
-		printParameter(hasTypeAttrSpecList, "hasTypeAttrSpecList");
-		printParameter(hasGenericNameList, "hasGenericNameList");
-		printRuleTrailer();
-	}
+   /** R430 
+    * derived_type_stmt
+    */
+   public void derived_type_stmt(Token label, Token keyword, Token id,
+                                 Token eos, boolean hasTypeAttrSpecList,
+                                 boolean hasGenericNameList)
+   {
+      printRuleHeader(430, "derived-type-stmt");
+      if (label != null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      printParameter(id, "id");
+      if (printKeywords) printParameter(eos, "eos");
+      printParameter(hasTypeAttrSpecList, "hasTypeAttrSpecList");
+      printParameter(hasGenericNameList, "hasGenericNameList");
+      printRuleTrailer();
+   }
 
-	/** R431
-	 * type_attr_spec
-	 */
-	public void type_attr_spec(Token keyword, Token id, int type) {
-		printRuleHeader(431, "type-attr-spec");
-		printParameter(keyword, "keyword");
-		printParameter(id, "id");
-		printParameter(type, "type");
-		printRuleTrailer();
-	}
+   /** R431
+    * type_attr_spec
+    */
+   public void type_attr_spec(Token keyword, Token id, int type) {
+      printRuleHeader(431, "type-attr-spec");
+      printParameter(keyword, "keyword");
+      printParameter(id, "id");
+      printParameter(type, "type");
+      printRuleTrailer();
+   }
 
-	/** R431 list
-	 * type_attr_spec
-	 * type_attr_spec_list
-	 */
-	public void type_attr_spec_list__begin() {
-		printRuleHeader(431, "type-attr-spec-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void type_attr_spec_list(int count) {
-		printRuleHeader(431, "type-attr-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();	
-	}
+   /** R431 list
+    * type_attr_spec
+    * type_attr_spec_list
+    */
+   public void type_attr_spec_list__begin() {
+      printRuleHeader(431, "type-attr-spec-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void type_attr_spec_list(int count) {
+      printRuleHeader(431, "type-attr-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();	
+   }
 
-	/**
-	 * R432
-	 * private_or_sequence
-	 *
-	 */
-	public void private_or_sequence() {
-		printRuleHeader(432, "private-or-sequence");
-		printRuleTrailer();
-	}
+   /** R432
+    * private_or_sequence
+    */
+   public void private_or_sequence() {
+      printRuleHeader(432, "private-or-sequence");
+      printRuleTrailer();
+   }
 
-	/** R433 
-	 * end_type_stmt
-	 *
-	 */
-	public void end_type_stmt(Token label, Token endKeyword, 
-									  Token typeKeyword, Token id, Token eos) {
-		printRuleHeader(433, "end-type-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R433 
+    * end_type_stmt
+    */
+   public void end_type_stmt(Token label, Token endKeyword,
+                             Token typeKeyword, Token id, Token eos)
+   {
+      printRuleHeader(433, "end-type-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/** R434 
-	 * sequence_stmt
-	 *
-	 */
-	public void sequence_stmt(Token label, Token sequenceKeyword, Token eos) {
-		printRuleHeader(434, "sequence-stmt");
-		if (label!=null) printParameter(label, "label");
-		printRuleTrailer();
-	}
+   /** R434 
+    * sequence_stmt
+    */
+   public void sequence_stmt(Token label, Token sequenceKeyword, Token eos) {
+      printRuleHeader(434, "sequence-stmt");
+      if (label!=null) printParameter(label, "label");
+      printRuleTrailer();
+   }
 
-	/** R436
-	 * type_param_decl
-	 */
-	public void type_param_decl(Token id, boolean hasInit) {
-		printRuleHeader(436, "type-param-decl");
-		printParameter(id, "id");
-		printParameter(hasInit, "hasInit");
-		printRuleTrailer();
-	}
+   /** R436
+    * type_param_decl
+    */
+   public void type_param_decl(Token id, boolean hasInit) {
+      printRuleHeader(436, "type-param-decl");
+      printParameter(id, "id");
+      printParameter(hasInit, "hasInit");
+      printRuleTrailer();
+   }
 
-	/** R436 list
-	 * type_param_decl
-	 * type_param_decl_list
-	 */
-	public void type_param_decl_list__begin() {
-		printRuleHeader(436, "type-param-decl-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void type_param_decl_list(int count) {
-		printRuleHeader(436, "type-param-decl-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();	
-	}
+   /** R436 list
+    * type_param_decl
+    * type_param_decl_list
+    */
+   public void type_param_decl_list__begin() {
+      printRuleHeader(436, "type-param-decl-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void type_param_decl_list(int count) {
+      printRuleHeader(436, "type-param-decl-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();	
+   }
 
-	/**
-	 * R437
-	 * type_param_attr_spec
-	 *
-	 * @param kindOrLen T_IDENT token for T_KIND or T_LEN.
-	 */
-	public void type_param_attr_spec(Token kindOrLen) {
-		printRuleHeader(437, "type-param-attr-spec");
-		printRuleTrailer();
-	}
+   /** R437
+    * type_param_attr_spec
+    */
+   public void type_param_attr_spec(Token kindOrLen) {
+      printRuleHeader(437, "type-param-attr-spec");
+      printRuleTrailer();
+   }
 
-	/** R439
-	 * component_def_stmt
-	 */
-	public void component_def_stmt(int type) {
-		printRuleHeader(439, "component-def-stmt");
-		printParameter(type, "type");
-		printRuleTrailer();
-	}
+   /** R439
+    * component_def_stmt
+    */
+   public void component_def_stmt(int type) {
+      printRuleHeader(439, "component-def-stmt");
+      printParameter(type, "type");
+      printRuleTrailer();
+   }
 
-	/** R440
-	 *	data_component_def_stmt
-	 */
-	public void data_component_def_stmt(Token label, Token eos, 
-													boolean hasSpec) {
-		printRuleHeader(440, "data-component-def-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(hasSpec, "hasSpec");
-		printRuleTrailer();
-	}
+   /** R440
+    *	data_component_def_stmt
+    */
+   public void data_component_def_stmt(Token label, Token eos, boolean hasSpec)
+   {
+      printRuleHeader(440, "data-component-def-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasSpec, "hasSpec");
+      printRuleTrailer();
+   }
 
-	/** R441
-	 * component_attr_spec
-	 *
-	 * @param attrKeyword T_POINTER, T_DIMENSION, T_ALLOCATABLE, T_KIND, or 
-	 * T_LEN if given; null otherwise.
-	 * @param specType Type of spec in enum form: pointer,
-	 * dimension_paren, dimension_bracket, allocable, access_spec,
-	 * kind, or len.
-	 */
-	public void component_attr_spec(Token attrKeyword, int specType) {
-		printRuleHeader(441, "component-attr-spec");
-		printParameter(specType, "specType");
-		printRuleTrailer();
-	}
+   /** R441
+    * component_attr_spec
+    */
+   public void component_attr_spec(Token attrKeyword, int specType) {
+      printRuleHeader(441, "component-attr-spec");
+      printParameter(specType, "specType");
+      printRuleTrailer();
+   }
 
-	/** R441 list
-	 * component_attr_spec
-	 * component_attr_spec_list
-	 */
-	public void component_attr_spec_list__begin() {
-		printRuleHeader(441, "component-attr-spec-list__begin", "list-begin");
-		printRuleTrailer();
-
-	}
-	public void component_attr_spec_list(int count) {
-		printRuleHeader(441, "component-attr-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();	
-	
-	}
+   /** R441 list
+    * component_attr_spec
+    * component_attr_spec_list
+    */
+   public void component_attr_spec_list__begin() {
+      printRuleHeader(441, "component-attr-spec-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void component_attr_spec_list(int count) {
+      printRuleHeader(441, "component-attr-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();	
+   }
 
    /** R438-F08
     * component_decl
@@ -773,418 +708,375 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleTrailer();
    }
 
-	/** R443
-	 * component_array_spec
-	 */
-	public void component_array_spec(boolean isExplicit) {
-		printRuleHeader(443, "component-array-spec");
-		printParameter(isExplicit, "isExplicit");
-		printRuleTrailer();
-	}
+   /** R443
+    * component_array_spec
+    */
+   public void component_array_spec(boolean isExplicit) {
+      printRuleHeader(443, "component-array-spec");
+      printParameter(isExplicit, "isExplicit");
+      printRuleTrailer();
+   }
 
-	/** R443 list
-	 * deferred_shape_spec_list
-	 */
-	public void deferred_shape_spec_list__begin() {
-		printRuleHeader(443, "deferred-shape-spec-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void deferred_shape_spec_list(int count) {
-		printRuleHeader(443, "deferred-shape-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R443 list
+    * deferred_shape_spec_list
+    */
+   public void deferred_shape_spec_list__begin() {
+      printRuleHeader(443, "deferred-shape-spec-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void deferred_shape_spec_list(int count) {
+      printRuleHeader(443, "deferred-shape-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R444
-	 * component_initialization
-	 *
-	 */
-	public void component_initialization() {
-		printRuleHeader(444, "component-initialization");
-		printRuleTrailer();
-	}
+   /** R444
+    * component_initialization
+    */
+   public void component_initialization() {
+      printRuleHeader(444, "component-initialization");
+      printRuleTrailer();
+   }
 
-	/** R445
-	 *	proc_component_def_stmt
-	 */
-	public void proc_component_def_stmt(Token label, Token procedureKeyword, 
-													Token eos, boolean hasInterface) {
-		printRuleHeader(445, "proc-component-def-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(hasInterface, "hasInterface");
-		printRuleTrailer();
-	}
+   /** R445
+    *	proc_component_def_stmt
+    */
+   public void proc_component_def_stmt(Token label, Token procedureKeyword, 
+                                       Token eos, boolean hasInterface) {
+      printRuleHeader(445, "proc-component-def-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(hasInterface, "hasInterface");
+      printRuleTrailer();
+   }
 
-	/** R446
-	 * proc_component_attr_spec
-	 *
-	 * @param attrSpecKeyword T_POINTER, T_PASS, or T_NOPASS token if given; 
-	 * null otherwise.
-	 * @param id Identifier if present in pass. 
-	 * @param specType "Enum" to specify type of spec: pointer, pass,
-	 * nopass, or access_spec
-	 */
-	public void proc_component_attr_spec(Token attrSpecKeyword, Token id, 
-													 int specType) {
-		printRuleHeader(446, "proc-component-attr-spec");
-		printParameter(id, "id");
-		printParameter(specType, "specType");
-		printRuleTrailer();
-	}
+   /** R446
+    * proc_component_attr_spec
+    */
+   public void proc_component_attr_spec(Token attrSpecKeyword, Token id, int specType)
+   {
+      printRuleHeader(446, "proc-component-attr-spec");
+      printParameter(id, "id");
+      printParameter(specType, "specType");
+      printRuleTrailer();
+   }
 
-	/** R446 list
-	 * proc_component_attr_spec_list
-	 */
-	public void proc_component_attr_spec_list__begin() {
-		printRuleHeader(446, "proc-component-attr-spec-list__begin", 
-			"list-begin");
-		printRuleTrailer();
-	}
-	public void proc_component_attr_spec_list(int count) {
-		printRuleHeader(446, "proc-component-attr-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R446 list
+    * proc_component_attr_spec_list
+    */
+   public void proc_component_attr_spec_list__begin() {
+      printRuleHeader(446, "proc-component-attr-spec-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void proc_component_attr_spec_list(int count) {
+      printRuleHeader(446, "proc-component-attr-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R447
-	 * private_components_stmt
-	 */
-	public void private_components_stmt(Token label, Token privateKeyword, 
-													Token eos) {
-		printRuleHeader(447, "private-components-stmt");
-		if (label!=null) printParameter(label, "label");
-		printRuleTrailer();
-	}
+   /** R447
+    * private_components_stmt
+    */
+   public void private_components_stmt(Token label, Token privateKeyword, Token eos)
+   {
+      printRuleHeader(447, "private-components-stmt");
+      if (label!=null) printParameter(label, "label");
+      printRuleTrailer();
+   }
 
-	/** R448
-	 * type_bound_procedure_part
-	 */
-	public void type_bound_procedure_part(int count, boolean hasBindingPrivateStmt) {
-		printRuleHeader(448, "type-bound-procedure-part");
-		printParameter(count, "count");
-		printParameter(hasBindingPrivateStmt, "hasBindingPrivateStmt");
-		printRuleTrailer();
-	}
+   /** R448
+    * type_bound_procedure_part
+    */
+   public void type_bound_procedure_part(int count, boolean hasBindingPrivateStmt)
+   {
+      printRuleHeader(448, "type-bound-procedure-part");
+      printParameter(count, "count");
+      printParameter(hasBindingPrivateStmt, "hasBindingPrivateStmt");
+      printRuleTrailer();
+   }
 
-	/** R449
-	 * binding_private_stmt
-	 */
-	public void binding_private_stmt(Token label, Token privateKeyword, 
-												Token eos) {
-		printRuleHeader(447, "binding-private-stmt");
-		if (label!=null) printParameter(label, "label");
-		printRuleTrailer();
-	}
+   /** R449
+    * binding_private_stmt
+    */
+   public void binding_private_stmt(Token label, Token privateKeyword, Token eos)
+   {
+      printRuleHeader(447, "binding-private-stmt");
+      if (label!=null) printParameter(label, "label");
+      printRuleTrailer();
+   }
 
-	/** R450
-	 * proc_binding_stmt
-	 */
-	public void proc_binding_stmt(Token label, int type, Token eos) {
-		printRuleHeader(450, "proc-binding-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(type, "type");
-		printRuleTrailer();
-	}
+   /** R450
+    * proc_binding_stmt
+    */
+   public void proc_binding_stmt(Token label, int type, Token eos) {
+      printRuleHeader(450, "proc-binding-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(type, "type");
+      printRuleTrailer();
+   }
 
-	/** R451
-	 * specific_binding
-	 *
-	 * @param procedureKeyword T_PROCEDURE token.
-	 * @param interfaceName Optional interface name.
-	 * @param bindingName Required binding name.
-	 * @param procedureName Optional procedure name.
-	 * @param hasBindingAttributeList True if has a binding-attr-list.
-	 */
-	public void specific_binding(Token procedureKeyword, Token interfaceName, 
-										  Token bindingName, Token procedureName,
-										  boolean hasBindingAttrList) {
-		printRuleHeader(451, "specific-binding");
-		printParameter(interfaceName, "interfaceName");
-		printParameter(bindingName, "bindingName");
-		printParameter(procedureName, "procedureName");
-		printParameter(hasBindingAttrList, "hasBindingAttrList");
-		printRuleTrailer();
-	}
+   /** R451
+    * specific_binding
+    */
+   public void
+   specific_binding(Token procedureKeyword, Token interfaceName,
+                    Token bindingName, Token procedureName, boolean hasBindingAttrList)
+   {
+      printRuleHeader(451, "specific-binding");
+      printParameter(interfaceName, "interfaceName");
+      printParameter(bindingName, "bindingName");
+      printParameter(procedureName, "procedureName");
+      printParameter(hasBindingAttrList, "hasBindingAttrList");
+      printRuleTrailer();
+   }
 
-	/** R452
-	 * generic_binding
-	 *
-	 * @param genericKeyword T_GENERIC token.
-	 * @param hasAccessSpec True if has public or private access spec.
-	 */
-	public void generic_binding(Token genericKeyword, boolean hasAccessSpec) {
-		printRuleHeader(452, "generic-binding");
-		printParameter(hasAccessSpec, "hasAccessSpec");
-		printRuleTrailer();
-	}
+   /** R452
+    * generic_binding
+    */
+   public void generic_binding(Token genericKeyword, boolean hasAccessSpec) {
+      printRuleHeader(452, "generic-binding");
+      printParameter(hasAccessSpec, "hasAccessSpec");
+      printRuleTrailer();
+   }
 
-	/** R453
-	 * binding_attr
-	 *
-	 * @param bindingAttr T_PASS, T_NOPASS, T_NON_OVERRIDABLE, T_DEFERRED, 
-	 * or null.
-	 * @param attr The binding attribute.
-	 * @param id Optional identifier in pass attribute.
-	 */
-	public void binding_attr(Token bindingAttr, int attr, Token id) {
-		printRuleHeader(453, "binding-attr");
-		printParameter(attr, "attr");
-		printParameter(id, "id");
-		printRuleTrailer();	
-	}
+   /** R453
+    * binding_attr
+    */
+   public void binding_attr(Token bindingAttr, int attr, Token id) {
+      printRuleHeader(453, "binding-attr");
+      printParameter(attr, "attr");
+      printParameter(id, "id");
+      printRuleTrailer();	
+   }
 
-	/** R453 list
-	 * binding_attr_list
-	 */
-	public void binding_attr_list__begin() {
-		printRuleHeader(453, "binding-attr-list__begin", 
-			"list-begin");
-		printRuleTrailer();
-	}
-	public void binding_attr_list(int count) {
-		printRuleHeader(453, "binding-attr-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R453 list
+    * binding_attr_list
+    */
+   public void binding_attr_list__begin() {
+      printRuleHeader(453, "binding-attr-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void binding_attr_list(int count) {
+      printRuleHeader(453, "binding-attr-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R454
-	 * final_binding
-	 *
-	 * @param finalKeyword T_FINAL token.
-	 */
-	public void final_binding(Token finalKeyword) {
-		printRuleHeader(454, "final-binding");
-		printRuleTrailer();
-	}
+   /** R454
+    * final_binding
+    */
+   public void final_binding(Token finalKeyword) {
+      printRuleHeader(454, "final-binding");
+      printRuleTrailer();
+   }
 
-	/** R455
-	 * derived_type_spec
-	 */
-	public void derived_type_spec(Token typeName, 
-											boolean hasTypeParamSpecList) {
-		printRuleHeader(455, "derived-type-spec");
-		printParameter(typeName, "typeName");
-		printParameter(hasTypeParamSpecList, "hasTypeParamSpecList");
-		printRuleTrailer();			
-	}
+   /** R455
+    * derived_type_spec
+    */
+   public void derived_type_spec(Token typeName, boolean hasTypeParamSpecList)
+   {
+      printRuleHeader(455, "derived-type-spec");
+      printParameter(typeName, "typeName");
+      printParameter(hasTypeParamSpecList, "hasTypeParamSpecList");
+      printRuleTrailer();			
+   }
 
-	/** R456
-	 * type_param_spec
-	 */
-	public void type_param_spec(Token keyWord) {
-		printRuleHeader(456, "type-param-spec");
-		printParameter(keyWord, "keyWord");
-		printRuleTrailer();
-	}
+   /** R456
+    * type_param_spec
+    */
+   public void type_param_spec(Token keyWord) {
+      printRuleHeader(456, "type-param-spec");
+      printParameter(keyWord, "keyWord");
+      printRuleTrailer();
+   }
 
-	/** R456 list
-	 * type_param_spec_list
-	 */
-	public void type_param_spec_list__begin() {
-		printRuleHeader(456, "type-param-spec-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void type_param_spec_list(int count) {
-		printRuleHeader(456, "type-param-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R456 list
+    * type_param_spec_list
+    */
+   public void type_param_spec_list__begin() {
+      printRuleHeader(456, "type-param-spec-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void type_param_spec_list(int count) {
+      printRuleHeader(456, "type-param-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R457
-	 * structure_constructor
-	 *
-	 * @param id T_IDENT token for strucure.
-	 */
-	public void structure_constructor(Token id) {
-		printRuleHeader(457, "structure-constructor");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R457
+    * structure_constructor
+    */
+   public void structure_constructor(Token id) {
+      printRuleHeader(457, "structure-constructor");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
+   /** R458 
+    * component_spec
+    */
+   public void component_spec(Token id) {
+      printRuleHeader(458, "component-spec");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R458 
-	 * component_spec
-	 *
-	 * @param id T_IDENT token for "keyword=" part of component-spec.
-	 */
-	public void component_spec(Token id) {
-		printRuleHeader(458, "component-spec");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R458 list
+    * component_spec_list
+    */
+   public void component_spec_list__begin() {
+      printRuleHeader(458, "component-spec-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void component_spec_list(int count) {
+      printRuleHeader(458, "component-spec-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R458 list
-	 * component_spec_list
-	 */
-	public void component_spec_list__begin() {
-		printRuleHeader(458, "component-spec-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void component_spec_list(int count) {
-		printRuleHeader(458, "component-spec-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R459
+    * component_data_source
+    */
+   public void component_data_source() {
+      printRuleHeader(459, "component-data-source");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R459
-	 * component_data_source
-	 *
-	 */
-	public void component_data_source() {
-		printRuleHeader(459, "component-data-source");
-		printRuleTrailer();
-	}
+   /** R460
+    * enum_def
+    */
+   public void enum_def(int numEls) {
+      printRuleHeader(460, "enum-def");
+      printParameter(numEls, "numEls");
+      printRuleTrailer();
+   }
 
-	/** R460
-	 * enum_def
-	 */
-	public void enum_def(int numEls) {
-		printRuleHeader(460, "enum-def");
-		printParameter(numEls, "numEls");
-		printRuleTrailer();
-	}
+   /** R461
+    * enum_def_stmt
+    */
+   public void enum_def_stmt(Token label, Token enumKeyword, 
+                             Token bindKeyword, Token id, Token eos)
+   {
+      printRuleHeader(461, "enum-def-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
 
-	/** R461
-	 * enum_def_stmt
-	 */
-	public void enum_def_stmt(Token label, Token enumKeyword, 
-									  Token bindKeyword, Token id, Token eos) {
-		printRuleHeader(461, "enum-def-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(id, "id");
-		printRuleTrailer();
-	}
+   /** R462
+    * enumerator_def_stmt
+    */
+   public void enumerator_def_stmt(Token label, Token enumeratorKeyword, Token eos)
+   {
+      printRuleHeader(462, "enumerator-def-stmt");
+      if (label!=null) printParameter(label, "label");
+      printRuleTrailer();
+   }
 
-	/** R462
-	 * enumerator_def_stmt
-	 */
-	public void enumerator_def_stmt(Token label, Token enumeratorKeyword, 
-											  Token eos) {
-		printRuleHeader(462, "enumerator-def-stmt");
-		if (label!=null) printParameter(label, "label");
-		printRuleTrailer();
-	}
+   /** R463
+    * enumerator
+    */
+   public void enumerator(Token id, boolean hasExpr) {
+      printRuleHeader(463, "enumerator");
+      printParameter(id, "id");
+      printParameter(hasExpr, "hasExpr");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R463
-	 * enumerator
-	 *
-	 * @param id T_IDENT for enumerator.
-	 * @param hasExpr Boolean specifying if the optional "= expr" was given.
-	 */
-	public void enumerator(Token id, boolean hasExpr) {
-		printRuleHeader(463, "enumerator");
-		printParameter(id, "id");
-		printParameter(hasExpr, "hasExpr");
-		printRuleTrailer();
-	}
+   /** R463 list
+    * enumerator_list
+    */
+   public void enumerator_list__begin() {
+      printRuleHeader(463, "enumerator-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void enumerator_list(int count) {
+      printRuleHeader(463, "enumerator-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R463 list
-	 * enumerator_list
-	 */
-	public void enumerator_list__begin() {
-		printRuleHeader(463, "enumerator-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void enumerator_list(int count) {
-		printRuleHeader(463, "enumerator-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R464
+    * end_enum_stmt
+    */
+   public void end_enum_stmt(Token label, Token endKeyword, Token enumKeyword, Token eos)
+   {
+      printRuleHeader(464, "end-enum-stmt");
+      if (label!=null) printParameter(label, "label");
+      printRuleTrailer();
+   }
 
-	/** R464
-	 * end_enum_stmt
-	 */
-	public void end_enum_stmt(Token label, Token endKeyword, Token enumKeyword, 
-									  Token eos) {
-		printRuleHeader(464, "end-enum-stmt");
-		if (label!=null) printParameter(label, "label");
-		printRuleTrailer();
-	}
+   /** R465
+    * array_constructor
+    */
+   public void array_constructor() {
+      printRuleHeader(465, "array-constructor");
+      printRuleTrailer();
+   }
 
-	/** R465
-	 * array_constructor
-	 */
-	public void array_constructor() {
-		printRuleHeader(465, "array-constructor");
-		printRuleTrailer();
-	}
+   /** R466
+    * ac_spec
+    */
+   public void ac_spec() {
+      printRuleHeader(466, "ac-spec");
+      printRuleTrailer();
+   }		
 
-	/**
-	 * R466
-	 * ac_spec
-	 *
-	 */
-	public void ac_spec() {
-		printRuleHeader(466, "ac-spec");
-		printRuleTrailer();
-	}		
+   /** R469
+    * ac_value
+    */
+   public void ac_value() {
+      printRuleHeader(469, "ac-value");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R469
-	 * ac_value
-	 *
-	 */
-	public void ac_value() {
-		printRuleHeader(469, "ac-value");
-		printRuleTrailer();
-	}
+   /** R469 list
+    * ac_value_list
+    */
+   public void ac_value_list__begin() {
+      printRuleHeader(469, "ac-value-list__begin", "list-begin");
+      printRuleTrailer();
+   }
+   public void ac_value_list(int count) {
+      printRuleHeader(469, "ac-value-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
 
-	/** R469 list
-	 * ac_value_list
-	 */
-	public void ac_value_list__begin() {
-		printRuleHeader(469, "ac-value-list__begin", "list-begin");
-		printRuleTrailer();
-	}
-	public void ac_value_list(int count) {
-		printRuleHeader(469, "ac-value-list", "list");
-		printParameter(count, "count");
-		printRuleTrailer();
-	}
+   /** R470
+    * ac_implied_do
+    */
+   public void ac_implied_do() {
+      printRuleHeader(470, "ac-implied-do");
+      printRuleTrailer();
+   }
 
-	/** R470
-	 * ac_implied_do
-	 */
-	public void ac_implied_do() {
-		printRuleHeader(470, "ac-implied-do");
-		printRuleTrailer();
-	}
+   /** R471
+    * ac_implied_do_control
+    */
+   public void ac_implied_do_control(boolean hasStride) {
+      printRuleHeader(471, "ac-implied-do-control");
+      printParameter(hasStride, "hasStride");
+      printRuleTrailer();
+   }
 
-	/** R471
-	 * ac_implied_do_control
-	 */
-	public void ac_implied_do_control(boolean hasStride) {
-		printRuleHeader(471, "ac-implied-do-control");
-		printParameter(hasStride, "hasStride");
-		printRuleTrailer();
-	}
+   /** R472
+    * scalar_int_variable
+    */
+   public void scalar_int_variable() {
+      printRuleHeader(472, "scalar-int-variable");
+      printRuleTrailer();
+   }
 
-	/**
-	 * R472
-	 * scalar_int_variable
-	 *
-	 */
-	public void scalar_int_variable() {
-		printRuleHeader(472, "scalar-int-variable");
-		printRuleTrailer();
-	}
-
-	/** R501
-	 * type_declaration_stmt
-	 */
-	public void type_declaration_stmt(Token label, int numAttributes, 
-												 Token eos) {
-		printRuleHeader(501, "type-declaration-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(numAttributes, "numAttributes");
-		printRuleTrailer();
-	}
+   /** R501
+    * type_declaration_stmt
+    */
+   public void type_declaration_stmt(Token label, int numAttributes, Token eos)
+   {
+      printRuleHeader(501, "type-declaration-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(numAttributes, "numAttributes");
+      printRuleTrailer();
+   }
 
 	/** R502
 	 * declaration_type_spec
@@ -3169,10 +3061,20 @@ public class FortranParserActionPrint implements IFortranParserAction {
    /** R807-F08
     * block-construct
     */
-   public void block_construct(boolean hasSpecPart)
+   public void block_construct()
    {
       printRuleHeader(807008, "block-construct");
-      printParameter(hasSpecPart, "hasSpecPart");
+      printRuleTrailer();
+   }
+
+   /** R807-F08 suppliment
+    *  see R204-F08 specification-part for comparison
+    */
+   public void specification_part_and_block(int numUseStmts, int numImportStmts)
+   {
+      printRuleHeader(807008, "specification_part_and_block");
+      printParameter(numUseStmts, "numUseStmts");
+      printParameter(numImportStmts, "numImportStmts");
       printRuleTrailer();
    }
 
@@ -4577,8 +4479,9 @@ public class FortranParserActionPrint implements IFortranParserAction {
 	 * R1107
 	 * module_subprogram_part
 	 */
-	public void module_subprogram_part() {
+	public void module_subprogram_part(int count) {
 		printRuleHeader(1107, "module-subprogram-part");
+		printParameter(count, "count");
 		printRuleTrailer();
 	}
 
@@ -4695,9 +4598,10 @@ public class FortranParserActionPrint implements IFortranParserAction {
    /** R1116-F08
     * submodule
     */
-   public void submodule()
+   public void submodule(boolean hasModuleSubprogramPart)
    {
       printRuleHeader(111608, "submodule");
+      printParameter(hasModuleSubprogramPart, "hasModuleSubprogramPart");
       printRuleTrailer();
    }
 
@@ -5311,79 +5215,122 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/** R1237
-	 * contains_stmt
-	 */
-	public void contains_stmt(Token label, Token keyword, Token eos) {
-		printRuleHeader(1237, "contains-stmt");
-		if (label != null) printParameter(label, "label");
-		if (printKeywords) printParameter(keyword, "keyword");
-		if (printKeywords) printParameter(eos, "eos");
-		printRuleTrailer();
-	}
+   /** R1237
+    * contains_stmt
+    */
+   public void contains_stmt(Token label, Token keyword, Token eos) {
+      printRuleHeader(1237, "contains-stmt");
+      if (label != null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
 
-	/** R1238
-	 * stmt_function_stmt
-	 *
-	 * @param label The label.
-	 * @param functionName The name of the function.
-	 * @param eos T_EOS token.
-	 * @param hasGenericNameList True if there is a list in the statement.
-	 */
-	public void stmt_function_stmt(Token label, Token functionName, Token eos, 
-											 boolean hasGenericNameList) {
-		printRuleHeader(1238, "stmt-function-stmt");
-		if (label!=null) printParameter(label, "label");
-		printParameter(functionName, "functionName");
-		printParameter(hasGenericNameList, "hasGenericNameList");
-		printRuleTrailer();
-	}
+   /** R1237-F08
+    * separate-module-subprogram
+    */
+   public void
+   separate_module_subprogram(boolean hasExecutionPart, boolean hasInternalSubprogramPart)
+   {
+      printRuleHeader(123708, "separate-module-subprogram");
+      printParameter(hasExecutionPart, "hasExecutionPart");
+      printParameter(hasInternalSubprogramPart, "hasInternalSubprogrampart");
+      printRuleTrailer();
+   }
+   public void separate_module_subprogram__begin()
+   {
+      printRuleHeader(123708, "separate-module-subprogram__begin", "begin");
+      printRuleTrailer();
+   }
 
+   /** R1238-F08
+    * mp-subprogram-stmt
+    */
+   public void mp_subprogram_stmt(Token label, Token moduleKeyword,
+                                  Token procedureKeyword, Token name, Token eos)
+   {
+      printRuleHeader(123808, "mp-subprogram-stmt");
+      if (label != null) printParameter(label, "label");
+      if (printKeywords) printParameter(moduleKeyword, "moduleKeyword");
+      if (printKeywords) printParameter(procedureKeyword, "procedureKeyword");
+      printParameter(name, "name");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
 
-	/**
-	 * Inserted rule.
-	 * end_of_stmt
-	 * 
-	 * @param eos T_EOS or EOF token.
-	 * @param currStreamName Name of the current input stream the parser is
-	 * processing.
-	 * @param nextStreamName Name of the stream that the parser will switch to 
-	 * next, starting with the next statement.  This is null if there is no 
-	 * new stream.  This variable signals to the action method that an include 
-	 * statement followed the current statement ended by this end_of_stmt.
-	 */
-// 	public void end_of_stmt(Token eos, String currStreamName, 
-// 									String nextStreamName) {
-// 		printRuleHeader(generatedRule, "end-of-stmt");
-// 		printParameter(currStreamName, "currStreamName");
-// 		printParameter(nextStreamName, "nextStreamName");
-// 	}
-	public void end_of_stmt(Token eos) {
-	}
+   /** R1239-F08
+    * end-mp-subprogram-stmt
+    */
+   public void end_mp_subprogram_stmt(Token label, Token keyword1, 
+                                      Token keyword2, Token name, Token eos)
+   {
+      printRuleHeader(123908, "end-mp-subprogram-stmt");
+      if (label != null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword1, "keyword1");
+      if (printKeywords) printParameter(keyword2, "keyword2");
+      printParameter(name, "name");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
 
+   /** R1238
+    * stmt_function_stmt
+    *
+    * @param label The label.
+    * @param functionName The name of the function.
+    * @param eos T_EOS token.
+    * @param hasGenericNameList True if there is a list in the statement.
+    */
+   public void stmt_function_stmt(Token label, Token functionName, Token eos, 
+                                  boolean hasGenericNameList)
+   {
+      printRuleHeader(1238, "stmt-function-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(functionName, "functionName");
+      printParameter(hasGenericNameList, "hasGenericNameList");
+      printRuleTrailer();
+   }
 
-	public void start_of_file(String filename) {
-		printRuleHeader(generatedRule, "start-of-file");
-		printParameter(filename, "filename");
-		printRuleTrailer();
-	}
+   /**
+    * Inserted rule.
+    * end_of_stmt
+    * 
+    * @param eos T_EOS or EOF token.
+    * @param currStreamName Name of the current input stream the parser is
+    * processing.
+    * @param nextStreamName Name of the stream that the parser will switch to 
+    * next, starting with the next statement.  This is null if there is no 
+    * new stream.  This variable signals to the action method that an include 
+    * statement followed the current statement ended by this end_of_stmt.
+    */
+   public void end_of_stmt(Token eos)
+   {
+      /* Do nothing.  */
+   }
 
-	/**
-	 * Inserted Rule
-	 * end_of_file
-	 */
-	public void end_of_file(String filename) {
-           printRuleHeader(generatedRule, "end-of-file");
-           printParameter(filename, "filename");
-           printRuleTrailer();
-	}
+   public void start_of_file(String filename) {
+      printRuleHeader(generatedRule, "start-of-file");
+      printParameter(filename, "filename");
+      printRuleTrailer();
+   }
 
-	/**
-	 * This method should never need to be called from Java.  
-	 */
-	public void cleanUp() {
-		/* Do nothing.  */
-	}
+   /**
+    * Inserted Rule
+    * end_of_file
+    */
+   public void end_of_file(String filename) {
+      printRuleHeader(generatedRule, "end-of-file");
+      printParameter(filename, "filename");
+      printRuleTrailer();
+   }
+
+   /**
+    * This method should never need to be called from Java.  
+    */
+   public void cleanUp()
+   {
+      /* Do nothing.  */
+   }
 
    //-------------------------------------------------------------------------
    // RICE CO-ARRAY FORTRAN RULES

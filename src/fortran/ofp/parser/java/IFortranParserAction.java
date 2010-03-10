@@ -44,7 +44,6 @@ public abstract interface IFortranParserAction {
    /** R204
     * specification_part
     *
-    *
     * @param numUseStmts  Number of use statements.
     * @param numImportStmts  Number of import statements.
     * @param numDeclConstructs  Number of declaration constructs.
@@ -2580,14 +2579,19 @@ public abstract interface IFortranParserAction {
     *          [ specification-part ]
     *          block
     *       end-block-stmt
-    *
-    * @param hasSpecPart True if specification-part is present
     */
-   public abstract void block_construct(boolean hasSpecPart);
+   public abstract void block_construct();
 
-   /** R808-F08
-    * block-stmt
-    *    is [ block-construct-name : ] BLOCK
+   /** R807-F08 suppliment
+    *  see R204-F08 specification-part for comparison
+    *
+    * @param numUseStmts  Number of use statements.
+    * @param numImportStmts  Number of import statements.
+    */
+   public abstract void
+   specification_part_and_block(int numUseStmts, int numImportStmts);
+
+   /** R808-F08 block-stmt is [ block-construct-name : ] BLOCK
     *
     * @param label The label
     * @param id The optional block-construct-name identifier
@@ -3701,20 +3705,21 @@ public abstract interface IFortranParserAction {
    end_module_stmt(Token label, Token endKeyword, 
                    Token moduleKeyword, Token id, Token eos);
 
-   /** R1107
+   /** R1107-F08
     * module_subprogram_part
+    *     is   contains-stmt
+    *          [ module-subprogram ] ...
     *
-    * @param containsKeyword T_CONTAINS token.
-    * @param eos T_EOS token.
+    * @param count The number of module-subprograms.
     */
-   public abstract void module_subprogram_part();
+   public abstract void module_subprogram_part(int count);
    
    /** R1108
     * module_subprogram
     *   :   (prefix)? function_subprogram
     *   |   subroutine_subprogram
     *
-    * @param ihasPrefix Boolean true if has a prefix.
+    * @param hasPrefix Boolean true if has a prefix.
     */
    public abstract void module_subprogram(boolean hasPrefix);
 
@@ -3792,8 +3797,12 @@ public abstract interface IFortranParserAction {
 
    /** R1116-F08
     * submodule
+    *     is submodule-stmt
+    *           [ specification-part ]
+    *           [ module-subprogram-part ]
+    *     end-submodule-stmt
     */
-   public abstract void submodule();
+   public abstract void submodule(boolean hasModuleSubprogramPart);
    
    /** R1117-F08
     * submodule_stmt__begin
@@ -4316,7 +4325,7 @@ public abstract interface IFortranParserAction {
     * @param label The label.
     * @param keyword The RETURN keyword token.
     * @param eos End of statement token.
-    * @param hasScalarIntExpr True if there is a scalar in in the return; 
+    * @param hasScalarIntExpr True if there is a scalar in the return; 
     */
    public abstract void return_stmt(Token label, Token keyword, Token eos, 
                                     boolean hasScalarIntExpr);
@@ -4331,6 +4340,48 @@ public abstract interface IFortranParserAction {
     */
    public abstract void contains_stmt(Token label, Token keyword, Token eos);
 
+   /** R1237-F08
+    * separate-module-subprogram
+    *   is   mp-subprogram-stmt          // NEW_TO_F2008
+    *           [ specification-part ]
+    *           [ execution-part ]
+    *           [ internal-subprogram-part ]
+    *        end-mp-subprogram
+    *
+    * @param hasExecutionPart True if there is an execution-part, false otherwise.
+    * @param hasInternalSubprogramPart True if there is an internal-subprogram-part.
+    */
+   public abstract void
+   separate_module_subprogram(boolean hasExecutionPart, boolean hasInternalSubprogramPart);
+
+   public abstract void separate_module_subprogram__begin();
+
+   /** R1238-F08
+    * mp-subprogram-stmt
+    *     is   MODULE PROCEDURE procedure-name
+    *
+    * @param label The label.
+    * @param moduleKeyword The MODULE keyword token.
+    * @param procedureKeyword The PROCEDURE keyword token.
+    * @param name The name of the procedure.
+    * @param eos T_EOS token.
+    */
+   public abstract void mp_subprogram_stmt(Token label, Token moduleKeyword,
+                                           Token procedureKeyword, Token name, Token eos);
+
+   /** R1239-F08
+    * end-mp-subprogram-stmt
+    *     is END [ PROCEDURE [ procedure-name ] ]
+    *
+    * @param label The label.
+    * @param keyword1 The END or ENDPROCEDURE keyword token.
+    * @param keyword2 The PROCEDURE keyword token (may be null).
+    * @param name The name of the procedure (may be null).
+    * @param eos End of statement token.
+    */
+   public abstract void end_mp_subprogram_stmt(Token label, Token keyword1, 
+                                               Token keyword2, Token name, Token eos);
+
    /** R1238
     * stmt_function_stmt
     *   :   (label)? T_STMT_FUNCTION T_IDENT T_LPAREN 
@@ -4341,9 +4392,8 @@ public abstract interface IFortranParserAction {
     * @param eos T_EOS token.
     * @param hasGenericNameList True if there is a list in the statement.
     */
-   public abstract void
-   stmt_function_stmt(Token label, Token functionName,
-                      Token eos, boolean hasGenericNameList);
+   public abstract void stmt_function_stmt(Token label, Token functionName,
+                                           Token eos, boolean hasGenericNameList);
 
    /**
     * Inserted rule.
