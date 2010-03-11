@@ -128,18 +128,24 @@ main_program
  */
 
 
+////////////
+// R204-F08
+//
+// TODO - fix parameters to action call (talk to Quinlan about this)
+//
+specification_part
+@init{int numUseStmts=0; int numImportStmts=0; int numDeclConstructs=0;}
+   :   ( use_stmt {numUseStmts++;} )*
+       ( import_stmt {numImportStmts++;} )*
+       implicit_part_recursion // making nonoptional with predicates fixes ambiguity
+       ( declaration_construct {numDeclConstructs++;} )*
+			{action.specification_part(numUseStmts, numImportStmts, numDeclConstructs);}
+	;
+
 /*
  * R205-F08   implicit-part           is [ implicit-part-stmt ] ...
  *                                       implicit-stmt
  */
-
-////////////
-// R206-F08
-//
-// implicit-part replaced with implicit-part-stmt with recursion and
-// predicates because of ambiguity of the F2008 grammar
-//
-// TODO - should be able to make implicit-part work properly with predicates
 
 /*
  * R206-F08   implicit-part-stmt      is implicit-stmt
@@ -149,17 +155,16 @@ main_program
  */
 
 ////////////
-// R206-F08
+// R205-F08
+// R206-F08 combined
 //
-// TODO - talk to Quinlan
-//
-implicit_part_stmt
-   :   implicit_stmt
-   |   parameter_stmt
-   |   format_stmt
-   |   entry_stmt
+implicit_part_recursion
+   :   ((label)? T_IMPLICIT)  => implicit_stmt  implicit_part_recursion
+   |   ((label)? T_PARAMETER) => parameter_stmt implicit_part_recursion
+   |   ((label)? T_FORMAT)    => format_stmt    implicit_part_recursion
+   |   ((label)? T_ENTRY)     => entry_stmt     implicit_part_recursion
+   |   // empty
    ;
-
 
 /*
  * R207-F08 declaration-construct
@@ -178,20 +183,14 @@ implicit_part_stmt
 ////////////
 // R207-F08
 //
-// ERR_CHK 207 implicit_stmt must precede all occurences of rules following it in text below
-// TODO - what does this mean - has been removed from grammar so must be done when reducing
 declaration_construct
-@after {
-    action.declaration_construct();
-}
-   :   entry_stmt
-   |   parameter_stmt
-   |   format_stmt
-   |   implicit_stmt  
-       // implicit_stmt must precede all occurences of the below
-   |   derived_type_def
+@after {action.declaration_construct();}
+   :   derived_type_def
+   |   entry_stmt
    |   enum_def
+   |   format_stmt
    |   interface_block
+   |   parameter_stmt
    |   procedure_declaration_stmt
    |   other_specification_stmt
    |   type_declaration_stmt
