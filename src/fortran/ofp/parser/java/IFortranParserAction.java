@@ -1003,15 +1003,18 @@ public abstract interface IFortranParserAction {
     * entity_decl
     *   : T_IDENT ( T_LPAREN array_spec T_RPAREN )?
     *             ( T_LBRACKET coarray_spec T_RBRACKET )?
-    *             ( T_ASTERISK char_length )? ( initialization )?
+    *             ( T_ASTERISK char_length )?
+    *             ( initialization )?
     *
     * @param id The identifier token
     * @param hasArraySpec True if array-spec is present, false otherwise
     * @param hasCoarraySpec True if coarray-spec is present, false otherwise
     * @param hasCharLength True if char-length is present, false otherwise
+    * @param hasInitialization True if initialization is present, false otherwise
     */
    public abstract void
-   entity_decl(Token id, boolean hasArraySpec, boolean hasCoarraySpec, boolean hasCharLength);
+   entity_decl(Token id, boolean hasArraySpec, boolean hasCoarraySpec,
+               boolean hasCharLength, boolean hasInitialization);
 
    /** R503-F08 list
     * entity_decl

@@ -1102,13 +1102,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * entity_decl
     */
    public void
-   entity_decl(Token id, boolean hasArraySpec, boolean hasCoarraySpec, boolean hasCharLength)
+   entity_decl(Token id, boolean hasArraySpec, boolean hasCoarraySpec,
+               boolean hasCharLength, boolean hasInitialization)
    {
       printRuleHeader(503008, "entity-decl");
       printParameter(id, "id");
       printParameter(hasArraySpec, "hasArraySpec");
       printParameter(hasCoarraySpec, "hasCoarraySpec");
       printParameter(hasCharLength, "hasCharLength");
+      printParameter(hasInitialization, "hasInitialization");
       printRuleTrailer();
    }
 
