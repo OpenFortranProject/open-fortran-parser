@@ -23,10 +23,6 @@ import org.antlr.runtime.Token;
 
 import fortran.ofp.parser.java.IActionEnums;
 
-/**
- * TODO - change/add from C to Fortran grammar in comments and actions
- * The goal is to do this slowly, one action at a time
- */
 public abstract interface IFortranParserAction {
 
    /** R102 list
@@ -43,32 +39,32 @@ public abstract interface IFortranParserAction {
 
    /** R204
     * specification_part
+    *    is [ use-stmt ] ... 
+    *       [ import-stmt ] ... 
+    *       [ implicit-part ] 
+    *       [ declaration-construct ] ... 
     *
     * @param numUseStmts  Number of use statements.
     * @param numImportStmts  Number of import statements.
+    * @param numImplStmts Number of implicit statements
     * @param numDeclConstructs  Number of declaration constructs.
     */
    public abstract void
-   specification_part(int numUseStmts, int numImportStmts, int numDeclConstructs);
+   specification_part(int numUseStmts, int numImportStmts,
+                      int numImplStmts, int numDeclConstructs);
 
-   /**
-    * R205, R206, R207
+   /** R205, R206, R207
     * declaration_construct
-    *
     */
    public abstract void declaration_construct();
 
-   /**
-    * R208
+   /** R208
     * execution_part
-    *
     */
    public abstract void execution_part();
 
-   /**
-    * R209
+   /** R209
     * execution_part_construct
-    *
     */
    public abstract void execution_part_construct();
 
@@ -80,43 +76,32 @@ public abstract interface IFortranParserAction {
     */
    public abstract void internal_subprogram_part(int count);
 
-   /**
-    * R211
+   /** R211
     * internal_subprogram
-    *
     */
    public abstract void internal_subprogram();
 
-   /**
-    * R212
-    *
+   /** R212
     * specification_stmt
     */
    public abstract void specification_stmt();
 
-   /**
-    * R213
+   /** R213
     * executable_construct
-    *
     */
    public abstract void executable_construct();
 
-   /**
-    * R214
-    *
+   /** R214
     * action_stmt
     */
    public abstract void action_stmt();
 
-   /**
-    * R215
+   /** R215
     * keyword
-    *
     */
    public abstract void keyword();
 
-   /**
-    * R304
+   /** R304
     * name
     *
     * @param id T_IDENT token for the name.
@@ -2587,9 +2572,10 @@ public abstract interface IFortranParserAction {
     *
     * @param numUseStmts  Number of use statements.
     * @param numImportStmts  Number of import statements.
+    * @param numDeclConstructs  Number of declaration constructs.
     */
    public abstract void
-   specification_part_and_block(int numUseStmts, int numImportStmts);
+   specification_part_and_block(int numUseStmts, int numImportStmts, int numDeclConstructs);
 
    /** R808-F08 block-stmt is [ block-construct-name : ] BLOCK
     *
