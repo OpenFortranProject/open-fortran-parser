@@ -28,6 +28,8 @@ BUILDDIR = $(OFP_BUILD_DIR)
 CLASSDIR = $(BUILDDIR)/fortran/ofp/parser/c/jni
 JFLAGS = -d $(BUILDDIR) @sourcefiles $(OFP_JFLAGS)
 
+INSTALLDIR = $(CLASSDIR)
+
 #CFLAGS=$(OFP_CFLAGS) -I$(OFP_C_DIR)
 #LDFLAGS=$(OFP_LDFLAGS)
 OFP_CFLAGS := $(OFP_CFLAGS) -I$(OFP_C_DIR)
@@ -78,6 +80,7 @@ jni_code: c_actions_jni.c
 
 c_actions_jni.c: ../../java/IFortranParserAction.java
 	$(JAVA) $(OFP_CLASSPATH) fortran.tools.ToC
+	cp c_actions_jni.c $(INSTALLDIR)/.
 
 c_main_ex: c_main_ex.o
 	$(CC) -o $@ -fPIC $(LDFLAGS) $(OFP_LDFLAGS) $<
