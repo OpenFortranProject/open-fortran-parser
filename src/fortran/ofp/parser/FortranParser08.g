@@ -14,6 +14,8 @@ import FortranParser03;
 }
 
 @members {
+   int gCount1;
+   int gCount2;
 
    public void initialize(String[] args, String kind, String filename) {
       action = FortranParserActionFactory.newAction(args, this, kind, filename);
@@ -51,25 +53,17 @@ main_program
    boolean hasProgramStmt = false;
    boolean hasExecutionPart = false;
    boolean hasInternalSubprogramPart = false;
+   action.main_program__begin();
 }
-   :       {
-               action.main_program__begin();
-           }
-
-       ( program_stmt {hasProgramStmt = true;} )?
-
+   :   ( program_stmt {hasProgramStmt = true;} )?
        specification_part
-
        ( execution_part {hasExecutionPart = true;} )?
-
        ( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
-
        end_program_stmt
-           {
-               action.main_program(hasProgramStmt, hasExecutionPart, 
-                                   hasInternalSubprogramPart);
-           }
-    ;
+         {
+           action.main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart);
+         }
+   ;
 
 
 /***
@@ -131,16 +125,14 @@ main_program
 ////////////
 // R204-F08
 //
-// TODO - fix parameters to action call (talk to Quinlan about this)
-//
 specification_part
-@init{int numUseStmts=0; int numImportStmts=0; int numDeclConstructs=0;}
+@init{int numUseStmts=0; int numImportStmts=0; gCount1=0; gCount2=0;}
    :   ( use_stmt {numUseStmts++;} )*
        ( import_stmt {numImportStmts++;} )*
        implicit_part_recursion // making nonoptional with predicates fixes ambiguity
-       ( declaration_construct {numDeclConstructs++;} )*
-			{action.specification_part(numUseStmts, numImportStmts, numDeclConstructs);}
-	;
+       ( declaration_construct {gCount2++;} )*
+           {action.specification_part(numUseStmts, numImportStmts, gCount1, gCount2);}
+   ;
 
 /*
  * R205-F08   implicit-part           is [ implicit-part-stmt ] ...
@@ -159,10 +151,10 @@ specification_part
 // R206-F08 combined
 //
 implicit_part_recursion
-   :   ((label)? T_IMPLICIT)  => implicit_stmt  implicit_part_recursion
-   |   ((label)? T_PARAMETER) => parameter_stmt implicit_part_recursion
-   |   ((label)? T_FORMAT)    => format_stmt    implicit_part_recursion
-   |   ((label)? T_ENTRY)     => entry_stmt     implicit_part_recursion
+   :   ((label)? T_IMPLICIT)  => implicit_stmt  {gCount1++;} implicit_part_recursion
+   |   ((label)? T_PARAMETER) => parameter_stmt {gCount2++;} implicit_part_recursion
+   |   ((label)? T_FORMAT)    => format_stmt    {gCount2++;} implicit_part_recursion
+   |   ((label)? T_ENTRY)     => entry_stmt     {gCount2++;} implicit_part_recursion
    |   // empty
    ;
 
@@ -877,14 +869,15 @@ block_construct
    ;
 
 specification_part_and_block
-@init{int numUseStmts=0; int numImportStmts=0;}
+@init{int numUseStmts=0; int numImportStmts=0; gCount1=0;}
    :   ( use_stmt {numUseStmts++;} )*
        ( import_stmt {numImportStmts++;} )*
        declaration_construct_and_block
-           {action.specification_part_and_block(numUseStmts, numImportStmts);}
+           {action.specification_part_and_block(numUseStmts, numImportStmts, gCount1);}
    ;
 
 declaration_construct_and_block
+@init{gCount1++;}
    :   ((label)? T_ENTRY)      => entry_stmt       declaration_construct_and_block
    |   ((label)? T_ENUM)       => enum_def         declaration_construct_and_block
    |   ((label)? T_FORMAT)     => format_stmt      declaration_construct_and_block
@@ -911,7 +904,7 @@ declaration_construct_and_block
    |   ((label)? T_SAVE)         => save_stmt         declaration_construct_and_block
    |   ((label)? T_TARGET)       => target_stmt       declaration_construct_and_block
    |   ((label)? T_VOLATILE)     => volatile_stmt     declaration_construct_and_block
-   |   block
+   |   block {gCount1--; /* decrement extra count as this isn't a declConstruct */}
    ;
 
 
