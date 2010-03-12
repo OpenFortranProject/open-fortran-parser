@@ -558,11 +558,20 @@ attr_spec
 // T_IDENT ( T_ASTERISK char_length )? takes character and function
 // TODO Pass more info to action....
 entity_decl
-@init{boolean hasArraySpec=false; boolean hasCoarraySpec=false; boolean hasCharLength=false;}
+@init{
+   boolean hasArraySpec=false;
+   boolean hasCoarraySpec=false;
+   boolean hasCharLength=false;
+   boolean hasInitialization=false;
+}
    :   T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=true;} )?
                ( T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=true;} )?
-               ( T_ASTERISK char_length {hasCharLength=true;} )? ( initialization )?
-           {action.entity_decl($T_IDENT, hasArraySpec, hasCoarraySpec, hasCharLength);}
+               ( T_ASTERISK char_length {hasCharLength=true;} )?
+               ( initialization {hasInitialization=true;} )?
+          {
+             action.entity_decl($T_IDENT, hasArraySpec,
+                                hasCoarraySpec, hasCharLength, hasInitialization);
+          }
    ;
 
 /*
