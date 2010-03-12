@@ -21,7 +21,9 @@ JAVAC=$(OFP_JAVAC) #javac
 JAVA=$(OFP_JAVA) #java
 JAR=$(OFP_JAR) #jar
 
-COPIED_FILES=FortranParser.g FortranLexer.g
+BUILDDIR=$(OFP_BUILD_DIR)
+INSTALLDIR = $(BUILDDIR)/fortran/ofp/parser/c
+
 GENERATED_C_HEADER=FortranParserAction.h
 GENERATED_C_NULL=FortranParserActionNull.c
 GENERATED_C_PRINT=FortranParserActionPrint.c
@@ -29,27 +31,15 @@ GENERATED_C_ENUMS=ActionEnums.h
 
 all: $(GENERATED_C_HEADER) $(GENERATED_C_PRINT) $(GENERATED_C_NULL) 
 
-# the -Xconversiontimeout is to try and override the time you allow antlr 
-# for converting NFA's.  i couldn't find documentation on what a good number
-# would be for the argument.  
-FortranLexer.c: FortranLexer.g 
-	$(JAVA) -Xms256M -Xmx512M org.antlr.Tool -Xconversiontimeout 2000 $<
-	sed "s/LexerLexer/Lexer/g" FortranLexerLexer.c > FortranLexer.c
-	sed "s/LexerLexer/Lexer/g" FortranLexerLexer.h > FortranLexer.h
-	rm FortranLexerLexer.c FortranLexerLexer.h
-
-FortranParser.c: FortranParser.g FortranLexer.tokens
-	$(JAVA) org.antlr.Tool $<
-	sed "s/ParserParser/Parser/g" FortranParserParser.c > FortranParser.c
-	sed "s/ParserParser/Parser/g" FortranParserParser.h > FortranParser.h
-	rm FortranParserParser.c FortranParserParser.h
-
 FortranParserAction.h:
 	$(JAVA) $(OFP_CLASSPATH) fortran.tools.CFiles header
+	cp FortranParserAction.h $(INSTALLDIR)/.
 FortranParserActionPrint.c:
 	$(JAVA) $(OFP_CLASSPATH) fortran.tools.CFiles print
+	cp FortranParserActionPrint.c $(INSTALLDIR)/.
 FortranParserActionNull.c:
 	$(JAVA) $(OFP_CLASSPATH) fortran.tools.CFiles null
+	cp FortranParserActionNull.c $(INSTALLDIR)/.
 
 clean:
 	rm -f $(GENERATED_C_PRINT)
