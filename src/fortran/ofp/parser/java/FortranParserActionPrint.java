@@ -122,11 +122,13 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * specification_part
     */
    public void
-   specification_part(int numUseStmts, int numImportStmts, int numDeclConstructs)
+      specification_part(int numUseStmts, int numImportStmts,
+                         int numImplStmts, int numDeclConstructs)
    {
       printRuleHeader(204, "specification-part");
       printParameter(numUseStmts, "numUseStmts");
       printParameter(numImportStmts, "numImportStmts");
+      printParameter(numImplStmts, "numImplicitStmts");
       printParameter(numDeclConstructs, "numDeclConstructs");
       printRuleTrailer();
    }
@@ -2978,11 +2980,13 @@ public class FortranParserActionPrint implements IFortranParserAction {
    /** R807-F08 suppliment
     *  see R204-F08 specification-part for comparison
     */
-   public void specification_part_and_block(int numUseStmts, int numImportStmts)
+   public void
+   specification_part_and_block(int numUseStmts, int numImportStmts, int numDeclConstructs)
    {
       printRuleHeader(807008, "specification_part_and_block");
       printParameter(numUseStmts, "numUseStmts");
       printParameter(numImportStmts, "numImportStmts");
+      printParameter(numDeclConstructs, "numDeclConstructs");
       printRuleTrailer();
    }
 
