@@ -168,7 +168,7 @@ specification_part
 		( import_stmt {numImportStmts++;})*
 		( declaration_construct {numDeclConstructs++;})*
 			{action.specification_part(numUseStmts, numImportStmts, 
-                                       numDeclConstructs);}
+                                       0, numDeclConstructs);}
 	;
 
 // R205 implicit_part removed from grammar (see ERR_CHK 207)
