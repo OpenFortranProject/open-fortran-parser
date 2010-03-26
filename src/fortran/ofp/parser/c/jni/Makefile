@@ -62,6 +62,8 @@ endif
 ############################# targets ##############################
 
 all: $(ALL_TARGETS)
+	cp jni_token_funcs.h $(INSTALLDIR)/.
+	cp jni_token_funcs.c $(INSTALLDIR)/.
 
 $(BUILDDIR)/$(C_ACTION_SO): $(C_TOKEN) $(C_ACTIONS_JNI) $(C_ACTIONS_GEN_JNI) $(C_ACTION_PRINT)
 	$(CC) $(OFP_DY_CFLAGS) $(CINCS) $(CFLAGS) $(OFP_CFLAGS) -fPIC $(C_TOKEN) \
