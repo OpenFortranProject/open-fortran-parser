@@ -1,7 +1,7 @@
 /*******************************************************************
  *                                                                 *
  *              OFP installation and build instructions            *
- *                        Version 0.8                              *
+ *                        Version 0.8.0                            *
  *                                                                 *
  *******************************************************************
  *    For help, please send e-mail to:                             *
@@ -25,7 +25,7 @@ http://sourceforge.net/projects/fortran-parser) and unpacked and untarred
 it, there should be, at least, the following files and directories:
 
 	configure ..................... used for Unix builds
-	lib ........................... a pre-built OpenFortranParser-0.8.jar file
+	lib ........................... a pre-built OpenFortranParser-0.8.0.jar file
 	test/ ......................... test files
 	src/ .......................... the OFP source code
 
@@ -68,5 +68,5 @@ same.  First, cd to the OFP top level directory and do the following:
 
          java fortran.ofp.FrontEnd [--verbose] filename
 
-    Note that your Java CLASSPATH must include the OpenFortranParser-0.8.jar
+    Note that your Java CLASSPATH must include the OpenFortranParser-0.8.0.jar
     and the antlr-3.2.jar files (see the README file).
