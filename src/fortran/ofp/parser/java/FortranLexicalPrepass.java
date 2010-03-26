@@ -709,28 +709,28 @@ public class FortranLexicalPrepass {
 
    private boolean matchAttrStmt(int lineStart, int lineEnd) {
       int firstToken;
-      int identOffset = -1;
+      int lParenOffset = -1;
+      int rParenOffset = -1;
+      int identOffset  = -1;
 
       firstToken = tokens.currLineLA(lineStart+1);
-      if(firstToken == FortranLexer.T_INTENT) {
-         int lParenOffset;
+
+      switch (firstToken) {
+
+      case FortranLexer.T_INTENT:
          lParenOffset = tokens.findToken(lineStart+1, FortranLexer.T_LPAREN);
          identOffset = matchClosingParen(lineStart, lParenOffset+1);
-//      } else if(firstToken == FortranLexer.T_BIND_LPAREN_C) {
-      // TODO - fix for T_BIND token
-      } else if(firstToken == FortranLexer.T_BIND) {
-         int rParenOffset;
-         
-         // find the closing paren, starting at first location after the
-         // left paren.  what follows it is optional :: and the ident(s).
-         // the T_BIND and T_LPAREN are the first two tokens, so lineStart+2
-         // puts you on the lookahead for LPAREN, which is the starting point
-         // for the matching routine.
-         rParenOffset = matchClosingParen(lineStart, lineStart+2);
-         // rParenOffset will be at the location following the T_RPAREN
-         identOffset = rParenOffset;
-      } else if(firstToken == FortranLexer.T_PARAMETER) {
-         int lParenOffset;
+         break;
+
+      case FortranLexer.T_BIND:
+         // find the closing paren, starting at first location after the left paren.
+         // What follows it is optional :: and the ident(s). The T_BIND and T_LPAREN
+         // are the first two tokens, so lineStart+2 puts you on the lookahead for LPAREN,
+         // which is the starting point for the matching routine.
+         identOffset = matchClosingParen(lineStart, lineStart+2);
+         break;
+
+      case FortranLexer.T_PARAMETER:
          // match a parameter stmt
          lParenOffset = tokens.findToken(lineStart+1, FortranLexer.T_LPAREN);
          if(lParenOffset == -1) {
@@ -740,59 +740,67 @@ public class FortranLexicalPrepass {
          // idents start after the T_LPAREN and stop at the T_RPAREN
          identOffset = lParenOffset;
          lineEnd = matchClosingParen(lineStart, lParenOffset+1);
-      } else if(firstToken == FortranLexer.T_IMPLICIT) {
-         int lparenOffset = -1;
-         int rparenOffset = -1;
+         break;
 
-         // fixup an implicit statement.  search for the T_NONE.  
+      case FortranLexer.T_PRIVATE:
+      case FortranLexer.T_PUBLIC:
+         // Match an access-stmt.  This means we need to process an access-id-list.
+         // An access-id can be T_IDENT or KEYWORD ( stuff ) where KEYWORD is one of
+         // {OPERATOR, ASSIGNMENT, READ, WRITE}.  For now punt.
+         // TODO - fix punt by processing list
+         return true;
+
+      case FortranLexer.T_IMPLICIT:
+         // TODO - does this really do anything as identOffset not changed
+         // Fixup an implicit statement.  Search for the T_NONE,
          // if given, nothing needs updated because it's an IMPLICIT NONE
-         if(tokens.currLineLA(lineStart+2) != FortranLexer.T_NONE) {
+         if (tokens.currLineLA(lineStart+2) != FortranLexer.T_NONE) {
             do {
-               lparenOffset = 
-                  tokens.findToken(lineStart, FortranLexer.T_LPAREN);
-               if(lparenOffset != -1) {
-                  rparenOffset = matchClosingParen(lineStart, lparenOffset+1);
-                  // the first set of parens could be the optional kind 
-                  // selector, or it is the letter designators for the 
-                  // implicit stmt.  either way, we can convert anything 
-                  // that's not T_KIND or T_LEN to an ident because T_KIND 
-                  // and T_LEN can only appear in the kind selector.  then, 
-                  // we don't need to look for an optional second paren set.
-                  for(int i = lparenOffset; i < rparenOffset; i++) {
-                     if(lexer.isKeyword(tokens.currLineLA(i+1)) &&
+               lParenOffset = tokens.findToken(lineStart, FortranLexer.T_LPAREN);
+               if (lParenOffset != -1) {
+                  rParenOffset = matchClosingParen(lineStart, lParenOffset+1);
+                  // The first set of parens could be the optional kind selector, or it
+                  // is the letter designators for the implicit stmt.  either way, we can
+                  // convert anything that's not T_KIND or T_LEN to an ident because T_KIND 
+                  // and T_LEN can only appear in the kind selector.  then, we don't need
+                  // to look for an optional second paren set.
+                  for (int i = lParenOffset; i < rParenOffset; i++) {
+                     if (lexer.isKeyword(tokens.currLineLA(i+1)) &&
                         tokens.currLineLA(i+1) != FortranLexer.T_KIND &&
                         tokens.currLineLA(i+1) != FortranLexer.T_LEN) {
                         tokens.getToken(i).setType(FortranLexer.T_IDENT);
                      }
                   }
 
-                  // there could be another set of parens, if the first set 
-                  // (above) was for the kind selector, then the second set 
-                  // would be for the letter designator(s) (required).
-                  if(tokens.currLineLA(rparenOffset+1) == 
-                     FortranLexer.T_LPAREN) {
-                     rparenOffset = 
-                        matchClosingParen(lineStart, rparenOffset+1);
+                  // There could be another set of parens, if the first set (above) was for
+                  // the kind selector, then the second set would be for the letter
+                  // designator(s) (required).
+                  if (tokens.currLineLA(rParenOffset+1) == FortranLexer.T_LPAREN) {
+                     rParenOffset = matchClosingParen(lineStart, rParenOffset+1);
                   }
 
-                  // reset the lineStart so we can accept a an 
-                  // implicit_spec_list
-                  lineStart = rparenOffset;
+                  // reset the lineStart so we can accept an implicit_spec_list
+                  lineStart = rParenOffset;
                }
-            } while(lineStart < lineEnd && 
-                    tokens.currLineLA(lineStart+1) != FortranLexer.T_EOS);
+            } while (lineStart < lineEnd && 
+                     tokens.currLineLA(lineStart+1) != FortranLexer.T_EOS);
          }
-      } else {
-         identOffset = lineStart+1;
-      }
+         break;
 
-      if(identOffset != -1) {
+      default:
+         identOffset = lineStart+1;
+         break;
+
+      } // end switch
+
+      if (identOffset != -1) {
          convertToIdents(identOffset, lineEnd);
          return true;
       } else {
          return false;
       }
-   }// end matchAttrStmt()
+
+   } // end matchAttrStmt()
 
 
    /*
