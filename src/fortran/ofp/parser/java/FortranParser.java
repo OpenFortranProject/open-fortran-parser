@@ -87,37 +87,39 @@ public abstract class FortranParser extends Parser implements IFortranParser {
     */
    public void checkForInclude() {
          
-	  if (input.LA(1) == FortranLexer.T_INCLUDE) {
-		 Token tk = input.LT(1);
-		 input.consume();
+      if (input.LA(1) == FortranLexer.T_INCLUDE) {
+         Token tk = input.LT(1);
+         input.consume();
 
-		 // get include filename from token stream
-		 tk = input.LT(1);
-		 input.consume();
-		 action.start_of_file(tk.getText());
+         // get include filename from token stream
+         tk = input.LT(1);
+         input.consume();
+         action.start_of_file(tk.getText());
 
-		 // check for empty include file (no statements)
-		 if (input.LA(1) == FortranLexer.T_EOF) {
-			tk = input.LT(1);
-			input.consume();
-			action.end_of_file(tk.getText());
-		 }
+         // check for empty include file (no statements)
+         if (input.LA(1) == FortranLexer.T_EOF) {
+            tk = input.LT(1);
+            input.consume();
+            action.end_of_file(tk.getText());
+         }
 
-		 // include acts like a statement so need to see if another include follows
-		 checkForInclude();
-	  }
+         // include acts like a statement so need to see if another include follows
+         checkForInclude();
+      }
 
-	  else if (input.LA(1) == FortranLexer.T_EOF) {
-		 Token tk = input.LT(1);
-		 input.consume();
-		 action.end_of_file(tk.getText());
-	  }
+      else if (input.LA(1) == FortranLexer.T_EOF) {
+         Token tk = input.LT(1);
+         input.consume();
+         action.end_of_file(tk.getText());
+         // unwind T_EOFs for include files containing includes
+         checkForInclude();
+      }
 
-	  else if (input.LA(1) == FortranLexer.EOF) {
-		 input.LT(1);
-		 input.consume();
-		 action.end_of_file(filename);
-	  }
+      else if (input.LA(1) == FortranLexer.EOF) {
+         input.LT(1);
+         input.consume();
+         action.end_of_file(filename);
+      }
    }	
 
 } // end FortranParser
