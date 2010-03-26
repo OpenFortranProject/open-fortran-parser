@@ -29,7 +29,10 @@ GENERATED_C_NULL=FortranParserActionNull.c
 GENERATED_C_PRINT=FortranParserActionPrint.c
 GENERATED_C_ENUMS=ActionEnums.h
 
-all: $(GENERATED_C_HEADER) $(GENERATED_C_PRINT) $(GENERATED_C_NULL) 
+all: $(GENERATED_C_HEADER) $(GENERATED_C_PRINT) $(GENERATED_C_NULL)
+	cp ActionEnums.h $(INSTALLDIR)/.
+	cp token.h $(INSTALLDIR)/.
+	cp token.c $(INSTALLDIR)/.
 
 FortranParserAction.h:
 	$(JAVA) $(OFP_CLASSPATH) fortran.tools.CFiles header
