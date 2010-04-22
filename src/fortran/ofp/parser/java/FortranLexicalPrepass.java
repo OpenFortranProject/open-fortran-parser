@@ -78,6 +78,14 @@ public class FortranLexicalPrepass {
          // get the token 
          tmpToken = tokens.getToken(i);
 
+         // Laksono 2009.11.30: force to make the identifier lowercase
+         // Laksono 2010.01.12: do not lowercase token between quotes
+         String sText   = tmpToken.getText();
+         char firstChar = sText.charAt(0);
+         if (firstChar != '\'' && firstChar != '\"') {
+           tmpToken.setText( tmpToken.getText().toLowerCase() );
+         }
+
          // this should not happen, but just in case..
          if (tmpToken == null) {
             System.out.println("convertToIdents(): couldn't retrieve token");
@@ -411,16 +419,25 @@ public class FortranLexicalPrepass {
       tokenType = tokens.currLineLA(lineStart+1);
       if (tokenType == FortranLexer.T_END) {
          if (lineEnd > 2) {
-            if (tokens.currLineLA(lineStart+2) == FortranLexer.T_BLOCK &&
+            // Laksono 2009.03.03: we will match the token with the keyword "end with team"
+            int nextToken = tokens.currLineLA(lineStart+2);     // the next token
+            int nextNextToken = tokens.currLineLA(lineStart+3); // the next of the next token
+
+            if (nextToken == FortranLexer.T_BLOCK &&
                 tokens.currLineLA(lineStart+3) == FortranLexer.T_DATA) {
                   // end-block-data-stmt
                   identOffset = lineStart+3;
             }
-            else if (tokens.currLineLA(lineStart+2) == FortranLexer.T_INTERFACE) {
+            else if (nextToken == FortranLexer.T_INTERFACE) {
                // have to accept a generic_spec
                identOffset = matchGenericSpec(lineStart+2, lineEnd);
-            }
-            else {
+            }  else if (nextToken == FortranLexer.T_WITH &&
+                        nextNextToken == FortranLexer.T_TEAM) {
+                // Laksono 2009.03.03:
+                // We have the perfect match of "end with team", so push the token 4 steps
+               identOffset = lineStart+4;
+
+            } else {
                // identifier is after the T_END and T_<construct>
                identOffset = lineStart+2;
             }
@@ -2014,12 +2031,36 @@ public class FortranLexicalPrepass {
             // the data_ref was a function call, so reset the line start
             // to account for it and then test for the '%'
             lineStart = tmpLineStart-1;
+
+            // Laksono 2009.02.26: need to consider CAF bracket after parentheses
+            // E.g.: A(...) [ ... ]
+            if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LBRACKET) {
+                tmpLineStart = matchClosingParen(lineStart, lineStart+2);
+
+                // the data_ref was a function call, so reset the line start
+                // to account for it and then test for the '%'
+                lineStart = tmpLineStart-1;
+
+            }
+
          } 
 
          if(tokens.currLineLA(lineStart+2) == FortranLexer.T_PERCENT) {
             // see if the next token is a %
             return matchDataRef(lineStart+2, lineEnd);
          } else {
+            // Laksono 2009.08.05: adding CAF feature
+            // It is possible that the variable is a co-array with derived type
+            //  var[4@team]%something = .....
+            if ( tokens.currLineLA(lineStart+2) == FortranLexer.T_LBRACKET) {
+                int tmpLineStart = matchClosingParen(lineStart, lineStart+2);
+                // Since the tmpLineStart is the T_RBRACKET, then tmpLineStart+1 must be a percent
+                //  otherwise, syntax error or co-scalar
+                // Laksono 2009.08.06: avoid co-scalar, only try to match derived metric
+                if ( tokens.currLineLA(tmpLineStart+1) ==  FortranLexer.T_PERCENT )
+                  return matchDataRef(tmpLineStart+1, lineEnd);
+            }
+
             // return lineStart, which is the raw index of the *last* 
             // identifier in a chain of id%id%id
             return lineStart;

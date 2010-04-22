@@ -412,6 +412,8 @@ action_stmt
  *    or POINTER
  */
 
+
+
 ////////////
 // R437-F08, R441-F03
 //
@@ -495,6 +497,22 @@ component_decl
  *    or VALUE
  *    or VOLATILE
  */
+
+
+/*
+Section 5:
+ */
+
+// R501
+type_declaration_stmt
+@init {Token lbl = null; int numAttrSpecs = 0;}
+@after{checkForInclude();}
+    :	(label {lbl=$label.tk;})? rice_declaration_type_spec
+		( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
+		entity_decl_list end_of_stmt
+    		{ action.type_declaration_stmt(lbl, numAttrSpecs, 
+                    $end_of_stmt.tk); }
+    ;
 
 ////////////
 // R502-F08, R503-F03
@@ -691,6 +709,27 @@ target_decl
  * Section/Clause 6: Use of data objects
  */               
 
+// R601
+variable
+        :       designator {action.variable();}
+        ;
+
+// R603
+//  :   object-name             // T_IDENT (data-ref isa T_IDENT)
+//	|	array-element           // R616 is data-ref
+//	|	array-section           // R617 is data-ref [ (substring-range) ] 
+//	|	structure-component     // R614 is data-ref
+//	|	substring
+// (substring-range) may be matched in data-ref
+// this rule is now identical to substring
+designator
+@init{boolean hasSubstringRange = false;}
+	:	data_ref (T_LPAREN substring_range {hasSubstringRange=true;} T_RPAREN)?
+			{ action.designator(hasSubstringRange); }
+	|	char_literal_constant T_LPAREN substring_range T_RPAREN
+			{ hasSubstringRange=true; action.substring(hasSubstringRange); }
+	;
+
 /*
  * R612-F08 part-ref
  *    is part-name [ ( section-subscript-list ) ] [ image-selector]
@@ -727,7 +766,7 @@ options {k=2;}
 // R624-F08
 //
 image_selector
-   :   T_LBRACKET cosubscript_list T_RBRACKET
+   :   T_LBRACKET rice_cosubscript_list T_RBRACKET
            {action.image_selector($T_LBRACKET, $T_RBRACKET);}
    ;
 
@@ -764,6 +803,7 @@ allocation
    :   allocate_object
        ( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} T_RPAREN )?
        ( T_LBRACKET allocate_coarray_spec {hasAllocateCoarraySpec=true;} T_RBRACKET )?
+       ( T_LBRACKET rice_allocate_coarray_spec {hasAllocateCoarraySpec=true;} T_RBRACKET )?
            {action.allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);}
    ;
 
@@ -1416,8 +1456,6 @@ rice_image_selector
 // Laks 2009.01.15: add rice caf allocation
 // the allocation is either using asterisk (with means all ranks) or team
 rice_allocate_coarray_spec:
-		T_ASTERISK	{ action.rice_allocate_coarray_spec(0,null); }
-	|
 		T_AT T_IDENT { action.rice_allocate_coarray_spec(1,$T_IDENT); }
 	|
 		{ action.rice_allocate_coarray_spec(-1,null); }
@@ -1453,3 +1491,60 @@ rice_end_with_team_stmt
 			{action.rice_end_with_team_stmt(lbl, id, 
                 $end_of_stmt.tk);}
 	;
+
+
+
+// R403 (rice version)
+rice_intrinsic_type_spec
+	:	
+		       T_LOCKSET {action.intrinsic_type_spec($T_LOCKSET, null,
+                                        IActionEnums.IntrinsicTypeSpec_LOCKSET,
+                                        false);}
+        |       T_TEAM {action.intrinsic_type_spec($T_TEAM, null,
+                                        IActionEnums.IntrinsicTypeSpec_TEAM,
+                                        false);}
+        |       T_TOPOLOGY {action.intrinsic_type_spec($T_TOPOLOGY, null,
+                                        IActionEnums.IntrinsicTypeSpec_TOPOLOGY,
+                                        false);}
+        |       T_EVENT {action.intrinsic_type_spec($T_EVENT, null,
+                                        IActionEnums.IntrinsicTypeSpec_EVENT,
+                                        false);}
+	;
+
+
+// R502 (rice version)
+rice_declaration_type_spec
+	:	// original F03 rule
+		declaration_type_spec 	
+	|   // rice CAF 2.0 rules
+		rice_intrinsic_type_spec
+			{ action.declaration_type_spec(null, 
+                IActionEnums.DeclarationTypeSpec_INTRINSIC); }
+	;
+
+
+/*
+ * R625-F08 cosubscript
+ *    is scalar-int-expr
+ */
+
+////////////
+// R625-F08
+//
+rice_cosubscript
+   :   expr
+   ;
+
+rice_cosubscript_list
+@init{
+ int count=0;
+ Token idTeam=null;
+ }
+   :       {action.cosubscript_list__begin();}
+       	rice_cosubscript {count++;} ( T_COMMA rice_cosubscript {count++;} )*
+   		 (T_AT T_IDENT {idTeam=$T_IDENT;})?
+           {
+           		action.cosubscript_list(count);
+            	action.rice_image_selector(idTeam); 
+            }
+   ;

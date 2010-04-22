@@ -86,6 +86,23 @@ public interface IActionEnums {
 		IntrinsicTypeSpecBase+5;
 	static final public int IntrinsicTypeSpec_LOGICAL=
 		IntrinsicTypeSpecBase+6;
+	//---------------------------------------------
+	// Laks 2010.4.15: add rice intrinsic types
+	//---------------------------------------------
+        static final public int IntrinsicTypeSpec_TEAM=
+                IntrinsicTypeSpecBase+7;
+	//(1/13/2010) for now CrayPointer is used for AST only
+        static final public int IntrinsicTypeSpec_CRAYPOINTER=
+                IntrinsicTypeSpecBase+8;
+        static final public int IntrinsicTypeSpec_EVENT=
+                IntrinsicTypeSpecBase+9;
+        static final public int IntrinsicTypeSpec_TOPOLOGY=
+                IntrinsicTypeSpecBase+10;
+        static final public int IntrinsicTypeSpec_LOCK=
+                IntrinsicTypeSpecBase+11;
+        static final public int IntrinsicTypeSpec_LOCKSET=
+                IntrinsicTypeSpecBase+12;
+
 	
 	static final public int DeclarationTypeSpec_INTRINSIC=
 		DeclarationTypeSpecBase+0;
