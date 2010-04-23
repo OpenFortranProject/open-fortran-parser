@@ -1,0 +1,6 @@
+program withteamtest
+
+with team t
+end with team
+
+end program
