@@ -1668,10 +1668,14 @@ public class FortranLexicalPrepass {
 
 
    private boolean matchProgramStmt(int lineStart, int lineEnd) {
+      // Laksono 2010.04.29: lowercase the identifier of the program
+      Token t_ident = tokens.getToken(lineStart+1);
+      t_ident.setText( t_ident.getText().toLowerCase() );
+
       // try to match T_PROGRAM T_IDENT T_EOS
       if(lexer.isKeyword(tokens.currLineLA(lineStart+2))) {
          // getToken is 0 based indexing; currLineLA is 1 based
-         tokens.getToken(lineStart+1).setType(FortranLexer.T_IDENT);
+         t_ident.setType(FortranLexer.T_IDENT);
       }
       return true;
    }// end matchProgramStmt()
