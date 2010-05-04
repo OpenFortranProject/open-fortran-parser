@@ -2145,10 +2145,11 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleHeader(625, "cosubscript-list__begin", "list-begin");
       printRuleTrailer();	
    }
-   public void cosubscript_list(int count)
+   public void cosubscript_list(int count, Token teamID)
    {
       printRuleHeader(625, "cosubscript-list", "list");
       printParameter(count, "count");
+      printParameter(teamID, "team");
       printRuleTrailer();
    }
 

@@ -26,10 +26,12 @@ extern "C" {
 #include <limits.h>
 #include <string.h>
 #include "token.h"
+//#include "fortran_error_handler.h"
 
 #define INIT_TOKEN_LIST_SIZE 1024
 
-  Token_t **token_list = NULL;
+  Token_t **token_list   = NULL;
+  Token_t *token_current = NULL;
   int token_list_size = 0;
   int num_tokens = 0;
   
@@ -37,7 +39,7 @@ extern "C" {
   {
 	 Token_t *tmp_token = NULL;
 
-	 tmp_token = malloc(sizeof(Token_t));
+	 tmp_token = (Token_t*)malloc(sizeof(Token_t));
 	 tmp_token->line = line;
 	 tmp_token->col = col;
 	 tmp_token->type = type;
@@ -67,6 +69,9 @@ extern "C" {
   {
      int i;
 
+     /* Laksono 2009.12.15: free the error handler */
+     //  fortran_error_handler_end();
+
      for (i = 0; i < num_tokens; i++) {
         if (token_list[i] != NULL) {
            free_token(token_list[i]);
@@ -93,7 +98,7 @@ extern "C" {
 			we currently don't have a single entry point into the actions, so we
 			don't have a place to do this.  We could expect the user to call an
 			init routine, as one option....  */
-		token_list = malloc(INIT_TOKEN_LIST_SIZE * sizeof(Token_t *));
+		token_list = (Token_t**)malloc(INIT_TOKEN_LIST_SIZE * sizeof(Token_t *));
 		if(token_list == NULL)
 		{
 		  fprintf(stderr, "Error: Unable to allocate token_list!\n");
@@ -104,6 +109,10 @@ extern "C" {
 		/* Initialize the array pointers to NULL.  */
 		for(i = 0; i < token_list_size; i++)
 		  token_list[i] = NULL;
+
+                /* Laksono 2009.12.05:  intercept SIGABRT */
+                //fortran_error_handler_begin();
+
 	 }
 	 else if(num_tokens == token_list_size)
 	 {
@@ -111,8 +120,7 @@ extern "C" {
 		int orig_size = token_list_size;
 		
 		/* The list is full so reallocate to twice it's current size.  */
-		token_list = realloc(token_list,
-									(token_list_size << 1) * sizeof(Token_t *));
+		token_list = (Token_t**)realloc(token_list,(token_list_size << 1) * sizeof(Token_t *));
 		if(token_list == NULL)
 		{
 		  fprintf(stderr, "Error: Out of memory for token_list\n");
@@ -128,6 +136,9 @@ extern "C" {
 	 /* The list is allocated and there is enough room for the new element.  */
 	 token_list[num_tokens] = tmp_token;
 	 num_tokens++;
+         if (tmp_token->line >0)
+            token_current = tmp_token;
+         //printf("token %d: l=%d t=%d s=%s\n", num_tokens, tmp_token->line, tmp_token->type, tmp_token->text);
 
 	 if(num_tokens >= INT_MAX)
 	 {
@@ -148,6 +159,21 @@ extern "C" {
 	 printf("[@0, '0:0=%s', <%d>, %d:%d]\n", 
 			  (tmp_token->text == NULL ? "null" : tmp_token->text),
 			  tmp_token->type, tmp_token->line, tmp_token->col);
+  }
+
+  Token_t *get_latest_token()
+  {
+     int ltok = num_tokens-1;
+     Token_t *current_token = token_current;
+/*
+     if (token_list == NULL) return NULL;
+     do {
+        current_token = token_list[ltok];
+        ltok--; 
+     } while (ltok>=0 && current_token != NULL && current_token->line == 0);
+*/
+     //printf(">> get_latest_token %d %d:'%s'\n", ltok, current_token->line, current_token->text);
+     return current_token;
   }
 
 #ifdef __cplusplus

@@ -786,7 +786,7 @@ cosubscript_list
 @init{int count=0;}
    :       {action.cosubscript_list__begin();}
        cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
-           {action.cosubscript_list(count);}
+           {action.cosubscript_list(count, null);}
    ;
 
 /*
@@ -1544,7 +1544,6 @@ rice_cosubscript_list
        	rice_cosubscript {count++;} ( T_COMMA rice_cosubscript {count++;} )*
    		 (T_AT T_IDENT {idTeam=$T_IDENT;})?
            {
-           		action.cosubscript_list(count);
-            	action.rice_image_selector(idTeam); 
-            }
+           		action.cosubscript_list(count, idTeam);
+           }
    ;

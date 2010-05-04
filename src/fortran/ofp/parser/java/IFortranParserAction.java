@@ -568,7 +568,7 @@ public abstract interface IFortranParserAction {
     * component_attr_spec
     *   :   T_POINTER
     *   |   T_DIMENSION T_LPAREN component_array_spec T_RPAREN
-    *   |   T_DIMENSION T_LBRACKET co_array_spec T_RBRACKET
+    *   |   T_DIMENSION T_LBRACKET coarray_spec T_RBRACKET
     *   |   T_ALLOCATABLE
     *   |   access_spec
     *   |   T_KIND
@@ -592,7 +592,7 @@ public abstract interface IFortranParserAction {
    /** R442
     * component_decl
     *   :   T_IDENT ( T_LPAREN component_array_spec T_RPAREN )?
-    *       ( T_LBRACKET co_array_spec T_RBRACKET )?
+    *       ( T_LBRACKET coarray_spec T_RBRACKET )?
     *       ( T_ASTERISK char_length )? ( component_initialization )?
     *
     * @param id Component identifier.
@@ -1162,11 +1162,11 @@ public abstract interface IFortranParserAction {
    /** R527-F08
     * allocatable_decl
     *   :   T_IDENT ( T_LPAREN array_spec T_RPAREN )?
-    *               ( T_LBRACKET co_array_spec T_RBRACKET )?
+    *               ( T_LBRACKET coarray_spec T_RBRACKET )?
     * 
     * @param id The name of the object
     * @param hasArraySpec True if an array_spec is present.
-    * @param hasCoarraySpec True if a co_array_spec is present.
+    * @param hasCoarraySpec True if a coarray_spec is present.
     */
    public abstract void
    allocatable_decl(Token id, boolean hasArraySpec, boolean hasCoarraySpec);
@@ -1490,7 +1490,7 @@ public abstract interface IFortranParserAction {
    /** R557-F08
     * target_decl
     *   :   T_IDENT (T_LPAREN array_spec T_RPAREN)?
-    *               (T_LBRACKET co_array_spec T_RBRACKET)?
+    *               (T_LBRACKET coarray_spec T_RBRACKET)?
     *
     * @param objName The name of the object
     * @param hasArraySpec True if has an array spec.
@@ -1914,12 +1914,12 @@ public abstract interface IFortranParserAction {
     */
 
    public abstract void cosubscript_list__begin();
-   public abstract void cosubscript_list(int count);
+   public abstract void cosubscript_list(int count, Token team);
 
    /** R628, R631-F2008
     * allocation
     *   :   ( T_LPAREN allocate_shape_spec_list T_RPAREN )?
-    *       ( T_LBRACKET allocate_co_array_spec T_RBRACKET )?
+    *       ( T_LBRACKET allocate_coarray_spec T_RBRACKET )?
     *
     * NOTE: In current parser, hasAllocateShapeSpecList is always
     * false, appears as R619 section-subscript-list.  In a

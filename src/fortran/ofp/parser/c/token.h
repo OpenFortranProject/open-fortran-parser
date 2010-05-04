@@ -47,7 +47,7 @@ extern "C" {
   void free_token_list(void);
   void register_token(Token_t *tmp_token);
   void print_token(Token_t *tmp_token);
-  
+  Token_t *get_latest_token();
 #ifdef __cplusplus
 } /* End extern C. */
 #endif
