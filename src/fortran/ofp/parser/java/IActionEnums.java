@@ -159,6 +159,8 @@ public interface IActionEnums {
 	// TODO are T_KIND and T_LEN correct?
 	static final public int AttrSpec_KIND=AttrSpecBase+26;
 	static final public int AttrSpec_LEN=AttrSpecBase+27;
+	// Laksono 2010.5.4: add coarray attribute
+	static final public int AttrSpec_COARRAY=AttrSpecBase+28;
 
 	static final public int BindingStatementType_specific=
 		BindingStatementTypeBase+0;
