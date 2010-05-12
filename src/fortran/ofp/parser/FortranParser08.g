@@ -766,7 +766,7 @@ options {k=2;}
 // R624-F08
 //
 image_selector
-   :   T_LBRACKET rice_cosubscript_list T_RBRACKET
+   :   T_LBRACKET caf_cosubscript_list T_RBRACKET
            {action.image_selector($T_LBRACKET, $T_RBRACKET);}
    ;
 
@@ -1441,17 +1441,6 @@ end_mp_subprogram_stmt
 // All Rice's rules and actions will prefixed with "rice_" keyword
 //----------------------------------------------------------------------------
 
-// Laks 2009.01.13: add declaration of rice caf
-rice_coshape_spec:
-	T_ASTERISK
-	;
-	
-// Laks 2009.01.15: add rice caf reference
-rice_image_selector
-@init {Token idTeam=null;}
-   :   T_LBRACKET expr (T_AT T_IDENT {idTeam=$T_IDENT;})? T_RBRACKET
-           { action.rice_image_selector(idTeam);	}
-   ;
 
 // Laks 2009.01.15: add rice caf allocation
 // the allocation is either using asterisk (with means all ranks) or team
@@ -1465,12 +1454,12 @@ rice_allocate_coarray_spec:
 // it into a construct block instead of statement. A disadvantage of this approach is
 // lack of flexibility and users are forced to use "end with team"
 rice_with_team_construct
-	: rice_co_with_team_stmt block rice_end_with_team_stmt
+	: rice_with_team_stmt block rice_end_with_team_stmt
 	;
 	
 // Laks 2009.01.20: the default team construct	
 // statement to specify the default team
-rice_co_with_team_stmt
+rice_with_team_stmt
 @init{Token lbl = null;}
 	:	
 	(label {lbl=$label.tk;})? (T_WITHTEAM | T_WITH T_TEAM) T_IDENT
@@ -1531,17 +1520,17 @@ rice_declaration_type_spec
 ////////////
 // R625-F08
 //
-rice_cosubscript
+caf_cosubscript
    :   expr
    ;
 
-rice_cosubscript_list
+caf_cosubscript_list
 @init{
  int count=0;
  Token idTeam=null;
  }
    :       {action.cosubscript_list__begin();}
-       	rice_cosubscript {count++;} ( T_COMMA rice_cosubscript {count++;} )*
+       	caf_cosubscript {count++;} ( T_COMMA caf_cosubscript {count++;} )*
    		 (T_AT T_IDENT {idTeam=$T_IDENT;})?
            {
            		action.cosubscript_list(count, idTeam);
