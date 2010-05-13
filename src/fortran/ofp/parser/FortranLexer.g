@@ -429,6 +429,7 @@ T_UNDERSCORE    : '_'   ;
 // begin Rice additions --------------------------
 // Laks 2009.01.13: add token at for team
 T_AT			: '@'   ;
+
 // end Rice additions ----------------------------
 
 T_EQ            : '.EQ.' ;
@@ -597,6 +598,8 @@ T_TEAM          :       'TEAM';
 T_TOPOLOGY      :       'TOPOLOGY';
 T_EVENT         :       'EVENT';
 T_LOCKSET       :       'LOCKSET';
+T_SPAWN			:		'SPAWN';
+
 // end Rice additions ----------------------------
 
 // these tokens (without blank characters) are from 3.3.2.2

@@ -4443,4 +4443,17 @@ public abstract interface IFortranParserAction {
     */
    public abstract void rice_end_with_team_stmt(Token label, Token id, Token eos);
 
+   /** 
+    * spawn_stmt
+    *   :   (label)? T_SPAWN procedure_designator
+    *                ( T_LPAREN (actual_arg_spec_list)? T_RPAREN )? T_EOS
+    * 
+    * @param label Optional statement label
+    * @param callKeyword T_CALL token.
+    * @param eos T_EOS token.
+    * @param hasActionArgSpecList True if an actual-arg-spec-list is present
+    */
+   public abstract void
+   rice_spawn_stmt(Token label, Token callKeyword, Token eos, boolean hasActualArgSpecList);
+
 }

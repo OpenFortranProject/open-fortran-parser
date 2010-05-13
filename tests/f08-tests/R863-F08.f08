@@ -1,2 +1,2 @@
-   LOCK a_lock_variable
+   LOCK (a_lock_variable)
 end

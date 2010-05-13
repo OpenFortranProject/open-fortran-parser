@@ -1190,8 +1190,8 @@ sync_memory_stmt
 lock_stmt
 @init {Token lbl = null; boolean hasLockStatList = false;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.tk;})? T_LOCK lock_variable
-             (lock_stat_list {hasLockStatList=true;})?
+    :    (label {lbl=$label.tk;})? T_LOCK T_LPAREN lock_variable
+             (lock_stat_list {hasLockStatList=true;})? T_RPAREN
              end_of_stmt
              { action.lock_stmt(lbl, $T_LOCK, $end_of_stmt.tk, hasLockStatList); }
     ;
@@ -1489,6 +1489,9 @@ rice_intrinsic_type_spec
 		       T_LOCKSET {action.intrinsic_type_spec($T_LOCKSET, null,
                                         IActionEnums.IntrinsicTypeSpec_LOCKSET,
                                         false);}
+        |       T_LOCK {action.intrinsic_type_spec($T_LOCK, null,
+                                        IActionEnums.IntrinsicTypeSpec_LOCK,
+                                        false);}
         |       T_TEAM {action.intrinsic_type_spec($T_TEAM, null,
                                         IActionEnums.IntrinsicTypeSpec_TEAM,
                                         false);}
@@ -1536,3 +1539,17 @@ caf_cosubscript_list
            		action.cosubscript_list(count, idTeam);
            }
    ;
+   
+ 
+ // R1218
+// C1222 (R1218) The procedure-designator shall designate a subroutine.
+rice_spawn_stmt
+@init {Token lbl = null; boolean hasActualArgSpecList = false;} 
+@after{checkForInclude();}
+    :    (label {lbl=$label.tk;})? T_SPAWN procedure_designator
+            ( T_LPAREN (actual_arg_spec_list {hasActualArgSpecList=true;})? 
+            T_RPAREN )? end_of_stmt
+         	{ action.rice_spawn_stmt(lbl, $T_SPAWN, $end_of_stmt.tk, 
+                hasActualArgSpecList); }
+    ;
+
