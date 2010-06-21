@@ -2,14 +2,17 @@
  * Section/Clause 1:
  */
 
-R101-03   xyz-list                       is    xyz [ , xyz ] ...
 R101-08   xyz-list                       is    xyz [ , xyz ] ...
 
-R102-03   xyz-name                       is    name
+R101-03   xyz-list                       is    xyz [ , xyz ] ...
+
 R102-08   xyz-name                       is    name
 
-R103-03   scalar-xyz                     is    xyz
+R102-03   xyz-name                       is    name
+
 R103-08   scalar-xyz                     is    xyz
+
+R103-03   scalar-xyz                     is    xyz
 
 C101-03   (R103) scalar-xyz shall be scalar.
 C101-08   (R103) scalar-xyz shall be scalar.
@@ -18,16 +21,11 @@ C101-08   (R103) scalar-xyz shall be scalar.
  * Section/Clause 2:
  */
 
-R201-03   program                     is program-unit
+R201-08   program                     is program-unit
                                              [ program-unit ] ...
 
 R201-03   program                     is program-unit
                                              [ program-unit ] ...
-
-R202-03   program-unit                is main-program
-                                      or external-subprogram
-                                      or module
-                                      or block-data
 
 R202-08   program-unit                is main-program
                                       or external-subprogram
@@ -35,37 +33,53 @@ R202-08   program-unit                is main-program
                                       or submodule         // NEW_TO_2008
                                       or block-data
 
-R203-03   external-subprogram         is function-subprogram
-                                      or subroutine-subprogram
+R202-03   program-unit                is main-program
+                                      or external-subprogram
+                                      or module
+                                      or block-data
 
 R203-08   external-subprogram         is function-subprogram
                                       or subroutine-subprogram
 
-R204-03   specification-part          is [ use-stmt ] ...
-                                             [ import-stmt ] ...
-                                             [ implicit-part ]
-                                             [ declaration-construct ] ...
+R203-03   external-subprogram         is function-subprogram
+                                      or subroutine-subprogram
 
 R204-08   specification-part          is [ use-stmt ] ...
                                              [ import-stmt ] ...
                                              [ implicit-part ]
                                              [ declaration-construct ] ...
 
-R205-03   implicit-part               is [ implicit-part-stmt ] ...
-                                             implicit-stmt
+R204-03   specification-part          is [ use-stmt ] ...
+                                             [ import-stmt ] ...
+                                             [ implicit-part ]
+                                             [ declaration-construct ] ...
 
 R205-08   implicit-part               is [ implicit-part-stmt ] ...
                                              implicit-stmt
+
+R205-03   implicit-part               is [ implicit-part-stmt ] ...
+                                             implicit-stmt
+
+R206-08   implicit-part-stmt          is implicit-stmt
+                                      or parameter-stmt
+                                      or format-stmt
+                                      or entry-stmt
 
 R206-03   implicit-part-stmt          is implicit-stmt
                                       or parameter-stmt
                                       or format-stmt
                                       or entry-stmt
 
-R206-08   implicit-part-stmt          is implicit-stmt
-                                      or parameter-stmt
-                                      or format-stmt
+R207-08   declaration-construct       is derived-type-def
                                       or entry-stmt
+                                      or enum-def                  // NEW NAME
+                                      or format-stmt
+                                      or interface-block
+                                      or parameter-stmt
+                                      or procedure-declaration-stmt
+                                      or other-specification-stmt  // NEW NAME
+                                      or type-declaration-stmt
+                                      or stmt-function-stmt
 
 R207-03   declaration-construct       is derived-type-def
                                       or entry-stmt
@@ -79,65 +93,34 @@ R207-03   declaration-construct       is derived-type-def
                                       or type-declaration-stmt
                                       or stmt-function-stmt
 
-R207-08   declaration-construct       is derived-type-def
-                                      or entry-stmt
-                                      or enum-def                  // NEW NAME
-                                      or format-stmt
-                                      or interface-block
-                                      or parameter-stmt
-                                      or procedure-declaration-stmt
-                                      or other-specification-stmt  // NEW NAME
-                                      or type-declaration-stmt
-                                      or stmt-function-stmt
-
-R208-03   execution-part              is executable-construct
-                                             [ execution-part-construct ] ...
-
 R208-08   execution-part              is executable-construct
                                              [ execution-part-construct ] ...
 
-R209-03   execution-part-construct    is executable-construct
-                                      or format-stmt
-                                      or entry-stmt
-                                      or data-stmt
+R208-03   execution-part              is executable-construct
+                                             [ execution-part-construct ] ...
 
 R209-08   execution-part-construct    is executable-construct
                                       or format-stmt
                                       or entry-stmt
                                       or data-stmt
 
-R210-03   internal-subprogram-part    is contains-stmt
-                                             internal-subprogram
-                                             [ internal-subprogram ] ...
+R209-03   execution-part-construct    is executable-construct
+                                      or format-stmt
+                                      or entry-stmt
+                                      or data-stmt
 
 R210-08   internal-subprogram-part   is contains-stmt
                                              [ internal-subprogram ] ...  // DIFFERENT
 
-R211-03   internal-subprogram         is function-subprogram
-                                      or subroutine-subprogram
+R210-03   internal-subprogram-part    is contains-stmt
+                                             internal-subprogram
+                                             [ internal-subprogram ] ...
 
 R211-08   internal-subprogram         is function-subprogram
                                       or subroutine-subprogram
 
-R212-03   specification-stmt          is access-stmt
-                                      or allocatable-stmt
-                                      or asynchronous-stmt
-                                      or bind-stmt
-                                      or common-stmt
-                                      or data-stmt
-                                      or dimension-stmt
-                                      or equivalence-stmt
-                                      or external-stmt
-                                      or intent-stmt
-                                      or intrinsic-stmt
-                                      or namelist-stmt
-                                      or optional-stmt
-                                      or pointer-stmt
-                                      or protected-stmt
-                                      or save-stmt
-                                      or target-stmt
-                                      or volatile-stmt
-                                      or value-stmt
+R211-03   internal-subprogram         is function-subprogram
+                                      or subroutine-subprogram
 
 R212-08   other-specification-stmt    is access-stmt            // NEW NAME
                                       or allocatable-stmt
@@ -160,14 +143,25 @@ R212-08   other-specification-stmt    is access-stmt            // NEW NAME
                                       or volatile-stmt
                                       or value-stmt
 
-R213-03   executable-construct        is action-stmt
-                                      or associate-construct
-                                      or case-construct
-                                      or do-construct
-                                      or forall-construct
-                                      or if-construct
-                                      or select-type-construct
-                                      or where-construct
+R212-03   specification-stmt          is access-stmt
+                                      or allocatable-stmt
+                                      or asynchronous-stmt
+                                      or bind-stmt
+                                      or common-stmt
+                                      or data-stmt
+                                      or dimension-stmt
+                                      or equivalence-stmt
+                                      or external-stmt
+                                      or intent-stmt
+                                      or intrinsic-stmt
+                                      or namelist-stmt
+                                      or optional-stmt
+                                      or pointer-stmt
+                                      or protected-stmt
+                                      or save-stmt
+                                      or target-stmt
+                                      or volatile-stmt
+                                      or value-stmt
 
 R213-08   executable-construct        is action-stmt
                                       or associate-construct
@@ -179,6 +173,54 @@ R213-08   executable-construct        is action-stmt
                                       or if-construct
                                       or select-type-construct
                                       or where-construct
+
+R213-03   executable-construct        is action-stmt
+                                      or associate-construct
+                                      or case-construct
+                                      or do-construct
+                                      or forall-construct
+                                      or if-construct
+                                      or select-type-construct
+                                      or where-construct
+
+R214-08   action-stmt                 is allocate-stmt
+                                      or assignment-stmt
+                                      or backspace-stmt
+                                      or call-stmt
+                                      or close-stmt
+                                      or continue-stmt
+                                      or cycle-stmt
+                                      or deallocate-stmt
+                                      or end-function-stmt
+                                      or end-mp-subprogram-stmt   // NEW_TO_2008
+                                      or end-program-stmt
+                                      or end-subroutine-stmt
+                                      or endfile-stmt
+                                      or error-stop-stmt
+                                      or exit-stmt
+                                      or flush-stmt
+                                      or forall-stmt
+                                      or goto-stmt
+                                      or if-stmt
+                                      or inquire-stmt
+                                      or lock-stmt          // NEW_TO_2008
+                                      or nullify-stmt
+                                      or open-stmt
+                                      or pointer-assignment-stmt
+                                      or print-stmt
+                                      or read-stmt
+                                      or return-stmt
+                                      or rewind-stmt
+                                      or stop-stmt
+                                      or sync-all-stmt      // NEW_TO_2008
+                                      or sync-images-stmt   // NEW_TO_2008
+                                      or sync-memory-stmt   // NEW_TO_2008
+                                      or unlock-stmt        // NEW_TO_2008
+                                      or wait-stmt
+                                      or where-stmt
+                                      or write-stmt
+                                      or arithmetic-if-stmt
+                                      or computed-goto-stmt
 
 R214-03   action-stmt                 is allocate-stmt
                                       or assignment-stmt
@@ -212,157 +254,130 @@ R214-03   action-stmt                 is allocate-stmt
                                       or arithmetic-if-stmt
                                       or computed-goto-stmt
 
-R214-08   action-stmt                 is allocate-stmt
-                                      or assignment-stmt
-                                      or backspace-stmt
-                                      or call-stmt
-                                      or close-stmt
-                                      or continue-stmt
-                                      or cycle-stmt
-                                      or deallocate-stmt
-                                      or end-function-stmt
-                                      or end-mp-subprogram-stmt   // NEW_TO_2008
-                                      or end-program-stmt
-                                      or end-subroutine-stmt
-                                      or endfile-stmt
-                                      or errorstop-stmt
-                                      or exit-stmt
-                                      or flush-stmt
-                                      or forall-stmt
-                                      or goto-stmt
-                                      or if-stmt
-                                      or inquire-stmt
-                                      or lock-stmt          // NEW_TO_2008
-                                      or nullify-stmt
-                                      or open-stmt
-                                      or pointer-assignment-stmt
-                                      or print-stmt
-                                      or read-stmt
-                                      or return-stmt
-                                      or rewind-stmt
-                                      or stop-stmt
-                                      or sync-all-stmt      // NEW_TO_2008
-                                      or sync-images-stmt   // NEW_TO_2008
-                                      or sync-memory-stmt   // NEW_TO_2008
-                                      or unlock-stmt        // NEW_TO_2008
-                                      or wait-stmt
-                                      or where-stmt
-                                      or write-stmt
-                                      or arithmetic-if-stmt
-                                      or computed-goto-stmt
-
 C201-03   (R208) An execution-part shall not contain an end-function-stmt, end-program-stmt, or end-subroutine-stmt.
 
 C201-08   (R208) An execution-part shall not contain an end-function-stmt, end-mp-subprogram-stmt, end-program-stmt, or end-subroutine-stmt.
 
-R215-03   keyword                     is name
-R215-08   keyword                     is name
+R215-08   keyword                    is name
+
+R215-03   keyword                    is name
 
 
 Section 3:
-R301    character                    is    alphanumeric-character
 
-                                     or special-character
-
-R302    alphanumeric-character       is    letter
-
+R301-08    alphanumeric-character    is    letter
                                      or digit
-
                                      or underscore
 
-R303    underscore                   is
+R302-03     alphanumeric-character   is    letter
+                                     or digit
+                                     or underscore
 
-R304    name                         is    letter [ alphanumeric-character ] ...
+R302-08    underscore                is  _
+
+R303-03    underscore                is  _
+
+R303-08    name                      is    letter [ alphanumeric-character ] ...
+
+R304-03    name                      is    letter [ alphanumeric-character ] ...
 
 C301    (R304) The maximum length of a name is 63 characters.
 
-R305    constant                     is    literal-constant
-
+R304-08    constant                  is    literal-constant
                                      or named-constant
 
-R306    literal-constant             is    int-literal-constant
+R305-03    constant                  is literal-constant
+                                     or named-constant
 
+R305-08    literal-constant          is    int-literal-constant
                                      or real-literal-constant
-
                                      or complex-literal-constant
-
                                      or logical-literal-constant
-
                                      or char-literal-constant
-
                                      or boz-literal-constant
 
-R307    named-constant               is    name
+R306-03    literal-constant          is int-literal-constant
+                                     or real-literal-constant
+                                     or complex-literal-constant
+                                     or logical-literal-constant
+                                     or char-literal-constant
+                                     or boz-literal-constant
 
-R308    int-constant                 is    constant
+R306-08    named-constant            is    name
+
+R307-03    named-constant            is    name
+
+R307-08    int-constant              is    constant
+
+R308-03    int-constant              is    constant
 
 C302    (R308)int-constant shall be of type integer.
 
-R309    char-constant                is    constant
+R308-08    char-constant             is    constant
+
+R309-03    char-constant             is    constant
 
 C303    (R309) char-constant shall be of type character.
 
-R310    intrinsic-operator           is    power-op
-
+R309-08    intrinsic-operator          is    power-op
                                        or mult-op
-
                                        or add-op
-
                                        or concat-op
-
                                        or rel-op
-
                                        or not-op
-
                                        or and-op
-
                                        or or-op
-
                                        or equiv-op
 
-                                       or /
+R310-03    intrinsic-operator          is    power-op
+                                       or mult-op
+                                       or add-op
+                                       or concat-op
+                                       or rel-op
+                                       or not-op
+                                       or and-op
+                                       or or-op
+                                       or equiv-op
+                                       or /          
+                                       or ­          
+                                       or .NE.       
+                                       or .LT.       
+                                       or .LE.      
+                                       or .GT.       
+                                       or .GE.       
+                                       or ==         
+                                       or /=         
+                                       or <          
+                                       or <=         
+                                       or >          
+                                       or >=         
+                                       or .NEQV.     
 
-                                       or ­
-
-                                       or .NE.
-
-                                       or .LT.
-
-                                       or .LE.
-
-                                       or .GT.
-
-                                       or .GE.
-
-                                       or ==
-
-                                       or /=
-
-                                       or <
-
-                                       or <=
-
-                                       or >
-
-                                       or >=
-
-                                       or .NEQV.
-
-R311    defined-operator                is    defined-unary-op
-
+R310-08  defined-operator              is defined-unary-op
                                        or defined-binary-op
-
                                        or extended-intrinsic-op
 
-R312    extended-intrinsic-op          is    intrinsic-operator
+R311-03  defined-operator              is defined-unary-op
+                                       or defined-binary-op
+                                       or extended-intrinsic-op
 
-R313    label                          is    digit [ digit [ digit [ digit [ digit ] ] ] ]
+R311-08  extended-intrinsic-op         is    intrinsic-operator
 
+R312-03  extended-intrinsic-op         is    intrinsic-operator
+
+R312-08  label                         is    digit [ digit [ digit [ digit [ digit ] ] ] ]
+
+R313-03  label                         is    digit [ digit [ digit [ digit [ digit ] ] ] ] 
+ 
 C304    (R313) At least one digit in a label shall be nonzero.
 
 /**
  * Section/Clause 4: Types
  */
+
+R401-08   type-param-value            is scalar-int-expr
+                                      or *
+                                      or :
 
 R401-03   type-param-value            is scalar-int-expr
                                       or *
@@ -372,13 +387,39 @@ C401-03   (R401) The type-param-value for a kind type parameter shall be an init
 
 C402-03   (R401) A colon may be used as a type-param-value only in the declaration of an entity or component that has the POINTER or ALLOCATABLE attribute.
 
-R402    signed-int-literal-constant    is    [ sign ] int-literal-constant
+R402_03  signed-int-literal-constant   is    [ sign ] int-literal-constant  
 
-R403    int-literal-constant           is    digit-string [     kind-param ]
+R402_08  type-spec                     is    intrinsic-type-spec             
 
-R404    kind-param                     is    digit-string
+                                       or derived-type-spec
+
+R403_03  int-literal-constant          is    digit-string [     kind-param ] 
+
+R403_08  declaration-type-spec         is intrinsic-type-spec               
+
+                                       or TYPE( intrinsic-type-spec )
+
+                                       or TYPE( derived-type-spec )
+
+                                       or CLASS( derived-type-spec )
+
+                                       or CLASS ( * )
+
+R404_03  kind-param                    is    digit-string
 
                                        or scalar-int-constant-name
+
+R404_08  intrinsic-type-spec           is INTEGER [ kind-selector ]         // CHANGE
+ 
+                                       or REAL [ kind-selector ]
+
+                                       or DOUBLE PRECISION
+
+                                       or COMPLEX [ kind-selector ]
+
+                                       or CHARACTER [ char-selector ]
+
+                                       or LOGICAL [ kind-selector ]
 
 R405    signed-digit-string            is    [ sign ] digit-string
 
@@ -2059,9 +2100,6 @@ R808-08   block-stmt                  is [ block-construct-name : ] BLOCK
 
 R809-08   end-block-stmt              is END BLOCK [ block-construct-name ]
 
-C806-08 (R807-08) The specification-part of a BLOCK construct shall not contain a COMMON,
-EQUIVALENCE, IMPLICIT, INTENT, NAMELIST, OPTIONAL, statement function, or VALUE statement.
-
 R810-08   critical-construct          is   critical-stmt
                                               block
                                               end-critical-stmt
@@ -2901,28 +2939,27 @@ C1102    (R1101) The program-name may be included in the end-program-stmt only i
 
 C1103    (R1101) An automatic object shall not appear in the specification-part (R204) of a main program.
 
-R1104-03   module                    is   module-stmt
-                                             [ specification-part ]
-                                             [ module-subprogram-part ]
-                                          end-module-stmt
+R1104 module                          is    module-stmt
 
-R1105-03   module-stmt               is   MODULE module-name
+                                                [ specification-part ]
 
-R1106-03   end-module-stmt           is   END [ MODULE [ module-name ] ]
+                                                [ module-subprogram-part ]
 
-R1107-03    module-subprogram-part   is   contains-stmt
-                                             module-subprogram
-                                             [ module-subprogram ] ...
+                                                end-module-stmt
 
-R1107-08    module-subprogram-part   is   contains-stmt
-                                             [ module-subprogram ] ...
+R1105 module-stmt                     is    MODULE module-name
 
-R1108-03   module-subprogram         is   function-subprogram
-                                     or   subroutine-subprogram
+R1106 end-module-stmt                 is    END [ MODULE [ module-name ] ]
 
-R1108-08   module-subprogram         is   function-subprogram
-                                     or   subroutine-subprogram
-                                     or   separate-module-subprogram   // NEW_F2008
+R1107 module-subprogram-part          is    contains-stmt
+
+                                                module-subprogram
+
+                                                [ module-subprogram ] ...
+
+R1108 module-subprogram               is    function-subprogram
+
+                                      or subroutine-subprogram
 
 C1104    (R1104) If the module-name is specified in the end-module-stmt , it shall be identical to the
          module-name specified in the module-stmt .
@@ -3315,18 +3352,6 @@ C1260    (R1235) The scalar-int-expr is allowed only in the scoping unit of a su
 R1236 contains-stmt                         is    CONTAINS
 
 R1237 stmt-function-stmt                    is    function-name ( [ dummy-arg-name-list ] ) = scalar-expr
-
-
-R1237-08   separate-module-subprogram       is   mp-subprogram-stmt          // NEW_F2008
-                                                    [ specification-part ]
-                                                    [ execution-part ]
-                                                    [ internal-subprogram-part ]
-                                                 end-mp-subprogram
-
-R1238-08   mp-subprogram-stmt               is   MODULE PROCEDURE procedure-name
-
-R1239-08   end-mp-subprogram-stmt           is END [ PROCEDURE [ procedure-name ] ]
-
 
 C1261    (R1237) The primaries of the scalar-expr shall be constants (literal and named), references to variables, references to functions and function dummy procedures, and intrinsic operations. If scalar-expr contains a reference to a function or a function dummy procedure, the reference shall not require an explicit interface, the function shall not require an explicit interface unless it is an intrinsic, the function shall not be a transformational intrinsic, and the result shall be scalar. If an argument to a function or a function dummy procedure is an array, it shall be an array name. If a reference to a statement function appears in scalar-expr , its definition shall have been provided earlier in the scoping unit and shall not be the name of the statement function being defined.
 
