@@ -1191,7 +1191,7 @@ lock_stmt
 @init {Token lbl = null; boolean hasLockStatList = false;}
 @after{checkForInclude();}
     :    (label {lbl=$label.tk;})? T_LOCK T_LPAREN lock_variable
-             (lock_stat_list {hasLockStatList=true;})? T_RPAREN
+             (T_COMMA lock_stat_list {hasLockStatList=true;})? T_RPAREN
              end_of_stmt
              { action.lock_stmt(lbl, $T_LOCK, $end_of_stmt.tk, hasLockStatList); }
     ;
@@ -1219,7 +1219,6 @@ lock_stat_list
             {action.lock_stat_list(count);}
     ;
 
-
 /*
  * R865-F08 unlock-stmt
  *    is UNLOCK ( lock-variable [, lock-stat-list ] )
@@ -1232,7 +1231,8 @@ unlock_stmt
 @init {Token lbl = null; boolean hasSyncStatList = false;}
 @after{checkForInclude();}
    :   (label {lbl=$label.tk;})?
-       T_UNLOCK lock_variable (sync_stat_list {hasSyncStatList=true;})? end_of_stmt
+       T_UNLOCK T_LPAREN lock_variable (T_COMMA sync_stat_list {hasSyncStatList=true;})?
+                T_RPAREN end_of_stmt
            {action.unlock_stmt(lbl, $T_UNLOCK, $end_of_stmt.tk, hasSyncStatList);}
    ;
 
