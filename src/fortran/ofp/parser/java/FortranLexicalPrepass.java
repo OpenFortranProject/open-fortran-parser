@@ -86,6 +86,7 @@ public class FortranLexicalPrepass {
            tmpToken.setText( tmpToken.getText().toLowerCase() );
          }
 
+
          // this should not happen, but just in case..
          if (tmpToken == null) {
             System.out.println("convertToIdents(): couldn't retrieve token");
@@ -326,6 +327,11 @@ public class FortranLexicalPrepass {
             if(lexer.isKeyword(identToken) == true) {
                identToken.setType(FortranLexer.T_IDENT);
             }
+	    // Laksono 2010.06.25 bug fix: we need to lowercase identifier to make OFP case insensitive
+	    String text = identToken.getText();
+	    if (text != null)
+	      identToken.setText(text.toLowerCase());
+
             // see if there are parens after the type name.  if there
             // are, we're looking at a 'TYPE IS' and need to handle the
             // derived_type_spec or intrinsic_type_spec
