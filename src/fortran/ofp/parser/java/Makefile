@@ -35,9 +35,9 @@ JARFILE=$(OFP_JARFILE)
 CLASS_FILES = $(CLASSDIR)/FortranToken.class \
               $(CLASSDIR)/FortranLexer.class \
               $(CLASSDIR)/FortranParser.class \
-              $(CLASSDIR)/FortranParser03.class \
               $(CLASSDIR)/FortranParser08.class \
-              $(CLASSDIR)/FortranParser08_FortranParser03.class \
+              $(CLASSDIR)/FortranParserExtras.class \
+              $(CLASSDIR)/FortranParserExtras_FortranParser08.class \
               $(CLASSDIR)/FortranStream.class \
               $(CLASSDIR)/FortranTokenStream.class \
               $(CLASSDIR)/FortranLexicalPrepass.class \
@@ -48,15 +48,15 @@ CLASS_FILES = $(CLASSDIR)/FortranToken.class \
               $(CLASSDIR)/FortranParserActionFactory.class \
               $(CLASSDIR)/FortranParserActionPrint.class
 GENERATED_JAVA_FILES = FortranLexer.java \
-                       FortranParser03.java \
                        FortranParser08.java \
-                       FortranParser08_FortranParser03.java
+                       FortranParserExtras.java \
+                       FortranParserExtras_FortranParser08.java
 GENERATED_CLASS_FILES=$(CLASSDIR)/FortranLexer*DFA*.class \
                       $(CLASSDIR)/*$$*.class
 GENERATED_TOKEN_FILES = FortranLexer.tokens \
-                        FortranParser03.tokens \
                         FortranParser08.tokens \
-                        FortranParser08_FortranParser03.tokens
+                        FortranParserExtras.tokens \
+                        FortranParserExtras_FortranParser08.tokens
 
 all: FortranParserActionNull.java $(GENERATED_JAVA_FILES) $(CLASS_FILES) $(BUILDDIR)/$(JARFILE)
 
@@ -75,10 +75,10 @@ FortranLexer.tokens: ../FortranLexer.g
 	@rm -f FortranLexer.tokens
 	@touch FortranLexer.tokens
 
-FortranParser03.java: ../FortranParser03.g FortranLexer.tokens
+FortranParser08.java: ../FortranParser08.g FortranLexer.tokens
 	$(JAVA) org.antlr.Tool -fo ./ $<
 
-FortranParser08.java: ../FortranParser08.g FortranLexer.tokens
+FortranParserExtras.java: ../FortranParserExtras.g FortranLexer.tokens
 	$(JAVA) org.antlr.Tool -fo ./ $<
 
 FortranParserActionNull.java: IFortranParserAction.java
@@ -90,13 +90,13 @@ $(CLASSDIR)/FortranLexer.class: FortranLexer.java FortranLexer.tokens
 $(CLASSDIR)/FortranParser.class: FortranParser.java
 	$(JAVAC) $(JFLAGS) $<
 
-$(CLASSDIR)/FortranParser03.class: FortranParser03.java FortranLexer.tokens
-	$(JAVAC) $(JFLAGS) $<
-
 $(CLASSDIR)/FortranParser08.class: FortranParser08.java FortranLexer.tokens
 	$(JAVAC) $(JFLAGS) $<
 
-$(CLASSDIR)/FortranParser08_FortranParser03.class: FortranParser08_FortranParser03.java FortranLexer.tokens
+$(CLASSDIR)/FortranParserExtras.class: FortranParserExtras.java FortranLexer.tokens
+	$(JAVAC) $(JFLAGS) $<
+
+$(CLASSDIR)/FortranParserExtras_FortranParser08.class: FortranParserExtras_FortranParser08.java FortranLexer.tokens
 	$(JAVAC) $(JFLAGS) $<
 
 $(CLASSDIR)/FortranStream.class: FortranStream.java
