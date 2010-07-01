@@ -24,6 +24,7 @@ import java.io.*;
 // the concrete parser classes
 import fortran.ofp.parser.java.FortranParser08;
 import fortran.ofp.parser.java.FortranParserExtras;
+import fortran.ofp.parser.java.FortranParserRiceCAF;
 
 import fortran.ofp.parser.java.FortranLexer;
 import fortran.ofp.parser.java.FortranLexicalPrepass;
@@ -55,11 +56,27 @@ public class FrontEnd implements Callable<Boolean> {
 
    public FrontEnd(String[] args, String filename, String type)
    throws IOException {
+      boolean riceCAF = false;
+
       this.lexer = new FortranLexer(new FortranStream(filename, this
             .determineSourceForm(filename)));
       this.tokens = new FortranTokenStream(lexer);
       
-      this.parser = new FortranParserExtras(tokens);
+      // check to see if using RiceCAF parser extensions
+      //
+
+      for (int i = 0; i < args.length; i++) {
+         if (args[i].startsWith("--RiceCAF")) {
+            riceCAF = true;
+         }
+      }
+
+      if (riceCAF == false) {
+         this.parser = new FortranParserExtras(tokens);
+      } else {
+         System.out.println("FortranLexer: using Rice University's CAF extensions");
+         this.parser = new FortranParserRiceCAF(tokens);
+      }
       this.parser.initialize(args, type, filename);
 
       this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
@@ -185,7 +202,11 @@ public class FrontEnd implements Callable<Boolean> {
       // Get the arguments. Use --silent --verbose, and --dump as shorthand
       // so we don't have to specify explicit class names on the command line.
       for (int i = 0; i < args.length; i++) {
-         if (args[i].startsWith("--dump")) {
+         if (args[i].startsWith("--RiceCAF")) {
+            newArgs.add(args[i]);
+            nArgs += 1;
+            continue;
+         } else if (args[i].startsWith("--dump")) {
             type = "fortran.ofp.parser.java.FortranParserActionPrint";
             silent = false;
             nArgs += 1;
