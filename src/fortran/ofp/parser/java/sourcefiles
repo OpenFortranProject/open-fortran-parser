@@ -5,6 +5,8 @@ FortranParser.java
 FortranParser08.java
 FortranParserExtras.java
 FortranParserExtras_FortranParser08.java
+FortranParserRiceCAF.java
+FortranParserRiceCAF_FortranParser08.java
 FortranParserActionFactory.java
 FortranParserActionNull.java
 FortranParserActionPrint.java
