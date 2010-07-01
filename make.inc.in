@@ -42,7 +42,7 @@ OFP_CURR_JDK_DIR=@OFP_CURR_JDK_DIR@
 OFP_JVM_LIB_DIR=@OFP_JVM_LIB_DIR@
 OFP_JVM_LIB=@OFP_JVM_LIB@
 
-OFP_JARFILE=OpenFortranParser-0.8.0.jar
+OFP_JARFILE=OpenFortranParser-0.8.1.jar
 OFP_C_ACTION_SO=libfortran_ofp_parser_c_jni_FortranParserActionJNI.so 
 
 OFP_CLASSPATH=-classpath $(OFP_BUILD_DIR)/$(OFP_JARFILE):$(CLASSPATH)
