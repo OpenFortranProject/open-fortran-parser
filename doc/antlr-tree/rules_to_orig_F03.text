@@ -1,0 +1,222 @@
+This file contains a list of the rules that were moved to version
+0.8.0 FortranParser03.g from FortranParser08.g.  Then original
+FortranParser03.g was renamed to FortranParser08.g and original
+FortranParser08.g (what was left over) was renamed to FortranParserExtras.g
+but without the Rice CAF extensions.
+
+////////////
+// R1101-F08
+//
+main_program
+
+////////////
+// R207-F08
+//
+declaration_construct
+
+////////////
+// R210-F08
+//
+internal_subprogram_part
+
+////////////
+// R212-F08
+//
+other_specification_stmt
+
+////////////
+// R437-F08, R441-F03
+//
+component_attr_spec
+
+////////////
+// R438-F08, R433-F03
+//
+component_decl
+
+////////////
+// R502-F08, R503-F03
+//
+attr_spec
+
+////////////
+// R503-F08, R504-F03
+//
+entity_decl
+
+////////////
+// R509-F08
+//
+coarray_spec
+
+////////////
+// R527-F08
+//
+allocatable_decl
+
+////////////
+// R531-F08
+//
+codimension_stmt
+   
+////////////
+// R532-F08
+//
+codimension_decl
+codimension_decl_list
+
+////////////
+// R557-F08
+//
+target_decl
+
+// R601
+variable
+
+// R603
+designator
+
+////////////
+// R612-F08
+// R613-F03
+//
+part_ref
+
+////////////
+// R636-F08
+//
+allocate_coarray_spec
+
+////////////
+// R637-F08
+//
+allocate_coshape_spec
+allocate_coshape_spec_list
+
+////////////
+// R807-F08
+//
+block_construct
+
+////////////
+// R808-F08
+//
+block_stmt
+
+////////////
+// R809-F08
+//
+end_block_stmt
+
+////////////
+// R810-F08
+//
+critical_construct
+
+////////////
+// R811-F08
+//
+critical_stmt
+
+////////////
+// R812-F08
+//
+end_critical_stmt
+
+////////////
+// R818-F08, R830-F03
+//
+loop_control
+
+////////////
+// R856-F08
+//
+errorstop_stmt
+
+////////////
+// R858-F08
+//
+sync_all_stmt
+ 
+////////////
+// R859-F08
+//
+sync_stat
+sync_stat_list
+ 
+////////////
+// R860-F08
+//
+sync_images_stmt
+ 
+////////////
+// R861-F08
+//
+image_set
+ 
+////////////
+// R862-F08
+//
+sync_memory_stmt
+ 
+////////////
+// R863-F08
+//
+lock_stmt
+ 
+////////////
+// R864-F08
+//
+// TODO - replace expr with scalar_logical_variable
+lock_stat 
+lock_stat_list
+ 
+////////////
+// R865-F08
+//
+unlock_stmt
+
+////////////
+// R1107-F08
+//
+module_subprogram_part
+
+////////////
+// R1108-F08
+//
+module_subprogram
+
+////////////
+// R1116-F08
+//
+submodule
+
+////////////
+// R1117-F08
+//
+submodule_stmt
+
+////////////
+// R1118-F08
+//
+parent_identifier
+
+////////////
+// R1119-F08
+//
+end_submodule_stmt
+
+////////////
+// R1237-F08
+//
+separate_module_subprogram
+
+////////////
+// R1238-F08
+//
+mp_subprogram_stmt
+
+////////////
+// R1239-F08
+//
+end_mp_subprogram_stmt
