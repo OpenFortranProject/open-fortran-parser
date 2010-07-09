@@ -304,7 +304,7 @@ type_declaration_stmt
 // a = foo(b) is ambiguous YUK...
 part_ref
 options {k=2;}
-@init{boolean hasSSL = false; boolean hasImageSelector = false;}
+@init{boolean hasSSL = false; boolean hasImageSelector = false; }
    :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
        (image_selector {hasImageSelector=true;})?
            {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
@@ -315,6 +315,103 @@ options {k=2;}
    ;
 
 
+
+part_ref_no_image_selector
+options{k=2;}
+@init{boolean hasSSL = false; boolean hasImageSelector = false;}
+   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+           {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   |   T_IDENT
+           {action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   ;
+
+
+
+/**
+ * R620-F08 section-subscript
+ *    is subscript
+ *    or subscript-triplet
+ *    or vector-subscript
+ */
+
+////////////
+// R620-F08, R619-F03
+//
+// expr inlined for subscript, vector_subscript, and stride (thus deleted option 3)
+// refactored first optional expr from subscript_triplet modified to also match
+// actual_arg_spec_list to reduce ambiguities and need for backtracking
+section_subscript returns [boolean isEmpty]
+@init {
+   boolean hasLowerBounds = false;
+   boolean hasUpperBounds = false;
+   boolean hasStride = false;
+   boolean hasExpr = false;
+}
+   :   expr section_subscript_ambiguous
+   |   T_COLON (expr {hasUpperBounds=true;})? (T_COLON expr {hasStride=true;})?
+           { action.section_subscript(hasLowerBounds, hasUpperBounds, hasStride, false); }
+   |   T_COLON_COLON expr
+           { hasStride=true;
+             action.section_subscript(hasLowerBounds, hasUpperBounds, hasStride, false);}
+   |   T_IDENT T_EQUALS expr	// could be an actual-arg, see R1220
+           { hasExpr=true; action.actual_arg(hasExpr, null); 
+             action.actual_arg_spec($T_IDENT); }
+   |   T_IDENT T_EQUALS T_ASTERISK label // could be an actual-arg, see R1220
+           { action.actual_arg(hasExpr, $label.tk); action.actual_arg_spec($T_IDENT); }
+   |   T_ASTERISK label /* could be an actual-arg, see R1220 */
+           { action.actual_arg(hasExpr, $label.tk); action.actual_arg_spec(null); }
+   |       { isEmpty = true; /* empty could be an actual-arg, see R1220 */ }
+   ;
+
+section_subscript_ambiguous
+@init {
+   boolean hasLowerBound = true;
+   boolean hasUpperBound = false;
+   boolean hasStride = false;
+   boolean isAmbiguous = false; 
+}
+   :   T_COLON (expr {hasUpperBound=true;})? (T_COLON expr {hasStride=true;})?
+           { action.section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);}
+       // this alternative is necessary because if alt1 above has no expr
+       // following the first : and there is the optional second : with no 
+       // WS between the two, the lexer will make a T_COLON_COLON token 
+       // instead of two T_COLON tokens.  in this case, the second expr is
+       // required.  for an example, see J3/04-007, Note 7.44.
+   |  T_COLON_COLON expr
+           { hasStride=true; 
+             action.section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);}
+   |       { /* empty, could be an actual-arg, see R1220 */
+             isAmbiguous=true; 
+             action.section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);
+           }
+   ;
+
+
+
+/**
+ * R620-F08 section-subscript
+ *    is subscript
+ *    or subscript-triplet
+ *    or vector-subscript
+ */
+
+////////////
+// R620-F08 list
+//
+// This rule must be kept here with part-ref, otherwise parsing errors will occur.
+// It is unknown why this happens.
+//
+section_subscript_list
+@init{int count = 0;}
+   :       { action.section_subscript_list__begin(); }
+       isEmpty=section_subscript
+           {
+               if (isEmpty == false) count += 1;
+           }
+       (T_COMMA section_subscript {count += 1;})*
+           { action.section_subscript_list(count); }
+   ;
+
 /*
  * R624-F08 image-selector
  *    is lbracket cosubscript-list rbracket
@@ -324,28 +421,10 @@ options {k=2;}
 // R624-F08
 //
 image_selector
-   :   T_LBRACKET caf_cosubscript_list T_RBRACKET
+   :   T_LBRACKET cosubscript_list T_RBRACKET
            {action.image_selector($T_LBRACKET, $T_RBRACKET);}
    ;
 
-/*
- * R625-F08 cosubscript
- *    is scalar-int-expr
- */
-
-////////////
-// R625-F08
-//
-cosubscript
-   :   scalar_int_expr
-   ;
-
-cosubscript_list
-@init{int count=0;}
-   :       {action.cosubscript_list__begin();}
-       cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
-           {action.cosubscript_list(count, null);}
-   ;
 
 /*
  * R631-08 allocation
@@ -359,15 +438,83 @@ cosubscript_list
 allocation
 @init{boolean hasAllocateShapeSpecList = false; boolean hasAllocateCoarraySpec = false;}
    :   allocate_object
-       ( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} T_RPAREN )?
-       ( T_LBRACKET allocate_coarray_spec {hasAllocateCoarraySpec=true;} T_RBRACKET )?
+       ( T_LPAREN allocate_shape_spec_list {System.out.println("------> ()"); hasAllocateShapeSpecList=true;} T_RPAREN )?
        ( T_LBRACKET rice_allocate_coarray_spec {hasAllocateCoarraySpec=true;} T_RBRACKET )?
            {action.allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);}
    ;
 
+
+
+/**
+ * R632-F08 allocate-object
+ *    is variable-name
+ *    structure-component
+ */
+
+////////////
+// R636-F08, R629-F03
+//
+// C644 (R632) An allocate-object shall not be a coindexed object.
+//
+// T_IDENT inlined for variable_name
+// data_ref inlined for structure_component
+// data_ref isa T_IDENT so T_IDENT deleted
+// data_ref inlined and part_ref_no_image_selector called directly
+//
+allocate_object
+@init{int numPartRefs = 0;}
+   :   part_ref_no_image_selector {numPartRefs += 1;}
+       (T_PERCENT part_ref_no_image_selector {numPartRefs += 1;})*
+           {action.data_ref(numPartRefs); action.allocate_object();}
+   ;
+
+/*
+ * R636-F08 allocate-coarray-spec
+ *    is   [ allocate-coshape-spec-list , ] [ lower-bound-expr : ] *
+ */
+
+////////////
+// R636-F08
+//
+allocate_coarray_spec
+options{k=3;}
+@after {action.allocate_coarray_spec();}
+   :   (T_ASTERISK)              => T_ASTERISK
+   |   (expr T_COLON T_ASTERISK) => expr T_COLON T_ASTERISK
+//PUTBACK   |   allocate_coshape_spec_list T_COMMA ( expr T_COLON )? T_ASTERISK
+//   |   T_ASTERISK // TESTING
+   ;
+
+//R632
+// Laksono (2010.07.08): hack verson of allocate_object. It has to be data_ref instead
+/*allocate_object
+@init{int numPartRefs = 0;}
+	: T_IDENT {numPartRefs += 1;}
+		(T_PERCENT T_IDENT {numPartRefs += 1;})?
+			{action.data_ref(numPartRefs);}
+	;
+	*/
+
 /**
  * Section/Clause 7: Expressions and assignment
  */
+
+/*
+ * R724-F08 logical-expr
+ *    is expr
+ */
+
+////////////
+// R724-F08, R724-F03
+//
+logical_expr
+   :   expr
+   ;
+
+scalar_logical_expr
+   :   expr
+   ;
+
 
 
 /*
@@ -509,17 +656,18 @@ rice_declaration_type_spec
 ////////////
 // R625-F08
 //
-caf_cosubscript
-   :   expr
+cosubscript
+   :   data_ref
+   | T_DIGIT_STRING {action.part_ref($T_DIGIT_STRING, false, false);}
    ;
 
-caf_cosubscript_list
+cosubscript_list
 @init{
  int count=0;
  Token idTeam=null;
  }
    :       {action.cosubscript_list__begin();}
-       	caf_cosubscript {count++;} ( T_COMMA caf_cosubscript {count++;} )*
+       	cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
    		 (T_AT T_IDENT {idTeam=$T_IDENT;})?
            {
            		action.cosubscript_list(count, idTeam);

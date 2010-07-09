@@ -21,19 +21,21 @@ JAR=jar
 BUILDDIR=../../../build
 PARDIR=../
 
+FLAGS=--RiceCAF 
+#FLAGS=--RiceCAF --dump
 
 all: runRuleTestsNoCheck
 
 runRuleTestsNoCheck:
 	@for file in *.caf ; do \
            echo "Running test $$file"; \
-           $(JAVA) fortran.ofp.FrontEnd $$file; \
+           $(JAVA) fortran.ofp.FrontEnd $(FLAGS) $$file ; \
         done;
 
 runRuleTestsVerbose:
 	@for file in *.caf ; do \
            echo "Running test $$file"; \
-           $(JAVA) fortran.ofp.FrontEnd --verbose $$file; \
+           $(JAVA) fortran.ofp.FrontEnd $(FLAGS) --verbose $$file; \
         done;
 
 clean:

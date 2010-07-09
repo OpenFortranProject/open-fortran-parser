@@ -196,6 +196,7 @@ public class FrontEnd implements Callable<Boolean> {
       ArrayList<String> newArgs = new ArrayList<String>(0);
       String type = "fortran.ofp.parser.java.FortranParserActionNull";
       int nArgs = 0;
+      boolean rice_caf = false;
 
       includeDirs = new ArrayList<String>();
 
@@ -204,6 +205,7 @@ public class FrontEnd implements Callable<Boolean> {
       for (int i = 0; i < args.length; i++) {
          if (args[i].startsWith("--RiceCAF")) {
             newArgs.add(args[i]);
+ 	    rice_caf = true;
             nArgs += 1;
             continue;
          } else if (args[i].startsWith("--dump")) {
@@ -248,8 +250,8 @@ public class FrontEnd implements Callable<Boolean> {
       }
 
       for (int i = 0; i < args.length; i++) {
-         if (args[i].startsWith("--dump") | args[i].startsWith("--silent")
-               | args[i].startsWith("--verbose")) {
+         if (!rice_caf && (args[i].startsWith("--dump") | args[i].startsWith("--silent")
+               | args[i].startsWith("--verbose")) ) {
             continue;
          } else if (args[i].startsWith("-I")) {
             /* Skip the include dir stuff; it's handled by the lexer. */
