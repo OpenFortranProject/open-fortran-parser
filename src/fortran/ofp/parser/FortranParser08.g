@@ -2479,10 +2479,8 @@ substring_range_or_arg_list returns [boolean isSubstringRange]
 	;
 
 substr_range_or_arg_list_suffix returns [boolean isSubstringRange]
-@init{boolean hasUpperBound = false; int count = 0;}
-@after {
-    action.substr_range_or_arg_list_suffix();
-}
+@init {boolean hasUpperBound = false; int count = 0;}
+@after{action.substr_range_or_arg_list_suffix();}
 	:		{
                 // guessed wrong on list creation, inform of error
                 action.actual_arg_spec_list(-1);  
@@ -2592,11 +2590,11 @@ data_ref
 ////////////
 // R612-F08, R613-F03
 //
-// This rule is implemented in FortranParserExtras grammar
+// This rule is implemented in the FortranParserExtras grammar
 //
 part_ref
    :   T_IDENT
-           {System.out.println("ERROR: part_ref implemented in FortranParserExtras.java");}
+           {System.err.println("ERROR: part_ref implemented in FortranParserExtras.java");}
    ;
 
 
@@ -2612,75 +2610,19 @@ part_ref
 // R618 subscript inlined as expr
 // ERR_CHK 618 scalar_int_expr replaced by expr
 
-// R619
-// expr inlined for subscript, vector_subscript, and stride (thus deleted 
-// option 3)
-// refactored first optional expr from subscript_triplet
-// modified to also match actual_arg_spec_list to reduce ambiguities and 
-// need for backtracking
-section_subscript returns [boolean isEmpty]
-@init {
-    boolean hasLowerBounds = false;
-    boolean hasUpperBounds = false;
-    boolean hasStride = false;
-    boolean hasExpr = false;
-}
-	:	expr section_subscript_ambiguous
-	|	T_COLON (expr {hasUpperBounds=true;})? 
-            (T_COLON expr {hasStride=true;})?
-			{ action.section_subscript(hasLowerBounds, hasUpperBounds, 
-                hasStride, false); }
-    |   T_COLON_COLON expr
-        	{hasStride=true; action.section_subscript(hasLowerBounds, 
-                hasUpperBounds, hasStride, false);}
-	|	T_IDENT T_EQUALS expr	// could be an actual-arg, see R1220
-			{ hasExpr=true; action.actual_arg(hasExpr, null); 
-                action.actual_arg_spec($T_IDENT); }
-	|	T_IDENT T_EQUALS T_ASTERISK label // could be an actual-arg, see R1220
-			{ action.actual_arg(hasExpr, $label.tk); 
-                action.actual_arg_spec($T_IDENT); }
-	|	T_ASTERISK label /* could be an actual-arg, see R1220 */
-			{ action.actual_arg(hasExpr, $label.tk); 
-                action.actual_arg_spec(null); }
-	|		{ isEmpty = true; /* empty could be an actual-arg, see R1220 */ }
-	;
 
-section_subscript_ambiguous
-@init {
-    boolean hasLowerBound = true;
-    boolean hasUpperBound = false;
-    boolean hasStride = false;
-    boolean isAmbiguous = false; 
-}
-	:	T_COLON (expr {hasUpperBound=true;})? (T_COLON expr {hasStride=true;})?
-	        { action.section_subscript(hasLowerBound, hasUpperBound, 
-                hasStride, isAmbiguous);}
-        // this alternative is necessary because if alt1 above has no expr
-        // following the first : and there is the optional second : with no 
-        // WS between the two, the lexer will make a T_COLON_COLON token 
-        // instead of two T_COLON tokens.  in this case, the second expr is
-        // required.  for an example, see J3/04-007, Note 7.44.
-    |   T_COLON_COLON expr
-            { hasStride=true; 
-              action.section_subscript(hasLowerBound, hasUpperBound, 
-                                       hasStride, isAmbiguous);}
-	|		{ /* empty, could be an actual-arg, see R1220 */
-                isAmbiguous=true; 
-                action.section_subscript(hasLowerBound, hasUpperBound, 
-                    hasStride, isAmbiguous);
-			}
-	;
+/**
+ * R620-F08 section-subscript
+ *    is subscript
+ *    or subscript-triplet
+ *    or vector-subscript
+ */
 
-section_subscript_list
-@init{int count = 0;}
-    :		{ action.section_subscript_list__begin(); }
-    	isEmpty=section_subscript
-    		{
-    			if (isEmpty == false) count += 1;
-    		}
-    	(T_COMMA section_subscript {count += 1;})*
-    		{ action.section_subscript_list(count); }
-    ;
+////////////
+// R620-F08, R619-F03
+//
+// This rule is implemented in FortranParserExtras grammar
+
 
 // R620 subscript_triplet inlined in R619
 // inlined expr as subscript and stride in subscript_triplet
@@ -2748,14 +2690,13 @@ alloc_opt_list
 // R627 inlined source_expr was expr
 
 ////////////
-// R628-F03, R631-F08
-//     - F08 specific syntax removed
+// R631-F08, R628-F03
+//
+// This rule is implemented in the FortranParserExtras grammar
 //
 allocation
-@init{boolean hasAllocateShapeSpecList = false; boolean hasAllocateCoarraySpec = false;}
-   :   allocate_object
-       ( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} T_RPAREN )?
-           {action.allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);}
+   :   T_IDENT
+           {System.err.println("ERROR: allocation implemented in FortranParserExtras.java");}
    ;
 
 allocation_list
@@ -2765,14 +2706,21 @@ allocation_list
            {action.allocation_list(count);}
    ;
 
-// R629
-// T_IDENT inlined for variable_name
-// data_ref inlined for structure_component
-// data_ref isa T_IDENT so T_IDENT deleted
+/**
+ * R632-F08 allocate-object
+ *    is variable-name
+ *    structure-component
+ */
+
+////////////
+// R636-F08, R629-F03
+//
+// This rule is implemented in the FortranParserExtras grammar
+//
 allocate_object
-	:	data_ref
-            { action.allocate_object(); }
-	;
+   :   T_IDENT
+           {System.err.println("ERROR: allocate_object implemented in FortranParserExtras.java");}
+   ;
 
 allocate_object_list
 @init{ int count=0;}
@@ -2815,11 +2763,7 @@ allocate_shape_spec_list
 ////////////
 // R636-F08
 //
-allocate_coarray_spec
-   :   //PUTBACK ( allocate_coshape_spec_list T_COMMA )? ( expr T_COLON )?
-       T_ASTERISK
-           { action.allocate_coarray_spec(); }
-   ;
+// This rule is implemented in FortranParserExtras grammar
 
 
 /*
