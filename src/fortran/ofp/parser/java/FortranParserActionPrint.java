@@ -2044,11 +2044,11 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * part_ref
     */
    public void
-   part_ref(Token id, boolean hasSelectionSubscriptList, boolean hasImageSelector)
+   part_ref(Token id, boolean hasSectionSubscriptList, boolean hasImageSelector)
    {
       printRuleHeader(613, "part-ref");
       printParameter(id, "id");
-      printParameter(hasSelectionSubscriptList, "hasSelectionSubscriptList");
+      printParameter(hasSectionSubscriptList, "hasSectionSubscriptList");
       printParameter(hasImageSelector, "hasImageSelector");
       printRuleTrailer();
    }
