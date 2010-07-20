@@ -1,5 +1,7 @@
 program alloctest
-
+ allocate(a(100))
+ allocate(a(100)[])
  allocate(a(100)[@team])
-
+ allocate(a%b(100)[@team])
+ allocate(a(2:100)[@team])
 end program
