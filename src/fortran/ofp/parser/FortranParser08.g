@@ -2891,18 +2891,27 @@ mult_operand
     		{ action.mult_operand(numMultOps); }
     ;
 
+// R705-addition
+// This rule has been added so the unary plus/minus has the correct
+// precedence when actions are fired.
+signed_operand
+@init{int numAddOps = 0;}
+   :   (tk=add_op)? mult_operand 
+          {action.signed_operand(tk);}
+   ;
+
 // R705
 // moved leading optionals to mult_operand
 add_operand
 @init{int numAddOps = 0;}
+@after{action.add_operand(numAddOps);}
 //    : ( add_operand mult_op )? mult_operand
 //    : ( mult_operand mult_op )* mult_operand
-    : (tk=add_op)? mult_operand 
-        ( tk1=add_op mult_operand 
-            {action.add_operand__add_op(tk1); numAddOps += 1;}
-        )*
-            {action.add_operand(tk, numAddOps);}
-    ;
+   :   signed_operand
+       ( tk=add_op mult_operand 
+            {action.add_operand__add_op(tk); numAddOps += 1;}
+       )*
+   ;
 
 // R706
 // moved leading optionals to add_operand
