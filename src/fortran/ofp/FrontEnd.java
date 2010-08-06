@@ -74,7 +74,9 @@ public class FrontEnd implements Callable<Boolean> {
       if (riceCAF == false) {
          this.parser = new FortranParserExtras(tokens);
       } else {
-         System.out.println("FortranLexer: using Rice University's CAF extensions");
+	 // laksono 08.06.2010: only output if we have --verbose option set
+   	 if (verbose)
+           System.out.println("FortranLexer: using Rice University's CAF extensions");
          this.parser = new FortranParserRiceCAF(tokens);
       }
       this.parser.initialize(args, type, filename);
