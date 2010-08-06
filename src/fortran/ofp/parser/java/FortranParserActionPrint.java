@@ -2382,13 +2382,22 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleTrailer();
    }
 
+   /** R705 addition:
+    */
+   public void signed_operand(Token addOp) {
+      if (addOp != null) {
+         printRuleHeader(705, "signed-operand");
+         printParameter(addOp, "addOp");
+         printRuleTrailer();
+      }
+   }
+
    /** R705: note, moved leading optionals to mult_operand
     * add_operand
     */
-   public void add_operand(Token addOp, int numAddOps) {
-      if (addOp != null | numAddOps > 0) {
+   public void add_operand(int numAddOps) {
+      if (numAddOps > 0) {
          printRuleHeader(705, "add-operand");
-         printParameter(addOp, "addOp");
          printParameter(numAddOps, "numAddOps");
          printRuleTrailer();
       }
