@@ -28,10 +28,10 @@ JARFILE=$(OFP_JARFILE)
 
 all: 
 	@echo " "
-	@echo "----------------------------------------------------"
-	@echo "Please run make twice..."
-	@echo "  - expected behavior is to fail the first attempt"
-	@echo "----------------------------------------------------"
+	@echo "-------------------------------------------------------"
+	@echo "Please run make thrice..."
+	@echo "  - expected behavior is to fail the first two attempts"
+	@echo "-------------------------------------------------------"
 	@echo " "
 	$(CD) $(OFP_FRONT_DIR); $(MAKE)
 	$(CD) $(OFP_TOOLS_DIR); $(MAKE) ; $(MAKE) jarfile ; $(MAKE) RuleStackTrace.java
