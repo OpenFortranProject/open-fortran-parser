@@ -2099,14 +2099,22 @@ public abstract interface IFortranParserAction {
    public abstract void mult_operand(int numMultOps);
    public abstract void mult_operand__mult_op(Token multOp);
 
+   /** R705 addition:
+    * This rule has been added so the unary plus/minus has the correct
+    * precedence when actions are fired.
+    *   :   (add_op)? mult_operand
+    *  
+    * @param addOp Optinoal add_op for this operand
+    */
+   public abstract void signed_operand(Token addOp);
+
    /** R705: note, moved leading optionals to mult_operand
     * add_operand
     *   :   (add_op)? mult_operand (add_op mult_operand)*
     *  
-    * @param addOp Optional add_op for this operand
     * @param numAddOps The number of optional add_ops
     */
-   public abstract void add_operand(Token addOp, int numAddOps);
+   public abstract void add_operand(int numAddOps);
    public abstract void add_operand__add_op(Token addOp);
 
    /** R706: note, moved leading optionals to add_operand
