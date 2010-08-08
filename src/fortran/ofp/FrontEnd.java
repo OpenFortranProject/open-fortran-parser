@@ -335,11 +335,12 @@ public class FrontEnd implements Callable<Boolean> {
          error = parseProgramUnit(lexer, tokens, parser);
 
          // see if we successfully parse the program unit or not
-         if (error != false) {
-            System.out.println("Parser failed");
-         } else {
-            if (verbose)
+         if (verbose) {
+            if (error != false) {
+               System.out.println("Parser failed");
+            } else {
                System.out.println("Parser exiting normally");
+            }
          }// end else(parser exited normally)
       }// end while(not end of file)
 
