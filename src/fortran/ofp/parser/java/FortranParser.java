@@ -32,6 +32,10 @@ import java.util.HashMap;
 
 public abstract class FortranParser extends Parser implements IFortranParser {
 
+   /* Provide action objects to implement the AST.  These are singleton objects. */
+   protected static IFortranParserAction action = null;
+   protected static IFortranParserAction nullAction = new FortranParserActionNull(null, null, null);
+
    protected FortranParser delegate = null;
    
    protected String filename;
@@ -39,31 +43,36 @@ public abstract class FortranParser extends Parser implements IFortranParser {
    // TODO - does this state have to be shared?   
    protected boolean has_error_occurred = false;
    
-   /** Provide an action object to implement the AST */
-   protected IFortranParserAction action = null;
-   
    protected FortranParser(TokenStream input, RecognizerSharedState state) {
-	  super(input, state);
+      super(input, state);
 
-	  // TODO - see if the size has to increase with new F2008 rules
-	  state.ruleMemo = new HashMap[489+1];
+      // TODO - see if the size has to increase with new F2008 rules
+      state.ruleMemo = new HashMap[489+1];
    }
 	
    public void initialize(FortranParser delegate, IFortranParserAction action, String filename) {
       this.delegate = delegate;
-      this.action   = action;
       this.filename = filename;
+
+      if (this.action != null) this.action = action;
    }
    
    public boolean hasErrorOccurred() { return delegate.has_error_occurred; }
 
    public void reportError(RecognitionException re) {
-	  super.reportError(re);
-	  delegate.has_error_occurred = true;
+      super.reportError(re);
+
+      // Change action class to FortranParserActionNull so that actions are no
+      // longer called.  This will allow error handling to be done by ANTLR
+      // only.
+      //
+      this.action = nullAction;
+
+      delegate.has_error_occurred = true;
    }
      
    public IFortranParserAction getAction() {
-	  return action;
+      return action;
    }
    
    public void main_program() throws RecognitionException {
