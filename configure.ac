@@ -156,6 +156,7 @@ ofp_show_subtitle "Final output"
 
 AC_CONFIG_FILES([
     make.inc
+    src/fortran/ofp/parser/java/runANTLR.sh
 ])
 AC_OUTPUT()
 

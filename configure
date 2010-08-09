@@ -4061,7 +4061,7 @@ fi
 
 ofp_show_subtitle "Final output"
 
-ac_config_files="$ac_config_files make.inc"
+ac_config_files="$ac_config_files make.inc src/fortran/ofp/parser/java/runANTLR.sh"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4632,6 +4632,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "make.inc") CONFIG_FILES="$CONFIG_FILES make.inc" ;;
+    "src/fortran/ofp/parser/java/runANTLR.sh") CONFIG_FILES="$CONFIG_FILES src/fortran/ofp/parser/java/runANTLR.sh" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
