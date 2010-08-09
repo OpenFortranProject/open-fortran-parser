@@ -85,10 +85,10 @@ FortranParser08.java: ../FortranParser08.g FortranLexer.tokens
 	$(JAVA) org.antlr.Tool -fo ./ $<
 
 FortranParserExtras.java: ../FortranParserExtras.g FortranLexer.tokens
-	$(JAVA) org.antlr.Tool -fo ./ $<
+	@sh runANTLR.sh
 
 FortranParserRiceCAF.java: ../FortranParserRiceCAF.g FortranLexer.tokens
-	$(JAVA) org.antlr.Tool -fo ./ $<
+	@sh runANTLR.sh
 
 FortranParserActionNull.java: IFortranParserAction.java
 	$(PERL) makNull.pl 
