@@ -32,7 +32,7 @@ OFP_ROOT_DIR="`pwd`"
 # Set the version of OFP that we are installing
 OFP_MAJOR_VERSION="0"
 OFP_MINOR_VERSION="8"
-OFP_SUB_VERSION="1"
+OFP_SUB_VERSION="2"
 
 # Initialize variables
 OFP_CFLAGS="$CFLAGS"
