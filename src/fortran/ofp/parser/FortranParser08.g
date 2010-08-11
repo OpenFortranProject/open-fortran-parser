@@ -757,65 +757,66 @@ char_selector
 @init {
     int kindOrLen1; kindOrLen1 = IActionEnums.KindLenParam_none;
     int kindOrLen2; kindOrLen2 = IActionEnums.KindLenParam_none;
-    Token tk1 = null;
-    Token tk2 = null;
+    Token tk = null;
     boolean hasAsterisk = false;
 }
-	:	T_ASTERISK char_length (T_COMMA)?
-			{ hasAsterisk=true; 
-              action.char_selector(tk1, tk2, kindOrLen1, kindOrLen2, 
-                                   hasAsterisk); }
-	|	T_LPAREN (tmp1=T_KIND { kindOrLen1=IActionEnums.KindLenParam_kind; 
-                                tk1=tmp1; }
-                  | tmp1=T_LEN { kindOrLen1=IActionEnums.KindLenParam_len; 
-                                 tk1=tmp1; })
-		  T_EQUALS type_param_value 
-            { action.char_selector(tk1, tk2, kindOrLen1, kindOrLen2, 
-                                   hasAsterisk); }
-		  ( T_COMMA (tmp2=T_KIND { kindOrLen2=IActionEnums.KindLenParam_kind; 
-                                   tk2=tmp2; } 
-                     | tmp2=T_LEN { kindOrLen2=IActionEnums.KindLenParam_len; 
-                                    tk2=tmp2; })
-            T_EQUALS type_param_value )?
-		T_RPAREN
-			{ action.char_selector(tk1, tk2, kindOrLen1, kindOrLen2, 
-                                   hasAsterisk); }
-	|	T_LPAREN type_param_value 
-            (T_COMMA (tmp3=T_KIND T_EQUALS { tk2=tmp3; })? expr
-			    { kindOrLen2=IActionEnums.KindLenParam_kind; 
-                action.type_param_value(true, false, false);} )?
-        T_RPAREN
-			{ action.char_selector(tk1, tk2, IActionEnums.KindLenParam_len, 
-                                   kindOrLen2, hasAsterisk); }
-	;
+   // length-selector without type-param-value
+   :   T_ASTERISK char_length (T_COMMA)?
+          {
+            hasAsterisk=true; 
+            action.char_selector(null, null, kindOrLen1, kindOrLen2, hasAsterisk);
+          }
+   // type-param-value but no LEN=
+   |   T_LPAREN type_param_value
+          (  T_COMMA (T_KIND T_EQUALS {tk=$T_KIND;})? expr
+             {kindOrLen2=IActionEnums.KindLenParam_kind;}
+          )?
+       T_RPAREN
+          {
+            kindOrLen1 = IActionEnums.KindLenParam_len;
+            action.char_selector(null, tk, kindOrLen1, kindOrLen2, hasAsterisk);
+          }
+   // type-param-value with LEN=
+   |   T_LPAREN T_LEN T_EQUALS type_param_value
+          (  T_COMMA T_KIND T_EQUALS expr
+             {kindOrLen2=IActionEnums.KindLenParam_kind; tk=$T_KIND;}
+          )?
+       T_RPAREN
+          {
+            kindOrLen1 = IActionEnums.KindLenParam_len;
+            action.char_selector($T_LEN, tk, kindOrLen1, kindOrLen2, hasAsterisk);
+          }
+   // KIND= first
+   |   T_LPAREN T_KIND T_EQUALS expr
+          (  T_COMMA (T_LEN T_EQUALS {tk=$T_LEN;})? type_param_value
+             {kindOrLen2=IActionEnums.KindLenParam_len;}
+          )?
+       T_RPAREN
+          {
+            kindOrLen1 = IActionEnums.KindLenParam_kind;
+            action.char_selector($T_KIND, tk, kindOrLen1, kindOrLen2, hasAsterisk);
+          }
+   ;
 
 // R425
 length_selector
-@init { 
-    Token len = null;
-}
-	:	T_LPAREN ( T_LEN { len=$T_LEN; } T_EQUALS )? type_param_value T_RPAREN
-			{ action.length_selector(len, IActionEnums.KindLenParam_len, 
-                                     false); }
-	|	T_ASTERISK char_length (T_COMMA)?
-			{ action.length_selector(len, IActionEnums.KindLenParam_none, 
-                                     true); }
-    ; 
+@init {Token len = null;}
+   :   T_LPAREN ( T_LEN { len=$T_LEN; } T_EQUALS )? type_param_value T_RPAREN
+          { action.length_selector(len, IActionEnums.KindLenParam_len, false); }
+   |   T_ASTERISK char_length (T_COMMA)?
+          { action.length_selector(len, IActionEnums.KindLenParam_none, true); }
+   ; 
 
 // R426
 char_length
-	:	T_LPAREN type_param_value T_RPAREN
-			{ action.char_length(true); }
-	|	scalar_int_literal_constant
-			{ action.char_length(false); }
-	;
+   :   T_LPAREN type_param_value T_RPAREN   { action.char_length(true); }
+   |   scalar_int_literal_constant          { action.char_length(false); }
+   ;
 
 scalar_int_literal_constant
-@after {
-    action.scalar_int_literal_constant();
-}
-	:	int_literal_constant
-	;
+@after {action.scalar_int_literal_constant();}
+   :   int_literal_constant
+   ;
 
 // R427
 // char_literal_constant
