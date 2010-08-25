@@ -44,35 +44,35 @@ public class FortranLexicalPrepass {
 
    public void setSourceForm(int sourceForm) {
       this.sourceForm = sourceForm;
-   }// end setSourceForm()
+   } // end setSourceForm()
 
 
-	private boolean isAssignment(int start, int end) {
-		if(tokens.getToken(start).getType() == FortranLexer.T_ASSIGNMENT &&
-			(start+3 < end) &&  
-			tokens.getToken(start+1).getType() == FortranLexer.T_LPAREN &&
-			tokens.getToken(start+2).getType() == FortranLexer.T_EQUALS)
-			return true;
-		else
-			return false;
-	}// end isAssignment()
+   private boolean isAssignment(int start, int end) {
+      if (tokens.getToken(start).getType() == FortranLexer.T_ASSIGNMENT && (start+3 < end) &&  
+          tokens.getToken(start+1).getType() == FortranLexer.T_LPAREN &&
+          tokens.getToken(start+2).getType() == FortranLexer.T_EQUALS) {
+         return true;
+      } else {
+         return false;
+      }
+   } // end isAssignment()
 
 
-	private boolean isOperator(int start, int end) {
-		if(tokens.getToken(start).getType() == FortranLexer.T_OPERATOR &&
-			(start+3 < end) && 
-			tokens.getToken(start+1).getType() == FortranLexer.T_LPAREN &&
-			tokens.getToken(start+2).getType() == FortranLexer.T_DEFINED_OP &&
-			tokens.getToken(start+3).getType() == FortranLexer.T_RPAREN)
-			return true;
-		else 
-			return false;
-	}// end isOperator()
+   private boolean isOperator(int start, int end) {
+      if (tokens.getToken(start).getType() == FortranLexer.T_OPERATOR && (start+3 < end) && 
+          tokens.getToken(start+1).getType() == FortranLexer.T_LPAREN &&
+          tokens.getToken(start+2).getType() == FortranLexer.T_DEFINED_OP &&
+          tokens.getToken(start+3).getType() == FortranLexer.T_RPAREN) {
+         return true;
+      }	else {
+         return false;
+      }
+   } // end isOperator()
 
 
    private void convertToIdents(int start, int end) {
       int i;
-      Token tmpToken;
+      Token tmpToken = null;
 
       for (i = start; i < end; i++) {
          // get the token 
@@ -85,7 +85,6 @@ public class FortranLexicalPrepass {
          if (firstChar != '\'' && firstChar != '\"') {
            tmpToken.setText( tmpToken.getText().toLowerCase() );
          }
-
 
          // this should not happen, but just in case..
          if (tmpToken == null) {
@@ -164,10 +163,11 @@ public class FortranLexicalPrepass {
       } while(tmpToken != FortranLexer.EOF && 
               tmpToken != FortranLexer.T_EOS && tmpToken != desiredToken);
 
-      if(tmpToken == desiredToken)
+      if (tmpToken == desiredToken) {
          // we found a what we wanted to
          // have to subtract one because 0 based indexing 
          return lookAhead-1;
+      }
          
       return -1;
    }// end salesScanForToken()
@@ -1806,7 +1806,7 @@ public class FortranLexicalPrepass {
       } else {
          return false;
       }
-   }// end matchActionStmt()
+   } // end matchActionStmt()
 
 
    private boolean matchSingleTokenStmt(int lineStart, int lineEnd) {
@@ -1964,57 +1964,54 @@ public class FortranLexicalPrepass {
    } // end matchDoStmt()
 
    
+   /**
+    * A few stmts can be one liners (where-stmt, if-stmt, forall).  These will
+    * fail Sale's because they will have an equal sign and no comma.
+    * Sale's says that it must not start w/ a keyword then, but these
+    * are exceptions.  They could also have no equal and no comma, such as:
+    *   if (result < 0.) cycle
+    */
    private boolean matchOneLineStmt(int lineStart, int lineEnd) {
       int tokenType;
       int identOffset = -1;
       int rparenOffset = -1;
 
-      // a few stmts can be one liners, such as a where-stmt.  these will
-      // fail Sale's because they will have an equal sign and no comma.
-      // Sale's says that it must not start w/ a keyword then, but these
-      // are exceptions.  they could also have no equal and no comma, such
-      // as: if(result < 0.) cycle
-      
       // get the token type and determine if we have an applicable stmt
       tokenType = tokens.currLineLA(lineStart+1);
-      if(tokenType == FortranLexer.T_WHERE ||
+      if (tokenType == FortranLexer.T_WHERE ||
          tokenType == FortranLexer.T_IF ||
          tokenType == FortranLexer.T_FORALL) {
          // next token must be the required left paren!
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
             identOffset = lineStart+2;
             // find the right paren (end of the expression)
             rparenOffset = matchClosingParen(lineStart, lineStart+2);
             // convert anything between the parens to idents
             convertToIdents(identOffset, rparenOffset);
 
-            // match the rest of the line (action statements)
-            // the matchLine() allows for more than we should, but the
-            // parser should catch those errors.  
-            if(matchLine(rparenOffset, lineEnd) == false) {
-               matchAssignStmt(rparenOffset, lineEnd);
+            // match the rest of the line (action statements), the matchLine() allows for
+            // more than we should, but the parser should catch those errors.
+            // assignment-stmt should be checked first as variable may be a keyword (CER 08.24.10)
+            if (matchAssignStmt(rparenOffset, lineEnd) == false) {
+               matchLine(rparenOffset, lineEnd);
             } 
 
             // insert a token to signal that this a one-liner statement, 
             // either a where_stmt, if_stmt, or forall_stmt.  hopefully this 
             // will allow the parser to do less backtracking.
-            if(tokenType == FortranLexer.T_WHERE) {
-               tokens.addToken(lineStart, FortranLexer.T_WHERE_STMT, 
-                               "__T_WHERE_STMT__");
-            } else if(tokenType == FortranLexer.T_IF) {
-               tokens.addToken(lineStart, FortranLexer.T_IF_STMT,
-                               "__T_IF_STMT__");
+            if (tokenType == FortranLexer.T_WHERE) {
+               tokens.addToken(lineStart, FortranLexer.T_WHERE_STMT, "__T_WHERE_STMT__");
+            } else if (tokenType == FortranLexer.T_IF) {
+               tokens.addToken(lineStart, FortranLexer.T_IF_STMT, "__T_IF_STMT__");
             } else {
-               tokens.addToken(lineStart, FortranLexer.T_FORALL_STMT, 
-                               "__T_FORALL_STMT__");
+               tokens.addToken(lineStart, FortranLexer.T_FORALL_STMT, "__T_FORALL_STMT__");
             }
 
             // a labeled action stmt can terminate a do loop.  see if we 
             // have to fix it up (possibly insert extra tokens).
-            if(lineStart > 0 && 
-               tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING)
+            if (lineStart > 0 && tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING) {
                fixupLabeledEndDo(lineStart, lineEnd);
-
+            }
             return true;
          } else {
             // didn't match the required left paren after the token
@@ -2023,7 +2020,7 @@ public class FortranLexicalPrepass {
       } 
 
       return false;
-   }// end matchOneLineStmt()
+   } // end matchOneLineStmt()
 
 
    private int matchDataRef(int lineStart, int lineEnd) {
@@ -2078,7 +2075,7 @@ public class FortranLexicalPrepass {
       } 
 
       return lineStart;
-   }// end matchDataRef()
+   } // end matchDataRef()
 
 
    private boolean matchAssignStmt(int lineStart, int lineEnd) {
@@ -2097,7 +2094,7 @@ public class FortranLexicalPrepass {
       // token, or the first token after a given ()
       if (tokens.currLineLA(newLineStart+2) == FortranLexer.T_EQUALS ||
           tokens.currLineLA(newLineStart+2) == FortranLexer.T_EQ_GT) {
-         // it must be an assignment stmt.  convert the line to idents
+         // it must be an assignment stmt, convert the line to idents
          identOffset = lineStart;
          assignType = tokens.currLineLA(newLineStart+2);
       } else if (tokens.currLineLA(newLineStart+2) == FortranLexer.T_LPAREN ||
@@ -2127,35 +2124,30 @@ public class FortranLexicalPrepass {
 
       // fixup the line if we found a valid ptr assignment and return true;
       // otherwise, change nothing and return false
-      if(identOffset != -1) {
+      if (identOffset != -1) {
          // found no '%', but did find the assignment token
          convertToIdents(identOffset, lineEnd);
 
          // try inserting a token, before the assignment stmt, to 
          // signify what type of assignment it is.  hopefully this will allow
-         // the parser to not backtrack for action_stmt.
-         // 02.05.07
-         if(assignType == FortranLexer.T_EQUALS) {
-            tokens.addToken(lineStart, FortranLexer.T_ASSIGNMENT_STMT, 
-                            "__T_ASSIGNMENT_STMT__");
+         // the parser to not backtrack for action_stmt. 02.05.07
+         if (assignType == FortranLexer.T_EQUALS) {
+            tokens.addToken(lineStart, FortranLexer.T_ASSIGNMENT_STMT, "__T_ASSIGNMENT_STMT__");
          }
-         else if(assignType == FortranLexer.T_EQ_GT) {
-            tokens.addToken(lineStart, FortranLexer.T_PTR_ASSIGNMENT_STMT, 
-                            "__T_PTR_ASSIGNMENT_STMT__");
+         else if (assignType == FortranLexer.T_EQ_GT) {
+            tokens.addToken(lineStart, FortranLexer.T_PTR_ASSIGNMENT_STMT, "__T_PTR_ASSIGNMENT_STMT__");
          }
 
          // a labeled action stmt can terminate a do loop.  see if we 
          // have to fix it up (possibly insert extra tokens).
-         if(lineStart > 0 && 
-            tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING)
+         if (lineStart > 0 && tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING) {
             fixupLabeledEndDo(lineStart, lineEnd);
-         
+         }
 
          return true;
       } else {
 //          System.out.println("couldn't match assignment statement with first "
-//                             + "token on line being: " + 
-//                             tokens.currLineLA(lineStart+1));
+//                             + "token on line being: " + tokens.currLineLA(lineStart+1));
          return false;
       }
    } // end matchAssignStmt()
@@ -2541,19 +2533,15 @@ public class FortranLexicalPrepass {
     } // end scanForRelationalOp(int, int)
 
 
-public void performPrepass() {
+   public void performPrepass() {
+      int i, lineStart, rawLineStart, rawLineEnd, tokensStart;
       int commaIndex = -1;
       int equalsIndex = -1;
-      int i;  
       int lineLength = 0;
-      int lineStart;
-      int rawLineStart;
-      int rawLineEnd;
-      int tokensStart;
       int newLineLength = 0;
-		Token eof = null;
+      Token eof = null;
 
-      if(this.sourceForm == FrontEnd.FIXED_FORM) {
+      if (this.sourceForm == FrontEnd.FIXED_FORM) {
          tokensStart = tokens.mark();
          tokens.fixupFixedFormat();
          tokens.rewind(tokensStart);
@@ -2564,12 +2552,12 @@ public void performPrepass() {
       // at -1 (before the list).  this use to be what it always was when 
       // entering this method in antlr-3.0b*, but in antlr-3.0, the number 
       // was no longer guaranteed to be -1.  so, seek the index ptr to -1.
-      if(tokensStart != -1) {
+      if (tokensStart != -1) {
          tokens.seek(-1);
          tokensStart = -1;
       }
 
-      while(tokens.LA(1) != FortranLexer.EOF) {
+      while (tokens.LA(1) != FortranLexer.EOF) {
          // initialize necessary variables
          commaIndex = -1;
          equalsIndex = -1;
@@ -2584,9 +2572,8 @@ public void performPrepass() {
          lineLength = tokens.getCurrLineLength();
 
          // get the end of the line
-         rawLineEnd = tokens.findTokenInSuper(rawLineStart, 
-                                              FortranLexer.T_EOS);
-         if(rawLineEnd == -1) {
+         rawLineEnd = tokens.findTokenInSuper(rawLineStart, FortranLexer.T_EOS);
+         if (rawLineEnd == -1) {
             // EOF was reached so use EOF as T_EOS to break loop
             rawLineEnd = tokens.getRawLineLength();
          }
@@ -2600,14 +2587,14 @@ public void performPrepass() {
          }
 
          // check for a label and consume it if exists
-         if(matchLabel(lineStart, lineLength) == true) {
+         if (matchLabel(lineStart, lineLength) == true) {
             // consume label by advancing lineStart to next nonWS char.
             lineStart++;
          }
 
          // check for the optional (T_IDENT T_COLON) that some 
          // constructs can have and skip if it's there.
-         if(matchIdentColon(lineStart, lineLength) == true) {
+         if (matchIdentColon(lineStart, lineLength) == true) {
             lineStart+=2;
          }
 
@@ -2621,32 +2608,32 @@ public void performPrepass() {
             lineLength = newLineLength;
          }
 
-         // Scan for relational operators, e.g., .EQ., this is done hear
+         // Scan for relational operators, e.g., .EQ., this is done here
          // to let the T_PERIOD tokens in reals be fixed first.
          // This method could shorten the line if it combines tokens into 
          // T_EQ, ..., tokens so we need to update our lineLength and 
          // the stored size of tokens.packedListSize (probably safer to not 
          // have the variable and simply use packedList.size() calls).
          if (this.sourceForm == FrontEnd.FIXED_FORM) {
-             newLineLength = scanForRelationalOp(lineStart, lineLength);
-             if (newLineLength != lineLength) {
-                lineLength = newLineLength;
-             }
+            newLineLength = scanForRelationalOp(lineStart, lineLength);
+            if (newLineLength != lineLength) {
+               lineLength = newLineLength;
+            }
          }
 
          // see if there is a comma in the stmt
          commaIndex = salesScanForToken(lineStart, FortranLexer.T_COMMA);
-         if(commaIndex != -1) {
+         if (commaIndex != -1) {
             // if there is a comma, the stmt must start with a keyword
             matchLine(lineStart, lineLength);
          } else {
             // see if there is an equal sign in the stmt
             equalsIndex = salesScanForToken(lineStart, FortranLexer.T_EQUALS);
-            if(equalsIndex == -1)
+            if (equalsIndex == -1) {
                // see if it's a pointer assignment stmt
-               equalsIndex = salesScanForToken(lineStart, 
-                                               FortranLexer.T_EQ_GT);
-            if(equalsIndex != -1) {
+               equalsIndex = salesScanForToken(lineStart, FortranLexer.T_EQ_GT);
+            }
+            if (equalsIndex != -1) {
                // TODO: 
                // have to figure out how to rearrange the case where we 
                // can't start with a keyword (given the tests below fail) for 
@@ -2656,23 +2643,20 @@ public void performPrepass() {
 //                   fixupFixedFormatLine(lineStart, lineLength, false);
 //                }
 
-               // we have an equal but no comma, so stmt can not 
-               // start with a keyword.
-               // try converting any keyword node found in this line 
-               // to an identifier
+               // we have an equal but no comma, so stmt can not start with a keyword.
+               // try converting any keyword node found in this line to an identifier
                // this is NOT true for data declarations that have an 
                // initialization expression (e.g., integer :: i = 1 inside
                // a derived type).  also, this does not work for one-liner
-               // statements, such as a where_stmt or procedure stmts.
+               // statements, such as a where-stmt, if-stmt, or procedure stmts.
                // first, see if it's a one-liner
-               if(matchOneLineStmt(lineStart, lineLength) == false) {
-                  if(matchProcStmt(lineStart, lineLength) == false) {
+               if (matchOneLineStmt(lineStart, lineLength) == false) {
+                  if (matchProcStmt(lineStart, lineLength) == false) {
                      // if not, see if it's an assignment stmt
-                     if(matchAssignStmt(lineStart, lineLength) == false) {
+                     if (matchAssignStmt(lineStart, lineLength) == false) {
                         // else, match it as a data declaration
-                        if(matchDataDecl(lineStart, lineLength) == false) {
-                           if(matchGenericBinding(lineStart, lineLength) 
-                              == false) {
+                        if (matchDataDecl(lineStart, lineLength) == false) {
+                           if (matchGenericBinding(lineStart, lineLength) == false) {
                               System.err.println("Couldn't match line!");
                               tokens.printPackedList();
                            }
@@ -2688,7 +2672,6 @@ public void performPrepass() {
 //                   fixupFixedFormatLine(lineStart, lineLength, true);
 //                }
 
-
                // no comma and no equal sign; must start with a keyword
                // can have a one-liner stmt w/ neither
 //                if(matchOneLineStmt(lineStart, lineLength) == false) {
@@ -2697,32 +2680,32 @@ public void performPrepass() {
                // call matchLine() first because it will try and match an
                // if_construct, etc.  if that fails, we may still have a 
                // one-liner statement, such as if_stmt, where_stmt, etc.
-               if(matchLine(lineStart, lineLength) == false) {
+               if (matchLine(lineStart, lineLength) == false) {
                   matchOneLineStmt(lineStart, lineLength);
                }
             }
-         }// end if(found comma)/else(found equals or neither)
+         } // end if(found comma)/else(found equals or neither)
 
          // consume the tokens we just processed
-         for(i = rawLineStart; i < rawLineEnd; i++) {
+         for (i = rawLineStart; i < rawLineEnd; i++) {
             tokens.consume();
          }
 
          // need to finalize the line with the FortranTokenStream in case
          // we had to change any tokens in the line
          tokens.finalizeLine();
-      }//end while(not EOF)
+      } //end while(not EOF)
 		
-		// We need to include the EOF in the token stream so the parser can 
-		// signal when to pop the include stream stack.
-		eof = tokens.LT(1);
-		eof.setText("EOF");
-		tokens.addTokenToNewList(eof);
+      // We need to include the EOF in the token stream so the parser can 
+      // signal when to pop the include stream stack.
+      eof = tokens.LT(1);
+      eof.setText("EOF");
+      tokens.addTokenToNewList(eof);
 
       // reset to the beginning of the tokens for the parser
       tokens.rewind(tokensStart);
 
       return;
-   }// end performPrepass()
+   } // end performPrepass()
    
-}// end class FortranLexicalPrepass
+} // end class FortranLexicalPrepass
