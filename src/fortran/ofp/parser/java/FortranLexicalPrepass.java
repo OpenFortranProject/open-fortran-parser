@@ -257,36 +257,31 @@ public class FortranLexicalPrepass {
 
    
    private boolean matchDataDecl(int lineStart, int lineEnd) {
-      int tokenType;
+      int tokenType = tokens.currLineLA(lineStart+1);
+      if (isIntrinsicType(tokenType) == true || isPrefixToken(tokenType) ||
+          ((tokenType == FortranLexer.T_TYPE || tokenType == FortranLexer.T_CLASS) &&
+            tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN)) {
 
-      tokenType = tokens.currLineLA(1);
-      if(isIntrinsicType(tokenType) == true ||
-			isPrefixToken(tokenType)  ||
-         ((tokenType == FortranLexer.T_TYPE || 
-           tokenType == FortranLexer.T_CLASS) &&
-          tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN)) {
+         // If a subroutine, then this is handled elsewhere.
+         if (isSubDecl(lineStart, lineEnd)) {
+            return false;
+         }
 
-		// If a subroutine, then this is handled elsewhere.
-		if(isSubDecl(lineStart, lineEnd)) {
-			return false;
-		}
-
-		// Test to see if it's a function decl.  If it is not, then
-		// it has to be a data decl
-		if(isFuncDecl(lineStart, lineEnd) == true) {
-			fixupFuncDecl(lineStart, lineEnd);
-		}
-
-		else {
-			// should have a variable declaration here
-			fixupDataDecl(lineStart, lineEnd);
-		}
+         // Test to see if it's a function decl.  If it is not, then
+         // it has to be a data decl
+         if (isFuncDecl(lineStart, lineEnd) == true) {
+            fixupFuncDecl(lineStart, lineEnd);
+         }
+         else {
+            // should have a variable declaration here
+            fixupDataDecl(lineStart, lineEnd);
+         }
 
          // We either matched a data decl or a function, but either way, 
          // the line has been matched.
          return true;
 
-      } else if(tokenType == FortranLexer.T_FUNCTION) {
+      } else if (tokenType == FortranLexer.T_FUNCTION) {
          // could be a function defn. that starts with the function keyword
          // instead of the type.  fix it up.
          fixupFuncDecl(lineStart, lineEnd);
@@ -295,7 +290,7 @@ public class FortranLexicalPrepass {
       
       // didn't match the line.
       return false;
-   }// end matchDataDecl()
+   } // end matchDataDecl()
 
 
    /**
@@ -614,30 +609,46 @@ public class FortranLexicalPrepass {
 
 
    /**
-    * This depends on the handling of multi-line statements.  This 
-    * function assumes that the T_EOS tokens in a multi-line statement
-    * are removed for all lines except the last.  This allows this 
-    * function to simply test if the first token on the line is
-    * a digit string.
+    * This depends on the handling of multi-line statements.  This function assumes
+    * that the T_EOS tokens in a multi-line statement are removed for all lines
+    * except the last.  This allows this function to simply test if the first token
+    * on the line is a digit string.
     */
    private boolean matchLabel(int lineStart, int lineEnd) {
       // assume that if the line starts with a digit string, it
       // must be a label.  this requires that the T_EOS is removed 
       // in all lines of a multi-line statement, except for the last!
-      if(tokens.currLineLA(1) == FortranLexer.T_DIGIT_STRING) 
+      if (tokens.currLineLA(1) == FortranLexer.T_DIGIT_STRING) {
          return true;
-      else
+      }
+      else {
          return false;
-   }// end matchLabel()
+      }
+   } // end matchLabel()
+
+
+   /**
+    * An include line is T_INCLUDE T_INCLUDE_NAME followed by the tokens in the
+    * first line of the included file.  So search for T_INCLUDE T_INCLUDE_NAME and
+    * return true if they are found.  The T_CHAR_CONSTANT token following T_INCLUDE
+    * is assigned to channel 99 and is not seen here.
+    */
+   private boolean matchInclude(int lineStart, int lineEnd) {
+      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_INCLUDE &&
+          tokens.currLineLA(lineStart+2) == FortranLexer.T_INCLUDE_NAME) {
+         return true;
+      }
+      else {
+         return false;
+      }
+   } // end matchInclude()
 
 
    private boolean matchIdentColon(int lineStart, int lineEnd) {
-      int secondToken;
-
-      secondToken = tokens.currLineLA(lineStart+2);
-      if(secondToken != -1 && secondToken == FortranLexer.T_COLON) {
+      int secondToken = tokens.currLineLA(lineStart+2);
+      if (secondToken == FortranLexer.T_COLON) {
          // line starts with the optional T_IDENT and T_COLON
-         if(lexer.isKeyword(tokens.currLineLA(lineStart+1)) == true) {
+         if (lexer.isKeyword(tokens.currLineLA(lineStart+1)) == true) {
             // convert keyword to T_IDENT
             tokens.getToken(lineStart).setType(FortranLexer.T_IDENT);
          }
@@ -645,7 +656,7 @@ public class FortranLexicalPrepass {
       }
 
       return false;
-   }// end matchIdentColon()
+   } // end matchIdentColon()
 
    
    /**
@@ -2180,14 +2191,14 @@ public class FortranLexicalPrepass {
 
 
    private boolean matchGenericBinding(int lineStart, int lineEnd) {
-      if(tokens.currLineLA(lineStart+1) == FortranLexer.T_GENERIC) {
+      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_GENERIC) {
          int colonOffset;
          int nextToken;
          // search for the required ::
-         colonOffset = salesScanForToken(lineStart+1, 
-                                         FortranLexer.T_COLON_COLON);
-         if(colonOffset == -1)
+         colonOffset = salesScanForToken(lineStart+1, FortranLexer.T_COLON_COLON);
+         if (colonOffset == -1) {
             return false;
+         }
          
          // see what we may need to convert
          // if the next token is a T_OPERATOR, T_ASSIGNMENT, T_READ, or T_WRITE
@@ -2580,10 +2591,16 @@ public class FortranLexicalPrepass {
          // add offset of T_EOS from the start to lineStart to get end
          rawLineEnd += rawLineStart;
 
-         // Check for a generated T_EOF and skip it if it exists.
+         // check for a generated T_EOF and skip it if it exists.
          if (tokens.currLineLA(1) == FortranLexer.T_EOF) {
-            // System.err.println("SKIPPING T_EOF in prepass!!!!!!!!!!!!!!!");
             lineStart++;
+         }
+
+         // Check for an include file and skip the include tokens if they exist.
+         // The include tokens are T_INCLUDE T_INCLUDE_NAME.  These tokens are
+         // followed by the first line in the included file.
+         if (matchInclude(lineStart, lineLength) == true) {
+            lineStart += 2;
          }
 
          // check for a label and consume it if exists
