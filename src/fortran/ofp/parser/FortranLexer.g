@@ -278,7 +278,8 @@ import fortran.ofp.parser.java.FortranToken;
 T_EOS 
 @after {
     // Throw away T_EOS if at beginning of file or after an include,
-    // T_EOS processing by the parser only works after the first statement.
+    // T_EOS processing by the parser only works after the first statement so
+    // any blank lines before statements in a file must be hidden.
     if (prevToken == null) {
         state.channel = HIDDEN;
     } else if (prevToken.getType() == T_EOS || prevToken.getType() == T_INCLUDE_NAME) {
