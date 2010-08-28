@@ -72,31 +72,34 @@ public class FortranLexicalPrepass {
 
    private void convertToIdents(int start, int end) {
       int i;
-      Token tmpToken = null;
+      Token tk = null;
 
       for (i = start; i < end; i++) {
          // get the token 
-         tmpToken = tokens.getToken(i);
+         tk = tokens.getToken(i);
+
+         // This is often a list so skip commas (or T_EOS) to save time
+         if (tk.getType() == FortranLexer.T_COMMA || tk.getType() == FortranLexer.T_EOS) continue;
 
          // Laksono 2009.11.30: force to make the identifier lowercase
          // Laksono 2010.01.12: do not lowercase token between quotes
-         String sText   = tmpToken.getText();
+         String sText   = tk.getText();
          char firstChar = sText.charAt(0);
          if (firstChar != '\'' && firstChar != '\"') {
-           tmpToken.setText( tmpToken.getText().toLowerCase() );
+           tk.setText( tk.getText().toLowerCase() );
          }
 
-         // this should not happen, but just in case..
-         if (tmpToken == null) {
-            System.out.println("convertToIdents(): couldn't retrieve token");
-            System.out.println("start: " + start + " end: " + end + " i: " + i);
-            tokens.printCurrLine();
-            System.exit(1);
-         }
-         if (lexer.isKeyword(tmpToken) == true) {
-            // Do not convert the ASSIGNMENT(=) or OPERATOR(T_DEFINED_OP)
-            if (isAssignment(i, end) == false && isOperator(i, end) == false) {
-               tmpToken.setType(FortranLexer.T_IDENT);
+         if (lexer.isKeyword(tk) == true) {
+            // generic-spec items should not be converted (unless an id), i.e., 
+            // ASSIGNMENT(=) OPERATOR(T_DEFINED_OP), READ(UN/FORMATTED), WRITE()
+            int idOffset = matchGenericSpec(i, end);
+            if (idOffset == i) {
+               // an ident
+               tk.setType(FortranLexer.T_IDENT);
+            }
+            else if (idOffset != -1) {
+               // skip over tokens in parens from matchGenericSpec
+               i = idOffset-1;
             }
          }
       } // end for(number of tokens in line)
@@ -335,8 +338,7 @@ public class FortranLexicalPrepass {
                int rparenOffset;
                // matchClosingParen returns the lookAhead (1 based); 
                // we want the offset (0 based), so subtract 1 from it.
-               rparenOffset = 
-                  matchClosingParen(lineStart+2, lineStart+3) - 1;
+               rparenOffset = matchClosingParen(lineStart+2, lineStart+3) - 1;
                // if the third token is a left paren, we have a 'type is'
                // and need to figure out what the type_spec is
                if(isIntrinsicType(tokens.currLineLA(lineStart+4)) 
@@ -738,7 +740,23 @@ public class FortranLexicalPrepass {
       }
 
       return false;
-   }// end matchProcDeclStmt()
+   } // end matchProcDeclStmt()
+
+
+   /**
+    * Try matching an access-stmt.  This means we need to process an access-id-list.
+    * An access-id can be T_IDENT or KEYWORD ( stuff ) where KEYWORD is one of
+    * {OPERATOR, ASSIGNMENT, READ, WRITE}.
+    */
+   private boolean matchAccessStmt(int lineStart, int lineEnd) {
+      int tk = tokens.currLineLA(lineStart+1);
+      if (tk != FortranLexer.T_PUBLIC && tk != FortranLexer.T_PRIVATE) {
+         return false;
+      }
+
+      convertToIdents(lineStart+1, lineEnd);
+      return true;
+   }
 
 
    private boolean matchAttrStmt(int lineStart, int lineEnd) {
@@ -780,9 +798,8 @@ public class FortranLexicalPrepass {
       case FortranLexer.T_PUBLIC:
          // Match an access-stmt.  This means we need to process an access-id-list.
          // An access-id can be T_IDENT or KEYWORD ( stuff ) where KEYWORD is one of
-         // {OPERATOR, ASSIGNMENT, READ, WRITE}.  For now punt.
-         // TODO - fix punt by processing list
-         return true;
+         // {OPERATOR, ASSIGNMENT, READ, WRITE}.
+         return matchAccessStmt(lineStart, lineEnd);
 
       case FortranLexer.T_IMPLICIT:
          // TODO - does this really do anything as identOffset not changed
@@ -837,10 +854,13 @@ public class FortranLexicalPrepass {
    } // end matchAttrStmt()
 
 
-   /*
+   /**
     * This matches closing paren or bracket even if the match is the wrong type,
     * i.e., '( ]'.  This shouldn't really matter as the parser proper will work it
-    * out and give an error if the match is incorrect.
+    * out and give an error if the match is incorrect
+    * 
+    * WARNING return value is one-based indexing (as is offset, the
+    * location of the LPAREN).
     */
    private int matchClosingParen(int lineStart, int offset) {
       int lookAhead = 0;
@@ -2164,26 +2184,29 @@ public class FortranLexicalPrepass {
    } // end matchAssignStmt()
 
 
+   /**
+    * Try to match a generic-spec.
+    * 
+    * Returns the index of the id (if an identifier) or the index after the
+    * terminating RPAREN if keyword type of generic-spec.  If a generic-spec
+    * is not found, -1 is returned.
+    */
    private int matchGenericSpec(int lineStart, int lineEnd) {
-      int firstToken;
-      
-      firstToken = tokens.currLineLA(lineStart+1);
-      if(firstToken == FortranLexer.T_OPERATOR ||
-         firstToken == FortranLexer.T_ASSIGNMENT) {
-         // nothing to do except skip over OPERATOR or ASSIGNMENT
-         return lineStart+1;
-      } else if(firstToken == FortranLexer.T_READ ||
-                firstToken == FortranLexer.T_WRITE) {
-         // find end of parentheses
-         int rparenOffset;
-         if(tokens.currLineLA(lineStart+2) != FortranLexer.T_LPAREN)
-            // syntax error in the spec.  parser will report
-            return -1;
+      int tk1 = tokens.currLineLA(lineStart+1);
+      int tk2 = tokens.currLineLA(lineStart+2);
 
-         // find the rparen
-         rparenOffset = matchClosingParen(lineStart, lineStart+2);
-         return rparenOffset+1;
-      } else {
+      if (tk1 == FortranLexer.T_OPERATOR || tk1 == FortranLexer.T_ASSIGNMENT ||
+          tk1 == FortranLexer.T_READ || tk1 == FortranLexer.T_WRITE) {
+         if (tk2 != FortranLexer.T_LPAREN) {
+            // not a generic-spec
+            return -1;
+         }
+         // find end of parentheses
+         int rparenOffset = matchClosingParen(lineStart, lineStart+2);
+         // matchClosingParen is one based indexing so next token is at rparenOffset
+         return rparenOffset;
+      }
+      else {
          // generic spec is simply an identifier
          return lineStart;
       }
