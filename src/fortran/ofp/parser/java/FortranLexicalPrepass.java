@@ -116,12 +116,13 @@ public class FortranLexicalPrepass {
     */
    public int salesScanForToken(int start, int desiredToken) {
       int lookAhead = 0;
-      int tmpToken;
+      int tk;
       int parenOffset;
 
       // if this line is a comment, skip scanning it
-      if(tokens.currLineLA(1) == FortranLexer.LINE_COMMENT)
+      if (tokens.currLineLA(1) == FortranLexer.LINE_COMMENT) {
          return -1;
+      }
       
       // start where the user says to
       lookAhead = start;
@@ -130,50 +131,28 @@ public class FortranLexicalPrepass {
          lookAhead++;
 
          // get the token and consume it (advances token index)
-         tmpToken = tokens.currLineLA(lookAhead);
+         tk = tokens.currLineLA(lookAhead);
 
          // if have a left paren, find the matching right paren.  must 
          // add one to lookAhead for starting index because 
          // lookAhead is 0 based indexing and currLineLA() needs 1 based.
-         if(tmpToken == FortranLexer.T_LPAREN ||
-            tmpToken == FortranLexer.T_LBRACKET) {
+         if (tk == FortranLexer.T_LPAREN || tk == FortranLexer.T_LBRACKET) {
             parenOffset = tokens.findToken(lookAhead-1, FortranLexer.T_LPAREN);
             parenOffset++;
             // lookAhead should be the exact lookAhead of where we found
             // the LPAREN or LBRACKET.  
             lookAhead = matchClosingParen(start, lookAhead);
-            tmpToken = tokens.currLineLA(lookAhead);
-//
-// TODO - fix this for removal of token.
-// This was removed because T_BIND_LPAREN_C token was removed and replaced by
-// T_BIND T_LPAREN T_IDENT [='c'|'C']
-//
-//          } else if(tmpToken == FortranLexer.T_BIND_LPAREN_C) {
-          } else if(tmpToken == FortranLexer.T_BIND) {
-
-            parenOffset = tokens.findToken(lookAhead-1, 
-//                  FortranLexer.T_BIND_LPAREN_C);
-                  FortranLexer.T_BIND);
-            // we need to advance by two.  parenOffset returned above is the 
-            // raw location of the T_BIND.  we need to skip past it to be on
-            // the LPAREN.  then, we add one more to convert the offset of the 
-            // LPAREN into the lookAhead of the LPAREN, which is needed by 
-            // the matchClosingParen routine.
-            parenOffset+=2;
-            lookAhead = matchClosingParen(lookAhead+1, parenOffset);
-            tmpToken = tokens.currLineLA(lookAhead);
+            tk = tokens.currLineLA(lookAhead);
          }
-      } while(tmpToken != FortranLexer.EOF && 
-              tmpToken != FortranLexer.T_EOS && tmpToken != desiredToken);
+      } while (tk != FortranLexer.EOF && tk != FortranLexer.T_EOS && tk != desiredToken);
 
-      if (tmpToken == desiredToken) {
-         // we found a what we wanted to
-         // have to subtract one because 0 based indexing 
+      if (tk == desiredToken) {
+         // found what we wanted, need to subtract one because 0 based indexing 
          return lookAhead-1;
       }
          
       return -1;
-   }// end salesScanForToken()
+   } // end salesScanForToken()
 
 
    private boolean matchIfConstStmt(int lineStart, int lineEnd) {
