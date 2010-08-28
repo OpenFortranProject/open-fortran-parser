@@ -66,22 +66,17 @@ import fortran.ofp.parser.java.FortranToken;
         return t;
     }
 
-    public boolean isKeyword(Token tmpToken) {
-        if(tmpToken.getType() >= T_INTEGER && 
-            tmpToken.getType() <= T_LEN) {
-            return true;
-        } else {
-            return false;
-        }
-    }// end isKeyword()
+    public boolean isKeyword(Token tk) {
+       return isKeyword(tk.getType());
+    } // end isKeyword()
 
     public boolean isKeyword(int tokenType) {
-        if(tokenType >= T_INTEGER && tokenType <= T_LEN) {
+        if (tokenType > T_BEGIN_KEYWORDS && tokenType < T_END_KEYWORDS) {
             return true;
         } else {
             return false;
         }
-    }// end isKeyword()
+    } // end isKeyword()
 
 
     /**
@@ -458,13 +453,10 @@ T_PERIOD_EXPONENT
 
 T_PERIOD        : '.' ;
 
-
-
-// not sure what this is; is it just a place holder for something 
-// else??  --Rickett, 10.27.06  
-// it's a placeholder in the parser..
-// make the text unreachable from valid Fortran.
-T_XYZ           : '__XYZ__';
+// begin keyword section (all keywords must appear between
+// T_BEGIN_KEYWORDS and T_END_KEYWORDS)
+// 
+T_BEGIN_KEYWORDS: '__BEGIN_KEYWORDS__';
 
 T_INTEGER       :       'INTEGER'       ;
 T_REAL          :       'REAL'          ;
@@ -632,9 +624,14 @@ T_END   : 'END'
 T_DIMENSION     :       'DIMENSION'     ;
 
 T_KIND : 'KIND' ;
-T_LEN : 'LEN' ;
+T_LEN  : 'LEN' ;
 
 T_BIND : 'BIND' ;
+
+// End keyword section (all keywords must appear between
+// T_BEGIN_KEYWORDS and T_END_KEYWORDS)
+// 
+T_END_KEYWORDS : '__END_KEYWORDS__';
 
 T_HOLLERITH : Digit_String 'H' 
     { 
