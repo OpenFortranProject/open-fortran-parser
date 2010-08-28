@@ -5260,13 +5260,15 @@ generic_spec
 	|	T_ASSIGNMENT T_LPAREN T_EQUALS T_RPAREN
 			{action.generic_spec($T_ASSIGNMENT, null, 
                                  IActionEnums.GenericSpec_ASSIGNMENT);}
-	|	dtio_generic_spec
+	|	defined_io_generic_spec
             { action.generic_spec(null, null, 
                 IActionEnums.GenericSpec_dtio_generic_spec); }
 	;
 
 // R1208
-dtio_generic_spec
+// TODO - the name has been changed from dtio_generic_spec to defined_io_generic_spec
+// change the actions and enums as well
+defined_io_generic_spec
 	:	T_READ T_LPAREN T_FORMATTED T_RPAREN
 		{action.dtio_generic_spec($T_READ, $T_FORMATTED, 
                                   IActionEnums.
