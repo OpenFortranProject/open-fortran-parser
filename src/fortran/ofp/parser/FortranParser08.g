@@ -1934,7 +1934,7 @@ options {backtrack=true; k=3;}
 	|	char_literal_constant
 	|	boz_literal_constant
 	|	structure_constructor // is null_init if 'NULL()'
-    |   hollerith_constant // extension??
+    |   hollerith_constant    // deleted in F77
     ;
 
 data_stmt_value_list
@@ -1955,8 +1955,11 @@ scalar_int_constant
             { action.scalar_int_constant(); }
     ;
 
+//
+// Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
+// deleted in F95.
+//
 hollerith_constant
-//     :   T_DIGIT_STRING T_IDENT
     :   T_HOLLERITH
             { action.hollerith_constant($T_HOLLERITH); }
     ;
