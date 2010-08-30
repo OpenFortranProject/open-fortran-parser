@@ -95,6 +95,11 @@ public abstract class FortranParser extends Parser implements IFortranParser {
     * at the beginning of program unit file).
     */
    public void checkForInclude() {
+	   
+      // consume bare T_EOS
+      while (input.LA(1) == FortranLexer.T_EOS) {
+    	  input.consume();
+      }
          
       if (input.LA(1) == FortranLexer.T_INCLUDE) {
          Token tk = input.LT(1);
