@@ -156,33 +156,30 @@ public class FortranLexicalPrepass {
 
 
    private boolean matchIfConstStmt(int lineStart, int lineEnd) {
-      int tokenType;
       int rparenOffset = -1;
       int commaOffset = -1;
 
       // lineStart should be the physical index of the start (0, etc.)
       // currLinLA() is 1 based, so must add one to everything
-      tokenType = tokens.currLineLA(lineStart+1);
-      if(tokenType == FortranLexer.T_IF &&
+      int tkType = tokens.currLineLA(lineStart+1);
+      if ((tkType == FortranLexer.T_IF || tkType == FortranLexer.T_ELSEIF) &&
          tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
          rparenOffset = matchClosingParen(lineStart+2, lineStart+2);
          commaOffset = salesScanForToken(rparenOffset+1, FortranLexer.T_COMMA);
-         if(rparenOffset == -1) {
-            System.err.println("Error in IF stmt at line: " + 
-                               tokens.getToken(0).getLine());
+         if (rparenOffset == -1) {
+            System.err.println("Error in IF stmt at line: " + tokens.getToken(0).getLine());
             return false;
          }
             
          // if we have a T_THEN token, everything between if and then are ids
          // this is an if_construct in the grammar
-         if(tokens.currLineLA(rparenOffset+1) == FortranLexer.T_THEN) {
+         if (tokens.currLineLA(rparenOffset+1) == FortranLexer.T_THEN) {
             convertToIdents(lineStart+1, rparenOffset);
-
             // match an if_construct
             return true;
-         } else if(commaOffset != -1 &&
-                   tokens.currLineLA(rparenOffset+1) 
-                   == FortranLexer.T_DIGIT_STRING) {
+         }
+         else if (commaOffset != -1 && tkType == FortranLexer.T_IF &&
+                  tokens.currLineLA(rparenOffset+1) == FortranLexer.T_DIGIT_STRING) {
             // The arithmetic if requires a label T_COMMA label
             // T_COMMA label.  We can distinguish between
             // arithmetic_if_stmt and if_stmt by verifying that the
@@ -2327,6 +2324,7 @@ public class FortranLexicalPrepass {
          return matchActionStmt(lineStart, lineEnd);
 
       case FortranLexer.T_IF:
+      case FortranLexer.T_ELSEIF:
          if (matchIfConstStmt(lineStart, lineEnd) == true) {
             return true;
          }
