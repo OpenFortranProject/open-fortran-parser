@@ -633,6 +633,10 @@ T_BIND : 'BIND' ;
 // 
 T_END_KEYWORDS : '__END_KEYWORDS__';
 
+//
+// Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
+// deleted in F95.
+//
 T_HOLLERITH : Digit_String 'H' 
     { 
         // If we're inside a format stmt we don't want to process it as 
@@ -699,6 +703,18 @@ T_IDENT
 options {k=1;}
 	:	Letter ( Alphanumeric_Character )*
 	;
+
+//
+// Used in format-item processing.  This token is replaced by an edit
+// descriptor in the prepass (by FortranLexicalPrepass).  Exclude 'H'
+// in the Letter portion so that T_HOLLERITH will take precedence.
+//
+T_INT_IDENT
+options {k=1;}
+   :   Digit_String
+          ('a'..'z' | 'A'..'G' | 'I'..'Z')
+          ( Alphanumeric_Character )*
+   ;
 
 LINE_COMMENT
     : '!'  ~('\n'|'\r')*  
