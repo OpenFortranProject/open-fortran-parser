@@ -19,7 +19,6 @@
 
 package fortran.ofp.parser.java;
 
-import java.io.*;
 import java.util.*;
 import org.antlr.runtime.*;
 
@@ -197,7 +196,7 @@ public class FortranLexicalPrepass {
             tokens.addToken(lineStart, FortranLexer.T_ARITHMETIC_IF_STMT, 
                             "__T_ARITHMETIC_IF_STMT__");
 
-            // matched an arithemetic if
+            // matched an arithmetic if
             return true;
          } else {
             // TODO: must be an if_stmt, which is matched elsewhere (for now..)
@@ -211,7 +210,6 @@ public class FortranLexicalPrepass {
    
    private boolean matchElseStmt(int lineStart, int lineEnd) {
       int tokenType;
-      boolean isElseIf = false;
 
       // lineStart should be physical index to start (0 based).  add 1 to 
       // make it one based.
@@ -223,16 +221,13 @@ public class FortranLexicalPrepass {
                // ELSE WHERE stmt.  anything after these two are idents
                convertToIdents(lineStart+2, lineEnd);
             } else {
-               // need to see if there is an if stmt to handle, starting 
-               // at the  else location (lineStart+1)
-               isElseIf = matchIfConstStmt(lineStart+1, lineEnd);
             }
          }
 
          return true;
       }
       return false;
-   }// end matchElseStmt()
+   } // end matchElseStmt()
 
    
    private boolean matchDataDecl(int lineStart, int lineEnd) {
@@ -317,24 +312,21 @@ public class FortranLexicalPrepass {
                rparenOffset = matchClosingParen(lineStart+2, lineStart+3) - 1;
                // if the third token is a left paren, we have a 'type is'
                // and need to figure out what the type_spec is
-               if(isIntrinsicType(tokens.currLineLA(lineStart+4)) 
-                  == true) {
-                  // we can't change the intrinsic type, but have to handle
-                  // the optional kind selector, if given.
-                  // fixup the intrinsic_type_spec, which is the 
-                  // third token
+               if (isIntrinsicType(tokens.currLineLA(lineStart+4)) == true) {
+                  // we can't change the intrinsic type, but have to handle the optional kind
+                  // selector, if given.  Fixup the intrinsic_type_spec, which is the third token
                   fixupDeclTypeSpec(lineStart+3, lineEnd);
                } else {
                   // we have a 'type is' with a derived type name, so 
                   // convert everything on line to idents after '('
                   convertToIdents(lineStart+3, lineEnd);
-               }// end else
+               } // end else
 
                // have to see if a label is after the right paren and
                // convert it to an ident if necessary
                // lineEnd is 1 based; rparenOffset 0 based.  convert 
                // lineEnd to 0 based before testing
-               if((lineEnd-1) > (rparenOffset+1)) {
+               if ((lineEnd-1) > (rparenOffset+1)) {
                   // rparenOffset 0 based; convert to 1 based to get it's
                   // lookAhead value, then lookAhead 1 more to see what
                   // follows it (i.e., rparenOffset+2 is desired lookAhead)
@@ -344,8 +336,8 @@ public class FortranLexicalPrepass {
                         setType(FortranLexer.T_IDENT);
                   }
                }
-            }// end if(is a 'type is')
-         }// end else(no :: is derived-type-stmt)
+            } // end if(is a 'type is')
+         } // end else(no :: is derived-type-stmt)
 
          return true;
       }
@@ -1250,23 +1242,24 @@ public class FortranLexicalPrepass {
 
    private int getDataEditDesc(String line, int lineIndex, int lineEnd) {
       // see if we have a repeat specification (T_DIGIT_STRING)
-      while(lineIndex < lineEnd && isDigit(line.charAt(lineIndex))) 
+      while (lineIndex < lineEnd && isDigit(line.charAt(lineIndex))) {
          lineIndex++;
+      }
 
       // data-edit-desc starts with a T_IDENT token, representing one of: 
       // I, B, O, Z, F, E, EN, ES, G, L, A, D, or DT
-      if(isValidDataEditDesc(line, lineIndex) == true) {
-			/* For DT, there can be an optional v-list.  */
-			if(Character.toLowerCase(line.charAt(lineIndex)) == 'd' 
-				&& Character.toLowerCase(line.charAt(lineIndex+1)) == 't') {
-				/* Advance past any optional v-list.  */
-				lineIndex = matchVList(line, lineIndex);
-			}
+      if (isValidDataEditDesc(line, lineIndex) == true) {
+         /* For DT, there can be an optional v-list.  */
+         if (Character.toLowerCase(line.charAt(lineIndex)) == 'd' 
+             && Character.toLowerCase(line.charAt(lineIndex+1)) == 't') {
+            /* Advance past any optional v-list.  */
+            lineIndex = matchVList(line, lineIndex);
+         }
          return findFormatItemEnd(line, lineIndex);
       }
 
       return -1;
-   }// end getDataEditDesc()
+   } // end getDataEditDesc()
 
 
    private boolean isDigit(char tmpChar) {
@@ -1394,8 +1387,7 @@ public class FortranLexicalPrepass {
    }// end getCharStringEditDesc()
 
 
-   private int parseFormatString(String line, int lineIndex, int lineNum, 
-                                 int charPos) {
+   private int parseFormatString(String line, int lineIndex, int lineNum, int charPos) {
       int lineLength;
       int descIndex = 0;
       boolean foundClosingParen = false;
@@ -1403,18 +1395,17 @@ public class FortranLexicalPrepass {
       lineLength = line.length();
 
       // stop before processing the closing RPAREN
-      while(lineIndex < (lineLength-1) && foundClosingParen == false) {
+      while (lineIndex < (lineLength-1) && foundClosingParen == false) {
          descIndex = getCharStringEditDesc(line, lineIndex, lineLength);
-         if(descIndex == -1) {
+         if (descIndex == -1) {
             descIndex = getDataEditDesc(line, lineIndex, lineLength);
-            if(descIndex == -1) {
+            if (descIndex == -1) {
                descIndex = getControlEditDesc(line, lineIndex, lineLength);
-               if(descIndex != -1) {
+               if (descIndex != -1) {
                   // found a control-edit-desc
                   // Don't create a token if we just have a / because it 
                   // is handled below since it is also a terminating char.
-                  if((descIndex - lineIndex) > 0 
-                     || line.charAt(descIndex) != '/') {
+                  if ((descIndex - lineIndex) > 0 || line.charAt(descIndex) != '/') {
                      tokens.addToken(
                         tokens.createToken(FortranLexer.T_CONTROL_EDIT_DESC, 
                                            line.substring(lineIndex, 
@@ -1446,38 +1437,36 @@ public class FortranLexicalPrepass {
          // string has something of the form: (i12, /, 'hello')
          // because the '/' is a control edit desc that terminates itself, 
          // so we'd next look at the ','.
-         if(descIndex != -1 || 
+         if (descIndex != -1 || 
             (descIndex == -1 && isDigit(line.charAt(lineIndex)) == false &&
              line.charAt(lineIndex) != '(')) {
             String termString = null;
 
             // if we started our search on a terminating character the 
             // descIndex won't have been set, so set it here.
-            if(descIndex == -1) {
+            if (descIndex == -1) {
                descIndex = lineIndex;
             }
 
             // add a token for out terminating character
-            if(line.charAt(descIndex) == ',') {
+            if (line.charAt(descIndex) == ',') {
                termString = new String(",");
                tokens.addToken(
-                  tokens.createToken(FortranLexer.T_COMMA, ",", lineNum,
-                                     charPos));
-            } else if(line.charAt(descIndex) == ')') {
+                  tokens.createToken(FortranLexer.T_COMMA, ",", lineNum, charPos));
+            } else if (line.charAt(descIndex) == ')') {
                tokens.addToken(
-                  tokens.createToken(FortranLexer.T_RPAREN, ")", lineNum,
-                                     charPos));
+                  tokens.createToken(FortranLexer.T_RPAREN, ")", lineNum, charPos));
             } else {
-               if(line.charAt(descIndex) == ':') {
+               if (line.charAt(descIndex) == ':') {
                   termString = new String(":");
-               } else if(line.charAt(descIndex) == '/') {
+               } else if (line.charAt(descIndex) == '/') {
                   termString = new String("/");
                } else {
                   // we have no terminator (this is allowed, apparently).
                   termString = null;
                }
 
-               if(termString != null) {
+               if (termString != null) {
                   // we could be using a / or : as a terminator, and they are 
                   // valid control-edit-descriptors themselves.  
                   tokens.addToken(
@@ -1493,12 +1482,12 @@ public class FortranLexicalPrepass {
             // we may have a nested format stmt
             // skip over the optional T_DIGIT_STRING, but if there, add a 
             // token for it.
-            while(lineIndex < lineLength && isDigit(line.charAt(lineIndex))) {
+            while (lineIndex < lineLength && isDigit(line.charAt(lineIndex))) {
                lineIndex++;
                charPos++;
             }
 
-            if(startIndex != lineIndex) {
+            if (startIndex != lineIndex) {
                // We have a T_DIGIT_STRING in front of the nested format stmt.
                // Put a token for it in the stream.
                tokens.addToken(
@@ -1508,22 +1497,19 @@ public class FortranLexicalPrepass {
             }
 
             // make sure we're on a left paren
-            if(line.charAt(lineIndex) == '(') {
+            if (line.charAt(lineIndex) == '(') {
                tokens.addToken(
-                  tokens.createToken(FortranLexer.T_LPAREN, "(", lineNum, 
-                                     charPos));
+                  tokens.createToken(FortranLexer.T_LPAREN, "(", lineNum, charPos));
                charPos++;
                // move past the left paren
                lineIndex++; 
-               descIndex = parseFormatString(line, lineIndex, lineNum, 
-                                             charPos);
-               if(descIndex == -1) {
-                  System.err.println("Could not parse the format string: " + 
-                                     line);
+               descIndex = parseFormatString(line, lineIndex, lineNum, charPos);
+               if (descIndex == -1) {
+                  System.err.println("Could not parse the format string: " + line);
                   return -1;
                } else {
                   lineIndex = descIndex+1;
-               }// end else()
+               } // end else()
             } else {
                // couldn't match anything!
                return -1;
@@ -1557,11 +1543,9 @@ public class FortranLexicalPrepass {
 
 
    private int fixupFormatStmt(int lineStart, int lineEnd) {
-      int descIndex;
       String line;
       int lineIndex = 0;
       int i = 0;
-      int lineLength = 0;
       int lineNum = 0;
       int charPos = 0;
       ArrayList<Token> origLine = new ArrayList<Token>();
@@ -1574,7 +1558,7 @@ public class FortranLexicalPrepass {
       lineStart++; // move past the T_FORMAT
       charPos = tokens.getToken(lineStart).getCharPositionInLine();
 
-      if(tokens.currLineLA(lineStart+1) != lexer. T_LPAREN)
+      if(tokens.currLineLA(lineStart+1) != FortranLexer.T_LPAREN)
          // error in the format stmt; missing paren
          return -1;
 
@@ -1593,8 +1577,6 @@ public class FortranLexicalPrepass {
          tokens.addToken(origLine.get(i));
 
       lineIndex = 0;
-      lineLength = line.length();
-
       lineIndex = parseFormatString(line, lineIndex, lineNum, charPos);
 
       // terminate the newLine with a T_EOS
