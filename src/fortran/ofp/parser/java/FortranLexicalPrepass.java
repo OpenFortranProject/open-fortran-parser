@@ -2315,7 +2315,16 @@ public class FortranLexicalPrepass {
          }
 
       case FortranLexer.T_ELSE:
-         if (matchElseStmt(lineStart, lineEnd) == true) {
+         // check to see if this is an elseif
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_IF) {
+            if (matchIfConstStmt(lineStart+1, lineEnd) == true) {
+               return true;
+            }
+            else {
+               return matchOneLineStmt(lineStart, lineEnd);
+            }
+    	 }
+         else if (matchElseStmt(lineStart, lineEnd) == true) {
             return true;
          }
          else {
