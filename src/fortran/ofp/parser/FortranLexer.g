@@ -670,16 +670,16 @@ T_DEFINED_OP
 // idents in Fortran.  we just need this token to be defined so we can 
 // create one of them while we're fixing up labeled do stmts.
 T_LABEL_DO_TERMINAL
-	:	'__LABEL_DO_TERMINAL__'
-	;
+   :	'__LABEL_DO_TERMINAL__'
+   ;
 
 T_DATA_EDIT_DESC : '__T_DATA_EDIT_DESC__' ;
 T_CONTROL_EDIT_DESC : '__T_CONTROL_EDIT_DESC__' ;
 T_CHAR_STRING_EDIT_DESC : '__T_CHAR_STRING_EDIT_DESC__' ;
 
 T_STMT_FUNCTION 
-	:	'STMT_FUNCTION'
-	;
+   :   'STMT_FUNCTION'
+   ;
 
 T_ASSIGNMENT_STMT : '__T_ASSIGNMENT_STMT__' ;
 T_PTR_ASSIGNMENT_STMT : '__T_PTR_ASSIGNMENT_STMT__' ;
@@ -706,13 +706,15 @@ options {k=1;}
 
 //
 // Used in format-item processing.  This token is replaced by an edit
-// descriptor in the prepass (by FortranLexicalPrepass).  Exclude 'H'
-// in the Letter portion so that T_HOLLERITH will take precedence.
+// descriptor in the prepass (by FortranLexicalPrepass).  It doesn't really
+// matter what this token contains because the format string is parsed
+// as a string in the lexical prepass.  The goal is to keep the lexer from
+// bombing on strings like 2es15.6 and also not interfer with real literal
+// constants and Holleriths.
 //
-T_INT_IDENT
-options {k=1;}
+T_EDIT_DESC_MISC
    :   Digit_String
-          ('a'..'z' | 'A'..'G' | 'I'..'Z')
+          ( ('e'|'E') (('n'|'N') | ('s'|'S')) )
           ( Alphanumeric_Character )*
    ;
 
