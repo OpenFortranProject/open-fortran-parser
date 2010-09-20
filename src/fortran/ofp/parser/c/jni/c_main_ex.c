@@ -91,9 +91,9 @@ extern "C" {
 	 jboolean retval;
 
 	 classpathEnvVar = getenv("CLASSPATH");
-	 len = strlen(classpathEnvVar) + strlen(javaCPOption) + 1;
+	 len = strlen(javaCPOption) + strlen(classpathEnvVar) + 1;
 	 classpath = malloc(sizeof(char)*len);
-	 snprintf(classpath, len, "%s%s\0", javaCPOption, classpathEnvVar);
+	 snprintf(classpath, len, "%s%s", javaCPOption, classpathEnvVar);
 
 	 /* Set up the VM initialization args.  */
 	 jni_version = getenv("JNI_VERSION");
