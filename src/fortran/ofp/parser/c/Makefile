@@ -35,13 +35,13 @@ all: $(GENERATED_C_HEADER) $(GENERATED_C_PRINT) $(GENERATED_C_NULL)
 	cp token.c $(INSTALLDIR)/.
 
 FortranParserAction.h:
-	$(JAVA) $(OFP_CLASSPATH) fortran.tools.CFiles header
+	$(JAVA) $(OFP_JFLAGS) fortran.tools.CFiles header
 	cp FortranParserAction.h $(INSTALLDIR)/.
 FortranParserActionPrint.c:
-	$(JAVA) $(OFP_CLASSPATH) fortran.tools.CFiles print
+	$(JAVA) $(OFP_JFLAGS) fortran.tools.CFiles print
 	cp FortranParserActionPrint.c $(INSTALLDIR)/.
 FortranParserActionNull.c:
-	$(JAVA) $(OFP_CLASSPATH) fortran.tools.CFiles null
+	$(JAVA) $(OFP_JFLAGS) fortran.tools.CFiles null
 	cp FortranParserActionNull.c $(INSTALLDIR)/.
 
 clean:

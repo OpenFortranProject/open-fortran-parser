@@ -18,7 +18,7 @@
 include ../../../../make.inc
 
 JAVAC=$(OFP_JAVAC) #javac
-JAVA=$(OFP_JAVA) #java
+JAVA=$(OFP_JAVA) $(OFP_JFLAGS) #java
 JAR=$(OFP_JAR) #jar
 CD=cd
 CP=cp

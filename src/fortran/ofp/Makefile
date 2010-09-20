@@ -22,7 +22,7 @@ include $(OFP_HOME)/make.inc
 CD=cd
 
 JAVAC=$(OFP_JAVAC) #javac
-JAVA=$(OFP_JAVA) #java
+JAVA=$(OFP_JAVA) $(OFP_JFLAGS) #java
 JAR=$(OFP_JAR) #jar
 SRCDIR=$(OFP_SRC_DIR)/src
 BUILDDIR=$(OFP_BUILD_DIR)

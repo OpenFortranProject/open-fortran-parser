@@ -81,7 +81,7 @@ $(BUILDDIR)/$(JARFILE): $(CLASS_FILES)
 jni_code: c_actions_jni.c
 
 c_actions_jni.c: ../../java/IFortranParserAction.java
-	$(JAVA) $(OFP_CLASSPATH) fortran.tools.ToC
+	$(JAVA) $(OFP_JFLAGS) fortran.tools.ToC
 	cp c_actions_jni.c $(INSTALLDIR)/.
 
 c_main_ex: c_main_ex.o
