@@ -18,7 +18,7 @@
 include make.inc
 
 JAVAC=$(OFP_JAVAC) 
-JAVA=$(OFP_JAVA) 
+JAVA=$(OFP_JAVA) $(OFP_JFLAGS)
 JAR=$(OFP_JAR) 
 CD=cd
 CP=cp

@@ -121,4 +121,18 @@ else
     AC_MSG_RESULT([no])
 fi
 
+
+#
+# ANTLR jar files
+#
+AC_MSG_CHECKING([if specified ANTLR jar file])
+AC_ARG_WITH([antlr], 
+    [AC_HELP_STRING([--with-antlr=JARFILE],
+	    [ANTLR jar files separated by ':' (/usr/local/jdk1.6.0/jre/lib/i386/client)])])
+if test -n "$with_antlr" ; then
+    AC_MSG_RESULT([$with_antlr])
+else
+    AC_MSG_RESULT([no])
+fi
+
 ])

@@ -43,6 +43,7 @@ OFP_ENABLE_JNI="no"
 OFP_JAVA=$JAVA
 OFP_JAVAC=$JAVAC
 OFP_JAR=$JAR
+OFP_ANTLR=$ANTLR
 OFP_CC=$CC
 INSTALL=""
 RANLIB=""
@@ -99,8 +100,11 @@ OFP_SETUP_JAVAC($with_javac)
 OFP_SETUP_JAVA($with_java)
 # defines OFP_JAR
 OFP_SETUP_JAR($with_jar)
+# defines OFP_ANTLR
+OFP_SETUP_ANTLR($with_antlr)
 
 # Determine the root directory of the java install.
+ofp_show_subtitle "Java root directory" 
 # Figure out the name of the java command, without the full path
 AC_MSG_CHECKING([for root directory of Java install])
 OFP_JAVA_BASE_NAME=`basename $OFP_JAVA`
@@ -156,7 +160,6 @@ ofp_show_subtitle "Final output"
 
 AC_CONFIG_FILES([
     make.inc
-    src/fortran/ofp/parser/java/runANTLR.sh
 ])
 AC_OUTPUT()
 

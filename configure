@@ -645,6 +645,7 @@ target_os
 OFP_JAVAC
 OFP_JAVA
 OFP_JAR
+OFP_ANTLR
 OFP_JAVA_PATH
 OFP_CURR_JDK_DIR
 OFP_CFLAGS
@@ -1260,6 +1261,8 @@ Optional Packages:
                           (-I/usr/local/jdk1.6.0/include)
   --with-java-lib-dir=DIR dir for libjvm
                           (/usr/local/jdk1.6.0/jre/lib/i386/client)
+  --with-antlr=JARFILE    ANTLR jar files separated by ':'
+                          (/usr/local/jdk1.6.0/jre/lib/i386/client)
 
 Some influential environment variables:
   CC          C compiler command
@@ -1749,6 +1752,7 @@ OFP_ENABLE_JNI="no"
 OFP_JAVA=$JAVA
 OFP_JAVAC=$JAVAC
 OFP_JAR=$JAR
+OFP_ANTLR=$ANTLR
 OFP_CC=$CC
 INSTALL=""
 RANLIB=""
@@ -1953,6 +1957,26 @@ fi
 if test -n "$with_java_lib_dir" ; then
     { echo "$as_me:$LINENO: result: $with_java_lib_dir" >&5
 echo "${ECHO_T}$with_java_lib_dir" >&6; }
+else
+    { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+#
+# ANTLR jar files
+#
+{ echo "$as_me:$LINENO: checking if specified ANTLR jar file" >&5
+echo $ECHO_N "checking if specified ANTLR jar file... $ECHO_C" >&6; }
+
+# Check whether --with-antlr was given.
+if test "${with_antlr+set}" = set; then
+  withval=$with_antlr;
+fi
+
+if test -n "$with_antlr" ; then
+    { echo "$as_me:$LINENO: result: $with_antlr" >&5
+echo "${ECHO_T}$with_antlr" >&6; }
 else
     { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
@@ -3661,8 +3685,87 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+# defines OFP_ANTLR
+
+
+ofp_show_subtitle "ANTLR parser generator"
+
+if test -n "$with_antlr" ; then
+    # The user specified an ANTLR jar with --with-antlr to configure so try it.
+
+    # Verify that the jar file exists.
+    as_ac_File=`echo "ac_cv_file_$with_antlr" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $with_antlr" >&5
+echo $ECHO_N "checking for $with_antlr... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$with_antlr"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  OFP_ANTLR=$with_antlr
+else
+  { { echo "$as_me:$LINENO: error: $with_antlr specified but does not exist" >&5
+echo "$as_me: error: $with_antlr specified but does not exist" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+else
+	OFP_ANTLR=no
+fi
+
+if test "$OFP_ANTLR" = "no" ; then
+    # We assume that ANTLR will be set in the environment when we build.
+    { echo "$as_me:$LINENO: WARNING: ANTLR will need to be on CLASSPATH at build time." >&5
+echo "$as_me: WARNING: ANTLR will need to be on CLASSPATH at build time." >&2;}
+else
+    { echo "$as_me:$LINENO: checking that $OFP_ANTLR can process a grammar" >&5
+echo $ECHO_N "checking that $OFP_ANTLR can process a grammar... $ECHO_C" >&6; }
+    # Create a test file
+    cat > ConfTest.g <<EOF
+		grammar ConfTest; main: X; X:  'x';
+EOF
+
+    # We know we can run Java since that was already tested (or should have
+    # been, if configure.ac sets up OFP_JAVA first).
+    $OFP_JAVA -classpath $OFP_ANTLR org.antlr.Tool -fo ./ ConfTest.g
+
+    # See whether ANTLR produced an expected output file.
+    if test -s ConfTestParser.java ; then
+		# We successfully processed the grammar.
+		rm -f ConfTest.g ConfTest.tokens ConfTestLexer.java ConfTestParser.java
+		{ echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+    else
+		# Clean up and exit configure with an error message.
+		rm -f ConfTest.g
+		{ { echo "$as_me:$LINENO: error: $OFP_ANTLR cannot process a grammar" >&5
+echo "$as_me: error: $OFP_ANTLR cannot process a grammar" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+fi
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define OFP_ANTLR "$OFP_ANTLR"
+_ACEOF
+
+
 
 # Determine the root directory of the java install.
+ofp_show_subtitle "Java root directory"
 # Figure out the name of the java command, without the full path
 { echo "$as_me:$LINENO: checking for root directory of Java install" >&5
 echo $ECHO_N "checking for root directory of Java install... $ECHO_C" >&6; }
@@ -4061,7 +4164,7 @@ fi
 
 ofp_show_subtitle "Final output"
 
-ac_config_files="$ac_config_files make.inc src/fortran/ofp/parser/java/runANTLR.sh"
+ac_config_files="$ac_config_files make.inc"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4632,7 +4735,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "make.inc") CONFIG_FILES="$CONFIG_FILES make.inc" ;;
-    "src/fortran/ofp/parser/java/runANTLR.sh") CONFIG_FILES="$CONFIG_FILES src/fortran/ofp/parser/java/runANTLR.sh" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -4762,6 +4864,7 @@ target_os!$target_os$ac_delim
 OFP_JAVAC!$OFP_JAVAC$ac_delim
 OFP_JAVA!$OFP_JAVA$ac_delim
 OFP_JAR!$OFP_JAR$ac_delim
+OFP_ANTLR!$OFP_ANTLR$ac_delim
 OFP_JAVA_PATH!$OFP_JAVA_PATH$ac_delim
 OFP_CURR_JDK_DIR!$OFP_CURR_JDK_DIR$ac_delim
 OFP_CFLAGS!$OFP_CFLAGS$ac_delim
@@ -4779,7 +4882,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 84; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 85; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

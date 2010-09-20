@@ -28,4 +28,5 @@ sinclude(config/ofp_setup_javac.m4)
 sinclude(config/ofp_setup_jar.m4)
 sinclude(config/ofp_setup_javah.m4)
 sinclude(config/ofp_setup_libjvm.m4)
+sinclude(config/ofp_setup_antlr.m4)
 
