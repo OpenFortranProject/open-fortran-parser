@@ -940,7 +940,7 @@ public abstract interface IFortranParserAction {
     * ac_implied_do_control
     *   :   T_IDENT T_EQUALS expr T_COMMA expr (T_COMMA expr)?
     *
-    * @param hasStride True if is of the form a = b,c,d
+    * @param hasStride True if is of the form a = b,c,d where d is optional stride
     */
    public abstract void ac_implied_do_control(boolean hasStride);
 
@@ -2879,9 +2879,9 @@ public abstract interface IFortranParserAction {
    public abstract void loop_control(Token keyword, int doConstructType, boolean hasOptExpr);
 
    /** R831
-    * do_variable
+    * do_variable is scalar-int-variable-name
     */
-   public abstract void do_variable();
+   public abstract void do_variable(Token id);
 
    /** R833
     * end_do
@@ -3394,8 +3394,10 @@ public abstract interface IFortranParserAction {
 
    /** R919
     * io_implied_do_control
+    *
+    * @param hasStride True if is of the form a = b,c,d where d is optional stride
     */
-   public abstract void io_implied_do_control();
+   public abstract void io_implied_do_control(boolean hasStride);
 
    /** R920
     * dtv_type_spec
