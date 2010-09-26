@@ -3280,8 +3280,9 @@ public class FortranParserActionPrint implements IFortranParserAction {
    /** R831
     * do_variable
     */
-   public void do_variable() {
+   public void do_variable(Token id) {
       printRuleHeader(831, "do-variable");
+      printParameter(id, "id");
       printRuleTrailer();
    }
 
@@ -3828,15 +3829,16 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		printRuleTrailer();
 	}
 
-	/**
-	 * R919
-	 * io_implied_do_control
-	 *
-	 */
-	public void io_implied_do_control() {
-		printRuleHeader(919, "io-implied-do-control");
-		printRuleTrailer();
-	}
+   /**
+    * R919
+    * io_implied_do_control
+    *
+    */
+   public void io_implied_do_control(boolean hasStride) {
+      printRuleHeader(919, "io-implied-do-control");
+      printParameter(hasStride, "hasStride");
+      printRuleTrailer();
+   }
 
 	/**
 	 * R920
