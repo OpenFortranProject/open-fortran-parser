@@ -1464,7 +1464,7 @@ ac_implied_do
 // by variable replaced by T_IDENT
 ac_implied_do_control
 @init{boolean hasStride=false;}
-    :    T_IDENT T_EQUALS expr T_COMMA expr ( T_COMMA expr {hasStride=true;})?
+    :    do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr {hasStride=true;})?
 			{action.ac_implied_do_control(hasStride);}
     ;
 
@@ -3918,9 +3918,10 @@ label_do_stmt
 // T_IDENT inlined for do_construct_name
 
 // R831
+// do_variable is scalar-int-variable-name
 do_variable
-	:	scalar_int_variable
-            { action.do_variable(); }
+	:	T_IDENT
+            { action.do_variable($T_IDENT); }
 	;
 
 // R832 do_block was block inlined in R826
@@ -4526,8 +4527,9 @@ options {backtrack=true;}
 // R919
 // ERR_CHK 919 scalar_int_expr replaced by expr
 io_implied_do_control
-    : do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr )?
-            { action.io_implied_do_control(); }
+@init{boolean hasStride=false;}
+    : do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr {hasStride=true;})?
+            { action.io_implied_do_control(hasStride); }
     ;
 
 // R920
