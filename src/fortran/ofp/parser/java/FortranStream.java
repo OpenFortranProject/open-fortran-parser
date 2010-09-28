@@ -38,41 +38,61 @@ public class FortranStream extends ANTLRFileStream {
    }
 
 
-	public int getSourceForm() {
-		return this.sourceForm;
-	}
+   public int getSourceForm() {
+      return this.sourceForm;
+   }
 
 
-	public String getFileName() {
-		return getSourceName();
-	}
+   public String getFileName() {
+      return getSourceName();
+   }
 
 
    public int LA(int i) {
-      int letter_value;
-
-      letter_value = super.LA(i);
+      int letter_value = super.LA(i);
+      int char_pos = super.getCharPositionInLine();
 
       // the letter is lower-case
-      if(Character.isLowerCase((char)letter_value)) {
+      if (Character.isLowerCase((char)letter_value)) {
          // convert to upper-case
-         letter_value = (int)(Character.toUpperCase((char)(letter_value)));
-      } 
+         letter_value = (int) Character.toUpperCase((char)(letter_value));
+      }
 
-      if(this.sourceForm == FrontEnd.FIXED_FORM) {
-         if((letter_value == 'C' || letter_value == '*') &&
-            super.getCharPositionInLine() == 0) {
-            // return '!' to signify a line comment so the lexer won't try and 
-            // parser this line.
-            letter_value = (int)'!';
-         } else if(super.getCharPositionInLine() == 5 &&
-                   Character.isWhitespace((char)letter_value) == false) {
-            // if a character appears in the 6th column in fixed format it 
-            // is a continuation character.  
-            letter_value = (int)'&';
+      if (this.sourceForm == FrontEnd.FIXED_FORM) {
+         if (char_pos == 0) {
+            if (letter_value == 'C' || letter_value == '*') {
+               // return '!' to signify a line comment so the lexer won't try
+               // and parse this line.
+               letter_value = (int) '!';
+            }
+         }
+         else {
+            // Look for continuation character. The convention we use
+            // is for TAB + (WS | '0') acts as ';'.  TAB + other char is a
+            // continuation line.  This follows DEC (I believe) but is
+            // non standard Fortran.
+            //
+        	 
+            // location of continuation character
+            int continue_pos = 5; // 6th column
+            
+            // check for tab formatting, note, this seems to work because LA always
+            // called with i==1, so getCharPositionInLine is always as expected
+            if (super.LA(-char_pos) == (int) '\t') {
+               // first character in line is a tab
+               continue_pos = 1;
+            }
+            
+            if (char_pos == continue_pos) {
+               // if neither '0' nor whitespace then a continuation character
+               if (! (letter_value == (int)'0' || Character.isWhitespace((char)letter_value))) {
+                  letter_value = (int)'&';
+               }
+            }
          }
       }
 
       return letter_value;
-   }// end LA()
-}// end class FortranStream
+   } // end LA()
+   
+} // end class FortranStream
