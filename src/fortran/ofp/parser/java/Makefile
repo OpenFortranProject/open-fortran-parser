@@ -26,6 +26,7 @@ BUILDDIR=$(OFP_BUILD_DIR)
 PARDIR=$(OFP_PARSER_DIR)
 
 CLASSDIR = $(BUILDDIR)/fortran/ofp/parser/java
+INSTALLDIR = $(CLASSDIR)
 JFLAGS = -d $(BUILDDIR) @sourcefiles $(OFP_JFLAGS)
 
 ACTION_CLASS="null"
@@ -67,6 +68,7 @@ GENERATED_TOKEN_FILES = FortranLexer.tokens \
                         FortranParserRiceCAF_FortranParser08.tokens
 
 all: FortranParserActionNull.java $(GENERATED_JAVA_FILES) $(CLASS_FILES) $(BUILDDIR)/$(JARFILE)
+	cp IFortranParserAction.java $(INSTALLDIR)/.
 
 # The -Xconversiontimeout is to try and override the time you allow antlr 
 # for converting NFA's.  I couldn't find documentation on what a good number
