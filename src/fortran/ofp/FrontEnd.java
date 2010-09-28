@@ -58,10 +58,9 @@ public class FrontEnd implements Callable<Boolean> {
    throws IOException {
       boolean riceCAF = false;
 
-      this.lexer = new FortranLexer(new FortranStream(filename, this
-            .determineSourceForm(filename)));
+      this.lexer = new FortranLexer(new FortranStream(filename, determineSourceForm(filename)));
       this.tokens = new FortranTokenStream(lexer);
-      
+
       // check to see if using RiceCAF parser extensions
       //
 
