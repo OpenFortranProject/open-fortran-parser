@@ -45,12 +45,12 @@ public class FortranTokenStream extends CommonTokenStream {
       this.newTokensList = new ArrayList<Token>();
    }// end constructor
 
-
    public void fixupFixedFormat() {
       ArrayList<Token> tmpArrayList = null;
+      boolean hasContinuation = false;
       List tmpList = null;
       int i = 0;
-      Token tmpToken;
+      Token tk;
       
       tmpList = super.getTokens();
       tmpArrayList = new ArrayList<Token>(tmpList.size());
@@ -62,7 +62,7 @@ public class FortranTokenStream extends CommonTokenStream {
       // however, having an ArrayList that contains typed objects (Token) is 
       // useful below because we may have to rewrite the stream when handling
       // comments and continuations.  
-      for(i = 0; i < tmpList.size(); i++) {
+      for (i = 0; i < tmpList.size(); i++) {
          try {
             tmpArrayList.add((Token)tmpList.get(i));
          } catch(Exception e) {
@@ -71,58 +71,84 @@ public class FortranTokenStream extends CommonTokenStream {
          }
       }
 
-      // loop across the tokens and convert anything in the col 0 to a 
+      // Loop across the tokens and convert anything in column 0 to a 
       // line comment, and anything in col 6 to continuation.  note: this may
       // require the splitting of tokens!
-      for(i = 0; i < tmpArrayList.size(); i++) {
-         tmpToken = tmpArrayList.get(i);
-         if(tmpToken.getCharPositionInLine() == 5 &&
-            tmpToken.getType() != FortranLexer.WS &&
-            (tmpToken.getType() != FortranLexer.T_EOS ||
-             (tmpToken.getType() == FortranLexer.T_EOS &&
-              tmpToken.getText().charAt(0) == ';'))) {
-            // any char, it appears, can be a continuation char if it's in 
-            // the 6th column (col. 5 cause zero based), including '!' or ';'.
-            // TODO:
-            // if the length is greater than 1, then the user is most likely 
-            // using a letter or number to signal the continuation.  in this 
-            // case, we need to split off the character that's in column 6 and
-            // make two tokens -- the continuation token and what's left.  we 
-            // should maybe warn the user about this in case they accidentally
-            // started in the wrong column?
-            if(tmpToken.getText().length() > 1) {
-               System.err.println("TODO: handle this continuation type!");
-            } else {
-               int j;
-               int k;
-               Token prevToken = null;
+      //
+      // We also have to check for tabs in the first character position.  Following
+      // DEC's convention, <TAB>digit (other than zero) is a continuation line,
+      // otherwise the line starts a new statement.  Codes seem to use <TAB><BLANK> to
+      // start so perhaps <TAB> is essentially treated as 5 spaces?
+      //
+      
+      int continue_pos = 5;
+      for (i = 0; i < tmpArrayList.size(); i++) {
+         tk = tmpArrayList.get(i);
 
-               tmpToken.setType(FortranLexer.CONTINUE_CHAR);
-               // hide the continuation token
-               tmpToken.setChannel(lexer.getIgnoreChannelNumber());
-               tmpArrayList.set(i, tmpToken);
+         int tk_pos = tk.getCharPositionInLine();
+         char tk_char_0 = tk.getText().charAt(0);
+         
+         // check for tab formatting
+         if (tk_pos == 0) {
+        	 if (tk_char_0 == '\t') {
+        	    continue_pos = 1; // follows tab
+        	 } else {
+                continue_pos = 5; // column 6
+	         }
+         }
 
-               j = i-1;
-               do {
-                  prevToken = tmpArrayList.get(j);
-                  j--;
-               } while(j >= 0 && (prevToken.getType() == FortranLexer.WS ||
-                                  prevToken.getType() == 
-                                  FortranLexer.LINE_COMMENT ||
-                                  prevToken.getType() == FortranLexer.T_EOS));
-
-               // channel 99 (hide) all tokens from after prevToken (j+1)+1 
-               // through the continue token (i)
-               for(k = j+2; k < i; k++) {
-                  tmpToken = tmpArrayList.get(k);
-                  // only hide the T_EOS tokens. all WS and LINE_COMMENT tokens
-                  // should already be hidden.
-                  if(tmpToken.getType() == FortranLexer.T_EOS &&
-                     tmpToken.getText().charAt(0) != ';') {
-                     tmpToken.setChannel(lexer.getIgnoreChannelNumber());
-                     tmpArrayList.set(k, tmpToken);
-                  }
+         if (tk_pos == continue_pos) {
+            int tk_type = tk.getType();
+            if (tk_type != FortranLexer.WS && tk_char_0 != '0' &&
+               (tk_type != FortranLexer.T_EOS ||
+               (tk_type == FortranLexer.T_EOS && tk_char_0 == ';'))) {
+               // any non blank char other than '0' can be a continuation char if it's in 
+               // the 6th column (col. 5 because zero based), or follows initial tab,
+               // including '!' or ';'.
+               // TODO:
+               // if the length is greater than 1, then the user is most likely 
+               // using a letter or number to signal the continuation.  in this 
+               // case, we need to split off the character that's in column 6 and
+               // make two tokens -- the continuation token and what's left.  we 
+               // should maybe warn the user about this in case they accidentally
+               // started in the wrong column?
+               if (tk.getText().length() > 1) {
+                  System.err.println("TODO: handle this continuation type!");
+               } else {
+                  hasContinuation = true;
                }
+            }
+         }
+         if (hasContinuation) {
+            int j, k, prevType;
+            Token prevToken = null;
+            hasContinuation = false;  // reset
+
+            tk.setType(FortranLexer.CONTINUE_CHAR);
+            // hide the continuation token
+            tk.setChannel(lexer.getIgnoreChannelNumber());
+            tmpArrayList.set(i, tk);
+
+            j = i-1;
+            do {
+               prevToken = tmpArrayList.get(j);
+               prevType = prevToken.getType();
+               j--;
+            } while (j >= 0 && (prevType == FortranLexer.WS ||
+                                prevType == FortranLexer.LINE_COMMENT ||
+                                prevType == FortranLexer.T_EOS));
+
+            // channel 99 (hide) all tokens from after prevToken (j+1)+1 
+            // through the continue token (i)
+            for (k = j+2; k < i; k++) {
+               tk = tmpArrayList.get(k);
+               // only hide the T_EOS tokens. all WS and LINE_COMMENT tokens
+               // should already be hidden.
+               if (tk.getType() == FortranLexer.T_EOS && tk.getText().charAt(0) != ';') {
+                  tk.setChannel(lexer.getIgnoreChannelNumber());
+                  tmpArrayList.set(k, tk);
+               }
+            }
                
                // TODO:
                /* how can we handle fixed-format split tokens?  for example:
@@ -152,9 +178,8 @@ public class FortranTokenStream extends CommonTokenStream {
 //                System.out.println("trying to match the string: " + 
 //                                   buffer.toString().toUpperCase() + 
 //                                   " for fixed-format continuation");
-            }
          }
-      }// end for(each Token in the ArrayList) 
+      } // end for (each Token in the ArrayList) 
 
 //       System.out.println("tmpArrayList as one big string: ");
 //       StringBuffer buffer = new StringBuffer();
@@ -628,7 +653,33 @@ public class FortranTokenStream extends CommonTokenStream {
       System.out.println("*********************************");
 
       return;
-   }// end printPackedList()
+   } // end printPackedList()
+
+
+   public void printTokenList() {
+      ArrayList<Token> tmpArrayList = null;
+      List tmpList = null;
+      int i = 0;
+      Token tmpToken;
+		      
+      tmpList = super.getTokens();
+      tmpArrayList = new ArrayList<Token>(tmpList.size());
+      for (i = 0; i < tmpList.size(); i++) {
+  	     try {
+            tmpArrayList.add((Token)tmpList.get(i));
+         } catch(Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+         }
+      }
+	      
+      System.out.println("*********************************");
+      for (i = 0; i < tmpArrayList.size(); i++) {
+         tmpToken = tmpArrayList.get(i);
+         System.out.println("tmpToken(" + i + ")==" + tmpToken + ": type=" + tmpToken.getType());
+      }
+      System.out.println("*********************************");
+   } // end printTokenList()
 
 
    public int currLineLA(int lookAhead) {
