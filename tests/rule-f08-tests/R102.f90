@@ -2,7 +2,7 @@
 
 ! Check for generic name list. Using derived type statement.
 
-type this
+type (this) that
 
 type coolguy ! (this,that,theother)
    integer :: age

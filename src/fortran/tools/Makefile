@@ -75,7 +75,7 @@ $(CLASSDIR)/DetectIncludeStmt.class: DetectIncludeStmt.java
 #
 RuleStackTrace.java: GenRuleStackTrace.java $(PARDIR)/java/IFortranParserAction.java 
 	cd $(BUILDDIR) ; $(JAR) cf $(JARFILE) fortran/
-	$(JAVA) $(OFP_CLASSPATH) fortran.tools.GenRuleStackTrace
+	$(JAVA) -cp $(OFP_CLASSPATH) fortran.tools.GenRuleStackTrace
 	$(MAKE) $(CLASSDIR)/RuleStackTrace.class
 
 jarfile: $(BUILDDIR)/$(JARFILE)

@@ -45,7 +45,7 @@ import FortranParser08;
  */
 
 /*
- * R204 speciﬁcation-part
+ * R204 specification-part
  *    is [ use-stmt ] ... 
  *       [ import-stmt ] ... 
  *       [ implicit-part ] 
