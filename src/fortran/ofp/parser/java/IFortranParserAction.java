@@ -2104,7 +2104,7 @@ public abstract interface IFortranParserAction {
     * precedence when actions are fired.
     *   :   (add_op)? mult_operand
     *  
-    * @param addOp Optinoal add_op for this operand
+    * @param addOp Optional add_op for this operand
     */
    public abstract void signed_operand(Token addOp);
 
