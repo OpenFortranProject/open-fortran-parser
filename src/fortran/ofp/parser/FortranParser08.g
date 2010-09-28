@@ -1460,8 +1460,7 @@ ac_implied_do
 
 // R471
 // ERR_CHK 471a scalar_int_expr replaced by expr
-// ERR_CHK 471b ac_do_variable replaced by scalar_int_variable replaced 
-// by variable replaced by T_IDENT
+// ERR_CHK 471b ac_do_variable replaced by do_variable
 ac_implied_do_control
 @init{boolean hasStride=false;}
     :    do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr {hasStride=true;})?
