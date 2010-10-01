@@ -27,7 +27,6 @@ import fortran.ofp.FrontEnd;
 public class FortranLexicalPrepass {
    private FortranLexer lexer;
    private FortranTokenStream tokens;
-   private IFortranParser parser;
    private Stack<Token> doLabels;
    private int sourceForm;
 
@@ -36,7 +35,6 @@ public class FortranLexicalPrepass {
                                 IFortranParser parser) {
       this.lexer = lexer;
       this.tokens = tokens;
-      this.parser = parser;
       this.doLabels = new Stack<Token>();
    }
 
@@ -79,14 +77,6 @@ public class FortranLexicalPrepass {
 
          // This is often a list so skip commas (or T_EOS) to save time
          if (tk.getType() == FortranLexer.T_COMMA || tk.getType() == FortranLexer.T_EOS) continue;
-
-         // Laksono 2009.11.30: force to make the identifier lowercase
-         // Laksono 2010.01.12: do not lowercase token between quotes
-         String sText   = tk.getText();
-         char firstChar = sText.charAt(0);
-         if (firstChar != '\'' && firstChar != '\"') {
-           tk.setText( tk.getText().toLowerCase() );
-         }
 
          if (lexer.isKeyword(tk) == true) {
             // generic-spec items should not be converted (unless an id), i.e., 
@@ -296,10 +286,6 @@ public class FortranLexicalPrepass {
             if(lexer.isKeyword(identToken) == true) {
                identToken.setType(FortranLexer.T_IDENT);
             }
-	    // Laksono 2010.06.25 bug fix: we need to lowercase identifier to make OFP case insensitive
-	    String text = identToken.getText();
-	    if (text != null)
-	      identToken.setText(text.toLowerCase());
 
             // see if there are parens after the type name.  if there
             // are, we're looking at a 'TYPE IS' and need to handle the
@@ -347,7 +333,6 @@ public class FortranLexicalPrepass {
 
    
    private boolean matchSub(int lineStart, int lineEnd) {
-      int tokenType;
       int bindOffset;
 
       // Move past the pure, elemental, and recursive keywords.
@@ -355,14 +340,10 @@ public class FortranLexicalPrepass {
          lineStart++;
       }
 
-      tokenType = tokens.currLineLA(lineStart+1);
       // look for a bind statement
-// TODO - fix for T_BIND token
-//      bindOffset = tokens.findToken(lineStart, FortranLexer.T_BIND_LPAREN_C);
       bindOffset = tokens.findToken(lineStart, FortranLexer.T_BIND);
       if (bindOffset != -1) {
-         // use the T_BIND_LPAREN_C token as a marker for the end 
-         // of the subroutine name and any args.
+         // use the T_BIND token as a marker for the end of the subroutine name and any args.
          convertToIdents(lineStart+1, bindOffset+lineStart);
       } else {
          // convert any keyword in line after first token to ident
@@ -538,8 +519,6 @@ public class FortranLexicalPrepass {
    private boolean matchUseStmt(int lineStart, int lineEnd) {
       int identPos;
       int colonOffset;
-      Token tmpToken;
-      Token onlyToken = null;
 
       // search for the only token, so we can reset it to a keyword
       // if it's there.
@@ -986,8 +965,6 @@ public class FortranLexicalPrepass {
       // use the scan function so that it will skip any tokens inside 
       // of parens (which, in this case, would make them args)
       resultOffset = salesScanForToken(lineStart, FortranLexer.T_RESULT);
-//      bindOffset = salesScanForToken(lineStart, FortranLexer.T_BIND_LPAREN_C);
-// TODO - fix for T_BIND token
       bindOffset = salesScanForToken(lineStart, FortranLexer.T_BIND);
       
       // get the actual tokens for result and bind(c)
@@ -1663,9 +1640,7 @@ public class FortranLexicalPrepass {
 
 
    private boolean matchProgramStmt(int lineStart, int lineEnd) {
-      // Laksono 2010.04.29: lowercase the identifier of the program
       Token t_ident = tokens.getToken(lineStart+1);
-      t_ident.setText( t_ident.getText().toLowerCase() );
 
       // try to match T_PROGRAM T_IDENT T_EOS
       if(lexer.isKeyword(tokens.currLineLA(lineStart+2))) {
@@ -1699,7 +1674,6 @@ public class FortranLexicalPrepass {
          Token firstToken = tokens.getToken(0);
          // the lineStart was advanced past the label, so the T_CONTINUE or
          // T_END is the first token in look ahead (lineStart+1)
-         int endType = tokens.currLineLA(lineStart+1);
          String labeledDoText = new String("LABELED_DO_TERM");
 
          if(labelsMatch(doLabelString, firstToken.getText()) == true) {
@@ -1892,9 +1866,6 @@ public class FortranLexicalPrepass {
    // beyond the statement label if it exists.
    //
    private boolean matchDoStmt(int lineStart, int lineEnd) {
-      int equalsOffset, commaOffset;
-      int whileOffset, concurrentOffset;
-
       // Default is to convert everything except T_DO to identifiers.
       //
       int identOffset = lineStart + 1;
@@ -2375,8 +2346,7 @@ public class FortranLexicalPrepass {
    } // end matchLine()
 
 
-   private void fixupFixedFormatLine(int lineStart, int lineEnd, 
-                                     boolean startsWithKeyword) {
+   private void fixupFixedFormatLine(int lineStart, int lineEnd, boolean startsWithKeyword) {
       StringBuffer buffer = new StringBuffer();
       Token token;
       int i = 0;
