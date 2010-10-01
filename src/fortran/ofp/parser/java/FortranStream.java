@@ -18,7 +18,6 @@
 package fortran.ofp.parser.java;
 
 import java.io.*;
-import java.util.ArrayList;
 import org.antlr.runtime.*;
 
 import fortran.ofp.FrontEnd;
