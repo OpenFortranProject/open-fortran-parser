@@ -17,7 +17,6 @@
 
 package fortran.ofp.parser.java;
 
-import java.io.*;
 import java.util.*;
 import org.antlr.runtime.*;
 
@@ -225,7 +224,6 @@ public class FortranTokenStream extends CommonTokenStream {
    private void createPackedList() {
       Token tmpToken = null;
       int i = 0;
-      boolean success;
 
       this.packedList = new ArrayList<Token>(this.lineLength+1);
 
@@ -243,8 +241,8 @@ public class FortranTokenStream extends CommonTokenStream {
 
       // need to make sure the line was terminated with a T_EOS.  this may 
       // not happen if we're working on a file that ended w/o a newline
-      if (packedList.get(packedList.size()-1).getType() != lexer.T_EOS) {
-         FortranToken eos = new FortranToken(lexer.getInput(), lexer.T_EOS, 
+      if (packedList.get(packedList.size()-1).getType() != FortranLexer.T_EOS) {
+         FortranToken eos = new FortranToken(lexer.getInput(), FortranLexer.T_EOS, 
                                              Token.DEFAULT_CHANNEL, 
                                              lexer.getInput().index(), 
                                              lexer.getInput().index()+1);
@@ -277,7 +275,6 @@ public class FortranTokenStream extends CommonTokenStream {
 
    private void fixupContinuedLine(ArrayList<Token> packedList) {
       int firstContCharOffset = -1;
-      int secondContCharOffset = -1;
       int i;
       int j;
 
@@ -441,8 +438,8 @@ public class FortranTokenStream extends CommonTokenStream {
          lineLength++;
       } while((start+lineLength) < super.tokens.size() &&
               (token.getChannel() == lexer.getIgnoreChannelNumber() || 
-               token.getType() != lexer.T_EOS && 
-               token.getType() != lexer.EOF));
+               token.getType() != FortranLexer.T_EOS && 
+               token.getType() != FortranLexer.EOF));
 
       return lineLength;
    }// end getLineLength()
@@ -520,7 +517,6 @@ public class FortranTokenStream extends CommonTokenStream {
     * Search the currLine list for the desired token.
     */
    public int findTokenInCurrLine(int start, int desiredToken) {
-      int tmpTokenType;
       int size;
       Token tmpToken;
 
@@ -610,7 +606,7 @@ public class FortranTokenStream extends CommonTokenStream {
       int tmpToken;
 
       // if this line is a comment, skip scanning it
-      if(super.LA(1) == lexer.LINE_COMMENT)
+      if(super.LA(1) == FortranLexer.LINE_COMMENT)
          return -1;
 
       do {
@@ -621,8 +617,8 @@ public class FortranTokenStream extends CommonTokenStream {
          tmpToken = super.LA(lookAhead);
 
          // continue until find what looking for or reach end
-      } while(tmpToken != lexer.EOF && tmpToken != lexer.T_EOS && 
-              tmpToken != desiredToken);
+      } while (tmpToken != FortranLexer.EOF && tmpToken != FortranLexer.T_EOS && 
+               tmpToken != desiredToken);
 
       if(tmpToken == desiredToken)
          // we found a what we wanted to
@@ -633,9 +629,6 @@ public class FortranTokenStream extends CommonTokenStream {
 
 
    public void printCurrLine() {
-      int i;
-      Token tmpToken;
-
       System.out.println("=================================");
       System.out.println("currLine.size() is: " + currLine.size());
       System.out.println(currLine.toString());
@@ -684,7 +677,6 @@ public class FortranTokenStream extends CommonTokenStream {
 
    public int currLineLA(int lookAhead) {
       Token tmpToken = null;
-      int i;
 
       // get the token from the packedList
       try {
@@ -707,7 +699,7 @@ public class FortranTokenStream extends CommonTokenStream {
          tmpToken = this.LA(lookAhead);
          // update lookAhead in case we look again
          lookAhead++;
-      } while(tmpToken != lexer.T_EOS && tmpToken != lexer.EOF && 
+      } while(tmpToken != FortranLexer.T_EOS && tmpToken != FortranLexer.EOF && 
               tmpToken != desiredToken);
       
       if(tmpToken == desiredToken) {
