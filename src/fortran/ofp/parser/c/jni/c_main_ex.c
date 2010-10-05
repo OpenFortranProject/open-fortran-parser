@@ -72,7 +72,7 @@ extern "C" {
 	 JavaVM *jvm;   /* The Java VM.  */
 	 JNIEnv *env;   /* The environment for retrieving class objects, etc.  */
 	 JavaVMInitArgs jvm_args;  /* VM initialization args.  */
-	 jclass ofp_class;  /* The OpenFortranParser main class.  */
+	 jclass ofp_class;  /* The OpenFortranParser FrontEnd class.  */
 	 jmethodID cons_method_id;
 	 jmethodID tmp_method_id = NULL;
 	 jclass new_ofp_class = NULL;
@@ -159,24 +159,22 @@ extern "C" {
 		jmethodID mainMethodID = NULL;
 		jmethodID errorMethodID = NULL;
 		
-		/* Get a FortranMain by calling the constructor referred to by
+		/* Get a OFP FrontEnd by calling the constructor referred to by
 			cons_method_id (String[] argc, String filename, String type).  */
-		new_ofp_class = (*env)->NewObject(env, ofp_class, cons_method_id,
-													 args, fileName, type);
+		new_ofp_class = (*env)->NewObject(env, ofp_class, cons_method_id, args, fileName, type);
 
-		/* Get the method ID for the main(String[] args) method in
-			FortranMain, which will call the call() method after parsing 
-			the args we give it.  */
-		mainMethodID = (*env)->GetStaticMethodID(env, ofp_class, "main",
-															  "([Ljava/lang/String;)V");
-		if(mainMethodID == NULL)
+		/* Get the method ID for the main(String[] args) method in the FrontEnd class,
+		   which will call the call() method after parsing the args we give it. */
+		mainMethodID = (*env)->GetStaticMethodID(env, ofp_class, "main", "([Ljava/lang/String;)V");
+        if (mainMethodID == NULL) {
 		  handleException(jvm, env);
-		else
+		}
+		else {
 		  (*env)->CallStaticVoidMethod(env, ofp_class, mainMethodID, args);
+		}
 
 		/* Get the error status from the 'boolean getError()' method.  */
-		errorMethodID = (*env)->GetStaticMethodID(env, ofp_class,
-																"getError", "()Z");
+		errorMethodID = (*env)->GetStaticMethodID(env, ofp_class, "getError", "()Z");
 		retval = (*env)->CallBooleanMethod(env, new_ofp_class, errorMethodID);
 	 }
 	 
