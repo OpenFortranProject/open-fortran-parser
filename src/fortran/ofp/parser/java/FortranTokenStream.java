@@ -649,15 +649,13 @@ public class FortranTokenStream extends CommonTokenStream {
    } // end printPackedList()
 
 
-   public void printTokenList() {
+   public void outputTokenList(IFortranParserAction actions) {
       ArrayList<Token> tmpArrayList = null;
       List tmpList = null;
-      int i = 0;
-      Token tmpToken;
 		      
       tmpList = super.getTokens();
       tmpArrayList = new ArrayList<Token>(tmpList.size());
-      for (i = 0; i < tmpList.size(); i++) {
+      for (int i = 0; i < tmpList.size(); i++) {
   	     try {
             tmpArrayList.add((Token)tmpList.get(i));
          } catch(Exception e) {
@@ -666,12 +664,10 @@ public class FortranTokenStream extends CommonTokenStream {
          }
       }
 	      
-      System.out.println("*********************************");
-      for (i = 0; i < tmpArrayList.size(); i++) {
-         tmpToken = tmpArrayList.get(i);
-         System.out.println("tmpToken(" + i + ")==" + tmpToken + ": type=" + tmpToken.getType());
+      for (int i = 0; i < tmpArrayList.size(); i++) {
+         Token tk = tmpArrayList.get(i);
+         actions.next_token(tk);
       }
-      System.out.println("*********************************");
    } // end printTokenList()
 
 
