@@ -5147,7 +5147,7 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleTrailer();
    }
 
-   /** 
+   /**
     * spawn_stmt
     *   :   (label)? T_SPAWN procedure_designator
     *                ( T_LPAREN (actual_arg_spec_list)? T_RPAREN )? T_EOS
@@ -5160,6 +5160,17 @@ public class FortranParserActionPrint implements IFortranParserAction {
    public void
    rice_spawn_stmt(Token label, Token callKeyword, Token eos, boolean hasActualArgSpecList)
    {
+   }
+   
+   /**
+    * next_token
+    * This action is not part of the Fortran grammar.  It is used to output the token stream.
+    * 
+    * @param tk The next token in the token stream
+    */
+   public void next_token(Token tk)
+   {
+      System.out.println(tk);
    }
 
 }
