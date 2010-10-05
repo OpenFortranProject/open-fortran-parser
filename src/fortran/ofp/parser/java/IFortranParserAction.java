@@ -4465,5 +4465,13 @@ public abstract interface IFortranParserAction {
     */
    public abstract void
    rice_spawn_stmt(Token label, Token callKeyword, Token eos, boolean hasActualArgSpecList);
+   
+   /** 
+    * next_token
+    * This action is not part of the Fortran grammar.  It is used to output the token stream.
+    * 
+    * @param tk The next token in the token stream
+    */
+   public abstract void next_token(Token tk);
 
 }
