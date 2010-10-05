@@ -194,6 +194,7 @@ public class FrontEnd implements Callable<Boolean> {
       Boolean error = false;
       Boolean verbose = false;
       Boolean silent = true;
+      Boolean dumpTokens = false;
       ArrayList<String> newArgs = new ArrayList<String>(0);
       String type = "fortran.ofp.parser.java.FortranParserActionNull";
       int nArgs = 0;
@@ -206,7 +207,7 @@ public class FrontEnd implements Callable<Boolean> {
       for (int i = 0; i < args.length; i++) {
          if (args[i].startsWith("--RiceCAF")) {
             newArgs.add(args[i]);
- 	    rice_caf = true;
+            rice_caf = true;
             nArgs += 1;
             continue;
          } else if (args[i].startsWith("--dump")) {
@@ -221,10 +222,17 @@ public class FrontEnd implements Callable<Boolean> {
             nArgs += 1;
             continue;
          } else if (args[i].startsWith("--silent")) {
-            type = "fortran.ofp.parser.java.FortranParserActionNull";
-            silent = true;
-            nArgs += 1;
-            continue;
+             type = "fortran.ofp.parser.java.FortranParserActionPrint";
+             silent = true;
+             nArgs += 1;
+             continue;
+         } else if (args[i].startsWith("--tokens")) {
+             type = "fortran.ofp.parser.java.FortranParserActionPrint";
+             silent = false;
+             verbose = true;
+             dumpTokens = true;
+             nArgs += 1;
+             continue;
          } else if (args[i].startsWith("--class")) {
             i += 1;
             type = args[i];
@@ -252,7 +260,7 @@ public class FrontEnd implements Callable<Boolean> {
 
       for (int i = 0; i < args.length; i++) {
          if (!rice_caf && (args[i].startsWith("--dump") | args[i].startsWith("--silent")
-               | args[i].startsWith("--verbose")) ) {
+               | args[i].startsWith("--verbose") | args[i].startsWith("--tokens")) ) {
             continue;
          } else if (args[i].startsWith("-I")) {
             /* Skip the include dir stuff; it's handled by the lexer. */
@@ -273,24 +281,26 @@ public class FrontEnd implements Callable<Boolean> {
             System.err.println("Error: " + args[i] + " does not exist!");
             error = new Boolean(true);
          } else {
-            FrontEnd ofp = new FrontEnd(newArgs.toArray(new String[newArgs
-                                                                   .size()]), args[i], type);
+            FrontEnd ofp = new FrontEnd(newArgs.toArray(new String[newArgs.size()]), args[i], type);
             ofp.setVerbose(verbose, silent);
             if (ofp.getParser().getAction().getClass().getName() == "fortran.ofp.parser.java.FortranParserActionPrint") {
-               FortranParserActionPrint action = (FortranParserActionPrint) ofp
-               .getParser().getAction();
-
-               // "verbose" in Print() is either "normal" or "verbose"
-               // here..
+               FortranParserActionPrint action = (FortranParserActionPrint) ofp.getParser().getAction();
+               // "verbose" in Print() is either "normal" or "verbose" here..
                action.setVerbose(!silent);
             }
+            
+            if (dumpTokens) {
+            	if (verbose) System.out.println("********** begin token stream ***********");
+            	ofp.tokens.outputTokenList(ofp.parser.getAction());
+            	if (verbose) System.out.println("*********** end token stream ************");
+            }
+            
             error |= ofp.call();
 
          }
 
          if (verbose) {
-            System.out
-            .println("********************************************");
+            System.out.println("********************************************");
          }
 
       }
