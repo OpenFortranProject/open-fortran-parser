@@ -16,7 +16,6 @@ ofp_show_subtitle "libjvm"
 
 OFP_JVM_LIB_DIR=
 OFP_JVM_LIB=
-OFP_JVM_FWRK=
 
 have_libjvm_so=no
 
@@ -28,7 +27,8 @@ case "${host}" in
 	    OFP_JVM_LIB_DIR="$OFP_JAVA_PATH/jre/lib/i386/client"
 	fi
 	OFP_JVM_LIB="libjvm.so"
-        OFP_DY_CFLAGS="-shared"
+    OFP_DY_CFLAGS="-shared"
+    OFP_LDFLAGS="$OFP_LDFLAGS -L$OFP_JVM_LIB_DIR -ljvm"
 	;;
     powerpc-*-darwin* | i?86-*-darwin*)
 	if test -n "$1" ; then
@@ -37,15 +37,14 @@ case "${host}" in
 	    OFP_JVM_LIB_DIR="$OFP_CURR_JDK_DIR/Libraries"
 	fi
 	OFP_JVM_LIB="libjvm.dylib"
-        OFP_JVM_FWRK="-framework JavaVM"
-        OFP_DY_CFLAGS="-dynamiclib"
+    OFP_JVM_FWRK="-framework JavaVM"
+    OFP_DY_CFLAGS="-dynamiclib"
+    OFP_LDFLAGS="$OFP_LDFLAGS $OFP_JVM_FWRK"
 	;;	    
 esac
 
 if test -d "$OFP_JVM_LIB_DIR" ; then
-    AC_CHECK_FILE([$OFP_JVM_LIB_DIR/$OFP_JVM_LIB], have_libjvm_so=yes, 
-	have_libjvm_so=no)
-    OFP_LDFLAGS="$OFP_LDFLAGS -L$OFP_JVM_LIB_DIR -ljvm $OFP_JVM_FWRK"
+    AC_CHECK_FILE([$OFP_JVM_LIB_DIR/$OFP_JVM_LIB], have_libjvm_so=yes, have_libjvm_so=no)
 fi
 
 # use the same variable as was used in searching for jni.h 
