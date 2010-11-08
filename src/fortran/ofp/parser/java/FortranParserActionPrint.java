@@ -5148,18 +5148,55 @@ public class FortranParserActionPrint implements IFortranParserAction {
    }
 
    /**
-    * spawn_stmt
-    *   :   (label)? T_SPAWN procedure_designator
-    *                ( T_LPAREN (actual_arg_spec_list)? T_RPAREN )? T_EOS
-    * 
-    * @param label Optional statement label
-    * @param callKeyword T_CALL token.
+    * rice_finish_stmt
+    * @param label The label.
+    * @param id Team identifier.
+    */
+   public void rice_finish_stmt(Token label, Token id, Token eos)
+   {
+      printRuleHeader(generatedRule, "rice-finish-stmt");
+      if (label!=null) printParameter(label, "label");
+      printParameter(id, "id");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
+
+
+   /**
+    * rice_end_finish_stmt
+    * @param label The label.
     * @param eos T_EOS token.
-    * @param hasActionArgSpecList True if an actual-arg-spec-list is present
+    */
+   public void rice_end_finish_stmt(Token label, Token eos)
+   {
+      printRuleHeader(generatedRule, "rice-end-finish-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
+
+   /** 
+    * spawn_stmt
+    *   :   (label)?
+    *       T_SPAWN procedure_designator // includes actual parameter list and cosubscript, sigh
+    *       // ( T_LPAREN (actual_arg_spec_list)? T_RPAREN )?
+    *       // ( T_LBRACKET expr T_AT T_IDENT T_RBRACKET)?
+    *       T_EOS
+    * 
+    * @param label Optional statement label.
+    * @param spawn T_SPAWN token.
+    * @param eos T_EOS token.
+    * @param hasEvent True if a notify-event is present
     */
    public void
-   rice_spawn_stmt(Token label, Token callKeyword, Token eos, boolean hasActualArgSpecList)
+   rice_spawn_stmt(Token label, Token spawn, Token eos, boolean hasEvent)
    {
+      printRuleHeader(generatedRule, "rice-spawn-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (label!=null) printParameter(spawn, "spawn");
+      if (printKeywords) printParameter(eos, "eos");
+      printParameter(hasEvent, "hasEvent");
+      printRuleTrailer();
    }
    
    /**

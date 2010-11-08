@@ -124,6 +124,8 @@ executable_construct
    |   select_type_construct
    |   where_construct
    |   rice_with_team_construct
+   |   rice_finish_construct
+   |   rice_spawn_stmt
    ;
 
 /*
@@ -657,8 +659,7 @@ rice_declaration_type_spec
 // R625-F08
 //
 cosubscript
-   :   data_ref
-   | T_DIGIT_STRING {action.part_ref($T_DIGIT_STRING, false, false);}
+     :   expr
    ;
 
 cosubscript_list
@@ -673,17 +674,48 @@ cosubscript_list
            		action.cosubscript_list(count, idTeam);
            }
    ;
-   
- 
- // R1218
-// C1222 (R1218) The procedure-designator shall designate a subroutine.
+
+
+rice_finish_construct
+  : rice_finish_stmt block rice_end_finish_stmt
+  ;
+  
+  
+rice_finish_stmt
+@init{Token lbl = null; Token idTeam = null;}
+  : 
+  (label {lbl=$label.tk;})?
+  T_FINISH ( T_IDENT {idTeam=$T_IDENT;} )?
+  end_of_stmt
+  {
+    action.rice_finish_stmt(lbl, idTeam, $end_of_stmt.tk);
+  }
+  ;
+  
+
+rice_end_finish_stmt
+@init{Token lbl = null;}
+  : 
+  (label {lbl=$label.tk;})?
+  T_END T_FINISH
+  end_of_stmt
+  {
+    action.rice_end_finish_stmt(lbl, $end_of_stmt.tk);
+  }
+  ;
+
+
 rice_spawn_stmt
-@init {Token lbl = null; boolean hasActualArgSpecList = false;} 
+@init {Token lbl = null; boolean hasEvent = false;} 
 @after{checkForInclude();}
-    :    (label {lbl=$label.tk;})? T_SPAWN procedure_designator
-            ( T_LPAREN (actual_arg_spec_list {hasActualArgSpecList=true;})? 
-            T_RPAREN )? end_of_stmt
-         	{ action.rice_spawn_stmt(lbl, $T_SPAWN, $end_of_stmt.tk, 
-                hasActualArgSpecList); }
-    ;
+  :
+  (label {lbl=$label.tk;})?
+  T_SPAWN ( T_LPAREN expr T_RPAREN {hasEvent=true;})?
+  procedure_designator // includes actual parameter list and cosubscript, sigh
+  // T_LBRACKET expr (T_AT T_IDENT)? T_RBRACKET
+  end_of_stmt
+  {
+    action.rice_spawn_stmt(lbl, $T_SPAWN, $end_of_stmt.tk, hasEvent);
+  }
+  ;
 
