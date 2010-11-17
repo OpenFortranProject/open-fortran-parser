@@ -2093,23 +2093,50 @@ named_constant_def
 			{action.named_constant_def($T_IDENT);}
 	;
 
-// R540
+/*
+ * R550-F08
+ *    is POINTER [ :: ] pointer-decl-list
+ */
+
+////////////
+// R550-F08, R540-F03
+//
+// Cray pointer extension added 11/17/2010
+//
 pointer_stmt
-@init {Token lbl = null;}
+@init {Token lbl=null; boolean isCrayPointer=false;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.tk;})? T_POINTER ( T_COLON_COLON )? 
-            pointer_decl_list end_of_stmt
-			{action.pointer_stmt(lbl,$T_POINTER,$end_of_stmt.tk);}
-	;
+   :   (label {lbl=$label.tk;})? T_POINTER
+       (
+              cray_pointer_assoc_list  {isCrayPointer = true;}
+          |
+              ( ( T_COLON_COLON )? pointer_decl_list )
+       ) end_of_stmt
+              {
+                 if (isCrayPointer) {
+                    action.cray_pointer_stmt(lbl,$T_POINTER,$end_of_stmt.tk);
+                 } else {
+                    action.pointer_stmt(lbl,$T_POINTER,$end_of_stmt.tk);
+                 }
+              }
+   ;
 
 pointer_decl_list
-@init{ int count=0;}
-    :  		{action.pointer_decl_list__begin();}
-		pointer_decl {count++;} ( T_COMMA pointer_decl {count++;} )*
-      		{action.pointer_decl_list(count);}
-    ;
+@init{int count=0;}
+   :      {action.pointer_decl_list__begin();}
+       pointer_decl {count++;} ( T_COMMA pointer_decl {count++;} )*
+          {action.pointer_decl_list(count);}
+   ;
 
-// R541
+/*
+ * R551-F08
+ *    is object-name [ ( deferred-shape-spec-list ) ]
+ *    or proc-entity-name    
+ */
+
+////////////
+// R551-F08, R541-F03
+//
 // T_IDENT inlined as object_name and proc_entity_name (removing second alt)
 pointer_decl
 @init{boolean hasSpecList=false;}
@@ -2117,6 +2144,18 @@ pointer_decl
             {hasSpecList=true;})?
 			{action.pointer_decl($T_IDENT,hasSpecList);}
     ;
+
+cray_pointer_assoc_list
+@init{int count=0;}
+   :      {action.cray_pointer_assoc_list__begin();}
+       cray_pointer_assoc {count++;} ( T_COMMA cray_pointer_assoc {count++;} )*
+          {action.cray_pointer_assoc_list(count);}
+   ;
+
+cray_pointer_assoc
+   :   T_LPAREN pointer=T_IDENT T_COMMA pointee=T_IDENT T_RPAREN
+          {action.cray_pointer_assoc(pointer, pointee);}
+   ;
 
 // R542
 // generic_name_list substituted for entity_name_list
