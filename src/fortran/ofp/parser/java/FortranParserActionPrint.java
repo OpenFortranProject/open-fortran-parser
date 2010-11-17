@@ -1608,6 +1608,41 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleTrailer();
    }
 
+   /** R540-extension
+    * cray_pointer_stmt
+    */
+   public void cray_pointer_stmt(Token label, Token keyword, Token eos) {
+      printRuleHeader(540000, "cray-pointer-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
+
+   /** R541-extension list
+    * cray_pointer_assoc_list
+    */
+   public void cray_pointer_assoc_list__begin() {
+      printRuleHeader(541000, "cray-pointer-assoc-list__begin", "list-begin");
+      printRuleTrailer();	
+   }
+   public void cray_pointer_assoc_list(int count) {
+      printRuleHeader(541000, "cray-pointer-assoc-list", "list");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+
+   /** R541-extension
+    * cray_pointer_assoc
+    */
+   public void cray_pointer_assoc(Token pointer, Token pointee)
+   {
+      printRuleHeader(541000, "cray-pointer-assoc");
+      printParameter(pointer, "pointer");
+      printParameter(pointee, "pointee");
+      printRuleTrailer();
+   }
+
    /** R542
     * protected_stmt
     */
