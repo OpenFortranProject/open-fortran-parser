@@ -1436,6 +1436,34 @@ public abstract interface IFortranParserAction {
     */
    public abstract void pointer_decl(Token id, boolean hasSpecList);
 
+   /** R540-extention
+    * cray_pointer_stmt
+    *   :   (label)? T_POINTER (T_LPAREN T_IDENT T_COMMA T_IDENT T_RPAREN)+ T_EOS
+    *
+    * @param label The label.
+    * @param keyword The POINTER keyword token.
+    * @param eos End of statement token.
+    */
+   public abstract void cray_pointer_stmt(Token label, Token keyword, Token eos);
+
+   /** R541-extension list
+    * cray_pointer_assoc_list
+    *   :   cray_pointer_decl ( T_COMMA cray_pointer_decl )*
+    * 
+    * @param count The number of items in the list.
+    */
+   public abstract void cray_pointer_assoc_list__begin();
+   public abstract void cray_pointer_assoc_list(int count);
+
+   /** R541-extension
+    * cray_pointer_assoc
+    *	:  T_LPAREN T_IDENT T_COMMA T_IDENT T_RPAREN
+    *
+    * @param pointer Pointer token.
+    * @param pointer Pointee token.
+    */
+   public abstract void cray_pointer_assoc(Token pointer, Token pointee);
+
    /** R542
     * protected_stmt
     *   :   (label)? T_PROTECTED ( T_COLON_COLON )? generic_name_list T_EOS
