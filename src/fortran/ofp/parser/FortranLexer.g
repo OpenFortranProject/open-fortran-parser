@@ -584,15 +584,14 @@ T_WHILE         :       'WHILE'         ;
 T_WRITE         :       'WRITE'         ;
 
 // begin Rice additions --------------------------
-// Laks 2009.01.20: add "with team construct"
-T_WITHTEAM      :       'WITHTEAM';
-T_WITH          :       'WITH';
-T_TEAM          :       'TEAM';
-T_TOPOLOGY      :       'TOPOLOGY';
-T_EVENT         :       'EVENT';
-T_LOCKSET       :       'LOCKSET';
-T_SPAWN			:		'SPAWN';
-
+T_WITHTEAM      :       'WITHTEAM'      ;
+T_WITH          :       'WITH'          ;
+T_TEAM          :       'TEAM'          ;
+T_TOPOLOGY      :       'TOPOLOGY'      ;
+T_EVENT         :       'EVENT'         ;
+T_LOCKSET       :       'LOCKSET'       ;
+T_FINISH        :       'FINISH'        ;
+T_SPAWN         :       'SPAWN'         ;
 // end Rice additions ----------------------------
 
 // these tokens (without blank characters) are from 3.3.2.2

@@ -3841,27 +3841,34 @@ echo "${ECHO_T}no" >&6; }
             OFP_DY_CFLAGS=-shared
 	    ;;
 	powerpc-*-darwin* | i?86-*-darwin*)
-	# Look in the *typical* place that darwin puts the java jdk.
+	# Look in the *typical* places that darwin puts the java jdk.
 	    { echo "$as_me:$LINENO: checking for jni.h" >&5
 echo $ECHO_N "checking for jni.h... $ECHO_C" >&6; }
 	    have_jni_h=no
 	    if test -d "/System/Library/Frameworks/JavaVM.framework" ; then
-		JVM_FRWK_DIR="/System/Library/Frameworks/JavaVM.framework"
-		if test -d "$JVM_FRWK_DIR/Versions/CurrentJDK" ; then
-		    OFP_CURR_JDK_DIR="$JVM_FRWK_DIR/Versions/CurrentJDK"
-		    if test -f "$OFP_CURR_JDK_DIR/Headers/jni.h" ; then
-			OFP_CFLAGS="$OFP_CFLAGS -I$OFP_CURR_JDK_DIR/Headers"
-			{ echo "$as_me:$LINENO: result: $OFP_CURR_JDK_DIR/Headers/jni.h" >&5
-echo "${ECHO_T}$OFP_CURR_JDK_DIR/Headers/jni.h" >&6; }
-			have_jni_h=yes
+		    JVM_FRWK_DIR="/System/Library/Frameworks/JavaVM.framework"
+		    if test -d "$JVM_FRWK_DIR/Headers" ; then
+		        OFP_CURR_JDK_DIR="$JVM_FRWK_DIR"
+		    elif test -d "$JVM_FRWK_DIR/Versions/CurrentJDK" ; then
+		        OFP_CURR_JDK_DIR="$JVM_FRWK_DIR/Versions/CurrentJDK"
 		    else
-			{ echo "$as_me:$LINENO: result: no" >&5
+                OFP_CURR_JDK_DIR=""  # correctly causes next 'test -f' for jni.h to fail
+		    fi
+		    if test -f "$OFP_CURR_JDK_DIR/Headers/jni.h" ; then
+		        OFP_CFLAGS="$OFP_CFLAGS -I$OFP_CURR_JDK_DIR/Headers"
+		        { echo "$as_me:$LINENO: result: $OFP_CURR_JDK_DIR/Headers/jni.h" >&5
+echo "${ECHO_T}$OFP_CURR_JDK_DIR/Headers/jni.h" >&6; }
+		        have_jni_h=yes
+		    else
+		        { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
 		    fi
-		fi
+		else
+		    { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
 	    fi
 
-            OFP_DY_CFLAGS=-dynamiclib
+        OFP_DY_CFLAGS=-dynamiclib
 	    OFP_ENABLE_C_ACTIONS=$have_jni_h
 	    ;;
     esac
@@ -3942,27 +3949,34 @@ echo "${ECHO_T}no" >&6; }
             OFP_DY_CFLAGS=-shared
 	    ;;
 	powerpc-*-darwin* | i?86-*-darwin*)
-	# Look in the *typical* place that darwin puts the java jdk.
+	# Look in the *typical* places that darwin puts the java jdk.
 	    { echo "$as_me:$LINENO: checking for jni.h" >&5
 echo $ECHO_N "checking for jni.h... $ECHO_C" >&6; }
 	    have_jni_h=no
 	    if test -d "/System/Library/Frameworks/JavaVM.framework" ; then
-		JVM_FRWK_DIR="/System/Library/Frameworks/JavaVM.framework"
-		if test -d "$JVM_FRWK_DIR/Versions/CurrentJDK" ; then
-		    OFP_CURR_JDK_DIR="$JVM_FRWK_DIR/Versions/CurrentJDK"
-		    if test -f "$OFP_CURR_JDK_DIR/Headers/jni.h" ; then
-			OFP_CFLAGS="$OFP_CFLAGS -I$OFP_CURR_JDK_DIR/Headers"
-			{ echo "$as_me:$LINENO: result: $OFP_CURR_JDK_DIR/Headers/jni.h" >&5
-echo "${ECHO_T}$OFP_CURR_JDK_DIR/Headers/jni.h" >&6; }
-			have_jni_h=yes
+		    JVM_FRWK_DIR="/System/Library/Frameworks/JavaVM.framework"
+		    if test -d "$JVM_FRWK_DIR/Headers" ; then
+		        OFP_CURR_JDK_DIR="$JVM_FRWK_DIR"
+		    elif test -d "$JVM_FRWK_DIR/Versions/CurrentJDK" ; then
+		        OFP_CURR_JDK_DIR="$JVM_FRWK_DIR/Versions/CurrentJDK"
 		    else
-			{ echo "$as_me:$LINENO: result: no" >&5
+                OFP_CURR_JDK_DIR=""  # correctly causes next 'test -f' for jni.h to fail
+		    fi
+		    if test -f "$OFP_CURR_JDK_DIR/Headers/jni.h" ; then
+		        OFP_CFLAGS="$OFP_CFLAGS -I$OFP_CURR_JDK_DIR/Headers"
+		        { echo "$as_me:$LINENO: result: $OFP_CURR_JDK_DIR/Headers/jni.h" >&5
+echo "${ECHO_T}$OFP_CURR_JDK_DIR/Headers/jni.h" >&6; }
+		        have_jni_h=yes
+		    else
+		        { echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
 		    fi
-		fi
+		else
+		    { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
 	    fi
 
-            OFP_DY_CFLAGS=-dynamiclib
+        OFP_DY_CFLAGS=-dynamiclib
 	    OFP_ENABLE_C_ACTIONS=$have_jni_h
 	    ;;
     esac
@@ -4002,7 +4016,6 @@ ofp_show_subtitle "libjvm"
 
 OFP_JVM_LIB_DIR=
 OFP_JVM_LIB=
-OFP_JVM_FWRK=
 
 have_libjvm_so=no
 
@@ -4014,7 +4027,8 @@ case "${host}" in
 	    OFP_JVM_LIB_DIR="$OFP_JAVA_PATH/jre/lib/i386/client"
 	fi
 	OFP_JVM_LIB="libjvm.so"
-        OFP_DY_CFLAGS="-shared"
+    OFP_DY_CFLAGS="-shared"
+    OFP_LDFLAGS="$OFP_LDFLAGS -L$OFP_JVM_LIB_DIR -ljvm"
 	;;
     powerpc-*-darwin* | i?86-*-darwin*)
 	if test -n "$with_java_lib_dir" ; then
@@ -4023,8 +4037,9 @@ case "${host}" in
 	    OFP_JVM_LIB_DIR="$OFP_CURR_JDK_DIR/Libraries"
 	fi
 	OFP_JVM_LIB="libjvm.dylib"
-        OFP_JVM_FWRK="-framework JavaVM"
-        OFP_DY_CFLAGS="-dynamiclib"
+    OFP_JVM_FWRK="-framework JavaVM"
+    OFP_DY_CFLAGS="-dynamiclib"
+    OFP_LDFLAGS="$OFP_LDFLAGS $OFP_JVM_FWRK"
 	;;
 esac
 
@@ -4054,7 +4069,6 @@ else
   have_libjvm_so=no
 fi
 
-    OFP_LDFLAGS="$OFP_LDFLAGS -L$OFP_JVM_LIB_DIR -ljvm $OFP_JVM_FWRK"
 fi
 
 # use the same variable as was used in searching for jni.h
@@ -4074,7 +4088,6 @@ ofp_show_subtitle "libjvm"
 
 OFP_JVM_LIB_DIR=
 OFP_JVM_LIB=
-OFP_JVM_FWRK=
 
 have_libjvm_so=no
 
@@ -4086,7 +4099,8 @@ case "${host}" in
 	    OFP_JVM_LIB_DIR="$OFP_JAVA_PATH/jre/lib/i386/client"
 	fi
 	OFP_JVM_LIB="libjvm.so"
-        OFP_DY_CFLAGS="-shared"
+    OFP_DY_CFLAGS="-shared"
+    OFP_LDFLAGS="$OFP_LDFLAGS -L$OFP_JVM_LIB_DIR -ljvm"
 	;;
     powerpc-*-darwin* | i?86-*-darwin*)
 	if test -n "" ; then
@@ -4095,8 +4109,9 @@ case "${host}" in
 	    OFP_JVM_LIB_DIR="$OFP_CURR_JDK_DIR/Libraries"
 	fi
 	OFP_JVM_LIB="libjvm.dylib"
-        OFP_JVM_FWRK="-framework JavaVM"
-        OFP_DY_CFLAGS="-dynamiclib"
+    OFP_JVM_FWRK="-framework JavaVM"
+    OFP_DY_CFLAGS="-dynamiclib"
+    OFP_LDFLAGS="$OFP_LDFLAGS $OFP_JVM_FWRK"
 	;;
 esac
 
@@ -4126,7 +4141,6 @@ else
   have_libjvm_so=no
 fi
 
-    OFP_LDFLAGS="$OFP_LDFLAGS -L$OFP_JVM_LIB_DIR -ljvm $OFP_JVM_FWRK"
 fi
 
 # use the same variable as was used in searching for jni.h

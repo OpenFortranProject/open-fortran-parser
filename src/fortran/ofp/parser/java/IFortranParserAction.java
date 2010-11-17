@@ -4481,18 +4481,44 @@ public abstract interface IFortranParserAction {
     */
    public abstract void rice_end_with_team_stmt(Token label, Token id, Token eos);
 
+   /**
+    * rice_finish_stmt
+    *   :   (label)?
+    *       T_FINISH (T_IDENT)?
+    *       T_EOS
+    *
+    * @param label The label.
+    * @param idTeam Team identifier.
+    * @param eos T_EOS token.
+    */
+   public abstract void rice_finish_stmt(Token label, Token idTeam, Token eos);
+
+  /**
+    * rice_end_finish_stmt
+    *   :   (label)?
+    *       T_END T_FINISH
+    *       T_EOS
+    *
+    * @param label The label.
+    * @param eos T_EOS token.
+    */
+   public abstract void rice_end_finish_stmt(Token label, Token eos);
+
    /** 
     * spawn_stmt
-    *   :   (label)? T_SPAWN procedure_designator
-    *                ( T_LPAREN (actual_arg_spec_list)? T_RPAREN )? T_EOS
+    *   :   (label)?
+    *       T_SPAWN procedure_designator // includes actual parameter list and cosubscript, sigh
+    *       // ( T_LPAREN (actual_arg_spec_list)? T_RPAREN )?
+    *       // ( T_LBRACKET expr T_AT T_IDENT T_RBRACKET)?
+    *       T_EOS
     * 
-    * @param label Optional statement label
-    * @param callKeyword T_CALL token.
+    * @param label Optional statement label.
+    * @param spawn T_SPAWN token.
     * @param eos T_EOS token.
-    * @param hasActionArgSpecList True if an actual-arg-spec-list is present
+    * @param hasEvent True if a notify-event is present
     */
    public abstract void
-   rice_spawn_stmt(Token label, Token callKeyword, Token eos, boolean hasActualArgSpecList);
+   rice_spawn_stmt(Token label, Token spawn, Token eos, boolean hasEvent);
    
    /** 
     * next_token

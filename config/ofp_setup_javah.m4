@@ -44,24 +44,30 @@ else
             OFP_DY_CFLAGS=-shared
 	    ;;
 	powerpc-*-darwin* | i?86-*-darwin*)
-	# Look in the *typical* place that darwin puts the java jdk.
+	# Look in the *typical* places that darwin puts the java jdk.
 	    AC_MSG_CHECKING([for jni.h])
 	    have_jni_h=no
 	    if test -d "/System/Library/Frameworks/JavaVM.framework" ; then
-		JVM_FRWK_DIR="/System/Library/Frameworks/JavaVM.framework"
-		if test -d "$JVM_FRWK_DIR/Versions/CurrentJDK" ; then
-		    OFP_CURR_JDK_DIR="$JVM_FRWK_DIR/Versions/CurrentJDK"
-		    if test -f "$OFP_CURR_JDK_DIR/Headers/jni.h" ; then
-			OFP_CFLAGS="$OFP_CFLAGS -I$OFP_CURR_JDK_DIR/Headers"
-			AC_MSG_RESULT([$OFP_CURR_JDK_DIR/Headers/jni.h])
-			have_jni_h=yes
+		    JVM_FRWK_DIR="/System/Library/Frameworks/JavaVM.framework"
+		    if test -d "$JVM_FRWK_DIR/Headers" ; then
+		        OFP_CURR_JDK_DIR="$JVM_FRWK_DIR"
+		    elif test -d "$JVM_FRWK_DIR/Versions/CurrentJDK" ; then
+		        OFP_CURR_JDK_DIR="$JVM_FRWK_DIR/Versions/CurrentJDK"
 		    else
-			AC_MSG_RESULT([no])
+                OFP_CURR_JDK_DIR=""  # correctly causes next 'test -f' for jni.h to fail 
 		    fi
-		fi
+		    if test -f "$OFP_CURR_JDK_DIR/Headers/jni.h" ; then
+		        OFP_CFLAGS="$OFP_CFLAGS -I$OFP_CURR_JDK_DIR/Headers"
+		        AC_MSG_RESULT([$OFP_CURR_JDK_DIR/Headers/jni.h])
+		        have_jni_h=yes
+		    else
+		        AC_MSG_RESULT([no])
+		    fi
+		else
+		    AC_MSG_RESULT([no])
 	    fi
 	    
-            OFP_DY_CFLAGS=-dynamiclib
+        OFP_DY_CFLAGS=-dynamiclib
 	    OFP_ENABLE_C_ACTIONS=$have_jni_h
 	    ;;	    
     esac
