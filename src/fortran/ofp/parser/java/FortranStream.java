@@ -84,7 +84,7 @@ public class FortranStream extends ANTLRFileStream {
             
             if (char_pos == continue_pos) {
                // if neither '0' nor whitespace then a continuation character
-               if (! (letter_value == (int)'0' || Character.isWhitespace((char)letter_value))) {
+               if (letter_value >= (int)'1' && letter_value <= (int)'9') {
                   letter_value = (int)'&';
                }
             }
