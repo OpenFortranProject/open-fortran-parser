@@ -83,7 +83,7 @@ public class FortranStream extends ANTLRFileStream {
             }
             
             if (char_pos == continue_pos) {
-               // if neither '0' nor whitespace then a continuation character
+               // if TAB followed by a digit 1-9 then a continuation character
                if (letter_value >= (int)'1' && letter_value <= (int)'9') {
                   letter_value = (int)'&';
                }
