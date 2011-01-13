@@ -77,7 +77,7 @@ public class FortranTokenStream extends CommonTokenStream {
       // We also have to check for tabs in the first character position.  Following
       // DEC's convention, <TAB>digit (other than zero) is a continuation line,
       // otherwise the line starts a new statement.  Codes seem to use <TAB><BLANK> to
-      // start so perhaps <TAB> is essentially treated as 5 spaces?
+      // start a new line so perhaps <TAB> is essentially treated as 5 spaces?
       //
       
       int continue_pos = 5;
@@ -101,9 +101,9 @@ public class FortranTokenStream extends CommonTokenStream {
             if (tk_type != FortranLexer.WS && tk_char_0 != '0' &&
                (tk_type != FortranLexer.T_EOS ||
                (tk_type == FortranLexer.T_EOS && tk_char_0 == ';'))) {
-               // any non blank char other than '0' can be a continuation char if it's in 
-               // the 6th column (col. 5 because zero based), or follows initial tab,
-               // including '!' or ';'.
+               // Any non blank char other than '0' can be a continuation char if it's in 
+               // the 6th column (col. 5 because zero based), even '!' or ';'.
+               // If an initial tab then continuation char is a digit 1-9.
                // TODO:
                // if the length is greater than 1, then the user is most likely 
                // using a letter or number to signal the continuation.  in this 
@@ -111,10 +111,11 @@ public class FortranTokenStream extends CommonTokenStream {
                // make two tokens -- the continuation token and what's left.  we 
                // should maybe warn the user about this in case they accidentally
                // started in the wrong column?
-               if (tk.getText().length() > 1) {
-                  System.err.println("TODO: handle this continuation type!");
-               } else {
+               if (tk.getText().length() == 1) {
                   hasContinuation = true;
+               }
+               else if (continue_pos != 1) {
+                  System.err.println("TODO: handle this continuation type!");
                }
             }
          }
