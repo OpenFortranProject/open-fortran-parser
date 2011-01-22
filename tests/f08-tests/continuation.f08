@@ -9,11 +9,11 @@ int&
        ! this is a comment line followed by two blank lines within a continued line
     
  
-&eger i
+&eger j
 
 ! continue line without splitting tokens
     integer :: &
     
-               i
+               k
 ! comment will end file (no '\n' before EOF)
 end!
