@@ -1,9 +1,9 @@
 !
 ! This is a regression test for bug 3076044.  It tests for a
-! TAB character followed by a blank.  The convention we use
-! is for TAB + (WS | '0') acts as ';'.  TAB + other char is a
-! continuation line.  This follows DEC (I believe) but is
-! non standard Fortran.
+! TAB character followed by a blank. The convention for a TAB
+! character in columns 1..5 followed by a digit 1..9 is a continuation
+! line.  If TAB + '0' the '0' is ignored in the input stream.  This
+! follows DEC convention (I believe) but is non standard Fortran.
 !
       subroutine cg1
 	integer i
