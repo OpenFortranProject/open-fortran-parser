@@ -294,6 +294,9 @@ public class FortranStream extends ANTLRFileStream
             // Continuation checked at '\n' so not need here, just pass the character.
             // If first line is a continuation it is an error so won't need to be
             // caught here.  TODO - what about included files with continuation, legal?
+
+            // but I think 0 in column 6 to start is legal (gfortran and ifort disagree)
+            if (data[i] == '0') data[i] = ' ';
          }
 
          else {
