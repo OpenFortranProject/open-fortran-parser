@@ -22,7 +22,7 @@ package fortran.ofp;
 import java.io.*;
 
 // the concrete parser classes
-import fortran.ofp.parser.java.FortranParser08;
+//import fortran.ofp.parser.java.FortranParser08;
 import fortran.ofp.parser.java.FortranParserExtras;
 import fortran.ofp.parser.java.FortranParserRiceCAF;
 
@@ -40,6 +40,7 @@ import java.util.concurrent.Callable;
 
 public class FrontEnd implements Callable<Boolean> {
 
+   private FortranStream inputStream;
    private FortranTokenStream tokens;
    private FortranLexer lexer;
    private IFortranParser parser;
@@ -50,15 +51,18 @@ public class FrontEnd implements Callable<Boolean> {
    private static boolean hasErrorOccurred = false;
    private static ArrayList<String> includeDirs;
 
+/*******OBSOLETE
    public static final int UNKNOWN_SOURCE_FORM = -1;
    public static final int FREE_FORM = 1;
    public static final int FIXED_FORM = 2;
+END OBSOLETE******/
 
    public FrontEnd(String[] args, String filename, String type)
    throws IOException {
       boolean riceCAF = false;
 
-      this.lexer = new FortranLexer(new FortranStream(filename, determineSourceForm(filename)));
+      this.inputStream = new FortranStream(filename);
+      this.lexer = new FortranLexer(inputStream);
       this.tokens = new FortranTokenStream(lexer);
 
       // check to see if using RiceCAF parser extensions
@@ -82,7 +86,9 @@ public class FrontEnd implements Callable<Boolean> {
 
       this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
       this.fileName = filename;
+/*******OBSOLETE
       this.sourceForm = UNKNOWN_SOURCE_FORM;
+END OBSOLETE********/
    }
 
    private static boolean parseMainProgram(FortranTokenStream tokens,
@@ -318,8 +324,10 @@ public class FrontEnd implements Callable<Boolean> {
 
    public Boolean call() throws Exception {
       boolean error = false;
+      
+      int sourceForm = inputStream.getSourceForm();
 
-      if (determineSourceForm(this.fileName) == FIXED_FORM)
+      if (sourceForm == FortranStream.FIXED_FORM)
          if (verbose)
             System.out.println(this.fileName + " is FIXED FORM");
          else if (verbose)
@@ -329,7 +337,7 @@ public class FrontEnd implements Callable<Boolean> {
 
       // determine whether the file is fixed or free form and
       // set the source form in the prepass so it knows how to handle lines.
-      prepass.setSourceForm(determineSourceForm(this.fileName));
+      prepass.setSourceForm(sourceForm);
 
       // apply Sale's algorithm to the tokens to allow keywords
       // as identifiers. also, fixup labeled do's, etc.
@@ -361,6 +369,7 @@ public class FrontEnd implements Callable<Boolean> {
       return new Boolean(error);
    }// end call()
 
+   /*******OBSOLETE
    private int determineSourceForm(String fileName) {
       if (fileName.endsWith(new String(".f")) == true
             || fileName.endsWith(new String(".F")) == true) {
@@ -371,6 +380,7 @@ public class FrontEnd implements Callable<Boolean> {
          return FREE_FORM;
       }
    }// end determineSourceForm()
+END OBSOLETE********/
 
    public int getSourceForm() {
       return this.sourceForm;
