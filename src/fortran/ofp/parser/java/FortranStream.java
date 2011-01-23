@@ -20,9 +20,6 @@ package fortran.ofp.parser.java;
 import java.io.*;
 import org.antlr.runtime.*;
 
-//OBSOLETE
-//import fortran.ofp.FrontEnd;
-
 public class FortranStream extends ANTLRFileStream
 {
    private int sourceForm;
@@ -45,14 +42,6 @@ public class FortranStream extends ANTLRFileStream
    }
 
 
-   public FortranStream(String filename, int sourceForm) throws IOException
-   {
-      super(filename);
-      this.sourceForm = sourceForm;
-      convertInputBuffer();
-   }
-
-   
    public int determineSourceForm(String filename) {
       if (filename.endsWith(new String(".f")) == true ||
 	      filename.endsWith(new String(".F")) == true) {
