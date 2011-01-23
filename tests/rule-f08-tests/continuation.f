@@ -20,8 +20,9 @@ C test continued token
 * test empty continuation lines
      0integer :: l
      1
-     2
+     2,
      3
+     4m
 
 c TODO add TAB continuation tests
 
