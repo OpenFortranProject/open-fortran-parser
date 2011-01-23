@@ -230,8 +230,8 @@ import fortran.ofp.parser.java.FortranToken;
 
             /* Create a new stream for the included file.  */
             try {
-                includedStream = new FortranStream(includedFile.getAbsolutePath(), 
-                    ((FortranStream)this.input).getSourceForm());
+                includedStream = new FortranStream(includedFile.getAbsolutePath());
+//                    ((FortranStream)this.input).getSourceForm());
             } catch(IOException e) {
                 System.err.println("WARNING: Could not open file '" + filename + "'");
                 e.printStackTrace();
