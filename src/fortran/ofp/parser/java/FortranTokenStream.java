@@ -42,8 +42,9 @@ public class FortranTokenStream extends CommonTokenStream {
       this.lineLength = 0;
       this.packedList = null;
       this.newTokensList = new ArrayList<Token>();
-   }// end constructor
+   } // end constructor
 
+/*******OBSOLETE
    public void fixupFixedFormat() {
       ArrayList<Token> tmpArrayList = null;
       boolean hasContinuation = false;
@@ -151,12 +152,12 @@ public class FortranTokenStream extends CommonTokenStream {
             }
                
                // TODO:
-               /* how can we handle fixed-format split tokens?  for example:
-                  inte
-                 $    ger j
-                  this is the variable declaration 'integer j'.  how are we 
-                  suppose to know this?  it compiles with gfortran.
-               */
+               // how can we handle fixed-format split tokens?  for example:
+               //   inte
+               //    ger j
+               //   this is the variable declaration 'integer j'.  how are we 
+               //   suppose to know this?  it compiles with gfortran.
+               //
 //                // need to find the next non-WS token
 //                i++;
 //                while(tmpArrayList.get(i).getType() == FortranLexer.WS ||
@@ -220,7 +221,7 @@ public class FortranTokenStream extends CommonTokenStream {
 
       return;
    }// end fixupFixedFormat()
-
+END OBSOLETE*******/
 
    private void createPackedList() {
       Token tmpToken = null;
@@ -230,6 +231,7 @@ public class FortranTokenStream extends CommonTokenStream {
 
       for(i = 0; i < currLine.size(); i++) {
          tmpToken = getTokenFromCurrLine(i);
+         // TODO - continued lines no longer fixed here see if can remove
          // get all tokens, including channel 99'ed ones, so we can fixup
          // continued lines.  we'll drop ignored tokens after that.
          try {
@@ -251,14 +253,16 @@ public class FortranTokenStream extends CommonTokenStream {
          packedList.add(eos);
       }
 
+/*******OBSOLETE      
       fixupContinuedLine(packedList);
+END OBSOLETE*******/
 
       dropIgnoredTokens(packedList);
       
       return;
    }// end createPackedList()
 
-
+/******OBSOLETE
    private boolean possiblySplitToken(ArrayList<Token> packedList, 
                                       int firstContCharOffset, 
                                       int currOffset) {
@@ -272,7 +276,6 @@ public class FortranTokenStream extends CommonTokenStream {
       }
       return true;
    }// end possiblySplitToken()
-
 
    private void fixupContinuedLine(ArrayList<Token> packedList) {
       int firstContCharOffset = -1;
@@ -374,8 +377,9 @@ public class FortranTokenStream extends CommonTokenStream {
 
       return;
    }// end fixupContinuedLine() 
+END OBSOLETE*******/
 
-
+   
    private void dropIgnoredTokens(ArrayList<Token> packedList) {
       ArrayList<Token> tmpList = packedList;
       Token tmpToken = null;

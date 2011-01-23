@@ -22,7 +22,7 @@ package fortran.ofp.parser.java;
 import java.util.*;
 import org.antlr.runtime.*;
 
-import fortran.ofp.FrontEnd;
+//import fortran.ofp.FrontEnd;
 
 public class FortranLexicalPrepass {
    private FortranLexer lexer;
@@ -44,6 +44,7 @@ public class FortranLexicalPrepass {
    } // end setSourceForm()
 
 
+/*******OBSOLETE
    private boolean isAssignment(int start, int end) {
       if (tokens.getToken(start).getType() == FortranLexer.T_ASSIGNMENT && (start+3 < end) &&  
           tokens.getToken(start+1).getType() == FortranLexer.T_LPAREN &&
@@ -53,8 +54,9 @@ public class FortranLexicalPrepass {
          return false;
       }
    } // end isAssignment()
+END OBSOLETE********/
 
-
+/*******OBSOLETE
    private boolean isOperator(int start, int end) {
       if (tokens.getToken(start).getType() == FortranLexer.T_OPERATOR && (start+3 < end) && 
           tokens.getToken(start+1).getType() == FortranLexer.T_LPAREN &&
@@ -65,9 +67,10 @@ public class FortranLexicalPrepass {
          return false;
       }
    } // end isOperator()
+END OBSOLETE********/
 
-
-   private void convertToIdents(int start, int end) {
+   private void convertToIdents(int start, int end)
+   {
       int i;
       Token tk = null;
 
@@ -946,7 +949,6 @@ public class FortranLexicalPrepass {
     */
    private void fixupFuncDecl(int lineStart, int lineEnd) {
       int identOffset;
-      int identEndOffset;
       int resultOffset;
       int bindOffset;
       int newLineStart = 0;
@@ -1246,17 +1248,18 @@ public class FortranLexicalPrepass {
          return false;
    }// end isDigit()
 
-
+/********OBSOLETE
    private boolean isLetter(char tmpChar) {
 		tmpChar = Character.toLowerCase(tmpChar);
-      if(tmpChar >= 'a' && tmpChar <= 'z')
+      if (tmpChar >= 'a' && tmpChar <= 'z')
          return true;
       else
          return false;
    }
+END OBSOLETE********/
 
-
-   private boolean isValidControlEditDesc(String line, int lineIndex) {
+   private boolean isValidControlEditDesc(String line, int lineIndex)
+   {
       char firstChar;
       char secondChar = '\0';
 
@@ -2178,7 +2181,7 @@ public class FortranLexicalPrepass {
       } else {
          return false;
       }
-   }// end matchGenericBinding()
+   } // end matchGenericBinding()
 
 
    /**
@@ -2346,6 +2349,7 @@ public class FortranLexicalPrepass {
    } // end matchLine()
 
 
+/******OBSOLETE
    private void fixupFixedFormatLine(int lineStart, int lineEnd, boolean startsWithKeyword) {
       StringBuffer buffer = new StringBuffer();
       Token token;
@@ -2399,7 +2403,7 @@ public class FortranLexicalPrepass {
 
       return;
    }// end fixupFixedFormatLine()
-
+END OBSOLETE*******/
 
    private int scanForRealConsts(int lineStart, int lineEnd) {
       int i;
@@ -2421,9 +2425,11 @@ public class FortranLexicalPrepass {
             newTokenText.append(tokens.getToken(i).getText());
             newTokenText.append(tokens.getToken(i+1).getText());
 
+/********OBSOLETE            	
             if(this.sourceForm != FrontEnd.FIXED_FORM &&
-               (col + tokens.getToken(i).getText().length())
-					!= (tokens.getToken(i+1).getCharPositionInLine())) {
+END OBSOLETE*******/
+            if ((col + tokens.getToken(i).getText().length())
+                    != (tokens.getToken(i+1).getCharPositionInLine())) {
                System.err.println("Error: Whitespace within real constant at " 
                                   + "{line:col}: " + line + ":" + (col+1));
             }
@@ -2451,58 +2457,58 @@ public class FortranLexicalPrepass {
    }
 
 
-    private int scanForRelationalOp(int lineStart, int lineEnd) {
+   private int scanForRelationalOp(int lineStart, int lineEnd) {
 
-	for (int i = lineStart; i < lineEnd; i++) {
-	    // make sure there are 3 more tokens in the line
-	    if (i+2 >= lineEnd) {
-		return lineEnd;
-	    }
-	    if (tokens.currLineLA(i+1) == FortranLexer.T_PERIOD) {
-		// check for an ident and trailing T_PERIOD
-		if (tokens.currLineLA(i+2) == FortranLexer.T_IDENT &&
-		    tokens.currLineLA(i+3) == FortranLexer.T_PERIOD) {
+      for (int i = lineStart; i < lineEnd; i++) {
+         // make sure there are 3 more tokens in the line
+         if (i+2 >= lineEnd) {
+            return lineEnd;
+         }
+         if (tokens.currLineLA(i+1) == FortranLexer.T_PERIOD) {
+            // check for an ident and trailing T_PERIOD
+            if (tokens.currLineLA(i+2) == FortranLexer.T_IDENT &&
+                tokens.currLineLA(i+3) == FortranLexer.T_PERIOD) {
 		    
-		    int type;
-		    int line = tokens.getToken(i).getLine();
-		    int col  = tokens.getToken(i).getCharPositionInLine();
-		    String text = tokens.getToken(i+1).getText();
+               int type;
+               int line = tokens.getToken(i).getLine();
+               int col  = tokens.getToken(i).getCharPositionInLine();
+               String text = tokens.getToken(i+1).getText();
 		       
-		    // intrinsic relational operators are:
-		    // .EQ., .NE., .GT., .GE., .LT., .LE.
-		    if        (text.compareToIgnoreCase("EQ") == 0) {
-			type = FortranLexer.T_EQ;
-		    } else if (text.compareToIgnoreCase("NE") == 0) {
-			type = FortranLexer.T_NE;
-		    } else if (text.compareToIgnoreCase("GT") == 0) {
-			type = FortranLexer.T_GT;
-		    } else if (text.compareToIgnoreCase("GE") == 0) {
-			type = FortranLexer.T_GE;
-		    } else if (text.compareToIgnoreCase("LT") == 0) {
-			type = FortranLexer.T_LT;
-		    } else if (text.compareToIgnoreCase("LE") == 0) {
-			type = FortranLexer.T_LE;
-		    } else {
-			continue;
-		    }
+               // intrinsic relational operators are:
+               // .EQ., .NE., .GT., .GE., .LT., .LE.
+               if        (text.compareToIgnoreCase("EQ") == 0) {
+                  type = FortranLexer.T_EQ;
+               } else if (text.compareToIgnoreCase("NE") == 0) {
+                  type = FortranLexer.T_NE;
+               } else if (text.compareToIgnoreCase("GT") == 0) {
+                  type = FortranLexer.T_GT;
+               } else if (text.compareToIgnoreCase("GE") == 0) {
+                  type = FortranLexer.T_GE;
+               } else if (text.compareToIgnoreCase("LT") == 0) {
+                  type = FortranLexer.T_LT;
+               } else if (text.compareToIgnoreCase("LE") == 0) {
+                  type = FortranLexer.T_LE;
+               } else {
+                  continue;
+               }
 		       
-		    // remove three old tokens, T_PERIOD, T_IDENT and T_PERIOD
-		    tokens.removeToken(i);
-		    tokens.removeToken(i);
-		    tokens.removeToken(i);
+               // remove three old tokens, T_PERIOD, T_IDENT and T_PERIOD
+               tokens.removeToken(i);
+               tokens.removeToken(i);
+               tokens.removeToken(i);
 		                   
-		    // replace with new token so that character position in buffer
-		    // reflects new token
-		    tokens.add(i, tokens.createToken(type, "." + text + ".", line, col));
+               // replace with new token so that character position in buffer
+               // reflects new token
+               tokens.add(i, tokens.createToken(type, "." + text + ".", line, col));
 
-		    // we've just removed two tokens (and replaced one) so line is shorter
-		    lineEnd -= 2;
-		}
-	    }
-	}
+               // we've just removed two tokens (and replaced one) so line is shorter
+               lineEnd -= 2;
+            }
+         }
+      }
 
-	return lineEnd;
-    } // end scanForRelationalOp(int, int)
+      return lineEnd;
+   } // end scanForRelationalOp(int, int)
 
 
    public void performPrepass() {
@@ -2513,11 +2519,13 @@ public class FortranLexicalPrepass {
       int newLineLength = 0;
       Token eof = null;
 
+/******OBSOLETE
       if (this.sourceForm == FrontEnd.FIXED_FORM) {
          tokensStart = tokens.mark();
          tokens.fixupFixedFormat();
          tokens.rewind(tokensStart);
       }
+END OBSOLETE*******/
 
       tokensStart = tokens.mark();
       // the mark is the curr index into the tokens array and needs to start 
@@ -2592,7 +2600,7 @@ public class FortranLexicalPrepass {
          // T_EQ, ..., tokens so we need to update our lineLength and 
          // the stored size of tokens.packedListSize (probably safer to not 
          // have the variable and simply use packedList.size() calls).
-         if (this.sourceForm == FrontEnd.FIXED_FORM) {
+         if (this.sourceForm == FortranStream.FIXED_FORM) {
             newLineLength = scanForRelationalOp(lineStart, lineLength);
             if (newLineLength != lineLength) {
                lineLength = newLineLength;
@@ -2612,6 +2620,7 @@ public class FortranLexicalPrepass {
                equalsIndex = salesScanForToken(lineStart, FortranLexer.T_EQ_GT);
             }
             if (equalsIndex != -1) {
+/********OBSOLETE            	
                // TODO: 
                // have to figure out how to rearrange the case where we 
                // can't start with a keyword (given the tests below fail) for 
@@ -2620,6 +2629,7 @@ public class FortranLexicalPrepass {
 //                if(this.sourceForm == FrontEnd.FIXED_FORM) {
 //                   fixupFixedFormatLine(lineStart, lineLength, false);
 //                }
+END OBSOLETE******/
 
                // we have an equal but no comma, so stmt can not start with a keyword.
                // try converting any keyword node found in this line to an identifier
@@ -2643,12 +2653,14 @@ public class FortranLexicalPrepass {
                   }
                } 
             } else {
+/********OBSOLETE            	
                // TODO:
                // need to make sure that this can be here because it may 
                // prevent something from matching below...
 //                if(this.sourceForm == FrontEnd.FIXED_FORM) {
 //                   fixupFixedFormatLine(lineStart, lineLength, true);
 //                }
+END OBSOLETE*******/
 
                // no comma and no equal sign; must start with a keyword
                // can have a one-liner stmt w/ neither
