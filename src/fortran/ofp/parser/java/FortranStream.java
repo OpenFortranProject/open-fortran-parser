@@ -270,7 +270,8 @@ public class FortranStream extends ANTLRFileStream
       char[] newData = new char[super.n];
       int count = 0;
       int addCR = 0;
-      int col   = 1;
+      int col   = 1;    // 1 based 
+      int line  = 1;    // 1 based
 
       for (int i = 0; i < super.n; i++) {
          int ii;
@@ -320,9 +321,15 @@ public class FortranStream extends ANTLRFileStream
             }
          }
             
-    	 if (data[i] == '\n') {
+         ii = -1;
+    	 while (data[i] == '\n' && ii != i) {
+            ii = i;
             if ((ii = checkForFixedFormContinuations(i, data)) != i) {
-               i = ii;   // skip over '\n', WS, and continuation character
+               i = ii;
+               addCR += 1;
+               if (data[i] == '\n') {
+                  ii = -1;
+               }
             }
          }
 
@@ -335,6 +342,7 @@ public class FortranStream extends ANTLRFileStream
             line += 1;
             while (addCR > 0) {
                addCR -= 1;
+               line += 1;
                newData[count++] = '\n';
             }
          }
@@ -344,7 +352,8 @@ public class FortranStream extends ANTLRFileStream
       this.data = newData;
       this.n = count;
    }
-   
+
+
    private int stripComment(int i, char buf[])
    {
       int ii = i;
@@ -357,7 +366,8 @@ public class FortranStream extends ANTLRFileStream
       }
       return i;
    }
-   
+
+
    private int stripFreeFormCommentLine(int i, char buf[])
    {
       // skip over leading blank characters
@@ -373,6 +383,7 @@ public class FortranStream extends ANTLRFileStream
       }
       return i;
    }
+
 
    /**
     * Check for comment characters, 'C', '*', and '!' at start of
@@ -394,6 +405,7 @@ public class FortranStream extends ANTLRFileStream
       return ii;
    }
 
+
    /**
     * If character at i == c, skip to next line advancing past '\n'
     */
@@ -407,12 +419,14 @@ public class FortranStream extends ANTLRFileStream
 
       return i;
    }
-   
+
+
    private int stripPreprocessLine(int i, char buf[])
    {
       return stripLineForChar('#', i, buf);
    }
-   
+
+
    /**
     * If the current character is '&', strip all remaining
     * characters including '\n'.  If there is a continuation,
@@ -430,7 +444,8 @@ public class FortranStream extends ANTLRFileStream
       }
       return i;
    }
-   
+
+
    /**
     * Check to see if there is a continuation character as '&'
     * the first non-blank character in a line.  If there is, return
@@ -445,6 +460,7 @@ public class FortranStream extends ANTLRFileStream
 
       return i;
    }
+
 
    /**
     * Called when at a '\n' character.  Look ahead for continuation
@@ -461,22 +477,19 @@ public class FortranStream extends ANTLRFileStream
     */
    private int checkForFixedFormContinuations(int i, char buf[])
    {
-      boolean continuation = false;
       int i0 = i;      // save initial value of i
       int ii = i + 1;  // look ahead past the '\n'
      
       // strip all preprocessor and comment lines
-      do {
-         i = ii;
-         if (i >= super.n) return i0;
-         if ((ii = stripPreprocessLine(i, buf)) != i) {
-            continue;
-         }
-         if ((ii = stripFixedFormCommentLine(i, buf)) != i) {
-            continue;
-         }
-      } while (i != ii);
-
+      //
+      i += 1;
+      if ((ii = stripPreprocessLine(i, buf)) != i) {
+          return ii-1;
+       }
+      if ((ii = stripFixedFormCommentLine(i, buf)) != i) {
+          return ii-1;
+       }
+      
       // search for TAB in columns 1..5, otherwise continued position will be ii
       for (int j = 0; j < 5; j++) {
          if (buf[ii]   == '\n') return i0;
@@ -492,14 +505,17 @@ public class FortranStream extends ANTLRFileStream
       }
 
       if (buf[ii] != '0' && buf[ii] != ' ') {
-         continuation = true;
+         return ii+1;  // a continuation found
       }
-     
-      if (continuation) return ii+1;  // return position just beyond continuation char
 
-      if (i == i0 + 1)  return i0;    // nothing found
-      else              return i-1;   // '\n' position from comment or preprocessor line
+      // if statement begins after '0', replace '0' with ' ' for parsing
+      if (buf[ii] == '0') {
+         buf[ii] = ' ';
+      }
+      
+      return i0;  // nothing found (expect possibly replacing '0' in column 6
    }
+
 
    /**
     * Check for the beginning of a string at this character position.  If
