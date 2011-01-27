@@ -41,6 +41,13 @@ public class FortranStream extends ANTLRFileStream
       convertInputBuffer();
    }
 
+   public FortranStream(String filename, int sourceForm) throws IOException
+   {
+      super(filename);
+      this.sourceForm = sourceForm;
+      convertInputBuffer();
+   }
+
 
    public int determineSourceForm(String filename) {
       if (filename.endsWith(new String(".f")) == true ||
