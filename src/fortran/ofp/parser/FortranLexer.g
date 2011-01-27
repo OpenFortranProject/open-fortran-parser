@@ -40,6 +40,7 @@ import fortran.ofp.parser.java.FortranToken;
 
 @members {
     private Token prevToken;
+    private int sourceForm;
     private boolean continueFlag;
     private boolean includeLine;
     private boolean inFormat;
@@ -153,19 +154,22 @@ import fortran.ofp.parser.java.FortranToken;
         return this.input;
     }
     
-    /**
-     * Do this here because not sure how to get antlr to generate the 
-     * init code.  It doesn't seem to do anything with the @init block below.
-     * This is called my FortranMain().
-     */
-    public FortranLexer(FortranStream input) {
-        super(input);
-        prevToken = null;
-        continueFlag = false;
-        includeLine = false;
-        inFormat = false;
-        oldStreams = new Stack<FortranStream>();
-    }// end constructor()
+
+   /**
+    * Do this here because not sure how to get antlr to generate the 
+    * init code.  It doesn't seem to do anything with the @init block below.
+    * This is called by FortranMain().
+    */
+   public FortranLexer(FortranStream input)
+   {
+      super(input);
+      this.sourceForm = input.getSourceForm();
+      this.prevToken = null;
+      this.continueFlag = false;
+      this.includeLine = false;
+      this.inFormat = false;
+      this.oldStreams = new Stack<FortranStream>();
+   } // end constructor()
 
 
     public void setIncludeDirs(ArrayList<String> includeDirs) {
@@ -230,8 +234,8 @@ import fortran.ofp.parser.java.FortranToken;
 
             /* Create a new stream for the included file.  */
             try {
-                includedStream = new FortranStream(includedFile.getAbsolutePath());
-//                    ((FortranStream)this.input).getSourceForm());
+               // the included file should have the save source form as original
+               includedStream = new FortranStream(includedFile.getAbsolutePath(), this.sourceForm);
             } catch(IOException e) {
                 System.err.println("WARNING: Could not open file '" + filename + "'");
                 e.printStackTrace();
