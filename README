@@ -2,7 +2,7 @@
  *                                                                 *
  *                Open Fortran Parser (OFP)                        *
  *                           OFP                                   *
- *                      Version 0.8.0                              *
+ *                      Version 0.8.2                              *
  *                                                                 *
  *  README - a brief description and pointers to more information  *
  *                                                                 *
@@ -40,10 +40,10 @@ Documentation:
 Running parser:
 
   - You must set your java CLASSPATH to include the ANTLR jar files and 
-    OpenFortranParser-0.8.0.jar.  If you use the bash shell, you can set the
+    OpenFortranParser-0.8.2.jar.  If you use the bash shell, you can set the
     CLASSPATH with something like (assuming files are installed in /usr/local):
 
-    export CLASSPATH=./:/usr/local/antlr/lib/antlr-3.2.jar:/usr/local/ofp/lib/OpenFortranParser-0.8.0.jar
+    export CLASSPATH=./:/usr/local/antlr/lib/antlr-3.2.jar:/usr/local/ofp/lib/OpenFortranParser-0.8.2.jar
 
   - Run the parser with the command
 
@@ -74,7 +74,7 @@ CVS Repository:
   - Location of the build directory.
   
 ./lib/
-  - Contains a pre-built OpenFortranParser-0.8.0.jar file if
+  - Contains a pre-built OpenFortranParser-0.8.2.jar file if
     an OFP distribution is downloaded.
 
 ./tests/
