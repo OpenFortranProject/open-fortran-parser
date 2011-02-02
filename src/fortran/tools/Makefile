@@ -22,7 +22,6 @@ JAVA=$(OFP_JAVA) #java
 JAR=$(OFP_JAR) #jar
 BUILDDIR=$(OFP_BUILD_DIR)
 PARDIR=$(OFP_PARSER_DIR)
-#JARDIR=../lib
 
 CLASSDIR = $(BUILDDIR)/fortran/tools
 JFLAGS = -d $(BUILDDIR) @sourcefiles $(OFP_JFLAGS)
