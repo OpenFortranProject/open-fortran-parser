@@ -233,9 +233,6 @@ END OBSOLETE********/
              nArgs += 1;
              continue;
          } else if (args[i].startsWith("--tokens")) {
-             type = "fortran.ofp.parser.java.FortranParserActionPrint";
-             silent = false;
-             verbose = true;
              dumpTokens = true;
              nArgs += 1;
              continue;
@@ -259,7 +256,7 @@ END OBSOLETE********/
 
       if (args.length <= nArgs) {
          System.out.println("Usage: java fortran.ofp.FrontEnd "
-               + "[--dump] [--silent] [--class className] ");
+               + "[--verbose] [--tokens] [--silent] [--class className] ");
          System.out.println("                                    "
                + "[--user_option user_arg] file1 [file2..fileN]");
       }
@@ -296,13 +293,11 @@ END OBSOLETE********/
             }
             
             if (dumpTokens) {
-            	if (verbose) System.out.println("********** begin token stream ***********");
-            	ofp.tokens.outputTokenList(ofp.parser.getAction());
-            	if (verbose) System.out.println("*********** end token stream ************");
+               ofp.tokens.outputTokenList(ofp.parser.getAction());
             }
-            
-            error |= ofp.call();
-
+            else {
+               error |= ofp.call();
+            }
          }
 
          if (verbose) {
