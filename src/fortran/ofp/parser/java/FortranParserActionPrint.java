@@ -1409,6 +1409,7 @@ public class FortranParserActionPrint implements IFortranParserAction {
     */
    public void data_implied_do(Token id, boolean hasThirdExpr) {
       printRuleHeader(527, "data-implied-do");
+      printParameter(id, "id");
       printParameter(hasThirdExpr, "hasThirdExpr");
       printRuleTrailer();
    }
