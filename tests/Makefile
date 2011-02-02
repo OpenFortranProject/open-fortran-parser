@@ -40,6 +40,15 @@ endef
 
 
 all:
+	@echo
+	@echo "Checking for files in the OFP jar file..."
+	@$(JAR) tf $(OFP_BUILD_DIR)/$(OFP_JARFILE) | grep ActionEnums.h
+	@$(JAR) tf $(OFP_BUILD_DIR)/$(OFP_JARFILE) | grep FortranParserAction.h
+	@$(JAR) tf $(OFP_BUILD_DIR)/$(OFP_JARFILE) | grep token.c
+	@$(JAR) tf $(OFP_BUILD_DIR)/$(OFP_JARFILE) | grep token.h
+	@$(JAR) tf $(OFP_BUILD_DIR)/$(OFP_JARFILE) | grep c_actions_jni.c
+	@$(JAR) tf $(OFP_BUILD_DIR)/$(OFP_JARFILE) | grep jni_token_funcs.h
+	@$(JAR) tf $(OFP_BUILD_DIR)/$(OFP_JARFILE) | grep jni_token_funcs.c
 	$(run-tests-recursive)
 
 runRuleTests:
