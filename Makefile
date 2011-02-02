@@ -27,11 +27,13 @@ JAVADIR=java
 JARFILE=$(OFP_JARFILE)
 
 all: 
+	mkdir -pv build/fortran/ofp/parser/c/jni
 	$(CD) $(OFP_FRONT_DIR); $(MAKE)
-	$(CD) $(OFP_TOOLS_DIR); $(MAKE) ; $(MAKE) jarfile ; $(MAKE) RuleStackTrace.java
+	$(CD) $(OFP_TOOLS_DIR); $(MAKE) ; $(MAKE) RuleStackTrace.java
+	$(CD) $(OFP_FRONT_DIR); $(MAKE) jarfile
 ifeq ($(OFP_ENABLE_JNI), "yes") 
 	$(CD) $(OFP_PARSER_DIR) ; perl java2c.pl ; \
-	$(CD) $(OFP_C_DIR) ; $(MAKE) ; \
+             $(CD) $(OFP_C_DIR) ; $(MAKE) ; \
              $(CD) $(OFP_JNI_DIR) ; \
              $(MAKE) ; $(MAKE) jarfile
 endif
@@ -53,6 +55,7 @@ clean:
 	$(CD) $(OFP_C_DIR); $(MAKE) clean
 	$(CD) $(OFP_JNI_DIR); $(MAKE) clean
 	rm -f ./build/$(OFP_JARFILE)
+	rm -rf ./build/fortran
 
 distclean:
 	$(CD) $(OFP_FRONT_DIR); $(MAKE) allclean
