@@ -32,7 +32,16 @@ public class FortranStream extends ANTLRFileStream
     * Create a new input buffer and use it to fix line continuation.  This
     * buffer will be used to strip out continuation characters, extra '\n'
     * characters, and in fixed form, extra characters in columns 1-6,
-    * including TAB.  It also strips comments and preprocesser commands.
+    * including TAB.  It also strips line comments and preprocesser commands.
+    * 
+    * Note that only line comments (white space followed by '!' comment) are
+    * stripped.  Comments occuring in middle of line are passed on to tokenizer.
+    * This is done so that FortranStream can handle Holleriths in edit descriptors
+    * like the very evil
+    * 
+    * 100     format (1h1,58x,1h!,/,60x,/,59x,1h*,/)
+    *  
+    *  which has "1h!" as a hollerith, not a comment!
     */
    public FortranStream(String filename) throws IOException
    {
@@ -162,6 +171,9 @@ public class FortranStream extends ANTLRFileStream
 
    private void convertFreeFormInputBuffer()
    {
+      // buffer for line comments and preprocessor lines
+      StringBuffer comments = new StringBuffer();
+
       char[] newData = new char[super.n];
       boolean continuation = false;
       int count = 0;
@@ -174,13 +186,17 @@ public class FortranStream extends ANTLRFileStream
          
          // process column 1 special characters
          if (col == 1) {
-            while ((ii = stripPreprocessLine(i, data)) != i) {
-               addCR += 1;  // can't add immediately because could 
-               i = ii;      // be in the middle of a continued line
+            while ((ii = processPreprocessLine(i, data, comments)) != i) {
+               // preprocess line can't be added immediately because
+               // could be in the middle of a continued line
+               line += 1;
+               i = ii;
             }
             
-            while ((ii = stripFreeFormCommentLine(i, data)) != i) {
-               addCR += 1;
+            while ((ii = processFreeFormCommentLine(i, data, comments)) != i) {
+               // comment line can't be added immediately because
+               // could be in the middle of a continued line
+               line += 1;
                i = ii;
             }
             
@@ -200,11 +216,14 @@ public class FortranStream extends ANTLRFileStream
                continuation = false;
             }
             else {
-               // add '\n' chars if not in middle of a continued line
-               while (addCR > 0) {
-                  addCR -= 1;
-                  newData[count++] = '\n';
-                  line += 1;
+               // add any comments and preprocess lines since not in 
+               // the middle of a continued line
+               if (comments.length() > 0) {
+                  count = copyCommentLines(count, newData, comments);
+                  if (i >= super.n) {
+                     // this can occur if last line is a comment line
+                     continue;
+                  }
                }
             }
          }
@@ -212,7 +231,8 @@ public class FortranStream extends ANTLRFileStream
          // process all columns > 1 
          else {
             // remove comment if it exists but retain '\n'
-            if ((ii = stripComment(i, data)) != i) {
+            if ((ii = processComment(i, data, count, newData)) != i) {
+               count += ii - i;
                i = ii;
             }
 
@@ -255,7 +275,7 @@ public class FortranStream extends ANTLRFileStream
       this.data = newData;
       this.n = count;
    }
-   
+
 
    /**
     * Comments must be removed from input stream or continuation
@@ -263,6 +283,9 @@ public class FortranStream extends ANTLRFileStream
     */
    private void convertFixedFormInputBuffer()
    {
+      // buffer for line comments and preprocessor lines
+      StringBuffer comments = new StringBuffer();
+
       char[] newData = new char[super.n];
       int count = 0;
       int addCR = 0;
@@ -274,14 +297,21 @@ public class FortranStream extends ANTLRFileStream
 
          // process column 1 special characters
          if (col == 1) {
-            while ((ii = stripPreprocessLine(i, data)) != i) {
-               newData[count++] = '\n';  // replace with empty line
+            while ((ii = processPreprocessLine(i, data, comments)) != i) {
+               count = copyCommentLines(count, newData, comments);
+               line += 1;
                i = ii;
             }
             
-            while ((ii = stripFixedFormCommentLine(i, data)) != i) {
-               newData[count++] = '\n';  // replace with empty line
+            while ((ii = processFixedFormCommentLine(i, data, comments)) != i) {
+               count = copyCommentLines(count, newData, comments);
+               line += 1;
                i = ii;
+            }
+
+            if (i >= super.n) {
+               // this can occur if last line is a comment line
+               continue;
             }
 
             // "expand" TABs by bumping to column 5
@@ -292,7 +322,8 @@ public class FortranStream extends ANTLRFileStream
 
          else if (col > 1 && col < 6) {
             // remove comment if it exists but retain '\n' or EOF
-            if ((ii = stripComment(i, data)) != i) {
+            if ((ii = processComment(i, data, count, newData)) != i) {
+               count += ii - i;
                i = ii;
             }
          }
@@ -307,8 +338,9 @@ public class FortranStream extends ANTLRFileStream
          }
 
          else {
-            // remove comment if it exists but retain '\n'
-            if ((ii = stripComment(i, data)) != i) {
+            // skip over comment if it exists but retain '\n'
+            if ((ii = processComment(i, data, count, newData)) != i) {
+               count += ii - i;
                i = ii;
             }
 
@@ -323,7 +355,7 @@ public class FortranStream extends ANTLRFileStream
          ii = -1;
     	 while (data[i] == '\n' && ii != i) {
             ii = i;
-            if ((ii = checkForFixedFormContinuations(i, data)) != i) {
+            if ((ii = checkForFixedFormContinuations(i, data, comments)) != i) {
                i = ii;
                addCR += 1;
                if (data[i] == '\n') {
@@ -335,8 +367,8 @@ public class FortranStream extends ANTLRFileStream
          // copy current character
          newData[count++] = data[i];
 
-    	 col += 1;
-    	 if (data[i] == '\n') {
+         col += 1;
+         if (data[i] == '\n') {
             col = 1;
             line += 1;
             while (addCR > 0) {
@@ -353,76 +385,136 @@ public class FortranStream extends ANTLRFileStream
    }
 
 
-   private int stripComment(int i, char buf[])
+   /**
+    * Copy comment line and preprocessor lines to data buffer
+    */
+   int copyCommentLines(int i, char [] newData, StringBuffer comments)
    {
-      int ii = i;
+      for(int ii = 0; ii < comments.length(); ii++) {
+         newData[i++] = comments.charAt(ii);
+      }
+      comments.delete(0, comments.length());
+      return i;
+   }
 
-      if (buf[ii] == '!') {
-         // found comment character, skip remaining characters
-         ii += 1;
-         while (buf[ii] != '\n') ii += 1;
-         i = ii;
+
+   /**
+    * if a comment, copy comment to newBuf excluding terminating '\n' character 
+    */
+   private int processComment(int i, char buf[], int count, char newBuf[])
+   {
+      if (i < super.n && buf[i] == '!') {
+         // found comment character, copy characters up to '\n'
+         do {
+            newBuf[count++] = buf[i++];
+         }
+         while (i < super.n && buf[i] != '\n');
       }
       return i;
    }
 
 
-   private int stripFreeFormCommentLine(int i, char buf[])
+   private int processFreeFormCommentLine(int i, char buf[], StringBuffer comments)
    {
+      if (i >= super.n) return i;
+      
       // skip over leading blank characters
       int i1 = i;
+      while(i1 < super.n && buf[i1] == ' ') i1 += 1;
 
-      while(buf[i1] == ' ') i1 += 1;
-      if (buf[i1] == '\n') return (i1 < super.n - 1) ? i1+1 : i;
-      
-      // skip over comment if it exists
-      int i2 = stripLineForChar('!', i1, buf);
-      if (i1 != i2) {
-    	  i = i2;  // found character, advance past '\n'
+      // nothing to do if not a comment line
+      if (i1 < super.n && buf[i1] != '!' && buf[i1] != '\n') return i;
+
+      // copy leading blank characters
+      for (int ii = 0; ii < i1-i; ii++) comments.append(' ');
+
+      if (i1 == super.n) return super.n;
+
+      if (buf[i1] == '\n') {
+         // a comment line with only whitespace
+         comments.append('\n');
+         i = i1+1;
       }
+      else {
+         i = processLineForCommentChar('!', i1, buf, comments);
+      }         
+
       return i;
    }
 
 
    /**
     * Check for comment characters, 'C', '*', and '!' at start of
-    * a line.  A blank line is also a comment line. If comment
-    * line is found, strip off the line comment, returning
-    * the position of character after the '\n' character.
+    * a line.  A blank line is also a comment line. If a comment line is
+    * found, copy the line comment to the comments buffer (without trailing
+    * '\n', and return the position of the character after the '\n' character.
     */
-   private int stripFixedFormCommentLine(int i, char buf[])
+   private int processFixedFormCommentLine(int i, char buf[], StringBuffer comments)
    {
+      if (i >= super.n) return i;
+
       // first check for free form ('!' comments and blank character lines)
-      int ii = stripFreeFormCommentLine(i, buf);
+      int ii = processFreeFormCommentLine(i, buf, comments);
       if (ii != i) return ii;
 
       // check for a normal comment line
-      if (buf[i] == '*')      ii = stripLineForChar('*', i,  buf);
-      else if (buf[i] == 'C') ii = stripLineForChar('C', i,  buf);
-      else if (buf[i] == 'c') ii = stripLineForChar('c', i,  buf);
+      if (buf[i] == '*')      ii = processLineForCommentChar('*', i,  buf, comments);
+      else if (buf[i] == 'C') ii = processLineForCommentChar('C', i,  buf, comments);
+      else if (buf[i] == 'c') ii = processLineForCommentChar('c', i,  buf, comments);
       
       return ii;
    }
 
 
    /**
-    * If character at i == c, skip to next line advancing past '\n'
+    * If character at i == c, skip to next line advancing past '\n', while
+    * copying intervening characters to comments buffer.
     */
-   private int stripLineForChar(char c, int i, char buf[])
+   private int processLineForCommentChar(char c, int i, char buf[], StringBuffer comments)
    {
+      if (i >= super.n) return i;
+
       if (buf[i] == c) {
-         // found character, skip to next line
+         if (buf[i] == '*' || buf[i] == 'C' || buf[i] == 'c') {
+            // replace by free form comment character
+            comments.append('!');
+         } else {
+            comments.append(buf[i]);
+         }
          i += 1;
-         while (buf[i++] != '\n');
+ 
+         // found character, copy rest of line
+         while (i < super.n && buf[i] != '\n') {
+            comments.append(buf[i++]);
+         }
+         if (i < super.n) {
+            comments.append(buf[i++]);  // copy '\n' also
+         }
       }
 
       return i;
    }
 
 
-   private int stripPreprocessLine(int i, char buf[])
+   /**
+    * If character at i == c, skip to next line advancing past '\n'.
+    */
+   private int stripLineForChar(char c, int i, char buf[])
    {
-      return stripLineForChar('#', i, buf);
+      if (i >= super.n) return i;
+
+      if (buf[i] == c) {
+         // found character, skip to next line
+         i += 1;
+         while (i < super.n && buf[i++] != '\n');
+      }
+      return i;
+   }
+
+
+   private int processPreprocessLine(int i, char buf[], StringBuffer comments)
+   {
+      return processLineForCommentChar('#', i, buf, comments);
    }
 
 
@@ -436,7 +528,7 @@ public class FortranStream extends ANTLRFileStream
       int ii;
       if ((ii = stripLineForChar('&', i, buf)) != i) {
          // backup to '\n'
-         // if '&' EOF this will backup to '&' which should
+         // if '&' EOF this will backup to '&' which will
          // throw a parser error, as it should, as the standard
          // says "there shall" be a later (non comment) line
          i = ii - 1;
@@ -454,7 +546,7 @@ public class FortranStream extends ANTLRFileStream
    {
       int ii = i;
 
-      while (buf[ii] == ' ' && buf[ii] != '&') ii += 1;
+      while (ii < super.n && buf[ii] == ' ' && buf[ii] != '&') ii += 1;
       if (buf[ii] == '&') i = ii + 1;
 
       return i;
@@ -474,7 +566,7 @@ public class FortranStream extends ANTLRFileStream
     *
     * WARNING, don't go beyond length of stream, super.n
     */
-   private int checkForFixedFormContinuations(int i, char buf[])
+   private int checkForFixedFormContinuations(int i, char buf[], StringBuffer comments)
    {
       int i0 = i;      // save initial value of i
       int ii = i + 1;  // look ahead past the '\n'
@@ -482,10 +574,10 @@ public class FortranStream extends ANTLRFileStream
       // strip all preprocessor and comment lines
       //
       i += 1;
-      if ((ii = stripPreprocessLine(i, buf)) != i) {
+      if ((ii = processPreprocessLine(i, buf, comments)) != i) {
           return ii-1;
        }
-      if ((ii = stripFixedFormCommentLine(i, buf)) != i) {
+      if ((ii = processFixedFormCommentLine(i, buf, comments)) != i) {
           return ii-1;
        }
       
@@ -524,6 +616,8 @@ public class FortranStream extends ANTLRFileStream
     */
    private int processString(int i, char buf[], int count, char newBuf[])
    {
+      if (i >= super.n) return i;
+
       char quote_char = 0;
 
       if (buf[i] == '\'') quote_char = '\'';
@@ -534,14 +628,15 @@ public class FortranStream extends ANTLRFileStream
       do {
          newBuf[count++] = buf[i++];
          // look for two quote chars in a row, if found copy both
-         if (buf[i] == quote_char && buf[i+1] == quote_char) {
+         if (i < super.n - 1 && buf[i] == quote_char && buf[i+1] == quote_char) {
             newBuf[count++] = buf[i++];
             newBuf[count++] = buf[i++];
          }
-      } while (buf[i] != quote_char && buf[i] != '\n');
+      }
+      while (i < super.n && buf[i] != quote_char && buf[i] != '\n');
 
       // copy terminating quote char (terminal '\n' is an error)
-      if (buf[i] == quote_char) {
+      if (i < super.n && buf[i] == quote_char) {
          newBuf[count++] = buf[i];
       }
 
