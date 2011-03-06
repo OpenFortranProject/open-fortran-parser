@@ -32,16 +32,27 @@ public class FortranStream extends ANTLRFileStream
     * Create a new input buffer and use it to fix line continuation.  This
     * buffer will be used to strip out continuation characters, extra '\n'
     * characters, and in fixed form, extra characters in columns 1-6,
-    * including TAB.  It also strips line comments and preprocesser commands.
+    * including TAB.  It also moves line comments and preprocesser commands if
+    * they are in the middle of continuation lines.
     * 
     * Note that only line comments (white space followed by '!' comment) are
     * stripped.  Comments occuring in middle of line are passed on to tokenizer.
     * This is done so that FortranStream can handle Holleriths in edit descriptors
     * like the very evil
     * 
-    * 100     format (1h1,58x,1h!,/,60x,/,59x,1h*,/)
+    * 100   format (1h1,58x,1h!,/,60x,/,59x,1h*,/)
     *  
     *  which has "1h!" as a hollerith, not a comment!
+    *
+    * Even worse consider
+    *
+    * 200   format (1h1,58x,1h!,/,60x,/,59x,1h*,/)
+    *      &1)
+    *
+    * In this example the '!', in "1h!" has to start a comment so that the continued
+    * line can terminate the format statement properly.  However, gfortran won't
+    * accept the 200 example so the hollerith edit descriptor wins out.  Thus we are
+    * forced to look for hollerith edit descriptors when processing comments.
     */
    public FortranStream(String filename) throws IOException
    {
@@ -186,14 +197,14 @@ public class FortranStream extends ANTLRFileStream
          
          // process column 1 special characters
          if (col == 1) {
-            while ((ii = processPreprocessLine(i, data, comments)) != i) {
+            while ((ii = matchPreprocessLine(i, data, comments)) != i) {
                // preprocess line can't be added immediately because
                // could be in the middle of a continued line
                line += 1;
                i = ii;
             }
             
-            while ((ii = processFreeFormCommentLine(i, data, comments)) != i) {
+            while ((ii = matchFreeFormCommentLine(i, data, comments)) != i) {
                // comment line can't be added immediately because
                // could be in the middle of a continued line
                line += 1;
@@ -208,7 +219,16 @@ public class FortranStream extends ANTLRFileStream
                   i = ii;
                }
                // process a string if it exists
-               if ((ii = processString(i, data, count, newData)) != i) {
+               if ((ii = matchFreeFormString(i, data, count, newData)) != i) {
+                  char quoteChar = data[i];
+                  while (data[ii] == '&') {
+                     // string is continued across multiple lines
+                     line += 1;
+                     count += ii - i;
+                     col   += ii - i;
+                     i = ii;
+                     ii = completeContinuedString(quoteChar, i, data, count, newData);
+                  }
                   count += ii - i;
                   col   += ii - i;
                   i = ii;
@@ -231,20 +251,36 @@ public class FortranStream extends ANTLRFileStream
          // process all columns > 1 
          else {
             // remove comment if it exists but retain '\n'
-            if ((ii = processComment(i, data, count, newData)) != i) {
-               count += ii - i;
+            if ((ii = matchComment(i, data, comments)) != i) {
+               count = copyCommentLines(count, newData, comments);
+               //CER  count += ii - i;
                i = ii;
             }
-
             // remove continuation if it exists but retain '\n'
-            if ((ii = stripFreeFormContinuation(i, data)) != i) {
+            else if ((ii = stripFreeFormContinuation(i, data)) != i) {
                continuation = true;
                addCR += 1;
                i = ii;
             }
-
-            // process a string if it exists
-            if ((ii = processString(i, data, count, newData)) != i) {
+            // process a string if it exists but retain trailing quote char
+            else if ((ii = matchFreeFormString(i, data, count, newData)) != i) {
+               char quoteChar = data[i];
+               while (data[ii] == '&') {
+                  // string is continued across multiple lines
+                  line += 1;
+                  count += ii - i;
+                  col   += ii - i;
+                  i = ii;
+                  ii = completeContinuedString(quoteChar, i, data, count, newData);
+               }
+               count += ii - i;
+               col   += ii - i;
+               i = ii;
+            }
+            // Holleriths are matched after strings so Hollerith matching doesn't have
+            // to worry about string, i.e, the string, "4HThis is a string".
+            else if ((ii = matchHollerith(i, data, count, newData)) != i) {
+               //System.out.println("Found Hollerith character");
                count += ii - i;
                col   += ii - i;
                i = ii;
@@ -297,13 +333,13 @@ public class FortranStream extends ANTLRFileStream
 
          // process column 1 special characters
          if (col == 1) {
-            while ((ii = processPreprocessLine(i, data, comments)) != i) {
+            while ((ii = matchPreprocessLine(i, data, comments)) != i) {
                count = copyCommentLines(count, newData, comments);
                line += 1;
                i = ii;
             }
             
-            while ((ii = processFixedFormCommentLine(i, data, comments)) != i) {
+            while ((ii = matchFixedFormCommentLine(i, data, comments)) != i) {
                count = copyCommentLines(count, newData, comments);
                line += 1;
                i = ii;
@@ -322,8 +358,9 @@ public class FortranStream extends ANTLRFileStream
 
          else if (col > 1 && col < 6) {
             // remove comment if it exists but retain '\n' or EOF
-            if ((ii = processComment(i, data, count, newData)) != i) {
-               count += ii - i;
+            if ((ii = matchComment(i, data, comments)) != i) {
+               //count = copyCommentLines(count, newData, comments);
+               //CER count += ii - i;
                i = ii;
             }
          }
@@ -338,14 +375,22 @@ public class FortranStream extends ANTLRFileStream
          }
 
          else {
-            // skip over comment if it exists but retain '\n'
-            if ((ii = processComment(i, data, count, newData)) != i) {
-               count += ii - i;
+            // consume a comment if it exists but retain '\n'
+            if ((ii = matchComment(i, data, comments)) != i) {
+               //count = copyCommentLines(count, newData, comments);
+               //CER count += ii - i;
                i = ii;
             }
-
-            // process a string if it exists
-            if ((ii = processString(i, data, count, newData)) != i) {
+            // consume a string if it exists but retain trailing quote char
+            else if ((ii = matchFixedFormString(i, data, count, newData)) != i) {
+               count += ii - i;
+               col   += ii - i;
+               i = ii;
+            }
+            // Holleriths are matched after strings so Hollerith matching doesn't have
+            // to worry about strings, i.e, the string, "4HThis is a string".
+            else if ((ii = matchHollerith(i, data, count, newData)) != i) {
+               //System.out.println("Found Hollerith character");
                count += ii - i;
                col   += ii - i;
                i = ii;
@@ -357,7 +402,7 @@ public class FortranStream extends ANTLRFileStream
             ii = i;
             if ((ii = checkForFixedFormContinuations(i, data, comments)) != i) {
                i = ii;
-               addCR += 1;
+               //CER addCR += 1;
                if (data[i] == '\n') {
                   ii = -1;
                }
@@ -371,6 +416,8 @@ public class FortranStream extends ANTLRFileStream
          if (data[i] == '\n') {
             col = 1;
             line += 1;
+            // copy comments that were caught up with continuation
+            count = copyCommentLines(count, newData, comments);
             while (addCR > 0) {
                addCR -= 1;
                line += 1;
@@ -401,12 +448,12 @@ public class FortranStream extends ANTLRFileStream
    /**
     * if a comment, copy comment to newBuf excluding terminating '\n' character 
     */
-   private int processComment(int i, char buf[], int count, char newBuf[])
+   private int matchComment(int i, char buf[], StringBuffer comments)
    {
       if (i < super.n && buf[i] == '!') {
          // found comment character, copy characters up to '\n'
          do {
-            newBuf[count++] = buf[i++];
+            comments.append(buf[i++]);
          }
          while (i < super.n && buf[i] != '\n');
       }
@@ -414,7 +461,7 @@ public class FortranStream extends ANTLRFileStream
    }
 
 
-   private int processFreeFormCommentLine(int i, char buf[], StringBuffer comments)
+   private int matchFreeFormCommentLine(int i, char buf[], StringBuffer comments)
    {
       if (i >= super.n) return i;
       
@@ -449,12 +496,12 @@ public class FortranStream extends ANTLRFileStream
     * found, copy the line comment to the comments buffer (without trailing
     * '\n', and return the position of the character after the '\n' character.
     */
-   private int processFixedFormCommentLine(int i, char buf[], StringBuffer comments)
+   private int matchFixedFormCommentLine(int i, char buf[], StringBuffer comments)
    {
       if (i >= super.n) return i;
 
       // first check for free form ('!' comments and blank character lines)
-      int ii = processFreeFormCommentLine(i, buf, comments);
+      int ii = matchFreeFormCommentLine(i, buf, comments);
       if (ii != i) return ii;
 
       // check for a normal comment line
@@ -512,7 +559,7 @@ public class FortranStream extends ANTLRFileStream
    }
 
 
-   private int processPreprocessLine(int i, char buf[], StringBuffer comments)
+   private int matchPreprocessLine(int i, char buf[], StringBuffer comments)
    {
       return processLineForCommentChar('#', i, buf, comments);
    }
@@ -574,10 +621,10 @@ public class FortranStream extends ANTLRFileStream
       // strip all preprocessor and comment lines
       //
       i += 1;
-      if ((ii = processPreprocessLine(i, buf, comments)) != i) {
+      if ((ii = matchPreprocessLine(i, buf, comments)) != i) {
           return ii-1;
        }
-      if ((ii = processFixedFormCommentLine(i, buf, comments)) != i) {
+      if ((ii = matchFixedFormCommentLine(i, buf, comments)) != i) {
           return ii-1;
        }
       
@@ -596,6 +643,7 @@ public class FortranStream extends ANTLRFileStream
       }
 
       if (buf[ii] != '0' && buf[ii] != ' ') {
+         comments.append('\n');
          return ii+1;  // a continuation found
       }
 
@@ -607,6 +655,151 @@ public class FortranStream extends ANTLRFileStream
       return i0;  // nothing found (expect possibly replacing '0' in column 6
    }
 
+   /**
+    * Check for a Hollerith following the current character position.  First must
+    * ensure that it's not an identifier, "var_2Hxx", so look for preceding
+    * character, ' ', '(', ',' (and perhaps more).  Then look for digit string, n,
+    * followed by 'H'|'h' and then n characters (none of which is \'n').
+    * Perhaps we want to change Hollerith to a quoted string.  In any case,
+    * copy string representation to newBuf.
+    *
+    * We would like to be conservative while matching Hollerith's.  Examples showing
+    * characters that can precede a Hollerith constant:
+    * " 1Hx", "=1Hx", ".eq.1Hx", "(1Hx", "-1Hx", ",1Hx".  Note Hollerith constants
+    * have no data type; they assume a numeric type based on the way they are used.
+    * They cannot assume a  character data type and cannot be used where a character
+    * value is expected (from a DEC manual for F77, I believe).  Not sure this
+    * applies to Hollerith edit descriptors.
+    *
+    * Assume that strings have been matched so a Hollerith-like constant
+    * within a string doesn't have to been considered.
+    *
+    * Return the last character position in the Hollerith constant if found.
+    */
+   private int matchHollerith(int i, char buf[], int count, char newBuf[])
+   {
+      int k;
+
+      if (i >= super.n) return i;
+
+      // Return i if the first character can be used in a name context, e.g.,
+      // "v1H" or "_1H" as this could have been the name "v_1H". A name is
+      // A name is a letter followed by an alphanumeric character
+      // (letter, digit, '_').  
+
+      // it might be conservative and look for only what CAN precede Hollerith
+
+      if (buf[i] >= 'a' && buf[i] <= 'z') return i;
+      if (buf[i] >= 'A' && buf[i] <= 'Z') return i;
+      if (buf[i] == '_') return i;
+
+      // count digits preceding possible Hollerith
+
+      int ii = i + 1;
+      int numDigits = 0;
+      while (buf[ii] >= '0' && buf[ii] <= '9') {
+         ii += 1;
+         numDigits += 1;
+      }
+      if (numDigits == 0) return i;
+      if (buf[ii] != 'H' && buf[ii] != 'h') return i;
+      
+      // found Hollerith
+      
+      StringBuffer chars = new StringBuffer(numDigits);
+      for (k = 0; k < numDigits; k++) {
+         chars.append(buf[i+1+k]);
+      }      
+      int numChars = Integer.parseInt(chars.toString());
+
+      // look for numChars printable characters
+      ii += 1;
+      for (k = 0; k < numChars; k++) {
+         if (buf[ii+k] < ' ' || buf[ii+k] > '-') break;
+      }
+
+      if (k != numChars) return i;
+      
+      // number of characters to copy (includes preceding character)
+      int numTotal = 1 + numDigits + 1 + numChars;
+
+      // found a Hollerith constant, copy all but last character to newBuf
+      for (k = 0; k < numTotal-1; k++) {
+         newBuf[count++] = buf[i+k];
+      }
+
+      return i + numTotal - 1;
+   }
+
+   /**
+    * Complete the processing of a string that is continued across multiple lines.
+    */
+   private int completeContinuedString(char quoteChar, int i, char buf[], int count, char newBuf[])
+   {
+      int i0 = i;
+
+      // skip initial '&'
+      if (++i >= super.n) return i0;
+
+      // skip characters after initial '&'
+      while (i < super.n && buf[i] != '\n') i += 1;  // TODO - check for comment
+      i += 1;  // skip '\n'
+
+      // skip ' ' characters on next line
+      while (i < super.n && buf[i] == ' ') i += 1;
+      if (i >= super.n || buf[i] != '&') {
+         System.err.println("Terminating '&' not found in continued string at character position " + i);
+         return i0;
+      }
+
+      // skip trailing '&'
+      if (++i >= super.n) return i0;
+
+      do {
+         newBuf[count++] = buf[i++];
+         // look for two quote chars in a row, if found copy both
+         if (i < super.n - 1 && buf[i] == quoteChar && buf[i+1] == quoteChar) {
+            newBuf[count++] = buf[i++];
+            newBuf[count++] = buf[i++];
+         }
+      }
+      while (i < super.n && buf[i] != quoteChar && buf[i] != '&' && buf[i] != '\n');
+
+      return i;
+   }
+
+   /**
+    * Check for the beginning of a string at this character position.  If
+    * found copy the characters of the string into newBuf, except for the
+    * terminating quote character.  A string may be continued, if so it
+    * continues after the '&' character on the next line; return the position
+    * of the trailing '&'.  If a string doesn't terminate it's an error,
+    * return '\n' position.  
+    */
+   private int matchFreeFormString(int i, char buf[], int count, char newBuf[])
+   {
+      if (i >= super.n) return i;
+
+      char quote_char = buf[i];
+      if (quote_char != '"' && quote_char != '\'') return i;  // not the start of a string
+
+      do {
+         newBuf[count++] = buf[i++];
+         // look for two quote chars in a row, if found copy both
+         if (i < super.n - 1 && buf[i] == quote_char && buf[i+1] == quote_char) {
+            newBuf[count++] = buf[i++];
+            newBuf[count++] = buf[i++];
+         }
+      }
+      while (i < super.n && buf[i] != quote_char && buf[i] != '&' && buf[i] != '\n');
+
+      //CER      // copy terminating quote char (terminal '\n' is an error)
+      //CER      if (i < super.n && buf[i] == quote_char) {
+      //CER         newBuf[count++] = buf[i];
+      //CER      }
+
+      return i;
+   }
 
    /**
     * Check for the beginning of a string at this character position.  If
@@ -614,16 +807,12 @@ public class FortranStream extends ANTLRFileStream
     * terminating quote character.  If a string doesn't terminate it's an error,
     * return '\n' position.  
     */
-   private int processString(int i, char buf[], int count, char newBuf[])
+   private int matchFixedFormString(int i, char buf[], int count, char newBuf[])
    {
       if (i >= super.n) return i;
 
-      char quote_char = 0;
-
-      if (buf[i] == '\'') quote_char = '\'';
-      if (buf[i] == '"')  quote_char = '"';
-
-      if (quote_char == 0) return i;  // not the start of a string
+      char quote_char = buf[i];
+      if (quote_char != '"' && quote_char != '\'') return i;  // not the start of a string
 
       do {
          newBuf[count++] = buf[i++];
@@ -635,10 +824,10 @@ public class FortranStream extends ANTLRFileStream
       }
       while (i < super.n && buf[i] != quote_char && buf[i] != '\n');
 
-      // copy terminating quote char (terminal '\n' is an error)
-      if (i < super.n && buf[i] == quote_char) {
-         newBuf[count++] = buf[i];
-      }
+      //CER      // copy terminating quote char (terminal '\n' is an error)
+      //CER      if (i < super.n && buf[i] == quote_char) {
+      //CER         newBuf[count++] = buf[i];
+      //CER      }
 
       return i;
    }
