@@ -274,6 +274,7 @@ import fortran.ofp.parser.java.FortranToken;
  * it seems that it may be the timeout issue that was mentioned..
  */
 
+
 T_EOS 
 @after {
     // Throw away T_EOS if at beginning of file or after an include,
@@ -427,9 +428,7 @@ T_RPAREN        : ')'   ;
 T_UNDERSCORE    : '_'   ;
 
 // begin Rice additions --------------------------
-// Laks 2009.01.13: add token at for team
-T_AT			: '@'   ;
-
+T_AT			      : '@'   ;
 // end Rice additions ----------------------------
 
 T_EQ            : '.EQ.' ;
@@ -596,6 +595,7 @@ T_EVENT         :       'EVENT'         ;
 T_LOCKSET       :       'LOCKSET'       ;
 T_FINISH        :       'FINISH'        ;
 T_SPAWN         :       'SPAWN'         ;
+T_COPOINTER     :       'COPOINTER'     ;
 // end Rice additions ----------------------------
 
 // these tokens (without blank characters) are from 3.3.2.2

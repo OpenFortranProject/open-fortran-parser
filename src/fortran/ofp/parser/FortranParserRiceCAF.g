@@ -1,8 +1,12 @@
-/**
- * FortranParserExtras.g - this file is needed because adding more rules to FortranParser08
- * currently will cause javac to fail with a "Code too large" error.  Removing some of
- * the rules to an inherited grammar is a workaround to the problem.
- */
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//  FortranParserRiceCAF.g - grammar extensions for the CAF 2.0 translator   //
+//                                                                           //
+//  Copyright ((c)) 2008-2011, Rice University.                              //
+//  All rights reserved. See the file "LICENSE" for details.                 //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
 
 parser grammar FortranParserRiceCAF;
 
@@ -260,6 +264,21 @@ type_declaration_stmt
 		entity_decl_list end_of_stmt
     		{ action.type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.tk); }
     ;
+
+// copointer extensions to rules R503(F03)/R502(F08), R441(F03)/R437(F08), R1213(F080)
+attr_spec_extension
+    :  T_COPOINTER
+           {action.attr_spec($T_COPOINTER, IActionEnums.AttrSpec_COPOINTER);}
+    ;
+component_attr_spec_extension
+    :  T_COPOINTER
+           {action.attr_spec($T_COPOINTER, IActionEnums.AttrSpec_COPOINTER);}
+    ;
+proc_attr_spec_extension
+    :  T_COPOINTER
+           {action.attr_spec($T_COPOINTER, IActionEnums.AttrSpec_COPOINTER);}
+    ;
+
 
 /*
  * R510-F08 deferred-coshape-spec
@@ -667,13 +686,13 @@ cosubscript_list
  int count=0;
  Token idTeam=null;
  }
-   :       {action.cosubscript_list__begin();}
-       	cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
-   		 (T_AT T_IDENT {idTeam=$T_IDENT;})?
-           {
-           		action.cosubscript_list(count, idTeam);
-           }
-   ;
+  :  {action.cosubscript_list__begin();}
+     ( cosubscript {count++;} ( T_COMMA cosubscript {count++;} )* )?
+     (T_AT T_IDENT {idTeam=$T_IDENT;})?
+     {
+       action.cosubscript_list(count, idTeam);
+     }
+  ;
 
 
 rice_finish_construct

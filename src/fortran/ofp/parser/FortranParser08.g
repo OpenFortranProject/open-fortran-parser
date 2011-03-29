@@ -1036,6 +1036,7 @@ component_attr_spec
           {action.component_attr_spec($T_DIMENSION, IActionEnums.ComponentAttrSpec_dimension);}
    |   T_POINTER
           {action.component_attr_spec($T_POINTER, IActionEnums.ComponentAttrSpec_pointer);}
+   |   component_attr_spec_extension
     // are T_KIND and T_LEN correct?
 //   |   T_KIND
 //          {action.component_attr_spec($T_KIND, 
@@ -1043,7 +1044,10 @@ component_attr_spec
 //   |   T_LEN
 //          {action.component_attr_spec($T_LEN, 
 //                  IActionEnums.ComponentAttrSpec_len);}
-	;
+  ;
+  
+// language extension point
+component_attr_spec_extension : {false}? => ;    // no extension
 
 component_attr_spec_list
 @init{int count=1;}
@@ -1575,7 +1579,12 @@ attr_spec
            {action.attr_spec($T_KIND, IActionEnums.AttrSpec_KIND);}
     |   T_LEN
            {action.attr_spec($T_LEN, IActionEnums.AttrSpec_LEN);}
+    |   attr_spec_extension
 	;
+	
+// language extension point
+attr_spec_extension : {false}? => ;    // no extension
+
 
 /*
  * R503-F08 entity-decl
@@ -5399,7 +5408,11 @@ proc_attr_spec
     |   T_DEFERRED
             { action.proc_attr_spec($T_DEFERRED, null, 
                 IActionEnums.AttrSpec_DEFERRED); }
+    |   proc_attr_spec_extension
 	;
+  
+// language extension point
+proc_attr_spec_extension : {false}? => ;    // no extension
 
 // R1214
 // T_IDENT inlined for procedure_entity_name

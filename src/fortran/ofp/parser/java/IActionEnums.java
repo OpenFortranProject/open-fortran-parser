@@ -87,7 +87,7 @@ public interface IActionEnums {
 	static final public int IntrinsicTypeSpec_LOGICAL=
 		IntrinsicTypeSpecBase+6;
 	//---------------------------------------------
-	// Laks 2010.4.15: add rice intrinsic types
+	// Rice intrinsic types
 	//---------------------------------------------
         static final public int IntrinsicTypeSpec_TEAM=
                 IntrinsicTypeSpecBase+7;
@@ -159,8 +159,11 @@ public interface IActionEnums {
 	// TODO are T_KIND and T_LEN correct?
 	static final public int AttrSpec_KIND=AttrSpecBase+26;
 	static final public int AttrSpec_LEN=AttrSpecBase+27;
-	// Laksono 2010.5.4: add coarray attribute
+	//---------------------------------------------
+	// Rice attributes
+	//---------------------------------------------
 	static final public int AttrSpec_COARRAY=AttrSpecBase+28;
+	static final public int AttrSpec_COPOINTER=AttrSpecBase+29;
 
 	static final public int BindingStatementType_specific=
 		BindingStatementTypeBase+0;
