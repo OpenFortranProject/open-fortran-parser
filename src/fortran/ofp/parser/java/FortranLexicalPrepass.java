@@ -1383,14 +1383,19 @@ END OBSOLETE********/
                descIndex = getControlEditDesc(line, lineIndex, lineLength);
                if (descIndex != -1) {
                   // found a control-edit-desc
-                  // Don't create a token if we just have a / because it 
-                  // is handled below since it is also a terminating char.
-                  if ((descIndex - lineIndex) > 0 || line.charAt(descIndex) != '/') {
-                     tokens.addToken(
-                        tokens.createToken(FortranLexer.T_CONTROL_EDIT_DESC, 
-                                           line.substring(lineIndex, 
-                                                          descIndex),
-                                           lineNum, charPos));
+                  // Don't create a token if we just have a / of : because it 
+                  // is handled below since it is also a terminating char (no comma needed).
+                  if ((descIndex - lineIndex) > 0 || (line.charAt(descIndex) != '/' &&
+                                                      line.charAt(descIndex) != ':') ) {
+                     // Don't understand how you can have a zero length token so
+                     // print out a warning in case it occurs to see what the problem
+                     // could be.
+                     if (descIndex == lineIndex) {
+                        System.out.println("FortranLexicalPrepass::parseFormatString: WARNING creating 0 length token");
+                     }
+                     tokens.addToken(tokens.createToken(FortranLexer.T_CONTROL_EDIT_DESC, 
+                                                        line.substring(lineIndex, descIndex),
+                                                        lineNum, charPos));
                      charPos += line.substring(lineIndex, descIndex).length();
                   }
                }
@@ -1428,7 +1433,7 @@ END OBSOLETE********/
                descIndex = lineIndex;
             }
 
-            // add a token for out terminating character
+            // add a token for the terminating character
             if (line.charAt(descIndex) == ',') {
                termString = new String(",");
                tokens.addToken(
