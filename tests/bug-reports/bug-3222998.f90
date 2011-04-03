@@ -1,4 +1,7 @@
 !
+! WARNING: this bug requires visual comparision with --verbose.  It should have
+! 2 format-items in 1000 format and 10 format-items in the 2000 format statement.
+!
 ! Test for bug 3222998.  The bug was fixed by testing for ':' as well as '\'
 ! in a control-edit-desc.  Both characters can terminate a format-item
 ! (replace a comma and be a format-item) so both must be checked otherwise a
