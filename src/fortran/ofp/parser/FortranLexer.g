@@ -274,6 +274,9 @@ import fortran.ofp.parser.java.FortranToken;
  * it seems that it may be the timeout issue that was mentioned..
  */
 
+// Support for language extension points
+T_NO_LANGUAGE_EXTENSION : {false}? 'no extension' ;   // can't be recognized
+
 
 T_EOS 
 @after {

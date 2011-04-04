@@ -1047,7 +1047,7 @@ component_attr_spec
   ;
   
 // language extension point
-component_attr_spec_extension : {false}? => ;    // no extension
+component_attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 
 component_attr_spec_list
 @init{int count=1;}
@@ -1583,7 +1583,7 @@ attr_spec
 	;
 	
 // language extension point
-attr_spec_extension : {false}? => ;    // no extension
+attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 
 
 /*
@@ -5412,7 +5412,7 @@ proc_attr_spec
 	;
   
 // language extension point
-proc_attr_spec_extension : {false}? => ;    // no extension
+proc_attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 
 // R1214
 // T_IDENT inlined for procedure_entity_name
