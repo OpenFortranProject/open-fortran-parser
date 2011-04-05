@@ -13,29 +13,10 @@ use File::Temp qw(tempfile);
 #
 
 ###############- Stage 1: Convert main interface to c and header.
-
-# File names:
-$outdir = "c";
-$javafile = "java/IFortranParserAction.java";
-$cfile = "$outdir/FortranParserActionNull.c";
-$hfile = "$outdir/FortranParserAction.h";
-
-# Extern C calls.
-$externc="\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n\n";
-$endExternc="\n#ifdef __cplusplus\n} /* End extern C. */\n#endif\n";
-
-# Include lines.
-$includeEnums = "#include \"ActionEnums.h\"";
-$includeTokens = "#include \"token.h\"";
-$includeParser = "#include \"FortranParserAction.h\"\n";
-
-# Build a "header top" that goes after copyrights and initial comments.
-$headtop="\n#ifndef FORTRANPARSERHEAD\n#define FORTRANPARSERHEAD\n";
-$headtop="$headtop\n$externc\n$includeEnums\n$includeTokens\n\n$typedef\n\n";
-
-# Build a tail for both files.
-$headtail="\n$endExternc\n#endif\n";
-
+#
+# 04/05/2011 (craig r.): removed stage 1 as it is now done in Java with introspection.
+#
+#######
 
 #############################################################
 #
@@ -43,13 +24,24 @@ $headtail="\n$endExternc\n#endif\n";
 ###############- Stage 2: Convert "enum" interface to header.
 
 # File names:
+$outdir = "c";
 $javafile = "java/IActionEnums.java";
 $hfile = "$outdir/ActionEnums.h";
+
+# Extern C calls.
+$externc="\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n\n";
+$endExternc="\n#ifdef __cplusplus\n} /* End extern C. */\n#endif\n";
+
+# Include lines.
+$includeTokens = "#include \"token.h\"";
 
 # Build a "header top" that goes after copyrights and initial comments.
 # Use the same tail as above.
 $headtop="\n#ifndef FORTRANPARSERENUMSHEAD\n#define FORTRANPARSERENUMSHEAD\n";
 $headtop="$headtop\n$externc\n$includeTokens\n\n";
+
+# Build a tail for the file.
+$headtail="$endExternc\n#endif\n";
 
 # Open the files the first time.
 open JAVA,  "<$javafile" or die "Couldn't open interface file $javafile.";
@@ -131,30 +123,13 @@ close HEAD or warn "Couldn't close header file.\n";
 # Now fix the file a little bit.
 fixit($hfile);
 
-# One last fix. Take advantage of the fact that C is not as verbose as java.
-open HEAD, "<$hfile" or die "Couldn't open file $hfile for last fix.\n"; 
-
-# create temp file.  set unlink flag to false since we know we're going to
-# be renaming the file and keeping it when we are done.  don't want to
-# unlink anything.
-($tempfh,$tempfname) = tempfile(UNLINK => 0);
-while ($line=<HEAD>){
-
-	if ($line=~m/=\s*\n/) {
-		$line2=<HEAD>;
-		$line="$line$line2";
-		$line=~s/=\s*\n\s*/=/g;
-	}
-	print $tempfh $line;
-
-}
-close HEAD or die "Couldn't close file $hfile for last fix.\n";
-close $tempfh or die "Couldn't close file $tempfname.\n";
-
-# unlink original file
-unlink $hfile;
-# move new file into its place from the temporary location
-rename $tempfname, $hfile;
+#
+# The next few lines were moved from below as it IS needed whereas combining lines
+# at '=' is not needed as the original is still valid C syntax.  I believe that this
+# line can remain here even if the unlinking and renaming is put back in.  It
+# seems that unlinking and renaming doesn't work on some file systems using
+# NFS.
+#
 
 # Tack on the tail.
 open HEAD, ">>$hfile" or die 
@@ -162,7 +137,38 @@ open HEAD, ">>$hfile" or die
 print HEAD $headtail;
 close HEAD or die "Couldn't close header file $hfile after pinning tail.\n";
 
+# One last fix. Take advantage of the fact that C is not as verbose as java.
+#CER open HEAD, "<$hfile" or die "Couldn't open file $hfile for last fix.\n"; 
 
+# create temp file.  set unlink flag to false since we know we're going to
+# be renaming the file and keeping it when we are done.  don't want to
+# unlink anything.
+#CER ($tempfh,$tempfname) = tempfile(UNLINK => 0);
+#CER while ($line=<HEAD>){
+#CER 
+#CER 	if ($line=~m/=\s*\n/) {
+#CER 		$line2=<HEAD>;
+#CER 		$line="$line$line2";
+#CER 		$line=~s/=\s*\n\s*/=/g;
+#CER 	}
+#CER 	print $tempfh $line;
+#CER 
+#CER }
+#CER 
+#CER close HEAD or die "Couldn't close file $hfile for last fix.\n";
+#CER close $tempfh or die "Couldn't close file $tempfname.\n";
+#CER 
+# unlink original file
+#CER unlink $hfile;
+# move new file into its place from the temporary location
+#CER rename $tempfname, $hfile;
+#CER 
+# Tack on the tail.
+#CER open HEAD, ">>$hfile" or die 
+#CER 	"Couldn't pin the tail on the header file $hfile\n";
+#CER print HEAD $headtail;
+#CER close HEAD or die "Couldn't close header file $hfile after pinning tail.\n";
+#CER 
 
 ##################################################################
 # Slurping subroutine. Used in both modes. 
