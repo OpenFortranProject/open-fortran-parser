@@ -291,6 +291,9 @@ END OBSOLETE********/
                // "verbose" in Print() is either "normal" or "verbose" here..
                action.setVerbose(!silent);
             }
+
+            /* The include directories must be set before the tokens can be dumped below. */
+            ofp.lexer.setIncludeDirs(includeDirs);
             
             if (dumpTokens) {
                ofp.tokens.outputTokenList(ofp.parser.getAction());
@@ -327,8 +330,6 @@ END OBSOLETE********/
             System.out.println(this.fileName + " is FIXED FORM");
          else if (verbose)
             System.out.println(this.fileName + " is FREE FORM");
-
-      lexer.setIncludeDirs(includeDirs);
 
       // determine whether the file is fixed or free form and
       // set the source form in the prepass so it knows how to handle lines.
