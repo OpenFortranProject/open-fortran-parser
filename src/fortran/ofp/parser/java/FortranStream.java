@@ -790,6 +790,16 @@ public class FortranStream extends ANTLRFileStream
             newBuf[count++] = buf[i++];
             newBuf[count++] = buf[i++];
          }
+         // look for continuation character as last non-blank character and
+         // if found, return the '&' position so caller can process continuation
+         if (buf[i] == '&') {
+            int ii = i;
+            while (buf[++ii] == ' ');
+            if (buf[ii] != '\n') {
+               // '&' not a continuation, just part of the string, so just copy it
+               newBuf[count++] = buf[i++];
+	    }
+	 }
       }
       while (i < super.n && buf[i] != quote_char && buf[i] != '&' && buf[i] != '\n');
 
