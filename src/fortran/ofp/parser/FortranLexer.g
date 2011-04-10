@@ -50,8 +50,14 @@ import fortran.ofp.parser.java.FortranToken;
     protected StringBuilder whiteText = new StringBuilder();
 
     public Token emit() {
-        FortranToken t = new FortranToken(input, state.type, state.channel,
-                                          state.tokenStartCharIndex, getCharIndex()-1);
+        int start = state.tokenStartCharIndex;
+        int stop = getCharIndex() - 1;
+        // TODO - this is a start at fixing the line:column information in tokens inserted
+        // by the lexer.  In future the stop should at least be the length of token text.
+        if (stop < 0) {
+           stop = start; // for now
+        }
+        FortranToken t = new FortranToken(input, state.type, state.channel, start, stop);
         t.setLine(state.tokenStartLine);
         t.setText(state.text);
         t.setCharPositionInLine(state.tokenStartCharPositionInLine);
@@ -105,7 +111,14 @@ import fortran.ofp.parser.java.FortranToken;
                 FortranToken eofToken = 
                     new FortranToken(this.input, T_EOF, Token.DEFAULT_CHANNEL,
                         this.input.index(), this.input.index()+1);
+
+                // TODO - provide better information about the location of this token
+                // It is probably ok for it to start at last character position in file but
+                // consider the end position of the token.
+                eofToken.setLine(state.tokenStartLine);
+                eofToken.setCharPositionInLine(state.tokenStartCharPositionInLine);
                 eofToken.setText(input.getSourceName());
+
                 tmpToken = eofToken;
                 /* We have at least one previous input stream on the stack, 
                    meaning we should be at the end of an included file.  
