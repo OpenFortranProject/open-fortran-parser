@@ -746,14 +746,30 @@ public class FortranStream extends ANTLRFileStream
       i += 1;  // skip '\n'
 
       // skip ' ' characters on next line
+      // TODO - what about TABS?
       while (i < super.n && buf[i] == ' ') i += 1;
-      if (i >= super.n || buf[i] != '&') {
-         System.err.println("Terminating '&' not found in continued string at character position " + i);
-         return i0;
-      }
+
+      //
+      // This should be removed in 0.8.3
+      //
+      //      if (i >= super.n || buf[i] != '&') {
+      //         // first non-blank character is part of the continued string so back up to get it
+      //         i -= 1;
+      //
+      //         //CER System.err.println("Terminating '&' not found in continued string at character position " + i);
+      //         //CER return i0;
+      //      }
+
+      if (i >= super.n) return i-1;
 
       // skip trailing '&'
-      if (++i >= super.n) return i0;
+      //
+      // NOTE: gfortran doesn't require the terminating character (warns with -Wall)
+      // so we also ignore the standard here if the trailing '&' is missing
+      //
+      if (buf[i] == '&') i += 1;
+
+      if (i >= super.n) return i-1;
 
       do {
          newBuf[count++] = buf[i++];
