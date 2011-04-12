@@ -359,7 +359,11 @@ public class FortranStream extends ANTLRFileStream
          else if (col > 1 && col < 6) {
             // remove comment if it exists but retain '\n' or EOF
             if ((ii = matchComment(i, data, comments)) != i) {
+               // TODO-FIXME need to retain comments in a way that won't break fixed form continuation
+               // copy comments were caught up in continuation that caused bug #3285011
                //count = copyCommentLines(count, newData, comments);
+               // for now just deop the comment (CER = 12.4.11)
+		comments.delete(0, comments.length());
                //CER count += ii - i;
                i = ii;
             }
@@ -377,7 +381,11 @@ public class FortranStream extends ANTLRFileStream
          else {
             // consume a comment if it exists but retain '\n'
             if ((ii = matchComment(i, data, comments)) != i) {
+               // TODO-FIXME need to retain comments in a way that won't break fixed form continuation
+               // copy comments were caught up in continuation that caused bug #3285011
                //count = copyCommentLines(count, newData, comments);
+               // for now just deop the comment (CER = 12.4.11)
+		comments.delete(0, comments.length());
                //CER count += ii - i;
                i = ii;
             }
@@ -417,7 +425,9 @@ public class FortranStream extends ANTLRFileStream
             col = 1;
             line += 1;
             // copy comments that were caught up with continuation
-            count = copyCommentLines(count, newData, comments);
+            // TODO-FIXME need to retain comments in a way that won't break fixed form continuation
+            // copy comments were caught up in continuation that caused bug #3285011
+            //count = copyCommentLines(count, newData, comments);
             while (addCR > 0) {
                addCR -= 1;
                line += 1;
