@@ -4443,6 +4443,7 @@ public abstract interface IFortranParserAction {
    
    public abstract void cleanUp();
 
+   
    //-------------------------------------------------------------------------
    // RICE CO-ARRAY FORTRAN RULES
    // ---------------------------
@@ -4450,11 +4451,26 @@ public abstract interface IFortranParserAction {
    //-------------------------------------------------------------------------
 
    /**
+    * rice_part_ref
+    * 
+    * @param hasCoDef Whether a co-dereference operator ( '[ ]' ) is present.
+    */
+   public abstract void rice_part_ref(boolean hasCoDef);
+
+   /**
     * rice_image_selector
     * 
     * @param idTeam The token for the id of the team.
     */
    public abstract void rice_image_selector(Token idTeam);
+
+   /**
+    * rice_co_dereference_op
+    * 
+    * @param lbracket The left bracket token of the operator.
+    * @param lbracket The right bracket token of the operator.
+    */
+   public abstract void rice_co_dereference_op(Token lbracket, Token rbracket);
 
    /**
     * rice_allocate_coarray_spec

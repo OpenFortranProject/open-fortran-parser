@@ -612,6 +612,7 @@ T_LOCKSET       :       'LOCKSET'       ;
 T_FINISH        :       'FINISH'        ;
 T_SPAWN         :       'SPAWN'         ;
 T_COPOINTER     :       'COPOINTER'     ;
+T_COTARGET      :       'COTARGET'      ;
 // end Rice additions ----------------------------
 
 // these tokens (without blank characters) are from 3.3.2.2

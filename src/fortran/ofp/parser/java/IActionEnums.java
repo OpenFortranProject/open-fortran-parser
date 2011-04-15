@@ -161,9 +161,10 @@ public interface IActionEnums {
 	static final public int AttrSpec_LEN=AttrSpecBase+27;
 	//---------------------------------------------
 	// Rice attributes
-	//---------------------------------------------
 	static final public int AttrSpec_COARRAY=AttrSpecBase+28;
 	static final public int AttrSpec_COPOINTER=AttrSpecBase+29;
+	static final public int AttrSpec_COTARGET=AttrSpecBase+30;
+	//---------------------------------------------
 
 	static final public int BindingStatementType_specific=
 		BindingStatementTypeBase+0;

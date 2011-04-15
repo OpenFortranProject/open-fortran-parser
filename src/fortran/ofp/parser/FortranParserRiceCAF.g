@@ -265,10 +265,14 @@ type_declaration_stmt
     		{ action.type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.tk); }
     ;
 
-// copointer extensions to rules R503(F03)/R502(F08), R441(F03)/R437(F08), R1213(F080)
+// Copointer extensions to rules R503(F03)/R502(F08), R441(F03)/R437(F08), R1213(F080)
+// Note that in F08 the 'TARGET' attribute can only appear in 'attr-spec's,
+// so we make the same decision for our new 'COTARGET' attribute.
 attr_spec_extension
     :  T_COPOINTER
            {action.attr_spec($T_COPOINTER, IActionEnums.AttrSpec_COPOINTER);}
+    |  T_COTARGET
+           {action.attr_spec($T_COTARGET, IActionEnums.AttrSpec_COTARGET);}
     ;
 component_attr_spec_extension
     :  T_COPOINTER
@@ -308,44 +312,48 @@ proc_attr_spec_extension
  * Section/Clause 6: Use of data objects
  */               
 
-/*
- * R612-F08 part-ref
- *    is part-name [ ( section-subscript-list ) ] [ image-selector]
- */
 
 ////////////
-// R612-F08, R613-F03
-//
-// This rule is implemented in FortranParserExtras grammar
-//
-// T_IDENT inlined for part_name
-// with k=2, this path is chosen over T_LPAREN substring_range T_RPAREN
-// TODO error: if a function call, should match id rather than 
-// (section_subscript_list)
-// a = foo(b) is ambiguous YUK...
-part_ref
-options {k=2;}
-@init{boolean hasSSL = false; boolean hasImageSelector = false; }
-   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
-       (image_selector {hasImageSelector=true;})?
-           {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
-   |   (T_IDENT T_LBRACKET) => T_IDENT image_selector
-           {hasImageSelector=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
-   |   T_IDENT
-           {action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
-   ;
+// Rice extension for copointer dereferencing
+////////////
 
+data_ref
+@init{int numPartRefs = 0;}
+  : rice_part_ref {numPartRefs += 1;} ( T_PERCENT rice_part_ref {numPartRefs += 1;})*
+      {action.data_ref(numPartRefs);}
+  ;
 
-
-part_ref_no_image_selector
-options{k=2;}
+rice_part_ref
 @init{boolean hasSSL = false; boolean hasImageSelector = false;}
-   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
-           {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
-   |   T_IDENT
-           {action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   :   (T_IDENT T_LPAREN) =>
+           T_IDENT T_LPAREN section_subscript_list T_RPAREN
+           (image_selector {hasImageSelector=true;})?
+               {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   |   (T_IDENT T_LBRACKET T_RBRACKET) =>
+           T_IDENT T_LBRACKET T_RBRACKET
+           (image_selector {hasImageSelector=true;})?
+               {action.part_ref($T_IDENT, hasSSL, hasImageSelector); action.rice_co_dereference_op($T_LBRACKET, $T_RBRACKET);}
+   |   (T_IDENT T_LBRACKET) =>
+           T_IDENT image_selector
+               {hasImageSelector=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   |       T_IDENT
+               {action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
    ;
+   
 
+/* alternate syntax for co-dereferencing
+
+rice_part_ref
+@init{boolean hasCoDeref = false; }
+   :  part_ref (rice_co_dereference_op {hasCoDeref=true;})?
+          {action.rice_part_ref(hasCoDeref);}
+   ;
+   
+rice_co_dereference_op
+   :   T_LBRACKET T_RBRACKET
+           {action.rice_co_dereference_op($T_LBRACKET, $T_RBRACKET);}
+   ;
+*/
 
 
 /**
@@ -484,8 +492,10 @@ allocation
 //
 allocate_object
 @init{int numPartRefs = 0;}
-   :   part_ref_no_image_selector {numPartRefs += 1;}
-       (T_PERCENT part_ref_no_image_selector {numPartRefs += 1;})*
+   :   /* part_ref_no_image_selector {numPartRefs += 1;} */
+       /* (T_PERCENT part_ref_no_image_selector {numPartRefs += 1;})* */
+       part_ref {numPartRefs += 1;}
+       (T_PERCENT part_ref {numPartRefs += 1;})*
            {action.data_ref(numPartRefs); action.allocate_object();}
    ;
 
@@ -515,53 +525,6 @@ options{k=3;}
 			{action.data_ref(numPartRefs);}
 	;
 	*/
-
-/**
- * Section/Clause 7: Expressions and assignment
- */
-
-/*
- * R724-F08 logical-expr
- *    is expr
- */
-
-////////////
-// R724-F08, R724-F03
-//
-logical_expr
-   :   expr
-   ;
-
-scalar_logical_expr
-   :   expr
-   ;
-
-
-
-/*
- * R726-08 int-expr
- *    is   expr
- */
-
-////////////
-// R726-F08, R727-F03
-//
-int_expr
-   :   expr
-   ;
-
-scalar_int_expr
-   :   expr
-   ;
-
-
-//----------------------------------------------------------------------------
-// additional rules following standard and useful for error checking
-//----------------------------------------------------------------------------
-
-scalar_variable
-   :   expr
-   ;
 
 
 /**
@@ -687,7 +650,7 @@ cosubscript_list
  Token idTeam=null;
  }
   :  {action.cosubscript_list__begin();}
-     ( cosubscript {count++;} ( T_COMMA cosubscript {count++;} )* )?
+     cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
      (T_AT T_IDENT {idTeam=$T_IDENT;})?
      {
        action.cosubscript_list(count, idTeam);
@@ -737,4 +700,59 @@ rice_spawn_stmt
     action.rice_spawn_stmt(lbl, $T_SPAWN, $end_of_stmt.tk, hasEvent);
   }
   ;
+
+
+///////////////////////////////////////////////////////////////////////////////
+// THESE RULES ARE COPIED FROM FORTRAN-PARSER-EXTRAS ONLY BECAUSE WE ARE     //
+// CURRENTLY IMPORTING FORTRAAN-PARSER-08 INSTEAD. FIX THIS.                 //
+///////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * Section/Clause 7: Expressions and assignment
+ */
+
+/*
+ * R724-F08 logical-expr
+ *    is expr
+ */
+
+////////////
+// R724-F08, R724-F03
+//
+logical_expr
+   :   expr
+   ;
+
+scalar_logical_expr
+   :   expr
+   ;
+
+
+/*
+ * R726-08 int-expr
+ *    is   expr
+ */
+
+////////////
+// R726-F08, R727-F03
+//
+int_expr
+   :   expr
+   ;
+
+scalar_int_expr
+   :   expr
+   ;
+
+
+//----------------------------------------------------------------------------
+// additional rules following standard and useful for error checking
+//----------------------------------------------------------------------------
+
+scalar_variable
+   :   expr
+   ;
+
+
 

@@ -5132,6 +5132,18 @@ public class FortranParserActionPrint implements IFortranParserAction {
    //-------------------------------------------------------------------------
 
    /**
+    * rice_part_ref
+    * 
+    * @param hasCoDef Whether a co-dereference operator ( '[ ]' ) is present.
+    */
+   public void rice_part_ref(boolean hasCoDef)
+   {
+	  printRuleHeader(generatedRule, "rice-part-ref");
+	  printParameter(hasCoDef, "hasCoDef");
+	  printRuleTrailer();
+   }
+
+   /**
     * rice_image_selector
     * @param idTeam The token for the id of the team.
     */
@@ -5140,6 +5152,20 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleHeader(generatedRule, "rice-image-selector");
       printParameter(idTeam, "idTeam");
       printRuleTrailer();
+   }
+
+   /**
+    * rice_co_dereference_op
+    * 
+    * @param lbracket The left bracket token of the operator.
+    * @param lbracket The right bracket token of the operator.
+    */
+   public void rice_co_dereference_op(Token lbracket, Token rbracket)
+   {
+      printRuleHeader(generatedRule, "rice-co-dereference-op");
+	  printParameter(lbracket, "lbracket");
+	  printParameter(rbracket, "rbracket");
+	  printRuleTrailer();
    }
 
    /**
