@@ -4451,13 +4451,6 @@ public abstract interface IFortranParserAction {
    //-------------------------------------------------------------------------
 
    /**
-    * rice_part_ref
-    * 
-    * @param hasCoDef Whether a co-dereference operator ( '[ ]' ) is present.
-    */
-   public abstract void rice_part_ref(boolean hasCoDef);
-
-   /**
     * rice_image_selector
     * 
     * @param idTeam The token for the id of the team.
@@ -4467,8 +4460,8 @@ public abstract interface IFortranParserAction {
    /**
     * rice_co_dereference_op
     * 
-    * @param lbracket The left bracket token of the operator.
-    * @param lbracket The right bracket token of the operator.
+    * @param lbracket The token for the left bracket of the operator.
+    * @param rbracket The token for the right bracket of the operator.
     */
    public abstract void rice_co_dereference_op(Token lbracket, Token rbracket);
 
