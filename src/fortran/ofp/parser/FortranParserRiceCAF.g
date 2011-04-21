@@ -317,13 +317,9 @@ proc_attr_spec_extension
 // Rice extension for copointer dereferencing
 ////////////
 
-data_ref
-@init{int numPartRefs = 0;}
-  : rice_part_ref {numPartRefs += 1;} ( T_PERCENT rice_part_ref {numPartRefs += 1;})*
-      {action.data_ref(numPartRefs);}
-  ;
-
-rice_part_ref
+// This rule is written so that the 'part_ref' action's signature doesn't change between F08 and CAF2.
+// and so is not quite the natural one.
+part_ref
 @init{boolean hasSSL = false; boolean hasImageSelector = false;}
    :   (T_IDENT T_LPAREN) =>
            T_IDENT T_LPAREN section_subscript_list T_RPAREN
@@ -343,10 +339,10 @@ rice_part_ref
 
 /* alternate syntax for co-dereferencing
 
-rice_part_ref
+part_ref
 @init{boolean hasCoDeref = false; }
    :  part_ref (rice_co_dereference_op {hasCoDeref=true;})?
-          {action.rice_part_ref(hasCoDeref);}
+          {action.part_ref(hasCoDeref);}
    ;
    
 rice_co_dereference_op
