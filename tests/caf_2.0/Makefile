@@ -24,7 +24,14 @@ PARDIR=../
 FLAGS=--RiceCAF 
 #FLAGS=--RiceCAF --dump
 
-all: runRuleTestsNoCheck
+all: runRuleTestsCheck
+
+runRuleTestsCheck:
+	@for file in *.caf ; do \
+           echo "Running test $$file"; \
+           $(JAVA) fortran.ofp.FrontEnd $(FLAGS) --verbose $$file | grep -q "Parser exiting normally" ; rc=$$? ; \
+           if [ $$rc != 0 ]; then echo "...$$file FAILED!"; fi \
+        done;
 
 runRuleTestsNoCheck:
 	@for file in *.caf ; do \
