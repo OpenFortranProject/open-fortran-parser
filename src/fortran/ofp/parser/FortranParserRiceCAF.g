@@ -558,9 +558,13 @@ lock_variable
 rice_allocate_coarray_spec:
 		T_AT T_IDENT
 		    { action.rice_allocate_coarray_spec(1,$T_IDENT); }
-	|
-		T_AT
-		    { action.rice_allocate_coarray_spec(-1,null); }
+  |
+    T_AT
+        { action.rice_allocate_coarray_spec(-1,null); }
+  |
+    // TEMPORARY: accept old empty version for legacy code's allocate-stmts
+    /* empty */ 
+        { action.rice_allocate_coarray_spec(-1,null); }
 	;
 
 rice_with_team_construct
