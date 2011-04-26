@@ -318,18 +318,19 @@ proc_attr_spec_extension
 ////////////
 
 // This rule is written so that the 'part_ref' action's signature doesn't change between F08 and CAF2.
-// and so is not quite the natural one.
+// and so the action sequence is not quite natural when a co-deref-op is present.
 part_ref
 @init{boolean hasSSL = false; boolean hasImageSelector = false;}
-   :   (T_IDENT T_LPAREN) =>
+   :  (T_IDENT T_LPAREN) =>
            T_IDENT T_LPAREN section_subscript_list T_RPAREN
            (image_selector {hasImageSelector=true;})?
                {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
-   |   (T_IDENT T_LBRACKET T_RBRACKET) =>
+   |  (T_IDENT T_LBRACKET T_RBRACKET ) =>
            T_IDENT T_LBRACKET T_RBRACKET
+           ( (T_LPAREN) => T_LPAREN section_subscript_list T_RPAREN  {hasSSL=true;} )?
            (image_selector {hasImageSelector=true;})?
                {action.part_ref($T_IDENT, hasSSL, hasImageSelector); action.rice_co_dereference_op($T_LBRACKET, $T_RBRACKET);}
-   |   (T_IDENT T_LBRACKET) =>
+   |  (T_IDENT T_LBRACKET) =>
            T_IDENT image_selector
                {hasImageSelector=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
    |       T_IDENT
@@ -554,47 +555,35 @@ lock_variable
 // All Rice's rules and actions will prefixed with "rice_" keyword
 //----------------------------------------------------------------------------
 
-
-// Laks 2009.01.15: add rice caf allocation
-// the allocation is either using asterisk (with means all ranks) or team
 rice_allocate_coarray_spec:
-		T_AT T_IDENT { action.rice_allocate_coarray_spec(1,$T_IDENT); }
+		T_AT T_IDENT
+		    { action.rice_allocate_coarray_spec(1,$T_IDENT); }
 	|
-		{ action.rice_allocate_coarray_spec(-1,null); }
+		T_AT
+		    { action.rice_allocate_coarray_spec(-1,null); }
 	;
 
-// Laks 2009.02.03: in order to make "with team" more structured, we need to force
-// it into a construct block instead of statement. A disadvantage of this approach is
-// lack of flexibility and users are forced to use "end with team"
 rice_with_team_construct
 	: rice_with_team_stmt block rice_end_with_team_stmt
 	;
 	
-// Laks 2009.01.20: the default team construct	
-// statement to specify the default team
 rice_with_team_stmt
 @init{Token lbl = null;}
 	:	
-	(label {lbl=$label.tk;})? (T_WITHTEAM | T_WITH T_TEAM) T_IDENT
-	end_of_stmt
-	{
-	  action.rice_co_with_team_stmt(lbl, $T_IDENT);
-	}
+	  (label {lbl=$label.tk;})?
+	  (T_WITHTEAM | T_WITH T_TEAM) T_IDENT
+	  end_of_stmt
+	      { action.rice_co_with_team_stmt(lbl, $T_IDENT); }
 	;
 	
-
-// R824
-// T_IDENT inlined for select_construct_name
 rice_end_with_team_stmt
 @init{Token lbl = null; Token id = null;}
-	: 
-	 (label {lbl=$label.tk;})? T_END (T_WITHTEAM | T_WITH T_TEAM) 
-            ( T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{action.rice_end_with_team_stmt(lbl, id, 
-                $end_of_stmt.tk);}
+	 : 
+	   (label {lbl=$label.tk;})?
+	   T_END (T_WITHTEAM | T_WITH T_TEAM) (T_IDENT {id=$T_IDENT;})?
+	   end_of_stmt
+	      {action.rice_end_with_team_stmt(lbl, id, $end_of_stmt.tk);}
 	;
-
-
 
 // R403 (rice version)
 rice_intrinsic_type_spec

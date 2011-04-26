@@ -803,8 +803,23 @@ END OBSOLETE********/
 
    } // end matchAttrStmt()
 
-
    /**
+    * Test to see if a token is an opening paren or bracket.
+    */
+	private boolean isOpenParen(int token)
+	{
+		return token == FortranLexer.T_LPAREN || token == FortranLexer.T_LBRACKET;
+	}// end isOpenParen()
+
+	/**
+	 * Test to see if a token is a closing paren or bracket.
+	 */
+	private boolean isCloseParen(int token)
+	{
+		return token == FortranLexer.T_RPAREN || token == FortranLexer.T_RBRACKET;
+	}// end isCloseParen()
+
+/**
     * This matches closing paren or bracket even if the match is the wrong type,
     * i.e., '( ]'.  This shouldn't really matter as the parser proper will work it
     * out and give an error if the match is incorrect
@@ -825,11 +840,9 @@ END OBSOLETE********/
       do {
          lookAhead++;
          tmpTokenType = tokens.currLineLA(lookAhead);
-         if(tmpTokenType == FortranLexer.T_LPAREN ||
-            tmpTokenType == FortranLexer.T_LBRACKET)
+         if(isOpenParen(tmpTokenType))
             nestingLevel++;
-         else if(tmpTokenType == FortranLexer.T_RPAREN ||
-                 tmpTokenType == FortranLexer.T_RBRACKET)
+         else if(isCloseParen(tmpTokenType))
             nestingLevel--;
 
          // handle the error condition of the user not giving the 
@@ -849,13 +862,11 @@ END OBSOLETE********/
          // have to continue until we're no longer in a nested
          // paren, and find the matching closing paren
       } while((nestingLevel != 0) || 
-              (tmpTokenType != FortranLexer.T_RPAREN && 
-               tmpTokenType != FortranLexer.T_RBRACKET &&
+              (!isCloseParen(tmpTokenType) &&
                tmpTokenType != FortranLexer.T_EOS && 
                tmpTokenType != FortranLexer.EOF));
 
-      if(tmpTokenType == FortranLexer.T_RPAREN ||
-         tmpTokenType == FortranLexer.T_RBRACKET)
+      if(isCloseParen(tmpTokenType))
          return lookAhead;
 
       return -1;
@@ -1991,133 +2002,89 @@ END OBSOLETE********/
    } // end matchOneLineStmt()
 
 
-   private int matchDataRef(int lineStart, int lineEnd) {
-      if(tokens.currLineLA(lineStart+1) == FortranLexer.T_IDENT ||
-         lexer.isKeyword(tokens.currLineLA(lineStart+1)) == true) {
-         // look to see if the next token is a paren so can skip it
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
-            int tmpLineStart;
-
-            // matchClosingParen() will give us the lookAhead required to 
-            // find the RPAREN, which will be the actual offset (0 based) of 
-            // the first token after the RPAREN
-            tmpLineStart = matchClosingParen(lineStart, lineStart+2);
-            
-            // the data_ref was a function call, so reset the line start
-            // to account for it and then test for the '%'
-            lineStart = tmpLineStart-1;
-
-            // Laksono 2009.02.26: need to consider CAF bracket after parentheses
-            // E.g.: A(...) [ ... ]
-            if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LBRACKET) {
-                tmpLineStart = matchClosingParen(lineStart, lineStart+2);
-
-                // the data_ref was a function call, so reset the line start
-                // to account for it and then test for the '%'
-                lineStart = tmpLineStart-1;
-
-            }
-
-         } 
-
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_PERCENT) {
-            // see if the next token is a %
-            return matchDataRef(lineStart+2, lineEnd);
-         } else {
-            // Laksono 2009.08.05: adding CAF feature
-            // It is possible that the variable is a co-array with derived type
-            //  var[4@team]%something = .....
-            if ( tokens.currLineLA(lineStart+2) == FortranLexer.T_LBRACKET) {
-                int tmpLineStart = matchClosingParen(lineStart, lineStart+2);
-                // Since the tmpLineStart is the T_RBRACKET, then tmpLineStart+1 must be a percent
-                //  otherwise, syntax error or co-scalar
-                // Laksono 2009.08.06: avoid co-scalar, only try to match derived metric
-                if ( tokens.currLineLA(tmpLineStart+1) ==  FortranLexer.T_PERCENT )
-                  return matchDataRef(tmpLineStart+1, lineEnd);
-            }
-
-            // return lineStart, which is the raw index of the *last* 
-            // identifier in a chain of id%id%id
-            return lineStart;
-         }
-      } 
-
-      return lineStart;
+   /**
+    * This matches an entire data_ref and returns the offset of the next token following it.
+    */
+   private int matchDataRef(int lineStart, int lineEnd)
+   {
+	   // SKW 2011-4-26: modified to accept CAF2 co-dereference operator ('[ ]') if present
+	   
+	   // skip any number of consecutive part refs separated by '%'
+	   // each begins with an identifier (or keyword)
+	   int nextOffset = lineStart + 1;
+       while( tokens.currLineLA(nextOffset) == FortranLexer.T_IDENT || lexer.isKeyword(tokens.currLineLA(nextOffset)) )
+	   {
+		   // skip the identifier if any
+    	   nextOffset += 1;
+		   
+		   // skip up to three balanced '( )' or '[ ]' pairs (co-dereference op, section subscript list, image selector)
+		   int numToSkip = 3;
+		   while( numToSkip > 0 )
+		   {
+			   if( isOpenParen(tokens.currLineLA(nextOffset)) )
+			   {
+				   nextOffset = 1 + matchClosingParen(nextOffset, nextOffset);
+				   numToSkip -= 1;
+			   }
+			   else
+				   numToSkip = 0;	// no more pairs available to skip
+		   }
+		   
+		   // skip the separating '%' if any
+	       if( tokens.currLineLA(nextOffset) == FortranLexer.T_PERCENT )
+	    	   nextOffset += 1;
+	   }
+       
+       return nextOffset;
    } // end matchDataRef()
 
 
-   private boolean matchAssignStmt(int lineStart, int lineEnd) {
-      int identOffset = -1;
-      int newLineStart;
-      int assignType = 0;
+   private boolean matchAssignStmt(int lineStart, int lineEnd)
+   {
+      int identOffset, assignType;
+	  int nextOffset = lineStart;
 
-      if (lineEnd < (lineStart+3)) {
+      // can't be an assignment statement if not enough tokens
+      if( lineEnd - lineStart < 3 )
          return false;
+
+      // advance past an initial data_ref
+      nextOffset = matchDataRef(nextOffset, lineEnd);
+
+      // look for an assignment token (including ptr assignment)
+      if( tokens.currLineLA(nextOffset) == FortranLexer.T_EQUALS ||
+          tokens.currLineLA(nextOffset) == FortranLexer.T_EQ_GT )
+      {
+          // will convert everything on line to identifier
+          identOffset = lineStart;
+          assignType  = tokens.currLineLA(nextOffset);
+      }
+      else
+      {
+    	  identOffset = -1;
+          assignType  =  0;  // javac complains without this
       }
 
-      // advance past any '%' references in the data_ref
-      newLineStart = matchDataRef(lineStart, lineEnd);
-
-      // need to see if we have an assignment token, either as the second 
-      // token, or the first token after a given ()
-      if (tokens.currLineLA(newLineStart+2) == FortranLexer.T_EQUALS ||
-          tokens.currLineLA(newLineStart+2) == FortranLexer.T_EQ_GT) {
-         // it must be an assignment stmt, convert the line to idents
-         identOffset = lineStart;
-         assignType = tokens.currLineLA(newLineStart+2);
-      } else if (tokens.currLineLA(newLineStart+2) == FortranLexer.T_LPAREN ||
-                 tokens.currLineLA(newLineStart+2) == FortranLexer.T_LBRACKET) {
-         int rparenOffset = -1;
-
-         rparenOffset = matchClosingParen(newLineStart, newLineStart+2);
-         if (tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQUALS ||
-             tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQ_GT) {
-            // matched an assignment statement (including ptr assignment)
-            // convert everything on line to identifier
-            identOffset = lineStart;
-            assignType = tokens.currLineLA(rparenOffset+1);
-
-         } else if (tokens.currLineLA(rparenOffset+1) == FortranLexer.T_LBRACKET) {
-            // data_ref could have a final image_selector
-            rparenOffset = matchClosingParen(newLineStart, rparenOffset+1);
-            if (tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQUALS ||
-                tokens.currLineLA(rparenOffset+1) == FortranLexer.T_EQ_GT) {
-               // matched an assignment statement (including ptr assignment)
-               // convert everything on line to identifier
-               identOffset = lineStart;
-               assignType = tokens.currLineLA(rparenOffset+1);
-            }
-         }
-      }
-
-      // fixup the line if we found a valid ptr assignment and return true;
+      // if we found a valid ptr assignment fix up the line and return true
       // otherwise, change nothing and return false
-      if (identOffset != -1) {
-         // found no '%', but did find the assignment token
+      if( identOffset != -1 )
+      {
          convertToIdents(identOffset, lineEnd);
 
-         // try inserting a token, before the assignment stmt, to 
-         // signify what type of assignment it is.  hopefully this will allow
-         // the parser to not backtrack for action_stmt. 02.05.07
-         if (assignType == FortranLexer.T_EQUALS) {
+         // insert a special token to signify an assignment statement of given kind
+         if( assignType == FortranLexer.T_EQUALS )
             tokens.addToken(lineStart, FortranLexer.T_ASSIGNMENT_STMT, "__T_ASSIGNMENT_STMT__");
-         }
-         else if (assignType == FortranLexer.T_EQ_GT) {
+         else if( assignType == FortranLexer.T_EQ_GT )
             tokens.addToken(lineStart, FortranLexer.T_PTR_ASSIGNMENT_STMT, "__T_PTR_ASSIGNMENT_STMT__");
-         }
 
-         // a labeled action stmt can terminate a do loop.  see if we 
-         // have to fix it up (possibly insert extra tokens).
-         if (lineStart > 0 && tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING) {
+         // see if we have to fix up a labeled action stmt terminating a do loop
+         if( lineStart > 0 && tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING )
             fixupLabeledEndDo(lineStart, lineEnd);
-         }
 
          return true;
-      } else {
-//          System.out.println("couldn't match assignment statement with first "
-//                             + "token on line being: " + tokens.currLineLA(lineStart+1));
-         return false;
       }
+      else
+         return false;
    } // end matchAssignStmt()
 
 
