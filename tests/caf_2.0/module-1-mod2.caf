@@ -1,0 +1,11 @@
+module module_mod2
+   use module_mod1
+contains
+
+   function do_check(val) result(res)
+      integer(8) :: val
+      logical :: res
+      res = val .eq. foo(0,0)[0]
+   end function do_check
+
+end module module_mod2

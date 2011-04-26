@@ -1,0 +1,25 @@
+program moduletest
+   use module_mod1
+   use module_mod2
+
+   integer(8), parameter :: val = 42
+   integer(8) :: npe, mypid
+   logical :: success
+
+
+   npe = team_size()
+   mypid = team_rank()
+
+   call do_initialize(val)
+
+   success = (val .eq. foo(0,0))
+
+   if (.not. success) then
+      print *, "test failed for image ", mypid, "output: ", foo(0,0)
+   end if
+
+   if (success .and. 0 .eq. mypid) then
+      write(*, '(A)') "test succeeded"
+   endif
+   
+end program moduletest

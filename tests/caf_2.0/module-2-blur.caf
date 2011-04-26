@@ -1,0 +1,12 @@
+program blur
+   use module_table
+   use module_blur
+   implicit none
+
+   call table_init()
+   call apply_blur()
+
+   if (0 .eq. team_rank()) then
+      write(*, '(A)') "Test succeeded"
+   endif
+end program blur

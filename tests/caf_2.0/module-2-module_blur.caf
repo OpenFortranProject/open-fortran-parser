@@ -1,0 +1,11 @@
+module module_blur
+    use module_table
+contains
+
+   subroutine apply_blur()
+      implicit none
+      integer(8) :: round
+      table(0,0) = table(1,1)[0]
+   end subroutine apply_blur
+
+end module
