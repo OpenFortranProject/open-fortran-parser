@@ -197,14 +197,14 @@ public class FortranStream extends ANTLRFileStream
          
          // process column 1 special characters
          if (col == 1) {
-            while ((ii = matchPreprocessLine(i, data, comments)) != i) {
+            while ((ii = consumePreprocessLine(i, data, comments)) != i) {
                // preprocess line can't be added immediately because
                // could be in the middle of a continued line
                line += 1;
                i = ii;
             }
             
-            while ((ii = matchFreeFormCommentLine(i, data, comments)) != i) {
+            while ((ii = consumeFreeFormCommentLine(i, data, comments)) != i) {
                // comment line can't be added immediately because
                // could be in the middle of a continued line
                line += 1;
@@ -239,7 +239,7 @@ public class FortranStream extends ANTLRFileStream
                // add any comments and preprocess lines since not in 
                // the middle of a continued line
                if (comments.length() > 0) {
-                  count = copyCommentLines(count, newData, comments);
+                  count = consumeCommentLines(count, newData, comments);
                   if (i >= super.n) {
                      // this can occur if last line is a comment line
                      continue;
@@ -251,8 +251,8 @@ public class FortranStream extends ANTLRFileStream
          // process all columns > 1 
          else {
             // remove comment if it exists but retain '\n'
-            if ((ii = matchComment(i, data, comments)) != i) {
-               count = copyCommentLines(count, newData, comments);
+            if ((ii = consumeComment(i, data, comments)) != i) {
+               count = consumeCommentLines(count, newData, comments);
                //CER  count += ii - i;
                i = ii;
             }
@@ -324,7 +324,6 @@ public class FortranStream extends ANTLRFileStream
 
       char[] newData = new char[super.n];
       int count = 0;
-      int addCR = 0;
       int col   = 1;    // 1 based 
       int line  = 1;    // 1 based
 
@@ -333,14 +332,14 @@ public class FortranStream extends ANTLRFileStream
 
          // process column 1 special characters
          if (col == 1) {
-            while ((ii = matchPreprocessLine(i, data, comments)) != i) {
-               count = copyCommentLines(count, newData, comments);
+            while ((ii = consumePreprocessLine(i, data, comments)) != i) {
+               count = consumeCommentLines(count, newData, comments);
                line += 1;
                i = ii;
             }
             
-            while ((ii = matchFixedFormCommentLine(i, data, comments)) != i) {
-               count = copyCommentLines(count, newData, comments);
+            while ((ii = consumeFixedFormCommentLine(i, data, comments)) != i) {
+               count = consumeCommentLines(count, newData, comments);
                line += 1;
                i = ii;
             }
@@ -357,20 +356,20 @@ public class FortranStream extends ANTLRFileStream
          }
 
          else if (col > 1 && col < 6) {
-            // remove comment if it exists but retain '\n' or EOF
-            if ((ii = matchComment(i, data, comments)) != i) {
-               // TODO-FIXME need to retain comments in a way that won't break fixed form continuation
+            // consume a comment if it exists but retain '\n' or EOF
+            if (matchComment(i, data)) {
+               // TODO-VERIFY need to retain comments in a way that won't break fixed form continuation
                // copy comments were caught up in continuation that caused bug #3285011
-               //count = copyCommentLines(count, newData, comments);
-               // for now just deop the comment (CER = 12.4.11)
-		comments.delete(0, comments.length());
-               //CER count += ii - i;
-               i = ii;
+               i = consumeComment(i, data, comments);
+               // can't add comments yet if the line is continued
+               if (!matchFixedFormContinuation(i, data)) {
+                  count = consumeCommentLines(count, newData, comments);
+               }
             }
          }
 
          else if (col == 6) {
-            // Continuation checked at '\n' so not need here, just pass the character.
+            // Continuation checked at '\n' so no need to here, just pass the character.
             // If first line is a continuation it is an error so won't need to be
             // caught here.  TODO - what about included files with continuation, legal?
 
@@ -379,15 +378,15 @@ public class FortranStream extends ANTLRFileStream
          }
 
          else {
-            // consume a comment if it exists but retain '\n'
-            if ((ii = matchComment(i, data, comments)) != i) {
-               // TODO-FIXME need to retain comments in a way that won't break fixed form continuation
+            // consume a comment if it exists but retain '\n' or EOF
+            if (matchComment(i, data)) {
+               // TODO-VERIFY need to retain comments in a way that won't break fixed form continuation
                // copy comments were caught up in continuation that caused bug #3285011
-               //count = copyCommentLines(count, newData, comments);
-               // for now just deop the comment (CER = 12.4.11)
-		comments.delete(0, comments.length());
-               //CER count += ii - i;
-               i = ii;
+               i = consumeComment(i, data, comments);
+               // can't add comments yet if the line is continued
+               if (!matchFixedFormContinuation(i, data)) {
+                  count = consumeCommentLines(count, newData, comments);
+               }
             }
             // consume a string if it exists but retain trailing quote char
             else if ((ii = matchFixedFormString(i, data, count, newData)) != i) {
@@ -405,16 +404,8 @@ public class FortranStream extends ANTLRFileStream
             }
          }
             
-         ii = -1;
-    	 while (data[i] == '\n' && ii != i) {
-            ii = i;
-            if ((ii = checkForFixedFormContinuations(i, data, comments)) != i) {
-               i = ii;
-               //CER addCR += 1;
-               if (data[i] == '\n') {
-                  ii = -1;
-               }
-            }
+    	 while (data[i] == '\n' && matchFixedFormContinuation(i, data)) {
+            i = consumeFixedFormContinuation(i, data, comments);
          }
 
          // copy current character
@@ -425,14 +416,7 @@ public class FortranStream extends ANTLRFileStream
             col = 1;
             line += 1;
             // copy comments that were caught up with continuation
-            // TODO-FIXME need to retain comments in a way that won't break fixed form continuation
-            // copy comments were caught up in continuation that caused bug #3285011
-            //count = copyCommentLines(count, newData, comments);
-            while (addCR > 0) {
-               addCR -= 1;
-               line += 1;
-               newData[count++] = '\n';
-            }
+            count = consumeCommentLines(count, newData, comments);
          }
       }
 
@@ -445,7 +429,7 @@ public class FortranStream extends ANTLRFileStream
    /**
     * Copy comment line and preprocessor lines to data buffer
     */
-   int copyCommentLines(int i, char [] newData, StringBuffer comments)
+   int consumeCommentLines(int i, char [] newData, StringBuffer comments)
    {
       for(int ii = 0; ii < comments.length(); ii++) {
          newData[i++] = comments.charAt(ii);
@@ -456,9 +440,18 @@ public class FortranStream extends ANTLRFileStream
 
 
    /**
-    * if a comment, copy comment to newBuf excluding terminating '\n' character 
+    * Return true if this character starts a comment
     */
-   private int matchComment(int i, char buf[], StringBuffer comments)
+   private boolean matchComment(int i, char buf[])
+   {
+      return (buf[i] == '!');
+   }
+
+
+   /**
+    * if a comment, copy comment to comments buffer excluding terminating '\n' character 
+    */
+   private int consumeComment(int i, char buf[], StringBuffer comments)
    {
       if (i < super.n && buf[i] == '!') {
          // found comment character, copy characters up to '\n'
@@ -471,7 +464,25 @@ public class FortranStream extends ANTLRFileStream
    }
 
 
-   private int matchFreeFormCommentLine(int i, char buf[], StringBuffer comments)
+   /**
+    * Return true if a comment line beginning with '!' is found
+    */
+   private boolean matchFreeFormCommentLine(int i, char buf[])
+   {
+      // skip over leading blank characters
+      // TODO - what about TABS
+      int i1 = i;
+      while(i1 < super.n && buf[i1] == ' ') i1 += 1;
+
+      if (i1 >= super.n) return false;
+
+      if (buf[i1] == '!' || buf[i1] == '\n') return true;
+
+      return false;
+   }
+
+
+   private int consumeFreeFormCommentLine(int i, char buf[], StringBuffer comments)
    {
       if (i >= super.n) return i;
       
@@ -501,17 +512,67 @@ public class FortranStream extends ANTLRFileStream
 
 
    /**
+    * If a comment, beginning with '!', copy the comment to comments buffer excluding
+    * the terminating '\n' character.  Because the next line could be a fixed form
+    * continuation, we can't immediately consume the comment as all comments must
+    * come after all continued lines (comments can be interspersed between continued
+    * lines).
+    */
+   private int consumeFixedFormComments(int i, char buf[], StringBuffer comments)
+   {
+      if (i < super.n && buf[i] == '!') {
+         // found comment character, copy characters up to '\n'
+         do {
+            comments.append(buf[i++]);
+         }
+         while (i < super.n && buf[i] != '\n');
+      }
+
+      // consume all comment lines before looking for continuation
+      //
+      while (matchFixedFormCommentLine(i, buf)) {
+         // add '\n' so comments are not merged on a single line
+         comments.append('\n');
+         // TODO - bump line number and set column?
+         i = consumeFixedFormCommentLine(i, buf, comments);
+      }
+
+      return i;
+   }
+
+
+   /**
+    * Return true if a fixed form comment line is found.
+    *
+    * Check for comment characters, 'C', '*', and '!' at the start of
+    * a line.  A blank line is also a comment line.
+    */
+   private boolean matchFixedFormCommentLine(int i, char buf[])
+   {
+      if (i >= super.n) return false;
+
+      // first check for free form ('!' comments and blank character lines)
+      if (matchFreeFormCommentLine(i, buf)) return true;
+
+      // check for a normal comment line
+      if (buf[i] == '*' || buf[i] == 'C' || buf[i] == 'c') return true;
+      
+      return false;
+   }
+
+
+   /**
     * Check for comment characters, 'C', '*', and '!' at start of
     * a line.  A blank line is also a comment line. If a comment line is
     * found, copy the line comment to the comments buffer (without trailing
     * '\n', and return the position of the character after the '\n' character.
     */
-   private int matchFixedFormCommentLine(int i, char buf[], StringBuffer comments)
+   private int consumeFixedFormCommentLine(int i, char buf[], StringBuffer comments)
    {
       if (i >= super.n) return i;
 
       // first check for free form ('!' comments and blank character lines)
-      int ii = matchFreeFormCommentLine(i, buf, comments);
+      int ii = consumeFreeFormCommentLine(i, buf, comments);
       if (ii != i) return ii;
 
       // check for a normal comment line
@@ -569,7 +630,12 @@ public class FortranStream extends ANTLRFileStream
    }
 
 
-   private int matchPreprocessLine(int i, char buf[], StringBuffer comments)
+   private boolean matchPreprocessLine(int i, char buf[])
+   {
+      return (buf[i] == '#');
+   }
+
+   private int consumePreprocessLine(int i, char buf[], StringBuffer comments)
    {
       return processLineForCommentChar('#', i, buf, comments);
    }
@@ -613,6 +679,55 @@ public class FortranStream extends ANTLRFileStream
    /**
     * Called when at a '\n' character.  Look ahead for continuation
     * character at column 6.  There could be comment or preprocess
+    * lines in between so have to skip over comment lines and if
+    * they exist.
+    *
+    * The convention for a TAB character in columns 1..5 followed
+    * by a digit 1..9 is a continuation line.  If TAB + '0' the
+    * '0' is ignored in the input stream.  This follows DEC convention
+    * (I believe) but is non standard Fortran.
+    *
+    * WARNING, don't go beyond length of stream, super.n
+    */
+   private boolean matchFixedFormContinuation(int i, char buf[])
+   {
+      int i0 = i;      // save initial value of i
+      int ii = i + 1;  // look ahead past the '\n'
+     
+      // skip all preprocessor and comment lines
+      //
+      i += 1;
+      while (matchPreprocessLine(i, buf) || matchFixedFormCommentLine(i, buf)) {
+         i = findCharacter('\n', i, buf);
+         if (buf[i] != '\n') return false;
+         i += 1;
+      }
+
+      // search for TAB in columns 1..5, otherwise continued position will be ii
+      ii = i;
+      for (int j = 0; j < 5; j++) {
+         if (buf[ii]   == '\n') return false;
+         if (buf[ii++] == '\t') {
+            if (buf[ii] >= '1' && buf[ii] <= '9') {
+               return true;
+            }
+            else {
+               return false;
+            }
+         }
+      }
+
+      if (buf[ii] != '0' && buf[ii] != ' ') {
+         return true;
+      }
+
+      return false;
+   }
+
+
+   /**
+    * Called when at a '\n' character.  Look ahead for continuation
+    * character at column 6.  There could be comment or preprocess
     * lines in between so have to search for comment lines and remove
     * them if they exist.
     *
@@ -623,20 +738,20 @@ public class FortranStream extends ANTLRFileStream
     *
     * WARNING, don't go beyond length of stream, super.n
     */
-   private int checkForFixedFormContinuations(int i, char buf[], StringBuffer comments)
+   private int consumeFixedFormContinuation(int i, char buf[], StringBuffer comments)
    {
       int i0 = i;      // save initial value of i
       int ii = i + 1;  // look ahead past the '\n'
      
-      // strip all preprocessor and comment lines
+      // consume all preprocessor and comment lines
       //
       i += 1;
-      if ((ii = matchPreprocessLine(i, buf, comments)) != i) {
-          return ii-1;
-       }
-      if ((ii = matchFixedFormCommentLine(i, buf, comments)) != i) {
-          return ii-1;
-       }
+      if (matchPreprocessLine(i, buf)) {
+         return (consumePreprocessLine(i, buf, comments) - 1);  // retain the '\n'
+      }
+      if (matchFixedFormCommentLine(i, buf)) {
+         return (consumeFixedFormCommentLine(i, buf, comments) - 1);  // retain the '\n'
+      }
       
       // search for TAB in columns 1..5, otherwise continued position will be ii
       for (int j = 0; j < 5; j++) {
@@ -664,6 +779,7 @@ public class FortranStream extends ANTLRFileStream
       
       return i0;  // nothing found (expect possibly replacing '0' in column 6
    }
+
 
    /**
     * Check for a Hollerith following the current character position.  First must
@@ -866,6 +982,16 @@ public class FortranStream extends ANTLRFileStream
       //CER      }
 
       return i;
+   }
+
+   private int findCharacter(char ch, int i, char buf[])
+   {
+      int i0 = i;
+      while (i < super.n && buf[i] != ch) {
+         if (buf[i] == ch) return i;
+         i += 1;  
+      }
+      return i0;
    }
 
 } // end class FortranStream
