@@ -28,7 +28,7 @@ DRAFT_TEST_DIRS="../annex_c" "../chapter_11" "../chapter_15" "../chapter_16" \
                 "../chapter_2"
 F90_TEST_DIRS="../misc" "../program-unit" 
 
-all: runRuleTestsNoCheck
+check: runRuleTestsNoCheck
 
 runTests: $(CLASS_FILES)
 	$(JAVA) fortran.ofp.FrontEnd ../test_files/*.f03 ../test_files/*.f90
