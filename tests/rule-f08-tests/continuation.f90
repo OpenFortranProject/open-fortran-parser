@@ -12,8 +12,8 @@ int&
 &eger j
 
 ! continue line without splitting tokens
-    integer :: &
-    
+    integer :: &! 'comment after' &
+
                k
 ! comment will end file (no '\n' before EOF)
 end!
