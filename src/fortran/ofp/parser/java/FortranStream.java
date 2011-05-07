@@ -219,7 +219,8 @@ public class FortranStream extends ANTLRFileStream
                   i = ii;
                }
                // process a string if it exists
-               if ((ii = matchFreeFormString(i, data, count, newData)) != i) {
+               else if (matchFreeFormString(i, data)) {
+                  ii = consumeFreeFormString(i, data, count, newData);
                   char quoteChar = data[i];
                   while (data[ii] == '&') {
                      // string is continued across multiple lines
@@ -263,7 +264,8 @@ public class FortranStream extends ANTLRFileStream
                i = ii;
             }
             // process a string if it exists but retain trailing quote char
-            else if ((ii = matchFreeFormString(i, data, count, newData)) != i) {
+            else if (matchFreeFormString(i, data)) {
+               ii = consumeFreeFormString(i, data, count, newData);
                char quoteChar = data[i];
                while (data[ii] == '&') {
                   // string is continued across multiple lines
@@ -908,6 +910,18 @@ public class FortranStream extends ANTLRFileStream
    }
 
    /**
+    * Check for the beginning of a string at this character position.
+    */
+   private boolean matchFreeFormString(int i, char buf[])
+   {
+      if (i >= super.n) return false;
+
+      char quote_char = buf[i];
+      if (quote_char == '"' || quote_char == '\'') return true;
+      else                                         return false;
+   }
+
+   /**
     * Check for the beginning of a string at this character position.  If
     * found copy the characters of the string into newBuf, except for the
     * terminating quote character.  A string may be continued, if so it
@@ -915,7 +929,7 @@ public class FortranStream extends ANTLRFileStream
     * of the trailing '&'.  If a string doesn't terminate it's an error,
     * return '\n' position.  
     */
-   private int matchFreeFormString(int i, char buf[], int count, char newBuf[])
+   private int consumeFreeFormString(int i, char buf[], int count, char newBuf[])
    {
       if (i >= super.n) return i;
 
@@ -950,11 +964,7 @@ public class FortranStream extends ANTLRFileStream
     */
    private boolean matchFixedFormString(int i, char buf[])
    {
-      if (i >= super.n) return false;
-
-      char quote_char = buf[i];
-      if (quote_char == '"' || quote_char == '\'') return true;
-      else                                         return false;
+      return matchFreeFormString(i, buf);
    }
 
    /**
