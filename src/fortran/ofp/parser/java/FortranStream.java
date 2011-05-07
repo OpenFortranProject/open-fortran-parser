@@ -987,11 +987,9 @@ public class FortranStream extends ANTLRFileStream
    private int findCharacter(char ch, int i, char buf[])
    {
       int i0 = i;
-      while (i < super.n && buf[i] != ch) {
-         if (buf[i] == ch) return i;
-         i += 1;  
-      }
-      return i0;
+      while (i < super.n && buf[i] != ch) i += 1;
+      if (buf[i] == ch) return i;
+      else              return i0;
    }
 
 } // end class FortranStream
