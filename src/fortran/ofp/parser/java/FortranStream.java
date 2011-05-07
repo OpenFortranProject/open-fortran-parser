@@ -32,27 +32,21 @@ public class FortranStream extends ANTLRFileStream
     * Create a new input buffer and use it to fix line continuation.  This
     * buffer will be used to strip out continuation characters, extra '\n'
     * characters, and in fixed form, extra characters in columns 1-6,
-    * including TAB.  It also moves line comments and preprocesser commands if
+    * including TAB.  It also moves comments and preprocesser commands if
     * they are in the middle of continuation lines.
     * 
-    * Note that only line comments (white space followed by '!' comment) are
-    * stripped.  Comments occuring in middle of line are passed on to tokenizer.
-    * This is done so that FortranStream can handle Holleriths in edit descriptors
-    * like the very evil
+    * Note that Holleriths in edit descriptors must be recognized, otherwise
+    * what looks like a comment will be processed incorrectly, consider the
+    * the very evil
     * 
     * 100   format (1h1,58x,1h!,/,60x,/,59x,1h*,/)
     *  
     *  which has "1h!" as a hollerith, not a comment!
     *
-    * Even worse consider
+    * Also consider
     *
-    * 200   format (1h1,58x,1h!,/,60x,/,59x,1h*,/)
-    *      &1)
-    *
-    * In this example the '!', in "1h!" has to start a comment so that the continued
-    * line can terminate the format statement properly.  However, gfortran won't
-    * accept the 200 example so the hollerith edit descriptor wins out.  Thus we are
-    * forced to look for hollerith edit descriptors when processing comments.
+    * 200   format (1h1,58x,2h!)
+    *      &)
     */
    public FortranStream(String filename) throws IOException
    {
@@ -157,11 +151,18 @@ public class FortranStream extends ANTLRFileStream
    private void convertInputBuffer()
    {
       //
-      // Processing is a lot easier of we add a couple of '\n'
+      // Processing is a lot easier if we add a couple of '\n'
       // chars to buffer, as file can terminate on '!', for example.
       //
       // IMPORTANT NOTE: In processing a buffer we assume we can always
-      // advance to character beyond a '\n'
+      // advance to character beyond a '\n'.
+      // TODO - I believe this means we don't have to check for end
+      // of buffer (as currently doing in many places) and these
+      // checks, for example, 
+      //
+      //      if (i < super.n && buf[i] == '!') {
+      //
+      // can be removed.
       //
       char[] newData = new char[super.n+2];
       for (int i = 0; i < super.n; i++) {
@@ -188,7 +189,6 @@ public class FortranStream extends ANTLRFileStream
       char[] newData = new char[super.n];
       boolean continuation = false;
       int count = 0;
-      int addCR = 0;
       int col   = 1;    // 1 based 
       int line  = 1;    // 1 based
 
@@ -214,7 +214,7 @@ public class FortranStream extends ANTLRFileStream
             if (continuation) {
                // '&' may be first nonblank character in a line,               
                // if so, skip over the continuation character
-               if ((ii = skipFreeFormContinuation(i, data)) != i) {
+               if ((ii = skipFreeFormContinuationAtBegin(i, data)) != i) {
                   col += ii - i;
                   i = ii;
                }
@@ -251,16 +251,15 @@ public class FortranStream extends ANTLRFileStream
 
          // process all columns > 1 
          else {
-            // remove comment if it exists but retain '\n'
+            // consume comment if it exists but retain '\n'
             if ((ii = consumeComment(i, data, comments)) != i) {
                count = consumeCommentLines(count, newData, comments);
-               //CER  count += ii - i;
                i = ii;
             }
             // remove continuation if it exists but retain '\n'
-            else if ((ii = stripFreeFormContinuation(i, data)) != i) {
+            else if (matchFreeFormContinuationAtEnd(i, data)) {
+               ii = consumeFreeFormContinuationAtEnd(i, data, comments);
                continuation = true;
-               addCR += 1;
                i = ii;
             }
             // process a string if it exists but retain trailing quote char
@@ -281,7 +280,7 @@ public class FortranStream extends ANTLRFileStream
             }
             // Holleriths are matched after strings so Hollerith matching doesn't have
             // to worry about string, i.e, the string, "4HThis is a string".
-            else if ((ii = matchHollerith(i, data, count, newData)) != i) {
+            else if ((ii = consumeHollerith(i, data, count, newData)) != i) {
                //System.out.println("Found Hollerith character");
                count += ii - i;
                col   += ii - i;
@@ -291,16 +290,16 @@ public class FortranStream extends ANTLRFileStream
 
          // copy current character
          if (!continuation) {
-    	    newData[count++] = data[i];
-    	    col += 1;
             if (data[i] == '\n') {
                col = 1;
                line += 1;
-               while (addCR > 0) {
-                  addCR -= 1;
-                  newData[count++] = '\n';
-               }
+               // copy comments that were caught up with continuation
+               count = consumeCommentLines(count, newData, comments);
             }
+            else {
+               col += 1;
+            }
+    	    newData[count++] = data[i];
          }
 
          // this line is to be continued
@@ -316,8 +315,8 @@ public class FortranStream extends ANTLRFileStream
 
 
    /**
-    * Comments must be removed from input stream or continuation
-    * is much more difficult.
+    * All comments in the middle of continuation lines are moved to a location
+    * immediately AFTER the continued line.
     */
    private void convertFixedFormInputBuffer()
    {
@@ -395,7 +394,7 @@ public class FortranStream extends ANTLRFileStream
             }
             // Holleriths are matched after strings so Hollerith matching doesn't have
             // to worry about strings, i.e, the string, "4HThis is a string".
-            else if ((ii = matchHollerith(i, data, count, newData)) != i) {
+            else if ((ii = consumeHollerith(i, data, count, newData)) != i) {
                //System.out.println("Found Hollerith character");
                count += ii - i;
                col   += ii - i;
@@ -437,7 +436,6 @@ public class FortranStream extends ANTLRFileStream
       return i;
    }
 
-
    /**
     * Return true if this character starts a comment
     */
@@ -445,7 +443,6 @@ public class FortranStream extends ANTLRFileStream
    {
       return (buf[i] == '!');
    }
-
 
    /**
     * if a comment, copy comment to comments buffer excluding terminating '\n' character 
@@ -461,7 +458,6 @@ public class FortranStream extends ANTLRFileStream
       }
       return i;
    }
-
 
    /**
     * Return true if a comment line beginning with '!' is found
@@ -479,7 +475,6 @@ public class FortranStream extends ANTLRFileStream
 
       return false;
    }
-
 
    private int consumeFreeFormCommentLine(int i, char buf[], StringBuffer comments)
    {
@@ -509,13 +504,15 @@ public class FortranStream extends ANTLRFileStream
       return i;
    }
 
-
    /**
     * If a comment, beginning with '!', copy the comment to comments buffer excluding
     * the terminating '\n' character.  Because the next line could be a fixed form
     * continuation, we can't immediately consume the comment as all comments must
     * come after all continued lines (comments can be interspersed between continued
     * lines).
+    * 
+    * Unused for now.  In future could be used to shorten code in made section
+    * when processing comments.
     */
    private int consumeFixedFormComments(int i, char buf[], StringBuffer comments)
    {
@@ -539,7 +536,6 @@ public class FortranStream extends ANTLRFileStream
       return i;
    }
 
-
    /**
     * Return true if a fixed form comment line is found.
     *
@@ -558,7 +554,6 @@ public class FortranStream extends ANTLRFileStream
       
       return false;
    }
-
 
    /**
     * Check for comment characters, 'C', '*', and '!' at start of
@@ -581,7 +576,6 @@ public class FortranStream extends ANTLRFileStream
       
       return ii;
    }
-
 
    /**
     * If character at i == c, skip to next line advancing past '\n', while
@@ -613,22 +607,6 @@ public class FortranStream extends ANTLRFileStream
    }
 
 
-   /**
-    * If character at i == c, skip to next line advancing past '\n'.
-    */
-   private int stripLineForChar(char c, int i, char buf[])
-   {
-      if (i >= super.n) return i;
-
-      if (buf[i] == c) {
-         // found character, skip to next line
-         i += 1;
-         while (i < super.n && buf[i++] != '\n');
-      }
-      return i;
-   }
-
-
    private boolean matchPreprocessLine(int i, char buf[])
    {
       return (buf[i] == '#');
@@ -639,32 +617,41 @@ public class FortranStream extends ANTLRFileStream
       return processLineForCommentChar('#', i, buf, comments);
    }
 
-
    /**
-    * If the current character is '&', strip all remaining
-    * characters including '\n'.  If there is a continuation,
-    * return the position of the '\n' following the '&'. 
+    * Return true if the current character is '&'
     */
-   private int stripFreeFormContinuation(int i, char buf[])
+   private boolean matchFreeFormContinuationAtEnd(int i, char buf[])
    {
-      int ii;
-      if ((ii = stripLineForChar('&', i, buf)) != i) {
-         // backup to '\n'
-         // if '&' EOF this will backup to '&' which will
-         // throw a parser error, as it should, as the standard
-         // says "there shall" be a later (non comment) line
-         i = ii - 1;
-      }
-      return i;
+      return (buf[i] == '&');
    }
 
+   /**
+    * If the current character is '&', skip the '&' character and
+    * copy all remaining characters to the comments buffer, including
+    * '\n', to retain possible comments following the continuation character.
+    */
+   private int consumeFreeFormContinuationAtEnd(int i, char buf[], StringBuffer comments)
+   {
+      if (i >= super.n || buf[i] != '&') return i;
+      
+      i += 1;   // skip the continuation character
+
+      while (i < super.n && buf[i] != '\n') {
+         comments.append(buf[i++]);
+      }
+      if (i < super.n) {
+         comments.append(buf[i++]);  // copy '\n' also
+      }
+
+      return i-1;  // retain the '\n'
+   }
 
    /**
     * Check to see if there is a continuation character as '&'
     * the first non-blank character in a line.  If there is, return
     * the position after the '&' character.
     */
-   private int skipFreeFormContinuation(int i, char buf[])
+   private int skipFreeFormContinuationAtBegin(int i, char buf[])
    {
       int ii = i;
 
@@ -690,8 +677,7 @@ public class FortranStream extends ANTLRFileStream
     */
    private boolean matchFixedFormContinuation(int i, char buf[])
    {
-      int i0 = i;      // save initial value of i
-      int ii = i + 1;  // look ahead past the '\n'
+      int ii;
      
       // skip all preprocessor and comment lines
       //
@@ -801,7 +787,7 @@ public class FortranStream extends ANTLRFileStream
     *
     * Return the last character position in the Hollerith constant if found.
     */
-   private int matchHollerith(int i, char buf[], int count, char newBuf[])
+   private int consumeHollerith(int i, char buf[], int count, char newBuf[])
    {
       int k;
 
