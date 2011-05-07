@@ -24,7 +24,7 @@ PARDIR=../
 FLAGS=--RiceCAF 
 #FLAGS=--RiceCAF --dump
 
-all: runRuleTestsCheck
+check: runRuleTestsCheck
 
 runRuleTestsCheck:
 	@for file in *.caf ; do \
