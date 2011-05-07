@@ -358,8 +358,6 @@ public class FortranStream extends ANTLRFileStream
          else if (col > 1 && col < 6) {
             // consume a comment if it exists but retain '\n' or EOF
             if (matchComment(i, data)) {
-               // TODO-VERIFY need to retain comments in a way that won't break fixed form continuation
-               // copy comments were caught up in continuation that caused bug #3285011
                i = consumeComment(i, data, comments);
                // can't add comments yet if the line is continued
                if (!matchFixedFormContinuation(i, data)) {
@@ -380,8 +378,6 @@ public class FortranStream extends ANTLRFileStream
          else {
             // consume a comment if it exists but retain '\n' or EOF
             if (matchComment(i, data)) {
-               // TODO-VERIFY need to retain comments in a way that won't break fixed form continuation
-               // copy comments were caught up in continuation that caused bug #3285011
                i = consumeComment(i, data, comments);
                // can't add comments yet if the line is continued
                if (!matchFixedFormContinuation(i, data)) {
@@ -389,7 +385,8 @@ public class FortranStream extends ANTLRFileStream
                }
             }
             // consume a string if it exists but retain trailing quote char
-            else if ((ii = matchFixedFormString(i, data, count, newData)) != i) {
+            else if (matchFixedFormString(i, data)) {
+               ii = consumeFixedFormString(i, data, count, newData);
                count += ii - i;
                col   += ii - i;
                i = ii;
@@ -945,12 +942,19 @@ public class FortranStream extends ANTLRFileStream
       }
       while (i < super.n && buf[i] != quote_char && buf[i] != '&' && buf[i] != '\n');
 
-      //CER      // copy terminating quote char (terminal '\n' is an error)
-      //CER      if (i < super.n && buf[i] == quote_char) {
-      //CER         newBuf[count++] = buf[i];
-      //CER      }
-
       return i;
+   }
+
+   /**
+    * Check for the beginning of a string at this character position.
+    */
+   private boolean matchFixedFormString(int i, char buf[])
+   {
+      if (i >= super.n) return false;
+
+      char quote_char = buf[i];
+      if (quote_char == '"' || quote_char == '\'') return true;
+      else                                         return false;
    }
 
    /**
@@ -959,7 +963,7 @@ public class FortranStream extends ANTLRFileStream
     * terminating quote character.  If a string doesn't terminate it's an error,
     * return '\n' position.  
     */
-   private int matchFixedFormString(int i, char buf[], int count, char newBuf[])
+   private int consumeFixedFormString(int i, char buf[], int count, char newBuf[])
    {
       if (i >= super.n) return i;
 
@@ -975,11 +979,6 @@ public class FortranStream extends ANTLRFileStream
          }
       }
       while (i < super.n && buf[i] != quote_char && buf[i] != '\n');
-
-      //CER      // copy terminating quote char (terminal '\n' is an error)
-      //CER      if (i < super.n && buf[i] == quote_char) {
-      //CER         newBuf[count++] = buf[i];
-      //CER      }
 
       return i;
    }
