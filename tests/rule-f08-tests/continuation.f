@@ -18,7 +18,7 @@ C test continued token
      &               k
      
 * test empty continuation lines
-     0integer :: l
+     0integer :: l! 'comment immediately before continuation
      1
      2,
      3
