@@ -22,7 +22,7 @@ BUILDDIR=../../../build
 PARDIR=../
 
 
-all: runRuleTestsNoCheck
+check: runRuleTestsNoCheck
 
 runRuleTestsNoCheck:
 	@for file in *.f08 ; do \
