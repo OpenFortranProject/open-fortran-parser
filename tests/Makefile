@@ -39,7 +39,7 @@ define run-tests-recursive
 endef
 
 
-all:
+check:
 	@echo
 	@echo "Checking for files in the OFP jar file..."
 	@$(JAR) tf $(OFP_BUILD_DIR)/$(OFP_JARFILE) | grep ActionEnums.h
