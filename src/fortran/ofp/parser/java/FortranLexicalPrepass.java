@@ -69,6 +69,9 @@ END OBSOLETE********/
    } // end isOperator()
 END OBSOLETE********/
 
+   /**
+    * Convert keyword tokens (except for generic-spec items) from start to end to identifiers
+    */
    private void convertToIdents(int start, int end)
    {
       int i;
@@ -1155,7 +1158,7 @@ END OBSOLETE********/
       }
 
       return false;
-   }// end isValidDataEditDesc()
+   } // end isValidDataEditDesc()
 
 
    private int findFormatItemEnd(String line, int lineIndex) {
@@ -1166,12 +1169,12 @@ END OBSOLETE********/
       do {
          currChar = line.charAt(lineIndex);
          lineIndex++;
-      } while(lineIndex < lineLength && currChar != ',' && 
-              currChar != ')' && currChar != '/' && currChar != ':');
+      } while (lineIndex < lineLength && currChar != ',' && 
+               currChar != ')' && currChar != '/' && currChar != ':');
 
       // we went one past the line terminator, so move back to it's location
       return lineIndex - 1;
-   }// end findFormatItemEnd()
+   } // end findFormatItemEnd()
 
 
 	private int matchVList(String line, int lineIndex) {
@@ -1275,8 +1278,9 @@ END OBSOLETE********/
       char secondChar = '\0';
 
       firstChar = Character.toLowerCase(line.charAt(lineIndex));
-      if(lineIndex < line.length()-1)
+      if (lineIndex < line.length()-1) {
          secondChar = Character.toLowerCase(line.charAt(lineIndex+1));
+      }
 
       if(firstChar == ':' || firstChar == '/' || firstChar == 'p' || 
          firstChar == 't' || firstChar == 's' || firstChar == 'b' ||
@@ -1312,18 +1316,18 @@ END OBSOLETE********/
 
    private int getControlEditDesc(String line, int lineIndex, int lineLength) {
       // skip the possible number before X
-      while(lineIndex < lineLength &&
-            (line.charAt(lineIndex) >= '0' && line.charAt(lineIndex) <= '9'))
+      while(lineIndex < lineLength && (line.charAt(lineIndex) >= '0' && line.charAt(lineIndex) <= '9')) {
          lineIndex++;
+      }
 
-      if(isValidControlEditDesc(line, lineIndex) == true) {
+      if (isValidControlEditDesc(line, lineIndex) == true) {
          // include the char we're on, in case it is a '/' or ':', which can
          // be the terminating char.
          return findFormatItemEnd(line, lineIndex);
       }
 
       return -1;
-   }// end getControlEditDesc()
+   } // end getControlEditDesc()
 
 
    private int getCharString(String line, int lineIndex, char quoteChar) {
@@ -1350,24 +1354,25 @@ END OBSOLETE********/
       int startIndex = lineIndex;
 
       // see if we have a repeat specification (T_DIGIT_STRING)
-      while(lineIndex < lineLength && isDigit(line.charAt(lineIndex))) 
+      while (lineIndex < lineLength && isDigit(line.charAt(lineIndex))) {
          lineIndex++;
+      }
 
       quoteChar = Character.toLowerCase(line.charAt(lineIndex));
 
       if(quoteChar == 'h') {
          // We have an H char-string-edit-desc, which is valid F90 but 
          // deleted from F03.
-         if(startIndex != lineIndex) {
+         if (startIndex != lineIndex) {
             // there has to be a number before the H so we know how many
             // chars to read (skip).
-            return lineIndex+
-               (Integer.parseInt(line.substring(startIndex, lineIndex)));
+            return lineIndex + 1 + (Integer.parseInt(line.substring(startIndex, lineIndex)));
          }            
       }
       
-      if(quoteChar != '\'' && quoteChar != '"')
+      if (quoteChar != '\'' && quoteChar != '"') {
          return -1;
+      }
 
       // find the end of the char string.  the lexer already verified that
       // the string was valid (it should have, at least..), but we need the
@@ -1377,7 +1382,9 @@ END OBSOLETE********/
       return findFormatItemEnd(line, lineIndex+1);
    }// end getCharStringEditDesc()
 
-
+   /**
+    *
+    */
    private int parseFormatString(String line, int lineIndex, int lineNum, int charPos) {
       int lineLength;
       int descIndex = 0;
@@ -1535,9 +1542,19 @@ END OBSOLETE********/
       // here because it should get handled above when looking for a nested
       // format stmt.
       return lineIndex;
-   }// end parseFormatString()
+   } // end parseFormatString()
 
 
+   /**
+    * Parse the format-specification in a format statement for edit descriptors.
+    * Although a Hollerith edit descriptor has been deprecated, deal with it anyway.
+    * All keywork tokens to the right of the paren have been converted to identifiers.
+    *
+    * The reason this method is needed is because most the items in a format-specification
+    * are just converted by the lexer to identifiers so now the edit descriptors need to
+    * be parsed, primarily by going back to the original character representation of the
+    * input stream.
+    */
    private int fixupFormatStmt(int lineStart, int lineEnd) {
       String line;
       int lineIndex = 0;
@@ -1554,13 +1571,13 @@ END OBSOLETE********/
       lineStart++; // move past the T_FORMAT
       charPos = tokens.getToken(lineStart).getCharPositionInLine();
 
-      if(tokens.currLineLA(lineStart+1) != FortranLexer.T_LPAREN)
+      if (tokens.currLineLA(lineStart+1) != FortranLexer.T_LPAREN) {
          // error in the format stmt; missing paren
          return -1;
+      }
 
-      // get the all text left in the line as one String
+      // get all the text left in the line as one String
       line = tokens.lineToString(lineStart, lineEnd);
-//       line = line.toLowerCase();
 
       // make a copy of the original packed line
       origLine.addAll(tokens.getTokensList());
@@ -1568,57 +1585,66 @@ END OBSOLETE********/
       // now, delete the tokens in the curr line so we can rewrite them
       tokens.clearTokensList();
       // first, copy the starting tokens to the new line (label T_FORMAT, etc.)
-      for(i = 0; i < lineStart; i++)
+      for (i = 0; i < lineStart; i++) {
          // adds to the end
          tokens.addToken(origLine.get(i));
+      }
 
       lineIndex = 0;
       lineIndex = parseFormatString(line, lineIndex, lineNum, charPos);
 
       // terminate the newLine with a T_EOS
       tokens.addToken(
-         tokens.createToken(FortranLexer.T_EOS, "\n", lineNum, 
-                            charPos+lineIndex));
+         tokens.createToken(FortranLexer.T_EOS, "\n", lineNum, charPos+lineIndex)
+      );
 
       // if there was an error, put the original line back
-      if(lineIndex == -1) {
-         System.err.println("Error in format statement " + line + 
-                            " at line " + lineNum);
+      if (lineIndex == -1) {
+         System.err.println("Error in format statement " + line + " at line " + lineNum);
          tokens.clearTokensList();
-         for(i = 0; i < lineEnd; i++)
+         for (i = 0; i < lineEnd; i++) {
             tokens.addToken(origLine.get(i));
+         }
       }
       
       return lineIndex;
-   }// end fixupFormatStmt()
+   } // end fixupFormatStmt()
 
 
+   /**
+    * Match one of the following tokens for an IO statement:
+    * T_CLOSE, T_OPEN, T_READ, T_FLUSH, T_REWIND, T_WRITE,
+    * T_INQUIRE, T_FORMAT, T_PRINT
+    */
    private boolean matchIOStmt(int lineStart, int lineEnd) {
       int tokenType;
       int identOffset = -1;
 
       tokenType = tokens.currLineLA(lineStart+1);
       
-      if(tokenType == FortranLexer.T_PRINT)
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_EQUALS)
+      if (tokenType == FortranLexer.T_PRINT) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_EQUALS) {
             return false;
-         else
+         }
+         else {
             identOffset = lineStart+1;
+         }
+      }
       else {
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
             identOffset = lineStart+2;
 
-            // fixup the inquire statement to try and help the parser not
-            // have to backtrack.  for an inquire_stmt, if something other
+            // fixup the inquire statement to try and help the parser to not
+            // have to backtrack.  For an inquire_stmt, if something other
             // than T_EOS follows the closing RPAREN, it must try and match
             // alt2.  
-            if(tokenType == FortranLexer.T_INQUIRE) {
+            if (tokenType == FortranLexer.T_INQUIRE) {
                int rparenOffset = -1;
                rparenOffset = matchClosingParen(lineStart+2, lineStart+2);
                // should not be possible for it to be -1..
-               if(rparenOffset != -1 && 
+               if (rparenOffset != -1 && 
                   (rparenOffset < (lineEnd-1))) {
-                  if(tokens.currLineLA(rparenOffset+1) != 
+                  if (tokens.currLineLA(rparenOffset+1) != 
                      FortranLexer.T_EOS) {
                      // add a token saying it must be alt2
                      tokens.addToken(lineStart, FortranLexer.T_INQUIRE_STMT_2,
@@ -1627,22 +1653,24 @@ END OBSOLETE********/
                      identOffset++;
                   }
                }
-            }// end if(was T_INQUIRE)
-         } else if((tokenType == FortranLexer.T_FLUSH ||
-                    tokenType == FortranLexer.T_REWIND) &&
+            } // end if(was T_INQUIRE)
+         }
+         else if ((tokenType == FortranLexer.T_FLUSH ||
+                   tokenType == FortranLexer.T_REWIND) &&
                    tokens.currLineLA(lineStart+2) != FortranLexer.T_EQUALS) {
             // this is the case if you have a FLUSH/REWIND stmt w/ no parens 
             identOffset = lineStart+1;
          }
       }
 
-      if(identOffset != -1) {
+      if (identOffset != -1) {
          convertToIdents(identOffset, lineEnd);
 
          // do the fixup after we've converted to identifiers because the
          // identOffset and lineEnd are based on the original line!
-         if(tokenType == FortranLexer.T_FORMAT) 
+         if (tokenType == FortranLexer.T_FORMAT) {
             fixupFormatStmt(lineStart, lineEnd);
+         }
 
          // need to see if this has a label, and if so, see if it's needed
          // to terminate a do loop.
@@ -1655,7 +1683,7 @@ END OBSOLETE********/
       else {
          return false;
       }
-   }// end matchIOStmt()
+   } // end matchIOStmt()
 
 
    private boolean matchProgramStmt(int lineStart, int lineEnd) {
