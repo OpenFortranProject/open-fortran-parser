@@ -22,7 +22,7 @@ import org.antlr.runtime.*;
 
 import fortran.ofp.parser.java.FortranToken;
 
-public class FortranTokenStream extends CommonTokenStream {
+public class FortranTokenStream extends LegacyCommonTokenStream {
    public FortranLexer lexer;
    public int needIdent;
    public int parserBacktracking;
