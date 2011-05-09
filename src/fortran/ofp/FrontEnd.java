@@ -51,12 +51,6 @@ public class FrontEnd implements Callable<Boolean> {
    private static boolean hasErrorOccurred = false;
    private static ArrayList<String> includeDirs;
 
-/*******OBSOLETE
-   public static final int UNKNOWN_SOURCE_FORM = -1;
-   public static final int FREE_FORM = 1;
-   public static final int FIXED_FORM = 2;
-END OBSOLETE******/
-
    public FrontEnd(String[] args, String filename, String type)
    throws IOException {
       boolean riceCAF = false;
@@ -67,7 +61,6 @@ END OBSOLETE******/
 
       // check to see if using RiceCAF parser extensions
       //
-
       for (int i = 0; i < args.length; i++) {
          if (args[i].startsWith("--RiceCAF")) {
             riceCAF = true;
@@ -86,9 +79,7 @@ END OBSOLETE******/
 
       this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
       this.fileName = filename;
-/*******OBSOLETE
-      this.sourceForm = UNKNOWN_SOURCE_FORM;
-END OBSOLETE********/
+      this.sourceForm = inputStream.getSourceForm();
    }
 
    private static boolean parseMainProgram(FortranTokenStream tokens,
