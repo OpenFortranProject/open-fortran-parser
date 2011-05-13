@@ -57,8 +57,12 @@ public class FrontEnd implements Callable<Boolean> {
 
       this.inputStream = new FortranStream(filename);
       this.lexer = new FortranLexer(inputStream);
-      this.tokens = new FortranTokenStream(lexer);
 
+      // Changes associated with antlr version 3.3 require that includeDirs
+      // be set here as the tokens are loaded by the constructor.
+      this.lexer.setIncludeDirs(includeDirs);
+      this.tokens = new FortranTokenStream(lexer);
+      
       // check to see if using RiceCAF parser extensions
       //
       for (int i = 0; i < args.length; i++) {
@@ -70,9 +74,10 @@ public class FrontEnd implements Callable<Boolean> {
       if (riceCAF == false) {
          this.parser = new FortranParserExtras(tokens);
       } else {
-	 // laksono 08.06.2010: only output if we have --verbose option set
-   	 if (verbose)
-           System.out.println("FortranLexer: using Rice University's CAF extensions");
+         // laksono 08.06.2010: only output if we have --verbose option set
+   	 if (verbose) {
+            System.out.println("FortranLexer: using Rice University's CAF extensions");
+         }
          this.parser = new FortranParserRiceCAF(tokens);
       }
       this.parser.initialize(args, type, filename);
@@ -275,6 +280,7 @@ public class FrontEnd implements Callable<Boolean> {
             System.err.println("Error: " + args[i] + " does not exist!");
             error = new Boolean(true);
          } else {
+            includeDirs.add(srcFile.getParent());
             FrontEnd ofp = new FrontEnd(newArgs.toArray(new String[newArgs.size()]), args[i], type);
             ofp.setVerbose(verbose, silent);
             if (ofp.getParser().getAction().getClass().getName() == "fortran.ofp.parser.java.FortranParserActionPrint") {
@@ -283,9 +289,6 @@ public class FrontEnd implements Callable<Boolean> {
                action.setVerbose(!silent);
             }
 
-            /* The include directories must be set before the tokens can be dumped below. */
-            ofp.lexer.setIncludeDirs(includeDirs);
-            
             if (dumpTokens) {
                ofp.tokens.outputTokenList(ofp.parser.getAction());
             }
