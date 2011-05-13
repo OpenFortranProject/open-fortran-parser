@@ -29,8 +29,9 @@ public class FortranTokenStream extends LegacyCommonTokenStream {
    public boolean matchFailed;
    private List currLine;
    private int lineLength;
+   private Token eofToken = null;
    private ArrayList<Token> packedList;
-   private ArrayList<Token> newTokensList;
+   private ArrayList<Token> newTokenList;
 
    public FortranTokenStream(FortranLexer lexer) {
       super(lexer);
@@ -41,8 +42,27 @@ public class FortranTokenStream extends LegacyCommonTokenStream {
       this.currLine = null;
       this.lineLength = 0;
       this.packedList = null;
-      this.newTokensList = new ArrayList<Token>();
+      this.newTokenList = new ArrayList<Token>();
+      
+      this.fillBuffer();
+
+      // For some reason antlr v3.3 LA/LT(1) no longer return <EOF> token
+      // save it last token from source (EOF) and return it in LT method.
+      eofToken = tokenSource.nextToken();
+      eofToken.setTokenIndex(size());
+
    } // end constructor
+   
+   /**
+    * For some reason antlr v3.3 LA/LT() no longer returns <EOF> token,
+    * so save it last token from source (EOF) and return it in LT method.
+    */
+   public Token LT(int k) {
+      if (index()+k-1 >= this.size()) {
+    	  return eofToken;
+      }
+      return super.LT(k);
+   }
 
 /*******OBSOLETE
    public void fixupFixedFormat() {
@@ -186,7 +206,7 @@ public class FortranTokenStream extends LegacyCommonTokenStream {
 //       StringBuffer buffer = new StringBuffer();
 //       for(i = 0; i < tmpArrayList.size(); i++) {
 //          tmpToken = tmpArrayList.get(i);
-//          if(tmpToken.getType() == FortranLexer.WS ||
+//          if (tmpToken.getType() == FortranLexer.WS ||
 //             (tmpToken.getType() == FortranLexer.T_EOS &&
 //              tmpToken.getText().charAt(0) != ';') ||
 //             tmpToken.getChannel() != lexer.getIgnoreChannelNumber()) {
@@ -220,31 +240,33 @@ public class FortranTokenStream extends LegacyCommonTokenStream {
       super.tokens = tmpArrayList;
 
       return;
-   }// end fixupFixedFormat()
+   } // end fixupFixedFormat()
 END OBSOLETE*******/
 
-   private void createPackedList() {
-      Token tmpToken = null;
+   /**
+    * Create a subset list of the non-whitespace tokens in the current line.
+    */
+   private ArrayList<Token> createPackedList() {
       int i = 0;
+      Token tk = null;
 
-      this.packedList = new ArrayList<Token>(this.lineLength+1);
+      ArrayList<Token> pList = new ArrayList<Token>(this.lineLength+1);
 
-      for(i = 0; i < currLine.size(); i++) {
-         tmpToken = getTokenFromCurrLine(i);
-         // TODO - continued lines no longer fixed here see if can remove
-         // get all tokens, including channel 99'ed ones, so we can fixup
-         // continued lines.  we'll drop ignored tokens after that.
+      for (i = 0; i < currLine.size(); i++) {
+         tk = getTokenFromCurrLine(i);
          try {
-            packedList.add(tmpToken);
+            if (tk.getChannel() != lexer.getIgnoreChannelNumber()) {
+               pList.add(tk);
+            }
          } catch(Exception e) {
             e.printStackTrace();
             System.exit(1);
          }
-      }// end for(each item in buffered line)
+      } // end for(each item in buffered line)
 
       // need to make sure the line was terminated with a T_EOS.  this may 
       // not happen if we're working on a file that ended w/o a newline
-      if (packedList.get(packedList.size()-1).getType() != FortranLexer.T_EOS) {
+      if (pList.get(pList.size()-1).getType() != FortranLexer.T_EOS) {
          FortranToken eos = new FortranToken(lexer.getInput(), FortranLexer.T_EOS, 
                                              Token.DEFAULT_CHANNEL, 
                                              lexer.getInput().index(), 
@@ -253,14 +275,8 @@ END OBSOLETE*******/
          packedList.add(eos);
       }
 
-/*******OBSOLETE      
-      fixupContinuedLine(packedList);
-END OBSOLETE*******/
-
-      dropIgnoredTokens(packedList);
-      
-      return;
-   }// end createPackedList()
+      return pList;
+   } // end createPackedList()
 
 /******OBSOLETE
    private boolean possiblySplitToken(ArrayList<Token> packedList, 
@@ -269,13 +285,13 @@ END OBSOLETE*******/
       int i = 0;
 
       for(i = firstContCharOffset+1; i < currOffset; i++) {
-         if(packedList.get(i).getType() != FortranLexer.WS &&
+         if (packedList.get(i).getType() != FortranLexer.WS &&
             packedList.get(i).getType() != FortranLexer.T_EOS) {
             return false;
          }
       }
       return true;
-   }// end possiblySplitToken()
+   } // end possiblySplitToken()
 
    private void fixupContinuedLine(ArrayList<Token> packedList) {
       int firstContCharOffset = -1;
@@ -284,14 +300,14 @@ END OBSOLETE*******/
 
       // search for a continue char ('&' in free form)
       for(i = 0; i < packedList.size(); i++) {
-         if(packedList.get(i).getType() == FortranLexer.CONTINUE_CHAR) {
-            if(firstContCharOffset == -1)
+         if (packedList.get(i).getType() == FortranLexer.CONTINUE_CHAR) {
+            if (firstContCharOffset == -1)
                firstContCharOffset = i;
             else {
                // if all tokens between the first '&' and this one are WS, 
                // we have to consider the '&' chars together.  otherwise, 
                // we don't.
-               if(possiblySplitToken(packedList, firstContCharOffset, i) 
+               if (possiblySplitToken(packedList, firstContCharOffset, i) 
                   == true) {
                   // we have to consider the token preceding the first '&' and
                   // the one following the second '&' together.
@@ -330,7 +346,7 @@ END OBSOLETE*******/
                   do {
                      tokenCount++;
                      token = myLexer.nextToken();
-                     if(tokenCount == 1) {
+                     if (tokenCount == 1) {
                         // this is the first of two possible tokens that 
                         // we're adding to the packed list, so look up the 
                         // line/col position from
@@ -348,7 +364,7 @@ END OBSOLETE*******/
                            packedList.get(i+1).
                            getCharPositionInLine());
                      }
-                     if(token.getType() >= 0) {
+                     if (token.getType() >= 0) {
                         token.setText(token.getText().toLowerCase());
                         // insert the token
                         try {
@@ -372,38 +388,14 @@ END OBSOLETE*******/
                   firstContCharOffset = i;
                }
             }
-         }// end if(FortranLexer.T_CONTINUE_CHAR)
-      }// end for()
+         } // end if (FortranLexer.T_CONTINUE_CHAR)
+      } // end for()
 
       return;
-   }// end fixupContinuedLine() 
+   } // end fixupContinuedLine() 
 END OBSOLETE*******/
 
    
-   private void dropIgnoredTokens(ArrayList<Token> packedList) {
-      ArrayList<Token> tmpList = packedList;
-      Token tmpToken = null;
-      int i;
-
-      this.packedList = new ArrayList<Token>(this.packedList.size());
-
-      for (i = 0; i < tmpList.size(); i++) {
-         tmpToken = tmpList.get(i);
-         if (tmpToken != null && tmpToken.getChannel() != 
-            lexer.getIgnoreChannelNumber()) {
-            try {
-               this.packedList.add(tmpToken);
-            } catch(Exception e) {
-               e.printStackTrace();
-               System.exit(1);
-            }
-         }
-      }
-
-      return;
-   }// end dropIgnoredTokens()
-
-
    public String lineToString(int lineStart, int lineEnd) {
       int i = 0;
       StringBuffer lineText = new StringBuffer();
@@ -413,12 +405,12 @@ END OBSOLETE*******/
       }
       
       return lineText.toString();
-   }// end lineToString()
+   } // end lineToString()
 
 
    public List getTokens(int start, int stop) {
       return super.getTokens(start, stop);
-   }// end getTokens()
+   } // end getTokens()
 
 
    public int getCurrLineLength() {
@@ -434,6 +426,7 @@ END OBSOLETE*******/
       Token token;
 
       lineLength = 0;
+      if (start >= super.tokens.size()) return lineLength;
 
       // this will not give you a lexer.EOF, so may need to 
       // add a T_EOS token when creating the packed list if the file
@@ -447,28 +440,28 @@ END OBSOLETE*******/
                token.getType() != FortranLexer.EOF));
 
       return lineLength;
-   }// end getLineLength()
+   } // end getLineLength()
 
 
    public int findTokenInPackedList(int start, int desiredToken) {
-      Token tmpToken;
+      Token tk;
 
-      if(start >= this.packedList.size()) {
+      if (start >= this.packedList.size()) {
          return -1;
       }
       
       do {
-         tmpToken = (Token)(packedList.get(start));
+         tk = (Token)(packedList.get(start));
          start++;
       } while(start < this.packedList.size() &&
-              tmpToken.getType() != desiredToken);
+              tk.getType() != desiredToken);
 
-      if(tmpToken.getType() == desiredToken)
+      if (tk.getType() == desiredToken)
          // start is one token past the one we want
          return start-1;
 
       return -1;
-   }// end findTokenInPackedList()
+   } // end findTokenInPackedList()
 
 
    public Token getToken(int pos) {
@@ -480,24 +473,24 @@ END OBSOLETE*******/
       }
       else
          return (Token)(packedList.get(pos));
-   }// end getToken()
+   } // end getToken()
 
 
    public Token getToken(int start, int desiredToken) {
       int index;
       
       index = findToken(start, desiredToken);
-      if(index != -1)
+      if (index != -1)
          return (Token)(packedList.get(index));
       else 
          return null;
-   }//end getToken()
+   } //end getToken()
 
 
    public int findToken(int start, int desiredToken) {
-      Token tmpToken;
+      Token tk;
 
-      if(start >= this.packedList.size()) {
+      if (start >= this.packedList.size()) {
          System.out.println("start is out of range!");
          System.out.println("start: " + start + 
                             " packedListSize: " + this.packedList.size());
@@ -505,17 +498,17 @@ END OBSOLETE*******/
       }
       
       do {
-         tmpToken = (Token)(packedList.get(start));
+         tk = (Token)(packedList.get(start));
          start++;
       } while (start < this.packedList.size() &&
-              tmpToken.getType() != desiredToken);
+              tk.getType() != desiredToken);
 
-      if(tmpToken.getType() == desiredToken)
+      if (tk.getType() == desiredToken)
          // start is one token past the one we want
          return start-1;
 
       return -1;
-   }// end findToken()
+   } // end findToken()
 
 
    /**
@@ -523,25 +516,25 @@ END OBSOLETE*******/
     */
    public int findTokenInCurrLine(int start, int desiredToken) {
       int size;
-      Token tmpToken;
+      Token tk;
 
       size = currLine.size();
-      if(start >= size) 
+      if (start >= size) 
          return -1;
 
       do {
          // get the i'th object out of the list
-         tmpToken = (Token)(currLine.get(start));
+         tk = (Token)(currLine.get(start));
          start++;
       } while(start < size && 
-              tmpToken.getType() != desiredToken);
+              tk.getType() != desiredToken);
          
       
-      if(tmpToken.getType() == desiredToken)
+      if (tk.getType() == desiredToken)
          return start;
 
       return -1;
-   }// end findTokenInCurrLine()
+   } // end findTokenInCurrLine()
 
    
    /**
@@ -549,12 +542,12 @@ END OBSOLETE*******/
     * will begin by looking at the next token (pos+1).
     */
    public Token getNextNonWSToken(int pos) {
-      Token tmpToken;
+      Token tk;
       
-      tmpToken = (Token)(packedList.get(pos+1));
+      tk = (Token)(packedList.get(pos+1));
 
-      return tmpToken;
-   }// end getNextNonWSToken()
+      return tk;
+   } // end getNextNonWSToken()
 
 
    /**
@@ -562,23 +555,25 @@ END OBSOLETE*******/
     * will begin by looking at the next token (pos+1).
     */
    public int getNextNonWSTokenPos(int pos) {
-      Token tmpToken;
+      Token tk;
       
       // find the next non WS token
-      tmpToken = getNextNonWSToken(pos);
+      tk = getNextNonWSToken(pos);
       // find it's position now
-      pos = findTokenInCurrLine(pos, tmpToken.getType());
+      pos = findTokenInCurrLine(pos, tk.getType());
 
       return pos;
-   }// end getNextNonWSTokenPos()
+   } // end getNextNonWSTokenPos()
 
 
    public Token getTokenFromCurrLine(int pos) {
-      if(pos >= currLine.size() || pos < 0) 
+      if (pos >= currLine.size() || pos < 0) {
          return null;
-      else
+      }
+      else {
          return ((Token)(currLine.get(pos)));
-   }// end getTokenFromCurrLine()
+      }
+   } // end getTokenFromCurrLine()
 
 
    public void setCurrLine(int lineStart) {
@@ -586,19 +581,15 @@ END OBSOLETE*******/
       
       // this will get the tokens [lineStart->((lineStart+lineLength)-1)]
       currLine = this.getTokens(lineStart, (lineStart + this.lineLength) - 1);
-      if(currLine == null) {
+      if (currLine == null) {
          System.err.println("currLine is null!!!!");
          System.exit(1);
       }
 
       // pack all non-ws tokens
-      createPackedList();
+      this.packedList = createPackedList();
 
-//       // just for debugging
-//       printPackedList();
-      
-      return;
-   }// end setCurrLine()       
+   } // end setCurrLine()       
 
 
    /**
@@ -608,29 +599,35 @@ END OBSOLETE*******/
     */
    public int findTokenInSuper(int lineStart, int desiredToken) {
       int lookAhead = 0;
-      int tmpToken;
+      int tk, channel;
 
+/*****OBSOLETE NOTE: returning -1 is painful when looking for T_EOS
       // if this line is a comment, skip scanning it
-      if(super.LA(1) == FortranLexer.LINE_COMMENT)
+      if (super.LA(1) == FortranLexer.LINE_COMMENT) {
          return -1;
+      }
+OBSOLETE*****/
 
       do {
          // lookAhead was initialized to 0
          lookAhead++;
 
-         // get the token 
-         tmpToken = super.LA(lookAhead);
+         // get the token
+         Token token = LT(lookAhead);
+         tk = token.getType();
+         channel = token.getChannel();
 
          // continue until find what looking for or reach end
-      } while (tmpToken != FortranLexer.EOF && tmpToken != FortranLexer.T_EOS && 
-               tmpToken != desiredToken);
+      } while ((tk != FortranLexer.EOF && tk != FortranLexer.T_EOS && tk != desiredToken)
+    		   || channel == lexer.getIgnoreChannelNumber());
 
-      if(tmpToken == desiredToken)
+      if (tk == desiredToken) {
          // we found a what we wanted to
          return lookAhead;
+      }
          
       return -1;
-   }// end findTokenInSuper()
+   } // end findTokenInSuper()
 
 
    public void printCurrLine() {
@@ -640,7 +637,7 @@ END OBSOLETE*******/
       System.out.println("=================================");
 
       return;
-   }// end printCurrLine()
+   } // end printCurrLine()
 
 
    public void printPackedList() {
@@ -677,38 +674,38 @@ END OBSOLETE*******/
 
 
    public int currLineLA(int lookAhead) {
-      Token tmpToken = null;
+      Token tk = null;
 
       // get the token from the packedList
       try {
-         tmpToken = (Token)(packedList.get(lookAhead-1));
+         tk = (Token)(packedList.get(lookAhead-1));
       } catch(Exception e) {
 //         e.printStackTrace();
 //         System.exit(1);
     	  return -1;
       }
-      return tmpToken.getType();
-   }// end currLineLA()
+      return tk.getType();
+   } // end currLineLA()
 
 
    public boolean lookForToken(int desiredToken) {
       int lookAhead = 1;
-      int tmpToken;
+      int tk;
 
       do {
          // get the next token
-         tmpToken = this.LA(lookAhead);
+         tk = this.LA(lookAhead);
          // update lookAhead in case we look again
          lookAhead++;
-      } while(tmpToken != FortranLexer.T_EOS && tmpToken != FortranLexer.EOF && 
-              tmpToken != desiredToken);
+      } while(tk != FortranLexer.T_EOS && tk != FortranLexer.EOF && 
+              tk != desiredToken);
       
-      if(tmpToken == desiredToken) {
+      if (tk == desiredToken) {
          return true;
       } else {
          return false;
       }
-   }// end testForFunction()
+   } // end testForFunction()
 
    
    public boolean appendToken(int tokenType, String tokenText) {
@@ -716,7 +713,7 @@ END OBSOLETE*******/
 		newToken.setText(tokenText);
       // append a token to the end of newTokenList
       return this.packedList.add(newToken);   
-   }// end appendToken()
+   } // end appendToken()
 
 
    public void addToken(Token token) {
@@ -729,7 +726,7 @@ END OBSOLETE*******/
          // for example: 
          // index = 1
          // packedList == label T_CONTINUE T_EOS  (size is 3)
-         // newTokensList.size() == 22
+         // newTokenList.size() == 22
          // 22-3+1=20 
          // so, inserted between the label and T_CONTINUE
          this.packedList.add(index, new FortranToken(tokenType, tokenText));
@@ -739,12 +736,12 @@ END OBSOLETE*******/
       }
       
       return;
-   }// end addToken()
+   } // end addToken()
 
 
    public void set(int index, Token token) {
       packedList.set(index, token);
-   }// end set()
+   } // end set()
 
 
    public void add(int index, Token token) {
@@ -755,29 +752,29 @@ END OBSOLETE*******/
    public void removeToken(int index) {
       packedList.remove(index);
       return;
-   }// end removeToken()
+   } // end removeToken()
 
 
    public void clearTokensList() {
       this.packedList.clear();
       return;
-   }// end clearTokensList()
+   } // end clearTokensList()
 
 
    public ArrayList<Token> getTokensList() {
       return this.packedList;
-   }// end getTokensList()
+   } // end getTokensList()
 
    
    public void setTokensList(ArrayList<Token> newList) {
       this.packedList = newList;
       return;
-   }// end setTokensList()
+   } // end setTokensList()
 
 
    public int getTokensListSize() {
       return this.packedList.size();
-   }// end getTokensListSize()
+   } // end getTokensListSize()
 
 
    public FortranToken createToken(int type, String text, int line, int col) {
@@ -785,36 +782,25 @@ END OBSOLETE*******/
       token.setLine(line);
       token.setCharPositionInLine(col);
       return token;
-   }// end createToken()
+   } // end createToken()
 
 
-	public void addTokenToNewList(Token token) {
-		if(this.newTokensList.add(token) == false) 
-			System.err.println("Couldn't add to newTokensList!");
-		return;
-	}
-
+   public void addTokenToNewList(Token token) {
+      if (this.newTokenList.add(token) == false) {
+         System.err.println("Couldn't add to newTokenList!");
+      }
+      return;
+   }
 
    public void finalizeLine() {
-      if(this.newTokensList.addAll(packedList) == false)
-         System.err.println("Couldn't add to newTokensList!");
-//       // just for debugging
-//       printPackedList();
-   }// end finalizeLine()
+      if (this.newTokenList.addAll(packedList) == false) {
+         System.err.println("Couldn't add to newTokenList!");
+      }
+   } // end finalizeLine()
 
 
    public void finalizeTokenStream() {
-//       System.out.println("super.tokens.size() in finalize.. is: " + 
-//                          super.tokens.size());
-//       System.out.println("this.newTokensList.size() in finalize.. is: " + 
-//                          this.newTokensList.size());
-//       // this next line could print a lot of stuff...use on small tests only!
-//       System.out.println("newTokensList.toString(): " + 
-//                          this.newTokensList.toString());
-//       System.out.println("================================================");
-//       System.out.println("original tokens list: " + super.tokens.toString());
-      super.tokens = this.newTokensList;
-//       System.out.println("================================================");
-//       System.out.println("super.tokens new list: " + super.tokens.toString());
-   }// end finalizeTokenStream()
-}// end class FortranTokenStream
+      super.tokens = this.newTokenList;
+   } // end finalizeTokenStream()
+
+} // end class FortranTokenStream
