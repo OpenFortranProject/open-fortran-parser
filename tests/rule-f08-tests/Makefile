@@ -28,12 +28,14 @@ runTestsNoCheck:
 	@for file in *.f* ; do \
            echo "Running test $$file"; \
            $(JAVA) fortran.ofp.FrontEnd $$file; \
+           if [ $$? != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
         done;
 
 runTestsVerbose:
 	@for file in *.f* ; do \
            echo "Running test $$file"; \
            $(JAVA) fortran.ofp.FrontEnd --verbose $$file; \
+           if [ $$? != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
         done;
 
 clean:
