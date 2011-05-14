@@ -880,11 +880,11 @@ END OBSOLETE********/
       int kindOffsetEnd = -1;
 
       // see if we have a derived type
-      if(tokens.currLineLA(lineStart+1) == FortranLexer.T_TYPE ||
-         tokens.currLineLA(lineStart+1) == FortranLexer.T_CLASS) {
+      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_TYPE ||
+          tokens.currLineLA(lineStart+1) == FortranLexer.T_CLASS) {
          int rparenOffset = -1;
          // left-paren is next token (or we're in trouble)
-         if(tokens.currLineLA(lineStart+2) != FortranLexer.T_LPAREN) {
+         if (tokens.currLineLA(lineStart+2) != FortranLexer.T_LPAREN) {
             System.err.println("Derived type or Class declaration error!");
             System.exit(1);
          }
@@ -894,7 +894,9 @@ END OBSOLETE********/
 
          // change it to being 0 based indexing
          return rparenOffset-1;
-      } else if(tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
+      }
+
+      if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
          int kindTokenOffset = -1;
          int lenTokenOffset = -1;
          kindOffsetEnd = 
@@ -907,24 +909,27 @@ END OBSOLETE********/
 
          convertToIdents(lineStart+1, kindOffsetEnd);
 
-         if(kindTokenOffset != -1 && kindTokenOffset < kindOffsetEnd &&
+         if (kindTokenOffset != -1 && kindTokenOffset < kindOffsetEnd &&
             tokens.currLineLA(kindTokenOffset+2) == FortranLexer.T_EQUALS) {
             tokens.getToken(kindTokenOffset).setType(FortranLexer.T_KIND);
          }
-         if(lenTokenOffset != -1 && lenTokenOffset < kindOffsetEnd &&
+         if (lenTokenOffset != -1 && lenTokenOffset < kindOffsetEnd &&
             tokens.currLineLA(lenTokenOffset+2) == FortranLexer.T_EQUALS) {
             tokens.getToken(lenTokenOffset).setType(FortranLexer.T_LEN);
          }
 
          // it is already 0 based??
          return kindOffsetEnd-1;
-      } else if(tokens.currLineLA(lineStart+1) == FortranLexer.T_DOUBLE) {
+      }
+
+      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_DOUBLE) {
          // return 0 based index of second token, which is lineStart+1
          lineStart = lineStart+1;
       }
       
       return lineStart;
-   }// end fixupDeclTypeSpec()
+   } // end fixupDeclTypeSpec()
+
 
    /**
     * TODO:: this could also be for a function, so need to handle 
@@ -1026,24 +1031,30 @@ END OBSOLETE********/
 
    /**
     * Find the first index after the typespec (with or without the optional
-    * kind selector).
+    * kind or character-length selector).
     */
    private int skipTypeSpec(int lineStart) {
       int firstToken;
       int rparenOffset = -1;
 
       firstToken = tokens.currLineLA(lineStart+1);
-      if(isIntrinsicType(firstToken) == true ||
+      if (isIntrinsicType(firstToken) == true ||
          firstToken == FortranLexer.T_TYPE) {
          // if the first token is T_DOUBLE, we are expecting one more token
          // to finish the type, so bump the lineStart one more.
-         if(firstToken == FortranLexer.T_DOUBLE) {
+         if (firstToken == FortranLexer.T_DOUBLE) {
             lineStart++;
+         }
+         
+         // skip character-length (*char-length) selector if present
+         if (firstToken == FortranLexer.T_CHARACTER 
+             && tokens.currLineLA(lineStart+2) == FortranLexer.T_ASTERISK) {
+        	 lineStart += 2;
          }
 
          // see if the next token is a left paren -- means either a kind 
          // selector or a type declaration.
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
             // will return logical index of rparen.  this is not zero 
             // based!  it is based on look ahead, which starts at 1!
             // therefore, if it is 4, it's really at offset 3 in the 
@@ -1051,7 +1062,7 @@ END OBSOLETE********/
             rparenOffset = matchClosingParen(lineStart, lineStart+2);
          }
          
-         if(rparenOffset != -1) 
+         if (rparenOffset != -1) 
             // rparenOffset will be the logical index of the right paren.
             // if it's token 4 in packedList, which is 0 based, it's actual
             // index is 3, but 4 is returned because we need 1 based for LA()
@@ -2512,12 +2523,11 @@ END OBSOLETE*******/
 
 
    public void performPrepass() {
-      int i, lineStart, rawLineStart, rawLineEnd, tokensStart;
+      int i, lineStart, rawLineStart, rawLineEnd;
       int commaIndex = -1;
       int equalsIndex = -1;
       int lineLength = 0;
       int newLineLength = 0;
-      Token eof = null;
 
 /******OBSOLETE
       if (this.sourceForm == FrontEnd.FIXED_FORM) {
@@ -2525,18 +2535,17 @@ END OBSOLETE*******/
          tokens.fixupFixedFormat();
          tokens.rewind(tokensStart);
       }
-END OBSOLETE*******/
-
-      tokensStart = tokens.mark();
+      
       // the mark is the curr index into the tokens array and needs to start 
-      // at -1 (before the list).  this use to be what it always was when 
+      // at -1 (before the list).  This used to be what it always was when 
       // entering this method in antlr-3.0b*, but in antlr-3.0, the number 
       // was no longer guaranteed to be -1.  so, seek the index ptr to -1.
       if (tokensStart != -1) {
-         tokens.seek(-1);
-         tokensStart = -1;
+          tokens.seek(-1);
+          tokensStart = -1;
       }
-
+END OBSOLETE******/
+      
       while (tokens.LA(1) != FortranLexer.EOF) {
          // initialize necessary variables
          commaIndex = -1;
@@ -2688,14 +2697,13 @@ END OBSOLETE*******/
 		
       // We need to include the EOF in the token stream so the parser can 
       // signal when to pop the include stream stack.
-      eof = tokens.LT(1);
-      eof.setText("EOF");
-      tokens.addTokenToNewList(eof);
+      tokens.addTokenToNewList(tokens.LT(1));
 
-      // reset to the beginning of the tokens for the parser
-      tokens.rewind(tokensStart);
-
-      return;
+      // Reset to the beginning of the tokens for the parser.  Reset, rather
+      // than rewinding to the original mark, because the newTokenList is
+      // used so should rewind and reset mark at the beginning.
+      tokens.reset();
+      
    } // end performPrepass()
    
 } // end class FortranLexicalPrepass
