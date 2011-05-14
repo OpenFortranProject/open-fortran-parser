@@ -28,12 +28,14 @@ runRuleTestsNoCheck:
 	@for file in *.f08 ; do \
            echo "Running test $$file"; \
            $(JAVA) fortran.ofp.FrontEnd $$file; \
+           if [ $$? != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
         done;
 
 runRuleTestsVerbose:
 	@for file in *.f08 ; do \
            echo "Running test $$file"; \
            $(JAVA) fortran.ofp.FrontEnd --verbose $$file; \
+           if [ $$? != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
         done;
 
 clean:
