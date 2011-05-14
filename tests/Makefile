@@ -34,6 +34,7 @@ define run-tests-recursive
 		echo ; echo Running $@ in $$dir...; \
 		$(CD) $$dir; \
 		$(MAKE) $@; \
+                if [ $$?? != 0 ]; then exit 1; fi; \
 		$(CD) ..; \
 	done
 endef
