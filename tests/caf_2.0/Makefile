@@ -30,19 +30,21 @@ runRuleTestsCheck:
 	@for file in *.caf ; do \
            echo "Running test $$file"; \
            $(JAVA) fortran.ofp.FrontEnd $(FLAGS) --verbose $$file | grep -q "Parser exiting normally" ; rc=$$? ; \
-           if [ $$rc != 0 ]; then echo "...$$file FAILED!"; fi \
+           if [ $$rc != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
         done;
 
 runRuleTestsNoCheck:
 	@for file in *.caf ; do \
            echo "Running test $$file"; \
            $(JAVA) fortran.ofp.FrontEnd $(FLAGS) $$file ; \
+           if [ $$?? != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
         done;
 
 runRuleTestsVerbose:
 	@for file in *.caf ; do \
            echo "Running test $$file"; \
            $(JAVA) fortran.ofp.FrontEnd $(FLAGS) --verbose $$file; \
+           if [ $$? != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
         done;
 
 clean:
