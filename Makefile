@@ -49,6 +49,9 @@ ifeq ($(OFP_ENABLE_C_ACTIONS), "yes")
             $(OFP_INSTALL_DIR)/lib
 endif
 
+check:
+	$(CD) tests; $(MAKE) check
+
 clean:
 	$(CD) $(OFP_FRONT_DIR); $(MAKE) clean
 	$(CD) $(OFP_TOOLS_DIR); $(MAKE) clean
