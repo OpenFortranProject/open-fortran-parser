@@ -4438,8 +4438,8 @@ public abstract interface IFortranParserAction {
 
    public abstract void end_of_stmt(Token eos);
    
-   public abstract void start_of_file(String filename);
-   public abstract void end_of_file(String filename);
+   public abstract void start_of_file(String filename, String path);
+   public abstract void end_of_file(String filename, String path);
    
    public abstract void cleanUp();
 
