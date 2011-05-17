@@ -45,7 +45,7 @@ public class FrontEnd implements Callable<Boolean> {
    private FortranLexer lexer;
    private IFortranParser parser;
    private FortranLexicalPrepass prepass;
-   private String fileName;
+   private String filename;
    private int sourceForm;
    private boolean verbose = false;
    private static boolean hasErrorOccurred = false;
@@ -54,6 +54,9 @@ public class FrontEnd implements Callable<Boolean> {
    public FrontEnd(String[] args, String filename, String type)
    throws IOException {
       boolean riceCAF = false;
+      
+      File file = new File(filename);
+      String path = file.getAbsolutePath();
 
       this.inputStream = new FortranStream(filename);
       this.lexer = new FortranLexer(inputStream);
@@ -61,7 +64,7 @@ public class FrontEnd implements Callable<Boolean> {
       // Changes associated with antlr version 3.3 require that includeDirs
       // be set here as the tokens are loaded by the constructor.
       this.lexer.setIncludeDirs(includeDirs);
-      this.tokens = new FortranTokenStream(lexer);
+      this.tokens = new FortranTokenStream(lexer, filename);
       
       // check to see if using RiceCAF parser extensions
       //
@@ -80,10 +83,10 @@ public class FrontEnd implements Callable<Boolean> {
          }
          this.parser = new FortranParserRiceCAF(tokens);
       }
-      this.parser.initialize(args, type, filename);
+      this.parser.initialize(args, type, filename, path);
 
       this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
-      this.fileName = filename;
+      this.filename = filename;
       this.sourceForm = inputStream.getSourceForm();
    }
 
@@ -304,7 +307,11 @@ public class FrontEnd implements Callable<Boolean> {
       }
 
       hasErrorOccurred = error.booleanValue();
-   }// end main()
+
+      // Reports are that ROSE sometimes doesn't get notification
+      // of a failure.  Try calling exit directly with an error condition.
+      if (hasErrorOccurred) System.exit(1);
+   } // end main()
 
    public void setVerbose(Boolean vFlag, Boolean sFlag) {
       this.verbose = vFlag;
@@ -320,10 +327,8 @@ public class FrontEnd implements Callable<Boolean> {
       int sourceForm = inputStream.getSourceForm();
 
       if (sourceForm == FortranStream.FIXED_FORM)
-         if (verbose)
-            System.out.println(this.fileName + " is FIXED FORM");
-         else if (verbose)
-            System.out.println(this.fileName + " is FREE FORM");
+         if (verbose)       System.out.println(filename + " is FIXED FORM");
+         else if (verbose)  System.out.println(filename + " is FREE FORM");
 
       // determine whether the file is fixed or free form and
       // set the source form in the prepass so it knows how to handle lines.
@@ -341,6 +346,10 @@ public class FrontEnd implements Callable<Boolean> {
          // attempt to parse the current program unit
          error = parseProgramUnit(lexer, tokens, parser);
 
+         // Call the end_of_file action here so that it comes after the
+         // end_program_stmt occurs.
+         getParser().eofAction();
+
          // see if we successfully parse the program unit or not
          if (verbose) {
             if (error != false) {
@@ -348,8 +357,8 @@ public class FrontEnd implements Callable<Boolean> {
             } else {
                System.out.println("Parser exiting normally");
             }
-         }// end else(parser exited normally)
-      }// end while(not end of file)
+         } // end else (parser exited normally)
+      } // end while (not end of file)
 
       // Call the cleanUp method for the give action class. This is more
       // important in the case of a C action *class* since it could easily
@@ -357,20 +366,7 @@ public class FrontEnd implements Callable<Boolean> {
       getParser().getAction().cleanUp();
 
       return new Boolean(error);
-   }// end call()
-
-   /*******OBSOLETE
-   private int determineSourceForm(String fileName) {
-      if (fileName.endsWith(new String(".f")) == true
-            || fileName.endsWith(new String(".F")) == true) {
-         this.sourceForm = FIXED_FORM;
-         return FIXED_FORM;
-      } else {
-         this.sourceForm = FREE_FORM;
-         return FREE_FORM;
-      }
-   }// end determineSourceForm()
-END OBSOLETE********/
+   } // end call()
 
    public int getSourceForm() {
       return this.sourceForm;
