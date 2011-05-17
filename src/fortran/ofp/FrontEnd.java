@@ -64,7 +64,7 @@ public class FrontEnd implements Callable<Boolean> {
       // Changes associated with antlr version 3.3 require that includeDirs
       // be set here as the tokens are loaded by the constructor.
       this.lexer.setIncludeDirs(includeDirs);
-      this.tokens = new FortranTokenStream(lexer, filename);
+      this.tokens = new FortranTokenStream(lexer);
       
       // check to see if using RiceCAF parser extensions
       //
