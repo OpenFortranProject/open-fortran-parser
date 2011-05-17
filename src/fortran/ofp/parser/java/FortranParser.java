@@ -39,22 +39,28 @@ public abstract class FortranParser extends Parser implements IFortranParser {
    protected FortranParser delegate = null;
    
    protected String filename;
+   protected String pathname;
 
    // TODO - does this state have to be shared?   
    protected boolean has_error_occurred = false;
    
-   protected FortranParser(TokenStream input, RecognizerSharedState state) {
+   protected FortranParser(TokenStream input, RecognizerSharedState state)
+   {
       super(input, state);
 
       // TODO - see if the size has to increase with new F2008 rules
       state.ruleMemo = new HashMap[489+1];
    }
 	
-   public void initialize(FortranParser delegate, IFortranParserAction action, String filename) {
+   public void initialize(FortranParser delegate, IFortranParserAction action,
+                          String filename, String path)
+   {
       this.delegate = delegate;
       this.filename = filename;
+      this.pathname = path;
 
-      if (this.action != null) this.action = action;
+//      if (FortranParser.action != null) FortranParser.action = action;
+      FortranParser.action = action;
    }
    
    public boolean hasErrorOccurred() { return delegate.has_error_occurred; }
@@ -102,19 +108,21 @@ public abstract class FortranParser extends Parser implements IFortranParser {
       }
          
       if (input.LA(1) == FortranLexer.T_INCLUDE) {
-         Token tk = input.LT(1);
-         input.consume();
+         String files[];
+         input.consume();  // consume T_INCLUDE
 
          // get include filename from token stream
-         tk = input.LT(1);
-         input.consume();
-         action.start_of_file(tk.getText());
+         files = input.LT(1).getText().split(":");
+         action.start_of_file(files[0], files[1]);
+         input.consume();  // consume T_INCLUDE_NAME
 
          // check for empty include file (no statements)
          if (input.LA(1) == FortranLexer.T_EOF) {
-            tk = input.LT(1);
+            Token tk = input.LT(1);
             input.consume();
-            action.end_of_file(tk.getText());
+
+            files = tk.getText().split(":");
+            action.end_of_file(files[0], files[1]);
          }
 
          // include acts like a statement so need to see if another include follows
@@ -123,17 +131,19 @@ public abstract class FortranParser extends Parser implements IFortranParser {
 
       else if (input.LA(1) == FortranLexer.T_EOF) {
          Token tk = input.LT(1);
+         String[] files = tk.getText().split(":");
          input.consume();
-         action.end_of_file(tk.getText());
+         action.end_of_file(files[0], files[1]);
          // unwind T_EOFs for include files containing includes
          checkForInclude();
       }
 
-      else if (input.LA(1) == FortranLexer.EOF) {
-         input.LT(1);
-         input.consume();
-         action.end_of_file(filename);
-      }
+// This is caught by derived class so don't do it here (Craig 2011.5.16)
+//      else if (input.LA(1) == FortranLexer.EOF) {
+//         Token tk = input.LT(1);
+//         input.consume();
+//         action.end_of_file(tk.getText());
+//      }
    }	
 
 } // end FortranParser
