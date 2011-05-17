@@ -22,7 +22,7 @@ import org.antlr.runtime.RecognitionException;
 
 public abstract interface IFortranParser {
 	
-   public void initialize(String[] args, String kind, String filename);
+   public void initialize(String[] args, String kind, String filename, String path);
 
    public void main_program()            throws RecognitionException;
    public void module()                  throws RecognitionException;
@@ -37,5 +37,6 @@ public abstract interface IFortranParser {
    public void reportError(RecognitionException re);
 
    public void checkForInclude();
+   public void eofAction();
 
 }
