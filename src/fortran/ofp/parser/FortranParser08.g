@@ -49,10 +49,14 @@ package fortran.ofp.parser.java;
    int gCount1;
    int gCount2;
 
-   public void initialize(String[] args, String kind, String filename) {
+   public void initialize(String[] args, String kind, String filename, String path) {
       action = FortranParserActionFactory.newAction(args, this, kind, filename);
-      initialize(this, action, filename);
-      action.start_of_file(this.filename);
+      initialize(this, action, filename, path);
+      action.start_of_file(filename, path);
+   }
+
+   public void eofAction() {
+      action.end_of_file(filename, pathname);
    }
 }
 
@@ -5810,10 +5814,11 @@ end_of_stmt returns [Token tk]
         // the (EOF) => EOF is done with lookahead because if it's not there, 
         // then antlr will crash with an internal error while trying to 
         // generate the java code.  (as of 12.11.06)
-        // not sure this is ever reached
     | (EOF) => EOF	
         {
             tk = $EOF; action.end_of_stmt($EOF); 
-            action.end_of_file(filename);
+            // don't call action.end_of_file() here or the action will be
+            // called before end_of_program action called
+            // action.end_of_file(eofToken.getText());
         }
     ;
