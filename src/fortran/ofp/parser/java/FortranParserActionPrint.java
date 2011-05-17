@@ -5101,9 +5101,10 @@ public class FortranParserActionPrint implements IFortranParserAction {
       /* Do nothing.  */
    }
 
-   public void start_of_file(String filename) {
+   public void start_of_file(String filename, String path) {
       printRuleHeader(generatedRule, "start-of-file");
       printParameter(filename, "filename");
+      printParameter(path, "path");
       printRuleTrailer();
    }
 
@@ -5111,9 +5112,10 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * Inserted Rule
     * end_of_file
     */
-   public void end_of_file(String filename) {
+   public void end_of_file(String filename, String path) {
       printRuleHeader(generatedRule, "end-of-file");
       printParameter(filename, "filename");
+      printParameter(path, "path");
       printRuleTrailer();
    }
 
