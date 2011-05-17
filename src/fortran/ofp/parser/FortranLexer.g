@@ -101,49 +101,53 @@ import fortran.ofp.parser.java.FortranToken;
 
 
     // overrides nextToken in superclass
-    public Token nextToken() {
-        Token tmpToken;
-        tmpToken = super.nextToken();
+   public Token nextToken() {
+      Token tk = super.nextToken();
 
-        if (tmpToken.getType() == EOF) {
-            tmpToken.setChannel(Token.DEFAULT_CHANNEL);
-            if(this.oldStreams != null && this.oldStreams.empty() == false) {
-                FortranToken eofToken = 
-                    new FortranToken(this.input, T_EOF, Token.DEFAULT_CHANNEL,
-                        this.input.index(), this.input.index()+1);
+      if (tk.getType() == EOF) {
+         Token eofToken;
+         FortranStream fs = getInput();
 
-                // TODO - provide better information about the location of this token
-                // It is probably ok for it to start at last character position in file but
-                // consider the end position of the token.
-                eofToken.setLine(state.tokenStartLine);
-                eofToken.setCharPositionInLine(state.tokenStartCharPositionInLine);
-                eofToken.setText(input.getSourceName());
+         tk.setChannel(Token.DEFAULT_CHANNEL);
+         eofToken = new FortranToken(this.input, T_EOF, Token.DEFAULT_CHANNEL,
+                                     this.input.index(), this.input.index()+1);
 
-                tmpToken = eofToken;
-                /* We have at least one previous input stream on the stack, 
-                   meaning we should be at the end of an included file.  
-                   Switch back to the previous stream and continue.  */
-                this.input = this.oldStreams.pop();
-                /* Is this ok to do??  */
-                resetLexerState();
-            }
+         if (this.oldStreams != null && this.oldStreams.empty() == false) {
 
-            return tmpToken;
-        }
+            // TODO - provide better information about the location of this token
+            // It is probably ok for it to start at last character position in file but
+            // consider the end position of the token.
+            eofToken.setLine(state.tokenStartLine);
+            eofToken.setCharPositionInLine(state.tokenStartCharPositionInLine);
 
-        if(tmpToken.getType() != LINE_COMMENT && 
-           tmpToken.getType() != WS &&
-           tmpToken.getType() != PREPROCESS_LINE) {
-            prevToken = tmpToken;
+            eofToken.setText(fs.getFileName() + ":" + fs.getAbsolutePath());
+
+            tk = eofToken;
+            /* We have at least one previous input stream on the stack, 
+               meaning we should be at the end of an included file.  
+               Switch back to the previous stream and continue.  */
+            this.input = this.oldStreams.pop();
+            /* Is this ok to do??  */
+            resetLexerState();
+         }
+         else {
+            tk.setText(fs.getFileName() + ":" + fs.getAbsolutePath());
+            eofToken = tk;
+         }
+
+         return tk;
+      }
+
+        if (tk.getType() != LINE_COMMENT && tk.getType() != WS &&
+            tk.getType() != PREPROCESS_LINE) {
+           prevToken = tk;
         } 
 
-        if(tmpToken.getType() == T_EOS && continueFlag == true) {
-            tmpToken.setChannel(99);
-        } else if(continueFlag == true) {
-            if(tmpToken.getType() != LINE_COMMENT &&
-               tmpToken.getType() != WS &&
-               tmpToken.getType() != PREPROCESS_LINE &&
-               tmpToken.getType() != CONTINUE_CHAR) {
+        if (tk.getType() == T_EOS && continueFlag == true) {
+            tk.setChannel(99);
+        } else if (continueFlag == true) {
+            if (tk.getType() != LINE_COMMENT && tk.getType() != WS &&
+                tk.getType() != PREPROCESS_LINE && tk.getType() != CONTINUE_CHAR) {
                 // if the token we have is not T_EOS or any kind of WS or 
                 // comment, and we have a continue, then this should be the
                 // first token on the line folliwng the '&'.  this means that
@@ -153,8 +157,8 @@ import fortran.ofp.parser.java.FortranToken;
             }
         }
 
-        return tmpToken;
-    }// end nextToken()
+        return tk;
+    } // end nextToken()
 
 
     public int getIgnoreChannelNumber() {
@@ -163,9 +167,9 @@ import fortran.ofp.parser.java.FortranToken;
     }// end getIgnoreChannelNumber()
 
     
-    public CharStream getInput() {
-        return this.input;
-    }
+   public FortranStream getInput() {
+      return (FortranStream) this.input;
+   }
     
 
    /**
@@ -224,7 +228,7 @@ import fortran.ofp.parser.java.FortranToken;
         } else {
             return tmpFile;
         }
-    }// end findFile()
+    } // end findFile()
 
 
     private String includeFile() {
@@ -242,13 +246,13 @@ import fortran.ofp.parser.java.FortranToken;
             includedFile = findFile(filename);
             if (includedFile == null) {
                 System.err.println("WARNING: Could not find file '" + filename + "'");
-                return filename;
+                return filename + ":ERROR_FILE_NOT_FOUND";
             }
 
             /* Create a new stream for the included file.  */
             try {
                // the included file should have the save source form as original
-               includedStream = new FortranStream(includedFile.getAbsolutePath(), this.sourceForm);
+               includedStream = new FortranStream(filename, includedFile.getAbsolutePath(), this.sourceForm);
             } catch(IOException e) {
                 System.err.println("WARNING: Could not open file '" + filename + "'");
                 e.printStackTrace();
@@ -256,7 +260,7 @@ import fortran.ofp.parser.java.FortranToken;
             }
             
             /* Save current character stream.  */
-            oldStreams.push((FortranStream)(this.input));
+            oldStreams.push(getInput());
             this.input = includedStream;
             /* Is this ok to do??  */
             resetLexerState();
@@ -265,11 +269,8 @@ import fortran.ofp.parser.java.FortranToken;
                                "include line");
         }
 
-        if (includedFile != null) {
-            filename = includedFile.getAbsolutePath();
-        }
+        return filename + ":" + includedFile.getAbsolutePath();
 
-        return filename;
     } // end includeFile()
 
 }
