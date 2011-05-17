@@ -23,13 +23,17 @@ import FortranParser08;
    int gCount1;
    int gCount2;
 
-   public void initialize(String[] args, String kind, String filename) {
+   public void initialize(String[] args, String kind, String filename, String path) {
       action = FortranParserActionFactory.newAction(args, this, kind, filename);
 
-      initialize(this, action, filename);
-      gFortranParser08.initialize(this, action, filename);
+      initialize(this, action, filename, path);
+      gFortranParser08.initialize(this, action, filename, path);
 
-      action.start_of_file(this.filename);
+      action.start_of_file(filename, path);
+   }
+
+   public void eofAction() {
+      gFortranParser08.eofAction();
    }
 
 } // end members
