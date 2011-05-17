@@ -23,6 +23,8 @@ import org.antlr.runtime.*;
 public class FortranStream extends ANTLRFileStream
 {
    private int sourceForm;
+   private String filename;
+   private String filepath;
 
    public static final int UNKNOWN_SOURCE_FORM = -1;
    public static final int FREE_FORM = 1;
@@ -51,21 +53,28 @@ public class FortranStream extends ANTLRFileStream
    public FortranStream(String filename) throws IOException
    {
       super(filename);
+      this.filename = filename;
+
+      File file = new File(filename);
+      this.filepath = file.getAbsolutePath();
+      
       this.sourceForm = determineSourceForm(filename);
       convertInputBuffer();
    }
 
-   public FortranStream(String filename, int sourceForm) throws IOException
+   public FortranStream(String filename, String path, int sourceForm) throws IOException
    {
-      super(filename);
+      super(path);
+      this.filename = filename;
+      this.filepath = path;
       this.sourceForm = sourceForm;
       convertInputBuffer();
    }
 
 
-   public int determineSourceForm(String filename) {
-      if (filename.endsWith(new String(".f")) == true ||
-	      filename.endsWith(new String(".F")) == true) {
+   public int determineSourceForm(String fileName) {
+      if (fileName.endsWith(new String(".f")) == true ||
+	      fileName.endsWith(new String(".F")) == true) {
          this.sourceForm = FIXED_FORM;
          return FIXED_FORM;
       } else {
@@ -74,18 +83,20 @@ public class FortranStream extends ANTLRFileStream
       }
    } // end determineSourceForm()
 
-
    public int getSourceForm()
    {
       return this.sourceForm;
    }
 
-
    public String getFileName()
    {
-      return getSourceName();
+      return filename;
    }
 
+   public String getAbsolutePath()
+   {
+      return filepath;
+   }
 
    /**
     * Convert characters to upper case.  This is only for look ahead
