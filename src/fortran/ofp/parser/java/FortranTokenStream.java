@@ -51,6 +51,8 @@ public class FortranTokenStream extends LegacyCommonTokenStream {
       eofToken = tokenSource.nextToken();
       eofToken.setTokenIndex(size());
 
+      FortranStream fs = ((FortranLexer) lexer).getInput();
+      eofToken.setText(fs.getFileName() + ":" + fs.getAbsolutePath());
    } // end constructor
    
    /**
