@@ -502,8 +502,7 @@ END OBSOLETE*******/
       do {
          tk = (Token)(packedList.get(start));
          start++;
-      } while (start < this.packedList.size() &&
-              tk.getType() != desiredToken);
+      } while (start < this.packedList.size() && tk.getType() != desiredToken);
 
       if (tk.getType() == desiredToken)
          // start is one token past the one we want
