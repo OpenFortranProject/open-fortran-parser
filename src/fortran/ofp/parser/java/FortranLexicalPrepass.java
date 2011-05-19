@@ -806,23 +806,54 @@ END OBSOLETE********/
 
    } // end matchAttrStmt()
 
+  /**
+   * Test to see if a token is an opening paren or bracket.
+   */
+   private boolean isOpenParen(int token)
+   {
+      return token == FortranLexer.T_LPAREN || token == FortranLexer.T_LBRACKET;
+   } // end isOpenParen()
+
    /**
-    * Test to see if a token is an opening paren or bracket.
+    * Test to see if a token is a closing paren or bracket.
     */
-	private boolean isOpenParen(int token)
-	{
-		return token == FortranLexer.T_LPAREN || token == FortranLexer.T_LBRACKET;
-	}// end isOpenParen()
+   private boolean isCloseParen(int token)
+   {
+      return token == FortranLexer.T_RPAREN || token == FortranLexer.T_RBRACKET;
+   } // end isCloseParen()
+   
+   /**
+    * Return the offset of the beginning of an array constructor, ie, the offset of '['
+    * or the offset of the '/' in the '(' '/' sequence, otherwise return -1.
+    */
+   private int arrayConstructorIndices(int start, int[] indices)
+   {
+      indices[0] = indices[1] = -1;
 
-	/**
-	 * Test to see if a token is a closing paren or bracket.
-	 */
-	private boolean isCloseParen(int token)
-	{
-		return token == FortranLexer.T_RPAREN || token == FortranLexer.T_RBRACKET;
-	}// end isCloseParen()
+      // look for '['
+      Token tk = tokens.getToken(start);
+      if (tk.getType() == FortranLexer.T_LBRACKET) {
+         indices[0] = start;
+         indices[1] = tokens.findToken(start+1, FortranLexer.T_RBRACKET);
+         if (indices[1] == -1) indices[0] = -1;
+      }
+      // look for '(' '/'
+      else if (tk.getType() == FortranLexer.T_LPAREN
+               && tokens.getToken(start+1).getType() == FortranLexer.T_SLASH) {
+         indices[0] = start + 1;
+         indices[1] = tokens.findToken(start+2, FortranLexer.T_SLASH);
+         if (indices[1] != -1) {
+            indices[1] += 1;
+            if (tokens.getToken(indices[1]).getType() != FortranLexer.T_RPAREN) {
+               indices[0] = -1;
+               indices[1] = -1;
+            }
+         }
+      }
+      return indices[0];
+   }
 
-/**
+   /**
     * This matches closing paren or bracket even if the match is the wrong type,
     * i.e., '( ]'.  This shouldn't really matter as the parser proper will work it
     * out and give an error if the match is incorrect
@@ -830,7 +861,8 @@ END OBSOLETE********/
     * WARNING return value is one-based indexing (as is offset, the
     * location of the LPAREN).
     */
-   private int matchClosingParen(int lineStart, int offset) {
+   private int matchClosingParen(int lineStart, int offset)
+   {
       int lookAhead = 0;
       int tmpTokenType;
       int nestingLevel = 0;
@@ -843,16 +875,17 @@ END OBSOLETE********/
       do {
          lookAhead++;
          tmpTokenType = tokens.currLineLA(lookAhead);
-         if(isOpenParen(tmpTokenType))
+         if (isOpenParen(tmpTokenType)) {
             nestingLevel++;
-         else if(isCloseParen(tmpTokenType))
+         }
+         else if (isCloseParen(tmpTokenType)) {
             nestingLevel--;
+         }
 
          // handle the error condition of the user not giving the 
          // closing paren(s)
-         if((tmpTokenType == FortranLexer.T_EOS || 
-             tmpTokenType == FortranLexer.EOF) &&
-            nestingLevel != 0) {
+         if ((tmpTokenType == FortranLexer.T_EOS || tmpTokenType == FortranLexer.EOF)
+             && nestingLevel != 0) {
             System.err.println("Error: matchClosingParen(): Missing " +
                                "closing paren (or bracket) on line " + 
                                tokens.getToken(lookAhead-1).getLine() + ":");
@@ -864,27 +897,28 @@ END OBSOLETE********/
 
          // have to continue until we're no longer in a nested
          // paren, and find the matching closing paren
-      } while((nestingLevel != 0) || 
-              (!isCloseParen(tmpTokenType) &&
-               tmpTokenType != FortranLexer.T_EOS && 
-               tmpTokenType != FortranLexer.EOF));
+      } while (nestingLevel != 0
+    		   || (!isCloseParen(tmpTokenType) && tmpTokenType != FortranLexer.T_EOS 
+                   && tmpTokenType != FortranLexer.EOF));
 
-      if(isCloseParen(tmpTokenType))
+      if (isCloseParen(tmpTokenType)) {
          return lookAhead;
+      }
 
       return -1;
-   }// end matchClosingParen()
+   } // end matchClosingParen()
 
-
+   /**
+    * The token at lineStart initiates an intrinsic or derived type-spec;
+    * convert kind/len expressions to identifiers.
+    */
    private int fixupDeclTypeSpec(int lineStart, int lineEnd) {
-      int kindOffsetEnd = -1;
-
       // see if we have a derived type
-      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_TYPE ||
-          tokens.currLineLA(lineStart+1) == FortranLexer.T_CLASS) {
+      if (tokens.getToken(lineStart).getType() == FortranLexer.T_TYPE ||
+          tokens.getToken(lineStart).getType() == FortranLexer.T_CLASS) {
          int rparenOffset = -1;
          // left-paren is next token (or we're in trouble)
-         if (tokens.currLineLA(lineStart+2) != FortranLexer.T_LPAREN) {
+         if (tokens.getToken(lineStart+1).getType() != FortranLexer.T_LPAREN) {
             System.err.println("Derived type or Class declaration error!");
             System.exit(1);
          }
@@ -896,33 +930,29 @@ END OBSOLETE********/
          return rparenOffset-1;
       }
 
-      if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
+      if (tokens.getToken(lineStart+1).getType() == FortranLexer.T_LPAREN) {
          int kindTokenOffset = -1;
          int lenTokenOffset = -1;
-         kindOffsetEnd = 
-            matchClosingParen(lineStart, 
-                              tokens.findToken(lineStart, 
-                                               FortranLexer.T_LPAREN)+1);
-         kindTokenOffset = tokens.findToken(lineStart+1, 
-                                            FortranLexer.T_KIND);
-         lenTokenOffset = tokens.findToken(lineStart+1, FortranLexer.T_LEN);
+         int offsetEnd = matchClosingParen(lineStart, 
+                              tokens.findToken(lineStart, FortranLexer.T_LPAREN)+1);
+         kindTokenOffset = tokens.findToken(lineStart+1, FortranLexer.T_KIND);
+         lenTokenOffset  = tokens.findToken(lineStart+1, FortranLexer.T_LEN);
 
-         convertToIdents(lineStart+1, kindOffsetEnd);
+         convertToIdents(lineStart+1, offsetEnd);
 
-         if (kindTokenOffset != -1 && kindTokenOffset < kindOffsetEnd &&
-            tokens.currLineLA(kindTokenOffset+2) == FortranLexer.T_EQUALS) {
+         if (kindTokenOffset != -1 && kindTokenOffset < offsetEnd
+             && tokens.getToken(kindTokenOffset+1).getType() == FortranLexer.T_EQUALS) {
             tokens.getToken(kindTokenOffset).setType(FortranLexer.T_KIND);
          }
-         if (lenTokenOffset != -1 && lenTokenOffset < kindOffsetEnd &&
-            tokens.currLineLA(lenTokenOffset+2) == FortranLexer.T_EQUALS) {
+         if (lenTokenOffset != -1 && lenTokenOffset < offsetEnd
+             && tokens.getToken(lenTokenOffset+1).getType() == FortranLexer.T_EQUALS) {
             tokens.getToken(lenTokenOffset).setType(FortranLexer.T_LEN);
          }
 
-         // it is already 0 based??
-         return kindOffsetEnd-1;
+         return offsetEnd-1;
       }
 
-      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_DOUBLE) {
+      if (tokens.getToken(lineStart).getType() == FortranLexer.T_DOUBLE) {
          // return 0 based index of second token, which is lineStart+1
          lineStart = lineStart+1;
       }
@@ -932,20 +962,22 @@ END OBSOLETE********/
 
 
    /**
-    * TODO:: this could also be for a function, so need to handle 
-    * that!!
+    * Token at lineStart has been identified as coming from a
+    * declaration-type-spec so convert appropriate tokens
+    * to identifiers.
     */
    private void fixupDataDecl(int lineStart, int lineEnd) {
+      int[] arrayConOffset = new int[2];
       int identOffset;
 
-      // we know the line started with an intrinsic typespec, so 
+      // we know the line started with an intrinsic type-spec, so 
       // now, we need to find the identifier(s) involved and convert 
       // any of them that are keyword to identifiers.
 
       // fixup the decl type spec part (which handles any kind selector)
       lineStart = fixupDeclTypeSpec(lineStart, lineEnd);
       identOffset = tokens.findToken(lineStart, FortranLexer.T_COLON_COLON);
-      if(identOffset != -1) {
+      if (identOffset != -1) {
          // found the :: so the idents start at identOffset+1
          identOffset++;
       } else {
@@ -953,14 +985,32 @@ END OBSOLETE********/
          // be the next token (0 based indexing)
          identOffset = lineStart+1;
       }
+      
+      // Look for a potential array constructor.  This could have a type-spec
+      // (which must be followed by "::") and the type-spec will have keywords.
+      int equalsOffset = tokens.findToken(identOffset, FortranLexer.T_EQUALS);
+      
+      while (equalsOffset != -1) {
+    	  convertToIdents(identOffset, equalsOffset); // convert kind/len params in type
+    	  identOffset = equalsOffset + 1;
+          if (arrayConstructorIndices(identOffset, arrayConOffset) != -1) {
+             Token tk = tokens.getToken(arrayConOffset[0]+1);
+             if (isIntrinsicType(tk.getType())) {
+                identOffset = fixupDeclTypeSpec(arrayConOffset[0]+1, arrayConOffset[1]);
+                convertToIdents(identOffset, arrayConOffset[1]);
+                identOffset = arrayConOffset[1] + 1;
+             }
+          }
+          // look for additional array constructors
+          equalsOffset = tokens.findToken(identOffset, FortranLexer.T_EQUALS);
+      }
 
-      // now we have the location of the ident(s).  simply loop 
-      // across any tokens left in this line and convert keywords
-      // to idents.
+      // now we have the location of the ident(s).  simply loop across
+      // any tokens left in this line and convert keywords to idents.
       convertToIdents(identOffset, lineEnd);
       
       return;
-   }// end fixupDataDecl()
+   } // end fixupDataDecl()
 
 
    /**
@@ -1685,9 +1735,10 @@ END OBSOLETE********/
 
          // need to see if this has a label, and if so, see if it's needed
          // to terminate a do loop.
-         if(lineStart > 0 && 
-            tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING)
+         if (lineStart > 0
+             && tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING) {
             fixupLabeledEndDo(lineStart, lineEnd);
+         }
 
          return true;
       }
@@ -1724,44 +1775,40 @@ END OBSOLETE********/
     */
    private void fixupLabeledEndDo(int lineStart, int lineEnd) {
       // if we don't have a label, return
-      if(tokens.currLineLA(1) != FortranLexer.T_DIGIT_STRING)
+      if (tokens.currLineLA(1) != FortranLexer.T_DIGIT_STRING) {
          return;
+      }
 
-      if(doLabels.empty() == false) {
+      if (doLabels.empty() == false) {
          String doLabelString = doLabels.peek().getText();
          Token firstToken = tokens.getToken(0);
          // the lineStart was advanced past the label, so the T_CONTINUE or
          // T_END is the first token in look ahead (lineStart+1)
          String labeledDoText = new String("LABELED_DO_TERM");
 
-         if(labelsMatch(doLabelString, firstToken.getText()) == true) {
+         if (labelsMatch(doLabelString, firstToken.getText()) == true) {
             // labels match up
             // try inserting a new token after the label. this will help 
             // the parser recognize a do loop being terminated
-            tokens.addToken(1, FortranLexer.T_LABEL_DO_TERMINAL, 
-                            labeledDoText);
+            tokens.addToken(1, FortranLexer.T_LABEL_DO_TERMINAL, labeledDoText);
 
             // need to pop off all occurrences of this label that
             // were pushed.  this can happen if one labeled action stmt
             // terminates nested do stmts.  start by popping the first one, 
             // then checking if there are any more.
             doLabels.pop();
-            while(doLabels.empty() == false &&
-                  (labelsMatch(doLabels.peek().getText(), 
-										 firstToken.getText()) == true)) {
+            while (doLabels.empty() == false &&
+                  (labelsMatch(doLabels.peek().getText(), firstToken.getText()) == true)) {
                // for each extra matching labeled do with this labeled end do, 
                // we need to add a T_LABEL_DO_TERMINAL to the token stream.
                // also, append a new statement for each do loop we need to 
                // terminate.  the added stmt is: 
                // label T_LABEL_DO_TERMINAL T_CONTINUE T_EOS
-               if(tokens.appendToken(FortranLexer.T_DIGIT_STRING, 
-                                     new String(firstToken.getText())) 
-                  == false ||
-                  tokens.appendToken(FortranLexer.T_LABEL_DO_TERMINAL, 
-                                     labeledDoText) == false ||
-                  tokens.appendToken(FortranLexer.T_CONTINUE, 
-                                     new String("CONTINUE")) == false ||
-                  tokens.appendToken(FortranLexer.T_EOS, null) == false) {
+               if (tokens.appendToken(FortranLexer.T_DIGIT_STRING, 
+                                      new String(firstToken.getText())) == false ||
+                   tokens.appendToken(FortranLexer.T_LABEL_DO_TERMINAL, labeledDoText) == false ||
+                   tokens.appendToken(FortranLexer.T_CONTINUE, new String("CONTINUE")) == false ||
+                   tokens.appendToken(FortranLexer.T_EOS, null) == false) {
                   // should we exit here??
                   System.err.println("Couldn't add tokens!");
                   System.exit(1);
@@ -1771,7 +1818,7 @@ END OBSOLETE********/
          }
       }
       return;
-   }// end fixupLabeledEndDo()
+   } // end fixupLabeledEndDo()
 
 
    private boolean matchActionStmt(int lineStart, int lineEnd) {
@@ -1811,17 +1858,18 @@ END OBSOLETE********/
          identOffset = lineStart+1;
       }
 
-      if(identOffset != -1) {
+      if (identOffset != -1) {
          convertToIdents(identOffset, lineEnd);
 
          // a labeled action stmt can terminate a do loop.  see if we 
          // have to fix it up (possibly insert extra tokens).
          // a number of things can't terminate a non-block DO, including
          // a goto.  
-         if((lineStart > 0 &&
-             tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING) &&
-            tokenType != FortranLexer.T_GOTO)
+         if ((lineStart > 0
+             && tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING)
+             && tokenType != FortranLexer.T_GOTO) {
             fixupLabeledEndDo(lineStart, lineEnd);
+         }
 
          return true;
       } else {
@@ -2081,49 +2129,51 @@ END OBSOLETE********/
    private boolean matchAssignStmt(int lineStart, int lineEnd)
    {
       int identOffset, assignType;
-	  int nextOffset = lineStart;
+      int nextOffset = lineStart;
 
       // can't be an assignment statement if not enough tokens
-      if( lineEnd - lineStart < 3 )
+      if ( lineEnd - lineStart < 3 ) {
          return false;
+      }
 
       // advance past an initial data_ref
       nextOffset = matchDataRef(nextOffset, lineEnd);
 
       // look for an assignment token (including ptr assignment)
-      if( tokens.currLineLA(nextOffset) == FortranLexer.T_EQUALS ||
-          tokens.currLineLA(nextOffset) == FortranLexer.T_EQ_GT )
-      {
+      if ( tokens.currLineLA(nextOffset) == FortranLexer.T_EQUALS ||
+          tokens.currLineLA(nextOffset) == FortranLexer.T_EQ_GT ) {
           // will convert everything on line to identifier
-          identOffset = lineStart;
-          assignType  = tokens.currLineLA(nextOffset);
+         identOffset = lineStart;
+         assignType  = tokens.currLineLA(nextOffset);
       }
-      else
-      {
-    	  identOffset = -1;
-          assignType  =  0;  // javac complains without this
+      else {
+         identOffset = -1;
+         assignType  =  0;  // javac complains without this
       }
 
       // if we found a valid ptr assignment fix up the line and return true
       // otherwise, change nothing and return false
-      if( identOffset != -1 )
-      {
+      if ( identOffset != -1 ) {
          convertToIdents(identOffset, lineEnd);
 
          // insert a special token to signify an assignment statement of given kind
-         if( assignType == FortranLexer.T_EQUALS )
+         if ( assignType == FortranLexer.T_EQUALS ) {
             tokens.addToken(lineStart, FortranLexer.T_ASSIGNMENT_STMT, "__T_ASSIGNMENT_STMT__");
-         else if( assignType == FortranLexer.T_EQ_GT )
+         }
+         else if ( assignType == FortranLexer.T_EQ_GT ) {
             tokens.addToken(lineStart, FortranLexer.T_PTR_ASSIGNMENT_STMT, "__T_PTR_ASSIGNMENT_STMT__");
+         }
 
          // see if we have to fix up a labeled action stmt terminating a do loop
-         if( lineStart > 0 && tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING )
+         if ( lineStart > 0 && tokens.currLineLA(lineStart) == FortranLexer.T_DIGIT_STRING ) {
             fixupLabeledEndDo(lineStart, lineEnd);
+         }
 
          return true;
       }
-      else
+      else {
          return false;
+      }
    } // end matchAssignStmt()
 
 
