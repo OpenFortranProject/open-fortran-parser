@@ -1391,22 +1391,46 @@ END OBSOLETE********/
    } // end getControlEditDesc()
 
 
+   // Return the index for the end of the char string.  The lexer already verified that
+   // the string was valid (it should have, at least..), but we need the end so we don't
+   // consider anything within the string as a terminator.
    private int getCharString(String line, int lineIndex, char quoteChar) {
       char nextChar;
       // we know the first character matches the quoteChar, so look at 
       // what the next char is
       lineIndex++;
       nextChar = line.charAt(lineIndex);
-      if(nextChar == '\'' || nextChar == '"')
-         return getCharString(line, lineIndex, nextChar);
 
+      // need to consider: 1. empty string; 2. escaped quotes, ie, """" is
+      // equivalent to '"'
+      
+      // look for empty string
+      if (nextChar == quoteChar && line.charAt(lineIndex+1) != quoteChar) {
+         // this is an empty string
+         return lineIndex + 1;
+      }
+      
       do {
-         lineIndex++;
-         nextChar = line.charAt(lineIndex);
-      } while(nextChar != '\'' && nextChar != '"');
+         if (nextChar == quoteChar) {
+            // look for two consequtive quote chars
+            if (line.charAt(lineIndex+1) == quoteChar) {
+               lineIndex += 1;  // skip the consequtive quotes
+            }
+         }
+         nextChar = line.charAt(++lineIndex);
+      } while (nextChar != quoteChar);
+      
+// OBSOLETE: replaced by fix to bug 3304566 19.5.2011
+//      if ((nextChar == '\'' || nextChar == '"') && nextChar == quoteChar)
+//         return getCharString(line, lineIndex, nextChar);
+//
+//      do {
+//         lineIndex++;
+//         nextChar = line.charAt(lineIndex);
+//      } while(nextChar != '\'' && nextChar != '"');
 
       return lineIndex;
-   }// end getCharString()
+   } // end getCharString()
 
 
    private int getCharStringEditDesc(String line, int lineIndex, 
