@@ -70,19 +70,31 @@ END OBSOLETE********/
 END OBSOLETE********/
 
    /**
-    * Convert keyword tokens (except for generic-spec items) from start to end to identifiers
+    * Convert keyword tokens (except for generic-spec items) from start to end to identifiers.
+    * Tokens to convert often represent expressions which can be primaries which can be
+    * array constructors.  So must look for occurrence of an array constructor of form
+    * [ type_spec_stuff :: ... ] and don't convert the intrisic-type-spec keyword.
     */
-   private void convertToIdents(int start, int end)
+   private int convertToIdents(int start, int end)
    {
-      int i;
+      int i, tkType;
+      int[] indices = new int[2];
       Token tk = null;
 
       for (i = start; i < end; i++) {
          // get the token 
          tk = tokens.getToken(i);
+         tkType = tk.getType();
 
          // This is often a list so skip commas (or T_EOS) to save time
-         if (tk.getType() == FortranLexer.T_COMMA || tk.getType() == FortranLexer.T_EOS) continue;
+         if (tkType == FortranLexer.T_COMMA || tkType == FortranLexer.T_EOS) continue;
+
+         indices[0] = i;
+         indices[1] = end;
+         if (arrayConstructorIndices(indices) != -1) {
+            // this could also match a coarray reference but that's ok
+            i = fixupArrayConstructor(indices);
+         }
 
          if (lexer.isKeyword(tk) == true) {
             // generic-spec items should not be converted (unless an id), i.e., 
@@ -97,9 +109,9 @@ END OBSOLETE********/
                i = idOffset-1;
             }
          }
-      } // end for(number of tokens in line)
+      } // end for (number of tokens in line)
 
-      return;
+      return end;
    } // end convertToIdents()
 
 
@@ -136,7 +148,7 @@ END OBSOLETE********/
             parenOffset++;
             // lookAhead should be the exact lookAhead of where we found
             // the LPAREN or LBRACKET.  
-            lookAhead = matchClosingParen(start, lookAhead);
+            lookAhead = matchClosingParen(lookAhead);
             tk = tokens.currLineLA(lookAhead);
          }
       } while (tk != FortranLexer.EOF && tk != FortranLexer.T_EOS && tk != desiredToken);
@@ -150,6 +162,44 @@ END OBSOLETE********/
    } // end salesScanForToken()
 
 
+   /**
+    * Returns true if the token at i is a name.  Since at this stage a keyword
+    * can also be a name, a name is (id | keyword).
+    */
+   private boolean matchName(int i)
+   {
+      Token tk = tokens.getToken(i);
+      if (lexer.isKeyword(tk) || tk.getType() == FortranLexer.T_IDENT) {
+         return true;
+      }
+      return false;
+   }
+
+
+   /**
+    * Return the indices of a type-spec, or -1 if not a type-spec.
+    *
+    * A type-spec looks a name token followed by optional parens.
+    */
+   private int matchTypeSpec(int[] indices)
+   {
+      int offset = indices[0];
+
+      indices[0] = indices[1] = -1;
+
+      // must start with a name
+      if (matchName(offset)) {
+         indices[0] = offset++;
+         // skip optional parens
+         if (tokens.getToken(offset).getType() == FortranLexer.T_LPAREN) {
+            indices[1] = matchClosingParen(offset+1);
+         }
+         if (indices[1] == -1) indices[0] = -1;
+         else                  indices[1] -= 1;
+      }
+      return indices[0];
+   }
+
    private boolean matchIfConstStmt(int lineStart, int lineEnd) {
       int rparenOffset = -1;
       int commaOffset = -1;
@@ -159,7 +209,7 @@ END OBSOLETE********/
       int tkType = tokens.currLineLA(lineStart+1);
       if ((tkType == FortranLexer.T_IF || tkType == FortranLexer.T_ELSEIF) &&
          tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
-         rparenOffset = matchClosingParen(lineStart+2, lineStart+2);
+         rparenOffset = matchClosingParen(lineStart+2);
          commaOffset = salesScanForToken(rparenOffset+1, FortranLexer.T_COMMA);
          if (rparenOffset == -1) {
             System.err.println("Error in IF stmt at line: " + tokens.getToken(0).getLine());
@@ -301,7 +351,7 @@ END OBSOLETE********/
                int rparenOffset;
                // matchClosingParen returns the lookAhead (1 based); 
                // we want the offset (0 based), so subtract 1 from it.
-               rparenOffset = matchClosingParen(lineStart+2, lineStart+3) - 1;
+               rparenOffset = matchClosingParen(lineStart+3) - 1;
                // if the third token is a left paren, we have a 'type is'
                // and need to figure out what the type_spec is
                if (isIntrinsicType(tokens.currLineLA(lineStart+4)) == true) {
@@ -655,7 +705,7 @@ END OBSOLETE********/
       } else {
          return false;
       }
-   }// end matchProcStmt()
+   } // end matchProcStmt()
 
 
    /**
@@ -672,10 +722,10 @@ END OBSOLETE********/
          // found a procedure decl.  need to find the parens
 			// The left paren should be the next token.
          lParenOffset = lineStart+1;
-         rParenOffset = matchClosingParen(lineStart, lParenOffset+1);
+         rParenOffset = matchClosingParen(lParenOffset+1);
 
-			// Don't convert proc-interface since it can be a 
-			// declaration-type-spec.
+         // Don't convert proc-interface since it can be a 
+         // declaration-type-spec.
 
          // double colons, if there, must come after the T_RPAREN
          colonOffset = 
@@ -724,7 +774,7 @@ END OBSOLETE********/
 
       case FortranLexer.T_INTENT:
          lParenOffset = tokens.findToken(lineStart+1, FortranLexer.T_LPAREN);
-         identOffset = matchClosingParen(lineStart, lParenOffset+1);
+         identOffset = matchClosingParen(lParenOffset+1);
          break;
 
       case FortranLexer.T_BIND:
@@ -732,7 +782,7 @@ END OBSOLETE********/
          // What follows it is optional :: and the ident(s). The T_BIND and T_LPAREN
          // are the first two tokens, so lineStart+2 puts you on the lookahead for LPAREN,
          // which is the starting point for the matching routine.
-         identOffset = matchClosingParen(lineStart, lineStart+2);
+         identOffset = matchClosingParen(lineStart+2);
          break;
 
       case FortranLexer.T_PARAMETER:
@@ -744,7 +794,7 @@ END OBSOLETE********/
          }
          // idents start after the T_LPAREN and stop at the T_RPAREN
          identOffset = lParenOffset;
-         lineEnd = matchClosingParen(lineStart, lParenOffset+1);
+         lineEnd = matchClosingParen(lParenOffset+1);
          break;
 
       case FortranLexer.T_PRIVATE:
@@ -762,7 +812,7 @@ END OBSOLETE********/
             do {
                lParenOffset = tokens.findToken(lineStart, FortranLexer.T_LPAREN);
                if (lParenOffset != -1) {
-                  rParenOffset = matchClosingParen(lineStart, lParenOffset+1);
+                  rParenOffset = matchClosingParen(lParenOffset+1);
                   // The first set of parens could be the optional kind selector, or it
                   // is the letter designators for the implicit stmt.  either way, we can
                   // convert anything that's not T_KIND or T_LEN to an ident because T_KIND 
@@ -780,7 +830,7 @@ END OBSOLETE********/
                   // the kind selector, then the second set would be for the letter
                   // designator(s) (required).
                   if (tokens.currLineLA(rParenOffset+1) == FortranLexer.T_LPAREN) {
-                     rParenOffset = matchClosingParen(lineStart, rParenOffset+1);
+                     rParenOffset = matchClosingParen(rParenOffset+1);
                   }
 
                   // reset the lineStart so we can accept an implicit_spec_list
@@ -826,8 +876,10 @@ END OBSOLETE********/
     * Return the offset of the beginning of an array constructor, ie, the offset of '['
     * or the offset of the '/' in the '(' '/' sequence, otherwise return -1.
     */
-   private int arrayConstructorIndices(int start, int[] indices)
+   private int arrayConstructorIndices(int[] indices)
    {
+	  int start = indices[0];
+	  
       indices[0] = indices[1] = -1;
 
       // look for '['
@@ -853,6 +905,24 @@ END OBSOLETE********/
       return indices[0];
    }
 
+   private int fixupArrayConstructor(int[] indices)
+   {
+      int offset = indices[0] + 1;
+      int end    = indices[1];
+
+      // see if there is a type-spec by looking for "::"
+      indices[0] = offset;
+      if (matchTypeSpec(indices) != -1) {
+         offset = indices[1] + 1;
+         if (tokens.getToken(offset).getType() == FortranLexer.T_COLON_COLON) {
+            offset = fixupDeclTypeSpec(indices[0], indices[1]) + 1;
+         }
+      }
+      
+      return convertToIdents(offset, end);
+   }
+
+
    /**
     * This matches closing paren or bracket even if the match is the wrong type,
     * i.e., '( ]'.  This shouldn't really matter as the parser proper will work it
@@ -861,7 +931,7 @@ END OBSOLETE********/
     * WARNING return value is one-based indexing (as is offset, the
     * location of the LPAREN).
     */
-   private int matchClosingParen(int lineStart, int offset)
+   private int matchClosingParen(int offset)
    {
       int lookAhead = 0;
       int tmpTokenType;
@@ -922,7 +992,7 @@ END OBSOLETE********/
             System.err.println("Derived type or Class declaration error!");
             System.exit(1);
          }
-         rparenOffset = matchClosingParen(lineStart, lineStart+2);
+         rparenOffset = matchClosingParen(lineStart+2);
          // convert anything between the (..) to idents
          convertToIdents(lineStart+1, rparenOffset);
 
@@ -933,8 +1003,7 @@ END OBSOLETE********/
       if (tokens.getToken(lineStart+1).getType() == FortranLexer.T_LPAREN) {
          int kindTokenOffset = -1;
          int lenTokenOffset = -1;
-         int offsetEnd = matchClosingParen(lineStart, 
-                              tokens.findToken(lineStart, FortranLexer.T_LPAREN)+1);
+         int offsetEnd = matchClosingParen(lineStart+2);
          kindTokenOffset = tokens.findToken(lineStart+1, FortranLexer.T_KIND);
          lenTokenOffset  = tokens.findToken(lineStart+1, FortranLexer.T_LEN);
 
@@ -967,7 +1036,7 @@ END OBSOLETE********/
     * to identifiers.
     */
    private void fixupDataDecl(int lineStart, int lineEnd) {
-      int[] arrayConOffset = new int[2];
+      int[] indices = new int[2];
       int identOffset;
 
       // we know the line started with an intrinsic type-spec, so 
@@ -993,12 +1062,14 @@ END OBSOLETE********/
       while (equalsOffset != -1) {
     	  convertToIdents(identOffset, equalsOffset); // convert kind/len params in type
     	  identOffset = equalsOffset + 1;
-          if (arrayConstructorIndices(identOffset, arrayConOffset) != -1) {
-             Token tk = tokens.getToken(arrayConOffset[0]+1);
+    	  indices[0] = identOffset;
+    	  indices[1] = lineEnd;
+          if (arrayConstructorIndices(indices) != -1) {
+             Token tk = tokens.getToken(indices[0]+1);
              if (isIntrinsicType(tk.getType())) {
-                identOffset = fixupDeclTypeSpec(arrayConOffset[0]+1, arrayConOffset[1]);
-                convertToIdents(identOffset, arrayConOffset[1]);
-                identOffset = arrayConOffset[1] + 1;
+                identOffset = fixupDeclTypeSpec(indices[0]+1, indices[1]);
+                convertToIdents(identOffset, indices[1]);
+                identOffset = indices[1] + 1;
              }
           }
           // look for additional array constructors
@@ -1109,7 +1180,7 @@ END OBSOLETE********/
             // based!  it is based on look ahead, which starts at 1!
             // therefore, if it is 4, it's really at offset 3 in the 
             // packed list array, but is currLineLA(4)!
-            rparenOffset = matchClosingParen(lineStart, lineStart+2);
+            rparenOffset = matchClosingParen(lineStart+2);
          }
          
          if (rparenOffset != -1) 
@@ -1631,7 +1702,56 @@ END OBSOLETE********/
 
 
    /**
-    * Parse the format-specification in a format statement for edit descriptors.
+    * Convert items in a list of expressions to identifiers.  The major difficulty
+    * is an array constructor because it can contain a type specifier with an
+    * intrisic type keyword that can't be converted to an identifier.
+    *
+    * Return the index following the expression list
+    */
+   private int fixupExprList(int start, int end)
+   {
+      // Pulling apart expressions is difficult, for now just convert everything
+      // to identifiers except when encountering an array constructor which has
+      // the form [ type_stuff :: ... ].  So make convertToIdents look for
+      // array constructors.
+
+      convertToIdents(start, end);
+
+      return end;
+
+   } // end fixupExprList()
+
+
+   /**
+    * Convert format-items in a format to identifiers.
+    *
+    * format is format-specification | label | '*'
+    *
+    * Return the index after the format, often ',' for an input/output-item-list.
+    *
+    * The reason this method is needed is because most the items in a format-specification
+    * are just converted by the lexer to identifiers so now the edit descriptors need to
+    * be parsed, primarily by going back to the original character representation of the
+    * input stream.
+    */
+   private int fixupFormat(int start, int lineEnd)
+   {
+      // check for easy ones first
+      int tk = tokens.getToken(start).getType();
+      if (tk == FortranLexer.T_ASTERISK || tk == FortranLexer.T_DIGIT_STRING) {
+         return start + 1;
+      }
+
+      // TODO - Convert the format-specification?  This is actually a string so
+      // should ROSE pull it apart?  It seems like OFP should really treat the string
+      // like a format-specification and pull out the edit descriptors.
+      
+      return start;
+
+   } // end fixupFormat()
+
+   /**
+    * Parse the format-specification in a format for edit descriptors.
     * Although a Hollerith edit descriptor has been deprecated, deal with it anyway.
     * All keywork tokens to the right of the paren have been converted to identifiers.
     *
@@ -1640,7 +1760,7 @@ END OBSOLETE********/
     * be parsed, primarily by going back to the original character representation of the
     * input stream.
     */
-   private int fixupFormatStmt(int lineStart, int lineEnd) {
+   private int fixupFormatStmt(int start, int lineEnd) {
       String line;
       int lineIndex = 0;
       int i = 0;
@@ -1652,17 +1772,17 @@ END OBSOLETE********/
        * always required!  See J3/04-007, pg. 221, lines 17-22
        */
       // get the lineNum that the format stmt occurs on
-      lineNum = tokens.getToken(lineStart).getLine();
-      lineStart++; // move past the T_FORMAT
-      charPos = tokens.getToken(lineStart).getCharPositionInLine();
+      lineNum = tokens.getToken(start).getLine();
+      start++; // move past the T_FORMAT
+      charPos = tokens.getToken(start).getCharPositionInLine();
 
-      if (tokens.currLineLA(lineStart+1) != FortranLexer.T_LPAREN) {
+      if (tokens.currLineLA(start+1) != FortranLexer.T_LPAREN) {
          // error in the format stmt; missing paren
          return -1;
       }
 
       // get all the text left in the line as one String
-      line = tokens.lineToString(lineStart, lineEnd);
+      line = tokens.lineToString(start, lineEnd);
 
       // make a copy of the original packed line
       origLine.addAll(tokens.getTokensList());
@@ -1670,7 +1790,7 @@ END OBSOLETE********/
       // now, delete the tokens in the curr line so we can rewrite them
       tokens.clearTokensList();
       // first, copy the starting tokens to the new line (label T_FORMAT, etc.)
-      for (i = 0; i < lineStart; i++) {
+      for (i = 0; i < start; i++) {
          // adds to the end
          tokens.addToken(origLine.get(i));
       }
@@ -1708,14 +1828,20 @@ END OBSOLETE********/
       tokenType = tokens.currLineLA(lineStart+1);
       
       if (tokenType == FortranLexer.T_PRINT) {
+         // Does this check for an assignment statement? What is it for?
          if (tokens.currLineLA(lineStart+2) == FortranLexer.T_EQUALS) {
             return false;
          }
          else {
-            identOffset = lineStart+1;
+            // fixup format and then the output-item-list
+            identOffset = fixupFormat(lineStart+1, lineEnd);
+            if (tokens.getToken(identOffset).getType() == FortranLexer.T_COMMA) {
+               identOffset = fixupExprList(identOffset+1, lineEnd);
+            }
          }
       }
       else {
+         // TODO - READ/WRITE handled here?  What about format and item-list?
          if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
             identOffset = lineStart+2;
 
@@ -1725,7 +1851,7 @@ END OBSOLETE********/
             // alt2.  
             if (tokenType == FortranLexer.T_INQUIRE) {
                int rparenOffset = -1;
-               rparenOffset = matchClosingParen(lineStart+2, lineStart+2);
+               rparenOffset = matchClosingParen(lineStart+2);
                // should not be possible for it to be -1..
                if (rparenOffset != -1 && 
                   (rparenOffset < (lineEnd-1))) {
@@ -1957,7 +2083,7 @@ END OBSOLETE********/
             if (lineStart+3 < lineEnd) {
                if (tokens.currLineLA(lineStart+3) == FortranLexer.T_LPAREN) {
                   int resultLA;
-                  resultLA = matchClosingParen(lineStart+3, lineStart+3);
+                  resultLA = matchClosingParen(lineStart+3);
                   
                   convertToIdents(lineStart+1, resultLA-1);
 
@@ -2075,7 +2201,7 @@ END OBSOLETE********/
          if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
             identOffset = lineStart+2;
             // find the right paren (end of the expression)
-            rparenOffset = matchClosingParen(lineStart, lineStart+2);
+            rparenOffset = matchClosingParen(lineStart+2);
             // convert anything between the parens to idents
             convertToIdents(identOffset, rparenOffset);
 
@@ -2134,7 +2260,7 @@ END OBSOLETE********/
 		   {
 			   if( isOpenParen(tokens.currLineLA(nextOffset)) )
 			   {
-				   nextOffset = 1 + matchClosingParen(nextOffset, nextOffset);
+				   nextOffset = 1 + matchClosingParen(nextOffset);
 				   numToSkip -= 1;
 			   }
 			   else
@@ -2219,7 +2345,7 @@ END OBSOLETE********/
             return -1;
          }
          // find end of parentheses
-         int rparenOffset = matchClosingParen(lineStart, lineStart+2);
+         int rparenOffset = matchClosingParen(lineStart+2);
          // matchClosingParen is one based indexing so next token is at rparenOffset
          return rparenOffset;
       }
@@ -2259,7 +2385,7 @@ END OBSOLETE********/
                return false;
 
             // find the rparen
-            rparenOffset = matchClosingParen(lineStart, nextTokenLA+1);
+            rparenOffset = matchClosingParen(nextTokenLA+1);
             convertToIdents(rparenOffset+1, lineEnd);
          }
          return true;
@@ -2653,6 +2779,8 @@ END OBSOLETE******/
          // followed by the first line in the included file.
          if (matchInclude(lineStart, lineLength) == true) {
             lineStart += 2;
+            // Check for empty include file, see bug # 2983414
+            if (tokens.getToken(lineStart).getType() == FortranLexer.T_EOF) lineStart += 1;
          }
 
          // check for a label and consume it if exists
