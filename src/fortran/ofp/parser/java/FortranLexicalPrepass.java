@@ -887,7 +887,6 @@ END OBSOLETE********/
       if (tk.getType() == FortranLexer.T_LBRACKET) {
          indices[0] = start;
          indices[1] = tokens.findToken(start+1, FortranLexer.T_RBRACKET);
-         if (indices[1] == -1) indices[0] = -1;
       }
       // look for '(' '/'
       else if (tk.getType() == FortranLexer.T_LPAREN
@@ -902,6 +901,10 @@ END OBSOLETE********/
             }
          }
       }
+
+      // make sure end is found
+      if (indices[1] == -1) indices[0] = -1;
+
       return indices[0];
    }
 
