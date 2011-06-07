@@ -2248,35 +2248,43 @@ END OBSOLETE********/
     */
    private int matchDataRef(int lineStart, int lineEnd)
    {
-	   // SKW 2011-4-26: modified to accept CAF2 co-dereference operator ('[ ]') if present
-	   
-	   // skip any number of consecutive part refs separated by '%'
-	   // each begins with an identifier (or keyword)
-	   int nextOffset = lineStart + 1;
-       while( tokens.currLineLA(nextOffset) == FortranLexer.T_IDENT || lexer.isKeyword(tokens.currLineLA(nextOffset)) )
-	   {
-		   // skip the identifier if any
-    	   nextOffset += 1;
+      // SKW 2011-4-26: modified to accept CAF2 co-dereference operator ('[ ]') if present
+
+      // skip any number of consecutive part refs separated by '%'
+      // each begins with an identifier (or keyword)
+      int nextOffset = lineStart + 1;
+      int tk = tokens.currLineLA(nextOffset);
+       while( tk == FortranLexer.T_IDENT || lexer.isKeyword(tk) )
+       {
+          // skip the identifier if any
+    	  nextOffset += 1;
 		   
-		   // skip up to three balanced '( )' or '[ ]' pairs (co-dereference op, section subscript list, image selector)
-		   int numToSkip = 3;
-		   while( numToSkip > 0 )
-		   {
-			   if( isOpenParen(tokens.currLineLA(nextOffset)) )
-			   {
-				   nextOffset = 1 + matchClosingParen(nextOffset);
-				   numToSkip -= 1;
-			   }
-			   else
-				   numToSkip = 0;	// no more pairs available to skip
-		   }
+         // skip up to three balanced '( )' or '[ ]' pairs (co-dereference op, section subscript list, image selector)
+         int numToSkip = 3;
+         while( numToSkip > 0 )
+         {
+            if ( isOpenParen(tokens.currLineLA(nextOffset)) )
+            {
+                nextOffset = 1 + matchClosingParen(nextOffset);
+                numToSkip -= 1;
+            }
+            else {
+               numToSkip = 0;	// no more pairs available to skip
+            }
+         }
 		   
-		   // skip the separating '%' if any
-	       if( tokens.currLineLA(nextOffset) == FortranLexer.T_PERCENT )
-	    	   nextOffset += 1;
-	   }
-       
-       return nextOffset;
+         // skip the separating '%' if any
+         if ( tokens.currLineLA(nextOffset) == FortranLexer.T_PERCENT )
+         {
+            nextOffset += 1;
+            tk = tokens.currLineLA(nextOffset);
+         }
+         else {
+	     break;  // no '%' so no new part-ref to skip
+	 }
+      }
+     
+      return nextOffset;
    } // end matchDataRef()
 
 
