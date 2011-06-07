@@ -346,24 +346,25 @@ public class FrontEnd implements Callable<Boolean> {
          // attempt to parse the current program unit
          error = parseProgramUnit(lexer, tokens, parser);
 
-         // Call the end_of_file action here so that it comes after the
-         // end_program_stmt occurs.
-         getParser().eofAction();
-
          // see if we successfully parse the program unit or not
-         if (verbose) {
-            if (error != false) {
-               System.out.println("Parser failed");
-            } else {
-               System.out.println("Parser exiting normally");
-            }
-         } // end else (parser exited normally)
+         if (verbose && error) {
+            System.out.println("Parser failed");
+            return new Boolean(error);
+         }
       } // end while (not end of file)
+
+      // Call the end_of_file action here so that it comes after the
+      // end_program_stmt occurs.
+      getParser().eofAction();
 
       // Call the cleanUp method for the give action class. This is more
       // important in the case of a C action *class* since it could easily
       // have created memory that's outside of the jvm.
       getParser().getAction().cleanUp();
+
+      if (verbose) {
+         System.out.println("Parser exiting normally");
+      }
 
       return new Boolean(error);
    } // end call()
