@@ -179,7 +179,9 @@ END OBSOLETE********/
    /**
     * Return the indices of a type-spec, or -1 if not a type-spec.
     *
-    * A type-spec looks a name token followed by optional parens.
+    * A type-spec is a name|keyword followed by optional parens.
+    * Note: but could mistakenly match a function call so have
+    * to be careful with interpreting results.
     */
    private int matchTypeSpec(int[] indices)
    {
@@ -916,8 +918,7 @@ END OBSOLETE********/
       // see if there is a type-spec by looking for "::"
       indices[0] = offset;
       if (matchTypeSpec(indices) != -1) {
-         offset = indices[1] + 1;
-         if (tokens.getToken(offset).getType() == FortranLexer.T_COLON_COLON) {
+         if (tokens.getToken(indices[1]+1).getType() == FortranLexer.T_COLON_COLON) {
             offset = fixupDeclTypeSpec(indices[0], indices[1]) + 1;
          }
       }
