@@ -402,7 +402,7 @@ END OBSOLETE********/
       bindOffset = tokens.findToken(lineStart, FortranLexer.T_BIND);
       if (bindOffset != -1) {
          // use the T_BIND token as a marker for the end of the subroutine name and any args.
-         convertToIdents(lineStart+1, bindOffset+lineStart);
+         convertToIdents(lineStart+1, bindOffset+lineStart-1);
       } else {
          // convert any keyword in line after first token to ident
          convertToIdents(lineStart+1, lineEnd);
