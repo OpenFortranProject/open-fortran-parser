@@ -3940,10 +3940,10 @@ block_do_construct
 // R827
 // label_do_stmt and nonlabel_do_stmt inlined
 do_stmt
-@init {Token lbl = null; 
+@init {Token lbl=null; 
        Token id=null;
-	   Token digitString=null;
-	   boolean hasLoopControl=false;}
+       Token digitString=null;
+       boolean hasLoopControl=false;}
 @after{checkForInclude();}
 	:	(label {lbl=$label.tk;})? ( T_IDENT T_COLON {id=$T_IDENT;})? T_DO 
 			( T_DIGIT_STRING {digitString=$T_DIGIT_STRING;})? 
@@ -4075,14 +4075,18 @@ exit_stmt
 
 // R845
 goto_stmt
-@init {Token goKeyword=null; Token toKeyword=null;}
+@init {Token lbl=null;
+       Token goto_target_lbl=null;
+       Token goKeyword=null;
+       Token toKeyword=null;}
 @after{checkForInclude();}
-	:	(T_GO T_TO { goKeyword=$T_GO; toKeyword=$T_TO;} 
-         | T_GOTO { goKeyword=$T_GOTO; toKeyword=null;}) 
-            label end_of_stmt
-			{ action.goto_stmt(goKeyword, toKeyword, $label.tk, 
-                $end_of_stmt.tk); }
-	;
+   :   (label {lbl=$label.tk;})?
+       (   T_GO T_TO { goKeyword=$T_GO; toKeyword=$T_TO;} 
+        |  T_GOTO    { goKeyword=$T_GOTO; toKeyword=null;}
+       )
+       T_DIGIT_STRING {goto_target=$T_DIGIT_STRING;} end_of_stmt
+          { action.goto_stmt(goKeyword, toKeyword, goto_target_lbl, $end_of_stmt.tk); }
+   ;
 
 // R846
 // ERR_CHK 846 scalar_int_expr replaced by expr
