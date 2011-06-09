@@ -4076,7 +4076,7 @@ exit_stmt
 // R845
 goto_stmt
 @init {Token lbl=null;
-       Token goto_target_lbl=null;
+       Token goto_target=null;
        Token goKeyword=null;
        Token toKeyword=null;}
 @after{checkForInclude();}
@@ -4085,7 +4085,7 @@ goto_stmt
         |  T_GOTO    { goKeyword=$T_GOTO; toKeyword=null;}
        )
        T_DIGIT_STRING {goto_target=$T_DIGIT_STRING;} end_of_stmt
-          { action.goto_stmt(goKeyword, toKeyword, goto_target_lbl, $end_of_stmt.tk); }
+          { action.goto_stmt(goKeyword, toKeyword, goto_target, $end_of_stmt.tk); }
    ;
 
 // R846
