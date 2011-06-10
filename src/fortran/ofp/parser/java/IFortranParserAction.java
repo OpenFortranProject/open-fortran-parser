@@ -2992,7 +2992,7 @@ public abstract interface IFortranParserAction {
     * @param eos T_EOS token.
     */
    public abstract void
-   goto_stmt(Token goKeyword, Token toKeyword, Token label, Token eos);
+   goto_stmt(Token label, Token goKeyword, Token toKeyword, Token gotoTarget, Token eos);
 
    /** R846
     * computed_goto_stmt
