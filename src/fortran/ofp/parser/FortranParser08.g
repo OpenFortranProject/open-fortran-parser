@@ -489,13 +489,14 @@ literal_constant
 @after {
     action.literal_constant();
 }
-	:	int_literal_constant
-	|	real_literal_constant
-	|	complex_literal_constant
-	|	logical_literal_constant
-	|	char_literal_constant
-	|	boz_literal_constant
-	;
+   :   int_literal_constant
+   |   real_literal_constant
+   |   complex_literal_constant
+   |   logical_literal_constant
+   |   char_literal_constant
+   |   boz_literal_constant
+   |   hollerith_literal_constant  // deleted in F77
+   ;
 
 // R307 named_constant was name inlined as T_IDENT
 
@@ -833,16 +834,24 @@ scalar_int_literal_constant
 // 	|	T_CHAR_CONSTANT
 //     ;
 char_literal_constant
-	:	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
-			{ action.char_literal_constant($T_DIGIT_STRING, null, 
-                                           $T_CHAR_CONSTANT); }
-        // removed the T_UNDERSCORE because underscores are valid characters 
-        // for identifiers, which means the lexer would match the T_IDENT and 
-        // T_UNDERSCORE as one token (T_IDENT).
-	|	T_IDENT T_CHAR_CONSTANT
-			{ action.char_literal_constant(null, $T_IDENT, $T_CHAR_CONSTANT); }
-	|	T_CHAR_CONSTANT
-			{ action.char_literal_constant(null, null, $T_CHAR_CONSTANT); }
+   :   T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
+          { action.char_literal_constant($T_DIGIT_STRING, null, $T_CHAR_CONSTANT); }
+       // removed the T_UNDERSCORE because underscores are valid characters 
+       // for identifiers, which means the lexer would match the T_IDENT and 
+       // T_UNDERSCORE as one token (T_IDENT).
+   |   T_IDENT T_CHAR_CONSTANT
+          { action.char_literal_constant(null, $T_IDENT, $T_CHAR_CONSTANT); }
+   |   T_CHAR_CONSTANT
+          { action.char_literal_constant(null, null, $T_CHAR_CONSTANT); }
+   ;
+
+//
+// Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
+// deleted in F95.
+//
+hollerith_literal_constant
+    :   T_HOLLERITH
+            { action.hollerith_literal_constant($T_HOLLERITH); }
     ;
 
 // R428
@@ -1937,17 +1946,17 @@ data_stmt_value
 options {backtrack=true; k=3;}
 @init {Token ast = null;}
 @after{action.data_stmt_value(ast);}
-	:	designator (T_ASTERISK data_stmt_constant {ast=$T_ASTERISK;})?
-	|	int_literal_constant (T_ASTERISK data_stmt_constant {ast=$T_ASTERISK;})?
-    |   signed_real_literal_constant
-	|	signed_int_literal_constant
-	|	complex_literal_constant
-	|	logical_literal_constant
-	|	char_literal_constant
-	|	boz_literal_constant
-	|	structure_constructor // is null_init if 'NULL()'
-    |   hollerith_constant    // deleted in F77
-    ;
+   :   designator (T_ASTERISK data_stmt_constant {ast=$T_ASTERISK;})?
+   |   int_literal_constant (T_ASTERISK data_stmt_constant {ast=$T_ASTERISK;})?
+   |   signed_real_literal_constant
+   |   signed_int_literal_constant
+   |   complex_literal_constant
+   |   logical_literal_constant
+   |   char_literal_constant
+   |   boz_literal_constant
+   |   structure_constructor       // is null_init if 'NULL()'
+   |   hollerith_literal_constant  // deleted in F77
+   ;
 
 data_stmt_value_list
 @init{ int count=0;}
@@ -1965,15 +1974,6 @@ data_stmt_value_list
 scalar_int_constant
     :   int_constant
             { action.scalar_int_constant(); }
-    ;
-
-//
-// Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
-// deleted in F95.
-//
-hollerith_constant
-    :   T_HOLLERITH
-            { action.hollerith_constant($T_HOLLERITH); }
     ;
 
 // R532
