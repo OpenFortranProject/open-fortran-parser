@@ -419,6 +419,17 @@ public abstract interface IFortranParserAction {
    logical_literal_constant(Token logicalValue, boolean isTrue, Token kindParam);
 
    /**
+    * Generated rule.
+    * hollerith_literal_constant
+    *
+    * Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
+    * deleted in F95.
+    *
+    * @param hollerithConstant T_HOLLERITH token.
+    */
+   public abstract void hollerith_literal_constant(Token hollerithConstant);
+
+   /**
     * R429
     * derived_type_def
     *
@@ -1325,14 +1336,6 @@ public abstract interface IFortranParserAction {
     * scalar_int_constant
     */
    public abstract void scalar_int_constant();
-
-   /**
-    * Generated rule.
-    * hollerith_constant
-    *
-    * @param hollerithConstant T_HOLLERITH token.
-    */
-   public abstract void hollerith_constant(Token hollerithConstant);
 
    /** R532
     * data_stmt_constant
