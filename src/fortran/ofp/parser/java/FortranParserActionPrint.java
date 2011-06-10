@@ -1467,12 +1467,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
 
    /**
     * Generated rule.
-    * hollerith_constant
+    * hollerith_literal_constant
+    *
+    * Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
+    * deleted in F95.
     *
     * @param hollerithConstant T_HOLLERITH token.
     */
-   public void hollerith_constant(Token hollerithConstant) {
-      printRuleHeader(454, "final-binding");
+   public void hollerith_literal_constant(Token hollerithConstant) {
+      printRuleHeader(306, "hollerith-literal-constant");
       printParameter(hollerithConstant, "hollerithConstant");
       printRuleTrailer();
    }
