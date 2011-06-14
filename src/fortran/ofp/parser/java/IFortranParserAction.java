@@ -2984,15 +2984,16 @@ public abstract interface IFortranParserAction {
 
    /** R845
     * goto_stmt
-    *   :   t_go_to label T_EOS
+    *   :  (label)? t_go_to target_label T_EOS
     *
+    * @param label Optional statement label
     * @param goKeyword T_GO or T_GOTO token.
     * @param toKeyword T_TO token, if given, null otherwise.
-    * @param label The branch target statement label
+    * @param target_label The branch target statement label
     * @param eos T_EOS token.
     */
    public abstract void
-   goto_stmt(Token label, Token goKeyword, Token toKeyword, Token gotoTarget, Token eos);
+   goto_stmt(Token label, Token goKeyword, Token toKeyword, Token target_label, Token eos);
 
    /** R846
     * computed_goto_stmt
