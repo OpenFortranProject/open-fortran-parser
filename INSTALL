@@ -1,7 +1,7 @@
 /*******************************************************************
  *                                                                 *
  *              OFP installation and build instructions            *
- *                        Version 0.8.3                            *
+ *                        Version 0.8.4                            *
  *                                                                 *
  *******************************************************************
  *    For help, please send e-mail to:                             *
@@ -12,7 +12,7 @@
                        REQUIRED PACKAGES:
                        ------------------
 
-The Open Fortran Parser (OFP) tools require ANTLR 3.2.
+The Open Fortran Parser (OFP) tools require ANTLR 3.3.
 You can obtain ANTLR from http://antlr.org/.  OFP also
 requires a Java installation.
 
@@ -25,7 +25,7 @@ http://sourceforge.net/projects/fortran-parser) and unpacked and untarred
 it, there should be, at least, the following files and directories:
 
 	configure ..................... used for Unix builds
-	lib ........................... a pre-built OpenFortranParser-0.8.3.jar file
+	lib ........................... a pre-built OpenFortranParser-0.8.4.jar file
 	test/ ......................... test files
 	src/ .......................... the OFP source code
 
@@ -52,9 +52,9 @@ same.  First, cd to the OFP top level directory and do the following:
 
 2. Run 'make' to build the OFP libraries.
 
-   IMPORTANT NOTE: Because of a bug (we think) in antlr-3.2, the first time
-   you run make it will fail.  As a work around, just type make again and 
-   everything should build properly.
+   IMPORTANT NOTE: Because of a bug (we think) in antlr-3.3, the build
+   reports an error a couple of times during the build process but continues
+   to finish.  This is expected behavior.
 
 4. Run 'make install' to install the OFP files under the location
    specified with the prefix configure option.  Note that you must have
@@ -68,5 +68,5 @@ same.  First, cd to the OFP top level directory and do the following:
 
          java fortran.ofp.FrontEnd [--verbose] filename
 
-    Note that your Java CLASSPATH must include the OpenFortranParser-0.8.3.jar
-    and the antlr-3.2.jar files (see the README file).
+    Note that your Java CLASSPATH must include the OpenFortranParser-0.8.4.jar
+    and the antlr-3.3-complete.jar files (see the README file).
