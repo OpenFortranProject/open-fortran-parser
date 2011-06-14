@@ -3383,11 +3383,11 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * goto_stmt
     */
    public void
-   goto_stmt(Token label, Token goKeyword, Token toKeyword, Token gotoTarget, Token eos)
+   goto_stmt(Token label, Token goKeyword, Token toKeyword, Token target_label, Token eos)
    {
       printRuleHeader(845, "goto-stmt");
       if (label!=null) printParameter(label, "label");
-      printParameter(gotoTarget, "gotoTarget");
+      printParameter(target_label, "target_label");
       printRuleTrailer();
    }
 
