@@ -391,6 +391,7 @@ public class FortranParserActionPrint implements IFortranParserAction {
     */
    public void boz_literal_constant(Token constant) {
       printRuleHeader(411, "boz-literal-constant");
+      printParameter(constant, "constant");
       printRuleTrailer();
    }
 
