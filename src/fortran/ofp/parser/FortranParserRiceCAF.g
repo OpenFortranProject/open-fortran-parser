@@ -465,6 +465,23 @@ image_selector
 ////////////
 // R631-F08, R628-F03
 //
+
+// SAD NOTE: This rule is flawed but can't be improved yet due to a flaw in ROSE.
+// The flaw is that the rhs's first nonterminal, 'allocate_object', will usually consume the subsequent tokens which
+// which are supposed to be parsed as the 'allocate_shape_spec_list' and 'rice_allocate_coarray_spec' because they
+// look like a 'section_subscript_list' and either an 'image_selector' or a 'rice_co_dereference_op'. The exception
+// is when the latter uses the old CAF2 "[ ]" syntax for the default team, as in "allocate( a(10)[ ] )". In such a
+// case the "[ ]" is correctly parsed as a bracketed 'rice_allocate_coarray_spec' because it can't be interpreted as
+// part of a 'part_ref' since it follows the subscript list. However, this is a mixed blessing (see next paragraph).
+//
+// This flaw can't be fixed right now because in ROSE, the 'allocation(hasShape, hasCoarray)' action ignores its
+// two boolean parameters! Thus if we fix this rule to do the right thing, ROSE will discard the shape-spec and
+// coarray-spec subtrees entirely. Sigh. In fact, in the special case just described, ROSE does discard the subtree
+// corresponding to "[ ]" and the unparsed source is incorrect.
+
+// Worse, this is not easy to fix in ROSE because there is no IR for allocations! That is, ROSE currently has no
+// place in its tree grammar to hold the 'allocate_shape_spec_list' and 'rice_allocate_coarray_spec' if any. Sigh!
+
 allocation
 @init{boolean hasAllocateShapeSpecList = false; boolean hasAllocateCoarraySpec = false;}
    :   allocate_object
@@ -555,20 +572,22 @@ lock_variable
 
 //----------------------------------------------------------------------------
 // RICE CO-ARRAY FORTRAN RULES
-// ---------------------------
-// All Rice's rules and actions will prefixed with "rice_" keyword
 //----------------------------------------------------------------------------
 
-rice_allocate_coarray_spec:
-		T_AT T_IDENT
-		    { action.rice_allocate_coarray_spec(1,$T_IDENT); }
-  |
-    T_AT
-        { action.rice_allocate_coarray_spec(-1,null); }
+
+// See "sad note" at R631-F08, R628-F03
+rice_allocate_coarray_spec
+@init{Token id = null;}
+  : 
+		T_AT (T_IDENT {id=$T_IDENT;})?
+		    { action.rice_allocate_coarray_spec(1, id); }
+//|
+//  T_AT
+//      { action.rice_allocate_coarray_spec(-1,null); }
   |
     // TEMPORARY: accept old empty version for legacy code's allocate-stmts
     /* empty */ 
-        { action.rice_allocate_coarray_spec(-1,null); }
+        { action.rice_allocate_coarray_spec(-1, null); }
 	;
 
 rice_with_team_construct
