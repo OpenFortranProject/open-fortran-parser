@@ -419,6 +419,17 @@ public abstract interface IFortranParserAction {
    logical_literal_constant(Token logicalValue, boolean isTrue, Token kindParam);
 
    /**
+    * Generated rule.
+    * hollerith_literal_constant
+    *
+    * Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
+    * deleted in F95.
+    *
+    * @param hollerithConstant T_HOLLERITH token.
+    */
+   public abstract void hollerith_literal_constant(Token hollerithConstant);
+
+   /**
     * R429
     * derived_type_def
     *
@@ -1325,14 +1336,6 @@ public abstract interface IFortranParserAction {
     * scalar_int_constant
     */
    public abstract void scalar_int_constant();
-
-   /**
-    * Generated rule.
-    * hollerith_constant
-    *
-    * @param hollerithConstant T_HOLLERITH token.
-    */
-   public abstract void hollerith_constant(Token hollerithConstant);
 
    /** R532
     * data_stmt_constant
@@ -2981,15 +2984,16 @@ public abstract interface IFortranParserAction {
 
    /** R845
     * goto_stmt
-    *   :   t_go_to label T_EOS
+    *   :  (label)? t_go_to target_label T_EOS
     *
+    * @param label Optional statement label
     * @param goKeyword T_GO or T_GOTO token.
     * @param toKeyword T_TO token, if given, null otherwise.
-    * @param label The branch target statement label
+    * @param target_label The branch target statement label
     * @param eos T_EOS token.
     */
    public abstract void
-   goto_stmt(Token goKeyword, Token toKeyword, Token label, Token eos);
+   goto_stmt(Token label, Token goKeyword, Token toKeyword, Token target_label, Token eos);
 
    /** R846
     * computed_goto_stmt

@@ -2,7 +2,7 @@
  *                                                                 *
  *                Open Fortran Parser (OFP)                        *
  *                           OFP                                   *
- *                      Version 0.8.3                              *
+ *                      Version 0.8.4                              *
  *                                                                 *
  *  README - a brief description and pointers to more information  *
  *                                                                 *
@@ -21,7 +21,7 @@ If you need access to a complete source-to-source Fortran compiler
 infrastructure incorporating OFP, you should consider using ROSE (see
 http://www.rosecompiler.org/).
 
-The OFP parser is based on an ANTLR 3 grammar and ANTLR version 3.2
+The OFP parser is based on an ANTLR 3 grammar and ANTLR version 3.3
 tools are used to generate the Fortran parser (written in Java).
 The C action interfaces are currently provided by JNI.
 
@@ -40,10 +40,10 @@ Documentation:
 Running parser:
 
   - You must set your java CLASSPATH to include the ANTLR jar files and 
-    OpenFortranParser-0.8.3.jar.  If you use the bash shell, you can set the
+    OpenFortranParser-0.8.4.jar.  If you use the bash shell, you can set the
     CLASSPATH with something like (assuming files are installed in /usr/local):
 
-    export CLASSPATH=./:/usr/local/antlr/lib/antlr-3.2.jar:/usr/local/ofp/lib/OpenFortranParser-0.8.3.jar
+    export CLASSPATH=/usr/local/antlr/lib/antlr-3.3-complete.jar:/usr/local/ofp/lib/OpenFortranParser-0.8.4.jar
 
   - Run the parser with the command
 
@@ -74,7 +74,7 @@ CVS Repository:
   - Location of the build directory.
   
 ./lib/
-  - Contains a pre-built OpenFortranParser-0.8.3.jar file if
+  - Contains a pre-built OpenFortranParser-0.8.4.jar file if
     an OFP distribution is downloaded.
 
 ./tests/

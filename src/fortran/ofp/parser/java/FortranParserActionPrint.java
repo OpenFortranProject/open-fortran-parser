@@ -391,6 +391,7 @@ public class FortranParserActionPrint implements IFortranParserAction {
     */
    public void boz_literal_constant(Token constant) {
       printRuleHeader(411, "boz-literal-constant");
+      printParameter(constant, "constant");
       printRuleTrailer();
    }
 
@@ -1467,12 +1468,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
 
    /**
     * Generated rule.
-    * hollerith_constant
+    * hollerith_literal_constant
+    *
+    * Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
+    * deleted in F95.
     *
     * @param hollerithConstant T_HOLLERITH token.
     */
-   public void hollerith_constant(Token hollerithConstant) {
-      printRuleHeader(454, "final-binding");
+   public void hollerith_literal_constant(Token hollerithConstant) {
+      printRuleHeader(306, "hollerith-literal-constant");
       printParameter(hollerithConstant, "hollerithConstant");
       printRuleTrailer();
    }
@@ -3380,10 +3384,11 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * goto_stmt
     */
    public void
-   goto_stmt(Token goKeyword, Token toKeyword, Token label, Token eos)
+   goto_stmt(Token label, Token goKeyword, Token toKeyword, Token target_label, Token eos)
    {
       printRuleHeader(845, "goto-stmt");
-      printParameter(label, "label");
+      if (label!=null) printParameter(label, "label");
+      printParameter(target_label, "target_label");
       printRuleTrailer();
    }
 
