@@ -31,7 +31,9 @@ JFLAGS = -d $(BUILDDIR) @sourcefiles $(OFP_JFLAGS)
 
 ACTION_CLASS="null"
 
+DATE=`date "+20%y%m%d"`
 JARFILE=$(OFP_JARFILE)
+ALT_JARFILE=OpenFortranParser-$(DATE).jar
 
 CLASS_FILES = $(CLASSDIR)/FortranToken.class \
               $(CLASSDIR)/FortranLexer.class \
@@ -67,7 +69,7 @@ GENERATED_TOKEN_FILES = FortranLexer.tokens \
                         FortranParserRiceCAF.tokens \
                         FortranParserRiceCAF_FortranParser08.tokens
 
-all: FortranParserActionNull.java $(GENERATED_JAVA_FILES) $(CLASS_FILES) $(BUILDDIR)/$(JARFILE)
+all: FortranParserActionNull.java $(GENERATED_JAVA_FILES) $(CLASS_FILES) $(BUILDDIR)/$(JARFILE) $(BUILDDIR)/$(ALT_JARFILE)
 	cp IFortranParserAction.java $(INSTALLDIR)/.
 
 # The -Xconversiontimeout is to try and override the time you allow antlr 
@@ -156,6 +158,9 @@ $(CLASSDIR)/FortranToken.class: FortranToken.java
 $(BUILDDIR)/$(JARFILE): $(CLASS_FILES)
 	cd $(BUILDDIR) ; $(JAR) cf $(JARFILE) fortran/
 
+$(BUILDDIR)/$(ALT_JARFILE): $(CLASS_FILES)
+	cd $(BUILDDIR) ; $(JAR) cf $(ALT_JARFILE) fortran/
+
 ############################ clean up ##############################
 clean:
 	rm -f $(CLASS_FILES) 
@@ -166,5 +171,5 @@ clean:
 
 allclean:
 	$(MAKE) clean
-	cd $(BUILDDIR) ; rm -f $(JARFILE)
+	cd $(BUILDDIR) ; rm -f $(JARFILE) $(ALT_JARFILE)
 
