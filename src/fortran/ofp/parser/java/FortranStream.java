@@ -176,11 +176,28 @@ public class FortranStream extends ANTLRFileStream
       // can be removed.
       //
       char[] newData = new char[super.n+2];
-      for (int i = 0; i < super.n; i++) {
-         newData[i] = super.data[i];
+////////////////////////////////////////////////////////////////////////////
+// SKW 2011-08-24: I replaced this code by the two 'while' loops below as a
+// quick & dirty way to make OFP handle files with CR-LF line termination.
+// It just discards CRs from the buffer and fills with LFs at the end.
+//
+//    for (int i = 0; i < super.n; i++) {
+//        newData[i] = super.data[i];
+//     }
+//    newData[super.n]   = '\n';
+//    newData[super.n+1] = '\n';
+////////////////////////////////////////////////////////////////////////////
+      int from = 0, to = 0;
+      while( from < super.n )
+      {
+    	  if( super.data[from] != '\r' )
+    		  newData[to++] = super.data[from];
+    	  from++;
       }
-      newData[super.n]   = '\n';
-      newData[super.n+1] = '\n';
+      while( to < super.n+2 )
+      {
+    	  newData[to++] = '\n';
+      }
       super.data = newData;
 
       if (this.sourceForm == FIXED_FORM) {
