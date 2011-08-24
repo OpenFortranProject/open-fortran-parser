@@ -191,12 +191,12 @@ public class FortranStream extends ANTLRFileStream
       while( from < super.n )
       {
     	  if( super.data[from] != '\r' )
-    		  newData[to++] = super.data[from];
-    	  from++;
+    	     newData[to++] = super.data[from];
+          from++;
       }
       while( to < super.n+2 )
       {
-    	  newData[to++] = '\n';
+          newData[to++] = '\n';
       }
       super.data = newData;
 
