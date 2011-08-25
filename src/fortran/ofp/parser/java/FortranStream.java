@@ -175,29 +175,55 @@ public class FortranStream extends ANTLRFileStream
       //
       // can be removed.
       //
+
+      // SKW (2011-08-24) noticed and helped fix a problem with CR-LF line
+      // termination.  All CRs are replaced with LFs and the extra LF
+      // (if it exists) is dropped.
+
+      // CER 2011-08-25: It would be nice not to have to pad the buffer
+      // with ' ' characters.  However, we get an index out of bounds
+      // exception unless we do.  So for now pad with ' '.
+
+      // count the number of dropped characters
+      //      int count = 0;
+      //      for (int i = 0; i < super.n; i++) {
+      //         if (super.data[i] == '\r') {
+      //            if (i+1 < super.n && super.data[i+1] == '\n') {
+      //               count += 1;  // drop the '\r' character
+      //               System.out.println("convertInputBuffer: count=" + count);
+      //               i += 1;
+      //            }
+      //         }
+      //      }
+      //      count = super.n + 2 - count;
+    
       char[] newData = new char[super.n+2];
-////////////////////////////////////////////////////////////////////////////
-// SKW 2011-08-24: I replaced this code by the two 'while' loops below as a
-// quick & dirty way to make OFP handle files with CR-LF line termination.
-// It just discards CRs from the buffer and fills with LFs at the end.
-//
-//    for (int i = 0; i < super.n; i++) {
-//        newData[i] = super.data[i];
-//     }
-//    newData[super.n]   = '\n';
-//    newData[super.n+1] = '\n';
-////////////////////////////////////////////////////////////////////////////
+
       int from = 0, to = 0;
       while( from < super.n )
       {
-    	  if( super.data[from] != '\r' )
-    	     newData[to++] = super.data[from];
-          from++;
+         if (super.data[from] != '\r') {
+            newData[to++] = super.data[from];
+         }
+         else {
+            newData[to++] = '\n';  // replace '\r'
+            if (from+1 < super.n && super.data[from+1] == '\n') {
+               from += 1;  // effectively skip the '\r' character
+            }
+         }
+         from += 1;
       }
+
+      // append two extra LFs
+      newData[to++] = '\n';
+      newData[to++] = '\n';
+
+      // fill any extra slots with blanks
       while( to < super.n+2 )
       {
-          newData[to++] = '\n';
+         newData[to++] = ' ';
       }
+
       super.data = newData;
 
       if (this.sourceForm == FIXED_FORM) {
