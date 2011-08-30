@@ -1154,60 +1154,76 @@ END OBSOLETE********/
    }// end isIntrinsicType()
 
 
-   /**
+    /**
     * Find the first index after the typespec (with or without the optional
     * kind or character-length selector).
     */
-   private int skipTypeSpec(int lineStart) {
-      int firstToken;
-      int rparenOffset = -1;
+   private int skipTypeSpec(int lineStart)
+   {
+       int firstToken;
+       int rparenOffset = -1;
+        firstToken = tokens.currLineLA(lineStart + 1);
 
-      firstToken = tokens.currLineLA(lineStart+1);
-      if (isIntrinsicType(firstToken) == true ||
-         firstToken == FortranLexer.T_TYPE) {
-         // if the first token is T_DOUBLE, we are expecting one more token
-         // to finish the type, so bump the lineStart one more.
-         if (firstToken == FortranLexer.T_DOUBLE) {
-            lineStart++;
-         }
-         
-         // skip character-length (*char-length) selector if present
-         if (firstToken == FortranLexer.T_CHARACTER 
-             && tokens.currLineLA(lineStart+2) == FortranLexer.T_ASTERISK) {
-        	 lineStart += 2;
-         }
+        if (isIntrinsicType(firstToken) == true || firstToken == FortranLexer.T_TYPE)
+        {
+            if (firstToken == FortranLexer.T_DOUBLE)
+            {
+                // a T_DOUBLE should be followed by T_PRECISION -- skip two tokens.
+                lineStart += 2;
+            }
 
-         // see if the next token is a left paren -- means either a kind 
-         // selector or a type declaration.
-         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN) {
-            // will return logical index of rparen.  this is not zero 
-            // based!  it is based on look ahead, which starts at 1!
-            // therefore, if it is 4, it's really at offset 3 in the 
-            // packed list array, but is currLineLA(4)!
-            rparenOffset = matchClosingParen(lineStart+2);
-         }
-         
-         if (rparenOffset != -1) 
-            // rparenOffset will be the logical index of the right paren.
-            // if it's token 4 in packedList, which is 0 based, it's actual
-            // index is 3, but 4 is returned because we need 1 based for LA()
-            lineStart = rparenOffset;
-         else {
-            lineStart = lineStart+1;
-         }
-         return lineStart;
-      } else {
-         // it wasn't a typespec, so return original start.  this should 
-         // not happen because this method should only be called if we're
-         // looking at a typespec!
-         return lineStart;
-      }
-   }// end skipTypeSpec()
+            else if(firstToken == FortranLexer.T_CHARACTER 
+                    && tokens.currLineLA(lineStart + 1 + 1) == FortranLexer.T_ASTERISK)
+            {
+                // skip character-length (*char-length) selector if present
+                lineStart += 2;
+                
+                // skip following length if not in parens (e.g. 'character * 6')
+                if( tokens.currLineLA(lineStart + 1) != FortranLexer.T_LPAREN )
+                    lineStart += 1;
+            }
+            else
+            {
+                // skip the built-in type or 'type' token
+                lineStart += 1;
+            }
+
+            // skip a kind selector or derived type name if any.
+            if (tokens.currLineLA(lineStart + 1) == FortranLexer.T_LPAREN)
+            {
+                // will return logical index of rparen.  this is not zero 
+                // based!  it is based on look ahead, which starts at 1!
+                // therefore, if it is 4, it's really at offset 3 in the 
+                // packed list array, but is currLineLA(4)!
+                rparenOffset = matchClosingParen(lineStart + 1);
+                if (rparenOffset != -1)
+                {
+                    // rparenOffset will be the logical index of the right paren.
+                    // if it's token 4 in packedList, which is 0 based, it's actual
+                    // index is 3, but 4 is returned because we need 1 based for LA()
+                    lineStart = rparenOffset;
+                }
+                else
+                {
+                    // unbalanced parens -- currently can't get here because 'matchClosingParen' calls 'exit' if no match
+                    lineStart += 1;
+                }
+            }
+
+            return lineStart + 1 - 1;
+        }
+        else
+        {
+            // it wasn't a typespec, so return original start.  this should 
+            // not happen because this method should only be called if we're
+            // looking at a typespec!
+            return lineStart;
+        }
+   } // end skipTypeSpec()
 
 
 	// Skip whole prefix, not just the type declaration.
 	private int skipPrefix(int lineStart) {
-
 		// First, skip over the pure, elemental, recursive tokens.
 		// Then skip type spec.
 		// Then skip over the pure, elemental, recursive tokens again
@@ -1220,7 +1236,6 @@ END OBSOLETE********/
 			lineStart++;
 
 		return lineStart;
-
    }// end skipPrefix()
 
 	// Test to see if a token is one of pure, elemental, or recursive.
@@ -1245,7 +1260,9 @@ END OBSOLETE********/
       if(tokens.currLineLA(lineStart+1) == FortranLexer.T_FUNCTION) {
          if(tokens.currLineLA(lineStart+2) == FortranLexer.T_IDENT ||
             (lexer.isKeyword(tokens.currLineLA(3))))
+         {
             return true;
+         }
       } 
 
       return false;
