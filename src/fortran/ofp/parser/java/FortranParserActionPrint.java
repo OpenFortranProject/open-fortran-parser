@@ -2366,7 +2366,12 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleHeader(701, "primary");
       printRuleTrailer();
    }
-	
+
+   public void parenthesized_expr() {
+       printRuleHeader(701, "parenthesized_expr");
+       printRuleTrailer();
+   }
+
    /** R702
     * level_1_expr
     */

@@ -2100,6 +2100,7 @@ public abstract interface IFortranParserAction {
     *   |   T_LPAREN expr T_RPAREN
     */
    public abstract void primary();
+   public abstract void parenthesized_expr();
 
    /** R702
     * level_1_expr

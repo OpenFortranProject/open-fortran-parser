@@ -2912,7 +2912,7 @@ options {backtrack=true;}       // alt 1,4 ambiguous
 	|	literal_constant
 	|	array_constructor
 	|	structure_constructor
-	|	T_LPAREN expr T_RPAREN
+	|	T_LPAREN expr T_RPAREN {action.parenthesized_expr();}
 	;
 
 // R702
