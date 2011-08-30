@@ -576,19 +576,11 @@ lock_variable
 
 
 // See "sad note" at R631-F08, R628-F03
-rice_allocate_coarray_spec
-@init{Token id = null;}
-  : 
-		T_AT (T_IDENT {id=$T_IDENT;})?
-		    { action.rice_allocate_coarray_spec(1, id); }
-//|
-//  T_AT
-//      { action.rice_allocate_coarray_spec(-1,null); }
-  |
-    // TEMPORARY: accept old empty version for legacy code's allocate-stmts
-    /* empty */ 
-        { action.rice_allocate_coarray_spec(-1, null); }
-	;
+rice_allocate_coarray_spec:
+     // TEMPORARY: accept old empty version for legacy code's allocate-stmts
+     /* empty */ 
+        { action.rice_allocate_coarray_spec(-1,null); }
+  ;
 
 rice_with_team_construct
 	: rice_with_team_stmt block rice_end_with_team_stmt
@@ -652,8 +644,13 @@ rice_declaration_type_spec
 ////////////
 // R625-F08
 //
+/*** TODO: sadly, this accepts some allocate-coarray-specs:
+ in 'allocate( a[@t] )', and in 'allocate( a[*] )'
+  -- see SAD NOTE at rule for 'allocation' ***/
 cosubscript
      :   expr
+     | T_AT T_IDENT
+     | T_ASTERISK
    ;
 
 cosubscript_list
