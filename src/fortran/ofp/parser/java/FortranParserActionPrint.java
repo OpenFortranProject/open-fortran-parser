@@ -3355,11 +3355,12 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * do_term_action_stmt
     */
    public void
-   do_term_action_stmt(Token label, Token endKeyword, Token doKeyword, Token id, Token eos)
+   do_term_action_stmt(Token label, Token endKeyword, Token doKeyword, Token id, Token eos, boolean inserted)
    {
       printRuleHeader(838, "do-term-action-stmt");
       printParameter(label, "label");
       printParameter(id, "id");
+      printParameter(inserted, "inserted");
       printRuleTrailer();
    }
 

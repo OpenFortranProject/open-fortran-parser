@@ -44,31 +44,6 @@ public class FortranLexicalPrepass {
    } // end setSourceForm()
 
 
-/*******OBSOLETE
-   private boolean isAssignment(int start, int end) {
-      if (tokens.getToken(start).getType() == FortranLexer.T_ASSIGNMENT && (start+3 < end) &&  
-          tokens.getToken(start+1).getType() == FortranLexer.T_LPAREN &&
-          tokens.getToken(start+2).getType() == FortranLexer.T_EQUALS) {
-         return true;
-      } else {
-         return false;
-      }
-   } // end isAssignment()
-END OBSOLETE********/
-
-/*******OBSOLETE
-   private boolean isOperator(int start, int end) {
-      if (tokens.getToken(start).getType() == FortranLexer.T_OPERATOR && (start+3 < end) && 
-          tokens.getToken(start+1).getType() == FortranLexer.T_LPAREN &&
-          tokens.getToken(start+2).getType() == FortranLexer.T_DEFINED_OP &&
-          tokens.getToken(start+3).getType() == FortranLexer.T_RPAREN) {
-         return true;
-      }	else {
-         return false;
-      }
-   } // end isOperator()
-END OBSOLETE********/
-
    /**
     * Convert keyword tokens (except for generic-spec items) from start to end to identifiers.
     * Tokens to convert often represent expressions which can be primaries which can be
@@ -1415,16 +1390,6 @@ END OBSOLETE********/
          return false;
    }// end isDigit()
 
-/********OBSOLETE
-   private boolean isLetter(char tmpChar) {
-		tmpChar = Character.toLowerCase(tmpChar);
-      if (tmpChar >= 'a' && tmpChar <= 'z')
-         return true;
-      else
-         return false;
-   }
-END OBSOLETE********/
-
    private boolean isValidControlEditDesc(String line, int lineIndex)
    {
       char firstChar;
@@ -1970,20 +1935,14 @@ END OBSOLETE********/
             doLabels.pop();
             while (doLabels.empty() == false &&
                   (labelsMatch(doLabels.peek().getText(), firstToken.getText()) == true)) {
-               // for each extra matching labeled do with this labeled end do, 
-               // we need to add a T_LABEL_DO_TERMINAL to the token stream.
-               // also, append a new statement for each do loop we need to 
-               // terminate.  the added stmt is: 
-               // label T_LABEL_DO_TERMINAL T_CONTINUE T_EOS
-               if (tokens.appendToken(FortranLexer.T_DIGIT_STRING, 
-                                      new String(firstToken.getText())) == false ||
-                   tokens.appendToken(FortranLexer.T_LABEL_DO_TERMINAL, labeledDoText) == false ||
-                   tokens.appendToken(FortranLexer.T_CONTINUE, new String("CONTINUE")) == false ||
-                   tokens.appendToken(FortranLexer.T_EOS, null) == false) {
-                  // should we exit here??
-                  System.err.println("Couldn't add tokens!");
-                  System.exit(1);
-               }
+                // for each extra matching labeled do with this labeled end do, 
+                // we need to add a T_LABEL_DO_TERMINAL_INSERTED to the token stream.
+                // the inserted token's text is the matched statement label.
+                if( ! tokens.appendToken(FortranLexer.T_LABEL_DO_TERMINAL_INSERTED, new String(firstToken.getText())) )
+                {
+                    System.err.println("FATAL ERROR: couldn't add tokens in fixupLabeledEndDo!");
+                    System.exit(1);
+                }
                doLabels.pop();
             }
          }
@@ -2265,8 +2224,6 @@ END OBSOLETE********/
     */
    private int matchDataRef(int lineStart, int lineEnd)
    {
-      // SKW 2011-4-26: modified to accept CAF2 co-dereference operator ('[ ]') if present
-
       // skip any number of consecutive part refs separated by '%'
       // each begins with an identifier (or keyword)
       int nextOffset = lineStart + 1;
@@ -2589,62 +2546,6 @@ END OBSOLETE********/
    } // end matchLine()
 
 
-/******OBSOLETE
-   private void fixupFixedFormatLine(int lineStart, int lineEnd, boolean startsWithKeyword) {
-      StringBuffer buffer = new StringBuffer();
-      Token token;
-      int i = 0;
-
-      if(startsWithKeyword == true) {
-         do {
-            System.out.println("fixed-format line must start with keyword");
-            tokens.printPackedList();
-            buffer = buffer.append(tokens.getToken(lineStart+i).getText());
-                  
-            ANTLRStringStream charStream = 
-               new ANTLRStringStream(buffer.toString().toUpperCase());
-            FortranLexer myLexer = new FortranLexer(charStream);
-
-//             System.out.println("trying to match the string: " + 
-//                                buffer.toString().toUpperCase() + 
-//                                " as keyword for fixed-format continuation");
-            token = myLexer.nextToken();
-//             System.out.println("lexer said next token.getText() is: " + 
-//                                token.getText());
-//             System.out.println("lexer said next token.getType() is: " + 
-//                                token.getType());
-            i++;
-         } while((lineStart + i) < lineEnd &&
-                 lexer.isKeyword(token.getType()) == false);
-
-         // make sure we found something that is a keyword
-         if((lineStart + i) == lineEnd) {
-            System.err.println("Error: Expected keyword on line: " + 
-                               token.getLine());
-         } else {
-            // hide all tokens that we combined to make a keyword
-            int j = 0;
-            Token tmpToken;
-
-            for(j = lineStart; j < lineStart+i; j++) {
-               tmpToken = tokens.getToken(j);
-               tmpToken.setChannel(lexer.getIgnoreChannelNumber());
-//                System.out.println("hiding token: " + tmpToken.getText() + 
-//                                   " on line: " + tmpToken.getLine());
-               tokens.set(j, tmpToken);
-            }
-            
-            // add the newly created token
-            tokens.add(j, token);
-         } 
-      } else {
-         System.out.println("fixed-format line must NOT start with keyword");
-      }
-
-      return;
-   }// end fixupFixedFormatLine()
-END OBSOLETE*******/
-
    private int scanForRealConsts(int lineStart, int lineEnd) {
       int i;
 
@@ -2665,9 +2566,6 @@ END OBSOLETE*******/
             newTokenText.append(tokens.getToken(i).getText());
             newTokenText.append(tokens.getToken(i+1).getText());
 
-/********OBSOLETE            	
-            if(this.sourceForm != FrontEnd.FIXED_FORM &&
-END OBSOLETE*******/
             if ((col + tokens.getToken(i).getText().length())
                     != (tokens.getToken(i+1).getCharPositionInLine())) {
                System.err.println("Error: Whitespace within real constant at " 
@@ -2758,23 +2656,6 @@ END OBSOLETE*******/
       int lineLength = 0;
       int newLineLength = 0;
 
-/******OBSOLETE
-      if (this.sourceForm == FrontEnd.FIXED_FORM) {
-         tokensStart = tokens.mark();
-         tokens.fixupFixedFormat();
-         tokens.rewind(tokensStart);
-      }
-      
-      // the mark is the curr index into the tokens array and needs to start 
-      // at -1 (before the list).  This used to be what it always was when 
-      // entering this method in antlr-3.0b*, but in antlr-3.0, the number 
-      // was no longer guaranteed to be -1.  so, seek the index ptr to -1.
-      if (tokensStart != -1) {
-          tokens.seek(-1);
-          tokensStart = -1;
-      }
-END OBSOLETE******/
-      
       while (tokens.LA(1) != FortranLexer.EOF) {
          // initialize necessary variables
          commaIndex = -1;
@@ -2860,17 +2741,6 @@ END OBSOLETE******/
                equalsIndex = salesScanForToken(lineStart, FortranLexer.T_EQ_GT);
             }
             if (equalsIndex != -1) {
-/********OBSOLETE            	
-               // TODO: 
-               // have to figure out how to rearrange the case where we 
-               // can't start with a keyword (given the tests below fail) for 
-               // fixed format where we may have to combine tokens to get the
-               // statement to be accepted.  
-//                if(this.sourceForm == FrontEnd.FIXED_FORM) {
-//                   fixupFixedFormatLine(lineStart, lineLength, false);
-//                }
-END OBSOLETE******/
-
                // we have an equal but no comma, so stmt can not start with a keyword.
                // try converting any keyword node found in this line to an identifier
                // this is NOT true for data declarations that have an 
@@ -2893,15 +2763,6 @@ END OBSOLETE******/
                   }
                } 
             } else {
-/********OBSOLETE            	
-               // TODO:
-               // need to make sure that this can be here because it may 
-               // prevent something from matching below...
-//                if(this.sourceForm == FrontEnd.FIXED_FORM) {
-//                   fixupFixedFormatLine(lineStart, lineLength, true);
-//                }
-END OBSOLETE*******/
-
                // no comma and no equal sign; must start with a keyword
                // can have a one-liner stmt w/ neither
 //                if(matchOneLineStmt(lineStart, lineLength) == false) {
