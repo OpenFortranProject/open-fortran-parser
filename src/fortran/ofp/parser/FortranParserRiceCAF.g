@@ -340,7 +340,17 @@ part_ref
    |       T_IDENT
                {action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
    ;
-   
+
+
+part_ref_no_image_selector
+options{k=2;}
+@init{boolean hasSSL = false; boolean hasImageSelector = false;}
+   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+           {hasSSL=true; action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   |   T_IDENT
+           {action.part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   ;
+
 
 /* alternate syntax for co-dereferencing
 
@@ -466,30 +476,27 @@ image_selector
 // R631-F08, R628-F03
 //
 
-// SAD NOTE: This rule is flawed but can't be improved yet due to a flaw in ROSE.
-// The flaw is that the rhs's first nonterminal, 'allocate_object', will usually consume the subsequent tokens which
-// which are supposed to be parsed as the 'allocate_shape_spec_list' and 'rice_allocate_coarray_spec' because they
-// look like a 'section_subscript_list' and either an 'image_selector' or a 'rice_co_dereference_op'. The exception
-// is when the latter uses the old CAF2 "[ ]" syntax for the default team, as in "allocate( a(10)[ ] )". In such a
-// case the "[ ]" is correctly parsed as a bracketed 'rice_allocate_coarray_spec' because it can't be interpreted as
-// part of a 'part_ref' since it follows the subscript list. However, this is a mixed blessing (see next paragraph).
-//
-// This flaw can't be fixed right now because in ROSE, the 'allocation(hasShape, hasCoarray)' action ignores its
-// two boolean parameters! Thus if we fix this rule to do the right thing, ROSE will discard the shape-spec and
-// coarray-spec subtrees entirely. Sigh. In fact, in the special case just described, ROSE does discard the subtree
-// corresponding to "[ ]" and the unparsed source is incorrect.
+// SAD NOTE 1: In ROSE, there is no IR for allocations. That is, there is no place in the AST to hold the
+// 'allocate_shape_spec_list' and 'rice_allocate_coarray_spec' if any. The only way to preserve them is
+// to encode them in the 'allocate_object' itself, i.e. as part of an expression.
 
-// Worse, this is not easy to fix in ROSE because there is no IR for allocations! That is, ROSE currently has no
-// place in its tree grammar to hold the 'allocate_shape_spec_list' and 'rice_allocate_coarray_spec' if any. Sigh!
+// SAD NOTE 2: In this rule, the 'allocate_shape_spec_list' is never recognized. Its corresponding action
+// 'action.allocate_shape_spec' is a no-op in ROSE. Shape specs are parsed by the 'allocate_object' rule
+// as a section subscript list within a part ref. Sigh! On the other hand, this is just as well because
+// there is no other way to represent the shape specs (see Sad Note 1).
+
+// SAD NOTE 3: In this rule, the 'rice_allocate_coarray_spec' *is* in fact parsed. Coshape specs do not
+// get parsed by 'allocate_object' because it looks for a 'partref_no_image_selector' instead of a part ref.
+// However, there is still no good place to represent the coshape specs (see Sad Note 1), so instead the
+// action 'action.rice_allocate_coarray_spec' builds a coarray reference node containing them. Sigh!
 
 allocation
 @init{boolean hasAllocateShapeSpecList = false; boolean hasAllocateCoarraySpec = false;}
    :   allocate_object
-       ( T_LPAREN allocate_shape_spec_list {System.out.println("------> ()"); hasAllocateShapeSpecList=true;} T_RPAREN )?
-       ( T_LBRACKET rice_allocate_coarray_spec {hasAllocateCoarraySpec=true;} T_RBRACKET )?
+     ( T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=true;} T_RPAREN )?
+     ( T_LBRACKET rice_allocate_coarray_spec {hasAllocateCoarraySpec=true;} T_RBRACKET )?
            {action.allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);}
    ;
-
 
 
 /**
@@ -510,40 +517,18 @@ allocation
 //
 allocate_object
 @init{int numPartRefs = 0;}
-   :   /* part_ref_no_image_selector {numPartRefs += 1;} */
-       /* (T_PERCENT part_ref_no_image_selector {numPartRefs += 1;})* */
-       part_ref {numPartRefs += 1;}
-       (T_PERCENT part_ref {numPartRefs += 1;})*
+   :   part_ref_no_image_selector {numPartRefs += 1;}
+       (T_PERCENT part_ref_no_image_selector {numPartRefs += 1;})*
+//       part_ref {numPartRefs += 1;}
+//       (T_PERCENT part_ref {numPartRefs += 1;})*
            {action.data_ref(numPartRefs); action.allocate_object();}
    ;
+
 
 /*
  * R636-F08 allocate-coarray-spec
  *    is   [ allocate-coshape-spec-list , ] [ lower-bound-expr : ] *
  */
-
-////////////
-// R636-F08
-//
-allocate_coarray_spec
-options{k=3;}
-@after {action.allocate_coarray_spec();}
-   :   (T_ASTERISK)              => T_ASTERISK
-   |   (expr T_COLON T_ASTERISK) => expr T_COLON T_ASTERISK
-//PUTBACK   |   allocate_coshape_spec_list T_COMMA ( expr T_COLON )? T_ASTERISK
-//   |   T_ASTERISK // TESTING
-   ;
-
-//R632
-// Laksono (2010.07.08): hack verson of allocate_object. It has to be data_ref instead
-/*allocate_object
-@init{int numPartRefs = 0;}
-	: T_IDENT {numPartRefs += 1;}
-		(T_PERCENT T_IDENT {numPartRefs += 1;})?
-			{action.data_ref(numPartRefs);}
-	;
-	*/
-
 
 /**
  * Section/Clause 8: Execution control
@@ -574,12 +559,20 @@ lock_variable
 // RICE CO-ARRAY FORTRAN RULES
 //----------------------------------------------------------------------------
 
-
-// See "sad note" at R631-F08, R628-F03
-rice_allocate_coarray_spec:
-     // TEMPORARY: accept old empty version for legacy code's allocate-stmts
-     /* empty */ 
-        { action.rice_allocate_coarray_spec(-1,null); }
+rice_allocate_coarray_spec
+@init{Token id = null;}
+  :
+    (T_ASTERISK) => T_ASTERISK
+        { action.rice_allocate_coarray_spec(0, null); }
+  |
+//  (expr T_COLON T_ASTERISK) => expr T_COLON T_ASTERISK
+//|
+    T_AT (T_IDENT {id=$T_IDENT;})?
+        { action.rice_allocate_coarray_spec(1, id); }
+  |
+    // TEMPORARY: accept old empty version for legacy code's allocate-stmts
+    /* empty */
+        { action.rice_allocate_coarray_spec(1, null); }
   ;
 
 rice_with_team_construct
@@ -649,8 +642,6 @@ rice_declaration_type_spec
   -- see SAD NOTE at rule for 'allocation' ***/
 cosubscript
      :   expr
-     | T_AT T_IDENT
-     | T_ASTERISK
    ;
 
 cosubscript_list
@@ -659,7 +650,7 @@ cosubscript_list
  Token idTeam=null;
  }
   :  {action.cosubscript_list__begin();}
-     cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
+     ( cosubscript {count++;} ( T_COMMA cosubscript {count++;} )* )?
      (T_AT T_IDENT {idTeam=$T_IDENT;})?
      {
        action.cosubscript_list(count, idTeam);

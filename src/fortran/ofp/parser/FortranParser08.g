@@ -2787,6 +2787,16 @@ allocate_object_list
 // R630
 // ERR_CHK 630a lower_bound_expr replaced by expr
 // ERR_CHK 630b upper_bound_expr replaced by expr
+
+// SAD NOTE 1: In ROSE, there is no IR for allocations. That is, there is no place in the AST to hold the
+// 'allocate_shape_spec_list' and 'rice_allocate_coarray_spec' if any. The only way to preserve them is
+// to encode them in the 'allocate_object' itself, i.e. as part of an expression.
+
+// SAD NOTE 2: In this rule, the 'allocate_shape_spec_list' is never recognized. Its corresponding action
+// 'action.allocate_shape_spec' is a no-op in ROSE. Shape specs are parsed by the 'allocate_object' rule
+// as a section subscript list within a part ref. Sigh! On the other hand, this is just as well because
+// there is no other way to represent the shape specs (see Sad Note 1).
+
 allocate_shape_spec
 @init{boolean hasLowerBound = false; boolean hasUpperBound = true;}
 	:	expr (T_COLON expr)?
