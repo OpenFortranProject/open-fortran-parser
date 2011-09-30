@@ -2100,6 +2100,7 @@ public abstract interface IFortranParserAction {
     *   |   T_LPAREN expr T_RPAREN
     */
    public abstract void primary();
+   public abstract void parenthesized_expr();
 
    /** R702
     * level_1_expr
@@ -2949,10 +2950,12 @@ public abstract interface IFortranParserAction {
     * @param doKeyword T_DO token if given, null otherwise.
     * @param id The identifier, if present. Otherwise, null.
     * @param eos T_EOS token.
+    * @param inserted whether this do-terminator is a synthetic one inserted
+    *                 to close outer shared DOs.
     */
    public abstract void
-   do_term_action_stmt(Token label, Token endKeyword,
-                       Token doKeyword, Token id, Token eos);
+   do_term_action_stmt(Token label, Token endKeyword, Token doKeyword, Token id,
+                       Token eos, boolean inserted);
 
    /** R843
     * cycle_stmt

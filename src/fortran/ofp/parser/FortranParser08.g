@@ -2787,6 +2787,16 @@ allocate_object_list
 // R630
 // ERR_CHK 630a lower_bound_expr replaced by expr
 // ERR_CHK 630b upper_bound_expr replaced by expr
+
+// SAD NOTE 1: In ROSE, there is no IR for allocations. That is, there is no place in the AST to hold the
+// 'allocate_shape_spec_list' and 'rice_allocate_coarray_spec' if any. The only way to preserve them is
+// to encode them in the 'allocate_object' itself, i.e. as part of an expression.
+
+// SAD NOTE 2: In this rule, the 'allocate_shape_spec_list' is never recognized. Its corresponding action
+// 'action.allocate_shape_spec' is a no-op in ROSE. Shape specs are parsed by the 'allocate_object' rule
+// as a section subscript list within a part ref. Sigh! On the other hand, this is just as well because
+// there is no other way to represent the shape specs (see Sad Note 1).
+
 allocate_shape_spec
 @init{boolean hasLowerBound = false; boolean hasUpperBound = true;}
 	:	expr (T_COLON expr)?
@@ -2912,7 +2922,7 @@ options {backtrack=true;}       // alt 1,4 ambiguous
 	|	literal_constant
 	|	array_constructor
 	|	structure_constructor
-	|	T_LPAREN expr T_RPAREN
+	|	T_LPAREN expr T_RPAREN {action.parenthesized_expr();}
 	;
 
 // R702
@@ -4008,8 +4018,7 @@ end_do_stmt
 // block_do_construct to reduce backtracking
 // Second alternative, outer_shared_do_construct (nested loops sharing a 
 // termination label) is ambiguous
-// with do_construct in do_body, so deleted.  Loop termination will have to 
-// be coordinated with
+// with do_construct in do_body, so deleted.  Loop termination is coordinated with
 // the scanner to unwind nested loops sharing a common termination statement 
 // (see do_term_action_stmt).
 
@@ -4023,27 +4032,22 @@ end_do_stmt
 // C826 (R842) A do-term-shared-stmt shall not be a goto-stmt, a return-stmt, 
 // a stop-stmt, an exit-stmt, a cyle-stmt, an end-function-stmt, an 
 // end-subroutine-stmt, an end-program-stmt, or an arithmetic-if-stmt.
-// TODO need interaction with scanner to have this extra terminal emitted 
-// when do label matched
-// TODO need interaction with scanner to terminate shared terminal action 
-// statements (see R835).
 do_term_action_stmt
-@init { Token id=null; Token endToken = null; Token doToken = null;}
+@init {Token endToken = null; Token doToken = null; Token id=null;}
 @after{checkForInclude();}
-    // try requiring an action_stmt and then we can simply insert the new
-    // T_LABEL_DO_TERMINAL during the Sale's prepass.  T_EOS is in action_stmt.
-    // added the T_END T_DO and T_ENDDO options to this rule because of the
-    // token T_LABEL_DO_TERMINAL that is inserted if they end a labeled DO.
+    // for a labeled statement which closes a DO, we insert a T_LABEL_DO_TERMINAL during the Sale's prepass.
     :   label T_LABEL_DO_TERMINAL 
-        (action_stmt | ( (T_END T_DO {endToken=$T_END; doToken=$T_DO;} 
-                          | T_ENDDO {endToken=$T_ENDDO; doToken=null;}) 
-                (T_IDENT {id=$T_IDENT;})?) end_of_stmt)
-	// BMR- Has to massage the rule a little bit to convince Antlr that thre aren't potentially two identifiers here. Original is below.
-       // (action_stmt | ( (T_END T_DO (T_IDENT {id=$T_IDENT;})?) | (T_ENDDO) (T_IDENT {id=$T_IDENT;})? ) T_EOS)
-			{action.do_term_action_stmt($label.tk, endToken, doToken, id, 
-                                        $end_of_stmt.tk);}
-// 	:	T_LABEL_DO_TERMINAL action_stmt  
-// 	:	T_LABEL_DO_TERMINAL action_or_cont_stmt  
+        (action_stmt
+         | ( (T_END T_DO {endToken=$T_END; doToken=$T_DO;} | T_ENDDO {endToken=$T_ENDDO; doToken=null;}) 
+                (T_IDENT {id=$T_IDENT;})?)
+                end_of_stmt
+        )
+            {action.do_term_action_stmt($label.tk, endToken, doToken, id, $end_of_stmt.tk, false);}
+                                        
+    // for an outer shared DO closed implicitly, we insert a T_LABEL_DO_TERMINAL_INSERTED during the Sale's prepass.
+    // the inserted token's text is the closing statement's label.
+    | T_LABEL_DO_TERMINAL_INSERTED
+            {action.do_term_action_stmt($T_LABEL_DO_TERMINAL_INSERTED, null, null, null, null, true);}
 	;
 
 // R839 outer_shared_do_construct removed because it caused ambiguity in 

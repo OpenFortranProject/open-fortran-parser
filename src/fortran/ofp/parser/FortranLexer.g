@@ -690,17 +690,15 @@ T_DEFINED_OP
 // added the underscores so there is no way this could overlap w/ any valid
 // idents in Fortran.  we just need this token to be defined so we can 
 // create one of them while we're fixing up labeled do stmts.
-T_LABEL_DO_TERMINAL
-   :	'__LABEL_DO_TERMINAL__'
-   ;
+
+T_LABEL_DO_TERMINAL : '__LABEL_DO_TERMINAL__' ;
+T_LABEL_DO_TERMINAL_INSERTED : '__T_LABEL_DO_TERMINAL_INSERTED__' ;
 
 T_DATA_EDIT_DESC : '__T_DATA_EDIT_DESC__' ;
 T_CONTROL_EDIT_DESC : '__T_CONTROL_EDIT_DESC__' ;
 T_CHAR_STRING_EDIT_DESC : '__T_CHAR_STRING_EDIT_DESC__' ;
 
-T_STMT_FUNCTION 
-   :   'STMT_FUNCTION'
-   ;
+T_STMT_FUNCTION : 'STMT_FUNCTION' ;
 
 T_ASSIGNMENT_STMT : '__T_ASSIGNMENT_STMT__' ;
 T_PTR_ASSIGNMENT_STMT : '__T_PTR_ASSIGNMENT_STMT__' ;

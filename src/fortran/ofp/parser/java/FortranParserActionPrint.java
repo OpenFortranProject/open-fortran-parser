@@ -391,6 +391,7 @@ public class FortranParserActionPrint implements IFortranParserAction {
     */
    public void boz_literal_constant(Token constant) {
       printRuleHeader(411, "boz-literal-constant");
+      printParameter(constant, "constant");
       printRuleTrailer();
    }
 
@@ -2365,7 +2366,12 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleHeader(701, "primary");
       printRuleTrailer();
    }
-	
+
+   public void parenthesized_expr() {
+       printRuleHeader(701, "parenthesized_expr");
+       printRuleTrailer();
+   }
+
    /** R702
     * level_1_expr
     */
@@ -3349,11 +3355,12 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * do_term_action_stmt
     */
    public void
-   do_term_action_stmt(Token label, Token endKeyword, Token doKeyword, Token id, Token eos)
+   do_term_action_stmt(Token label, Token endKeyword, Token doKeyword, Token id, Token eos, boolean inserted)
    {
       printRuleHeader(838, "do-term-action-stmt");
       printParameter(label, "label");
       printParameter(id, "id");
+      printParameter(inserted, "inserted");
       printRuleTrailer();
    }
 

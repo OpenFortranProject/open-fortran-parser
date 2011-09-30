@@ -24,7 +24,9 @@ CD=cd
 CP=cp
 JAVADIR=java
 
+DATE=`date "+20%y%m%d"`
 JARFILE=$(OFP_JARFILE)
+ALT_JARFILE=OpenFortranParser-$(DATE).jar
 
 all: 
 	mkdir -pv build/fortran/ofp/parser/c/jni
@@ -57,7 +59,7 @@ clean:
 	$(CD) $(OFP_TOOLS_DIR); $(MAKE) clean
 	$(CD) $(OFP_C_DIR); $(MAKE) clean
 	$(CD) $(OFP_JNI_DIR); $(MAKE) clean
-	rm -f ./build/$(OFP_JARFILE)
+	rm -f ./build/$(OFP_JARFILE) ./build/$(ALT_JARFILE)
 	rm -rf ./build/fortran
 
 distclean:

@@ -455,6 +455,16 @@ cosubscript_list
 //
 // C644 (R632) An allocate-object shall not be a coindexed object.
 //
+
+// SAD NOTE 1: In ROSE, there is no IR for allocations. That is, there is no place in the AST to hold the
+// 'allocate_shape_spec_list' and 'allocate_coarray_spec' if any. The only way to preserve them is
+// to encode them in the 'allocate_object' itself, i.e. as part of an expression.
+
+// SAD NOTE 2: In this rule, an 'allocate_shape_spec_list' would never be recognized. Its corresponding action
+// 'action.allocate_shape_spec' is a no-op in ROSE. Shape specs are parsed by the 'allocate_object' rule
+// as a section subscript list within a part ref. Sigh! On the other hand, this is just as well because
+// there is no other way to represent the shape specs (see Sad Note 1).
+
 allocation
 @init{boolean hasAllocateShapeSpecList = false; boolean hasAllocateCoarraySpec = false;}
    :   (allocate_object T_LBRACKET)
@@ -512,8 +522,6 @@ options{k=3;}
 @after {action.allocate_coarray_spec();}
    :   (T_ASTERISK)              => T_ASTERISK
    |   (expr T_COLON T_ASTERISK) => expr T_COLON T_ASTERISK
-//PUTBACK   |   allocate_coshape_spec_list T_COMMA ( expr T_COLON )? T_ASTERISK
-//   |   T_ASTERISK // TESTING
    ;
 
 
