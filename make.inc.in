@@ -15,6 +15,7 @@
 # accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+OFP_DATE=@OFP_DATE@
 OFP_INSTALL_DIR=@prefix@
 OFP_ROOT_DIR=@OFP_ROOT_DIR@
 OFP_BUILD_DIR=$(OFP_ROOT_DIR)/build
