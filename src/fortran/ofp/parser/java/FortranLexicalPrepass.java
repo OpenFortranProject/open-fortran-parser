@@ -1464,29 +1464,21 @@ public class FortranLexicalPrepass {
       // look for empty string
       if (nextChar == quoteChar && line.charAt(lineIndex+1) != quoteChar) {
          // this is an empty string
-         return lineIndex + 1;
+         return lineIndex;
       }
       
       do {
+         nextChar = line.charAt(lineIndex++);
          if (nextChar == quoteChar) {
-            // look for two consequtive quote chars
-            if (line.charAt(lineIndex+1) == quoteChar) {
-               lineIndex += 1;  // skip the consequtive quotes
+            // look for two consecutive quote chars
+            if (line.charAt(lineIndex) == quoteChar) {
+               // pretend the second quote char starts a new string
+               return getCharString(line, lineIndex, quoteChar);
             }
          }
-         nextChar = line.charAt(++lineIndex);
       } while (nextChar != quoteChar);
       
-// OBSOLETE: replaced by fix to bug 3304566 19.5.2011
-//      if ((nextChar == '\'' || nextChar == '"') && nextChar == quoteChar)
-//         return getCharString(line, lineIndex, nextChar);
-//
-//      do {
-//         lineIndex++;
-//         nextChar = line.charAt(lineIndex);
-//      } while(nextChar != '\'' && nextChar != '"');
-
-      return lineIndex;
+      return lineIndex-1;
    } // end getCharString()
 
 
