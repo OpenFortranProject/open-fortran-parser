@@ -616,6 +616,10 @@ T_COPOINTER     :       'COPOINTER'     ;
 T_COTARGET      :       'COTARGET'      ;
 // end Rice additions ----------------------------
 
+// begin LANL additions --------------------------
+T_EXTEND        :       'EXTEND'        ;
+// end LANL additions ----------------------------
+
 // these tokens (without blank characters) are from 3.3.2.2
 //
 
