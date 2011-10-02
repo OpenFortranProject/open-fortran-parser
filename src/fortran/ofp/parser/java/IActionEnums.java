@@ -165,6 +165,9 @@ public interface IActionEnums {
 	static final public int AttrSpec_COPOINTER=AttrSpecBase+29;
 	static final public int AttrSpec_COTARGET=AttrSpecBase+30;
 	//---------------------------------------------
+	// LANL attributes
+	static final public int AttrSpec_EXTEND=AttrSpecBase+31;
+	//---------------------------------------------
 
 	static final public int BindingStatementType_specific=
 		BindingStatementTypeBase+0;
