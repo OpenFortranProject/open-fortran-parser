@@ -24,7 +24,7 @@ CD=cd
 CP=cp
 JAVADIR=java
 
-DATE=`date "+20%y%m%d"`
+DATE=$(OFP_DATE)
 JARFILE=$(OFP_JARFILE)
 ALT_JARFILE=OpenFortranParser-$(DATE).jar
 
