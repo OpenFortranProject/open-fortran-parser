@@ -25,7 +25,7 @@ import java.io.*;
 //import fortran.ofp.parser.java.FortranParser08;
 import fortran.ofp.parser.java.FortranParserExtras;
 import fortran.ofp.parser.java.FortranParserRiceCAF;
-import fortran.ofp.parser.java.FortranParserLANL;
+import fortran.ofp.parser.java.FortranParserOFP;
 
 import fortran.ofp.parser.java.FortranLexer;
 import fortran.ofp.parser.java.FortranLexicalPrepass;
@@ -76,10 +76,10 @@ public class FrontEnd implements Callable<Boolean> {
          }
       }
 
-      // check to see if using LANL parser extensions
+      // check to see if using OFP parser extensions
       //
       for (int i = 0; i < args.length; i++) {
-         if (args[i].startsWith("--lanl")) {
+         if (args[i].startsWith("--OFP")) {
             lanlExtensions = true;
          }
       }
@@ -93,9 +93,9 @@ public class FrontEnd implements Callable<Boolean> {
       }
       else if (lanlExtensions == true) {
    	 if (verbose) {
-            System.out.println("FortranLexer: using LANL's research extensions");
+            System.out.println("FortranLexer: using OFP's research extensions");
          }
-         this.parser = new FortranParserLANL(tokens);
+         this.parser = new FortranParserOFP(tokens);
       }
       else {
          this.parser = new FortranParserExtras(tokens);
@@ -234,7 +234,7 @@ public class FrontEnd implements Callable<Boolean> {
             rice_caf = true;
             nArgs += 1;
             continue;
-         } else if (args[i].startsWith("--lanl")) {
+         } else if (args[i].startsWith("--OFP")) {
             newArgs.add(args[i]);
             lanl_extensions = true;
             nArgs += 1;
@@ -287,7 +287,7 @@ public class FrontEnd implements Callable<Boolean> {
       for (int i = 0; i < args.length; i++) {
          // skip args that are not files
          //
-         if (args[i].startsWith("--RiceCAF") | args[i].startsWith("--lanl") | 
+         if (args[i].startsWith("--RiceCAF") | args[i].startsWith("--OFP") | 
              args[i].startsWith("--dump")    | args[i].startsWith("--silent") |
              args[i].startsWith("--verbose") | args[i].startsWith("--tokens")) {
             continue;
