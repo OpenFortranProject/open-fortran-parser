@@ -51,13 +51,17 @@ CLASS_FILES = $(CLASSDIR)/FortranToken.class \
               $(CLASSDIR)/FortranParserActionFactory.class \
               $(CLASSDIR)/FortranParserActionPrint.class \
               $(CLASSDIR)/FortranParserRiceCAF.class \
-              $(CLASSDIR)/FortranParserRiceCAF_FortranParser08.class
+              $(CLASSDIR)/FortranParserRiceCAF_FortranParser08.class \
+              $(CLASSDIR)/FortranParserLANL.class \
+              $(CLASSDIR)/FortranParserLANL_FortranParser08.class
 GENERATED_JAVA_FILES = FortranLexer.java \
                        FortranParser08.java \
                        FortranParserExtras.java \
                        FortranParserExtras_FortranParser08.java \
                        FortranParserRiceCAF.java \
-                       FortranParserRiceCAF_FortranParser08.java
+                       FortranParserRiceCAF_FortranParser08.java \
+                       FortranParserLANL.java \
+                       FortranParserLANL_FortranParser08.java
                        #FortranParserRiceCAF_FortranParserExtras.java \
                        #FortranParserRiceCAF_FortranParserExtras_FortranParser08.java
 GENERATED_CLASS_FILES=$(CLASSDIR)/FortranLexer*DFA*.class \
@@ -67,7 +71,9 @@ GENERATED_TOKEN_FILES = FortranLexer.tokens \
                         FortranParserExtras.tokens \
                         FortranParserExtras_FortranParser08.tokens \
                         FortranParserRiceCAF.tokens \
-                        FortranParserRiceCAF_FortranParser08.tokens
+                        FortranParserRiceCAF_FortranParser08.tokens \
+                        FortranParserLANL.tokens \
+                        FortranParserLANL_FortranParser08.tokens
 
 all: FortranParserActionNull.java $(GENERATED_JAVA_FILES) $(CLASS_FILES) $(BUILDDIR)/$(JARFILE) $(BUILDDIR)/$(ALT_JARFILE)
 	cp IFortranParserAction.java $(INSTALLDIR)/.
@@ -98,6 +104,10 @@ FortranParserRiceCAF.java: ../FortranParserRiceCAF.g FortranLexer.tokens
 	@echo Note: error and/or warning messages expected from the next command:
 	-$(JAVA) org.antlr.Tool -fo ./ $<
 
+FortranParserLANL.java: ../FortranParserLANL.g FortranLexer.tokens
+	@echo Note: error and/or warning messages expected from the next command:
+	-$(JAVA) org.antlr.Tool -fo ./ $<
+
 FortranParserActionNull.java: IFortranParserAction.java
 	$(PERL) makNull.pl 
 
@@ -116,6 +126,9 @@ $(CLASSDIR)/FortranParserExtras.class: FortranParserExtras.java FortranLexer.tok
 $(CLASSDIR)/FortranParserRiceCAF.class: FortranParserRiceCAF.java FortranLexer.tokens
 	$(JAVAC) $(JFLAGS) $<
 
+$(CLASSDIR)/FortranParserLANL.class: FortranParserLANL.java FortranLexer.tokens
+	$(JAVAC) $(JFLAGS) $<
+
 $(CLASSDIR)/FortranParserExtras_FortranParser08.class: FortranParserExtras_FortranParser08.java FortranLexer.tokens
 	$(JAVAC) $(JFLAGS) $<
 
@@ -126,6 +139,12 @@ $(CLASSDIR)/FortranParserRiceCAF_FortranParserExtras.class: FortranParserRiceCAF
 	$(JAVAC) $(JFLAGS) $<
 
 $(CLASSDIR)/FortranParserRiceCAF_FortranParserExtras_FortranParser08.class: FortranParserRiceCAF_FortranParserExtras_FortranParser08.java FortranLexer.tokens
+	$(JAVAC) $(JFLAGS) $<
+
+$(CLASSDIR)/FortranParserLANL_FortranParserExtras.class: FortranParserLANL_FortranParserExtras.java FortranLexer.tokens
+	$(JAVAC) $(JFLAGS) $<
+
+$(CLASSDIR)/FortranParserLANL_FortranParserExtras_FortranParser08.class: FortranParserLANL_FortranParserExtras_FortranParser08.java FortranLexer.tokens
 	$(JAVAC) $(JFLAGS) $<
 
 $(CLASSDIR)/FortranStream.class: FortranStream.java
