@@ -25,6 +25,7 @@ import java.io.*;
 //import fortran.ofp.parser.java.FortranParser08;
 import fortran.ofp.parser.java.FortranParserExtras;
 import fortran.ofp.parser.java.FortranParserRiceCAF;
+import fortran.ofp.parser.java.FortranParserLANL;
 
 import fortran.ofp.parser.java.FortranLexer;
 import fortran.ofp.parser.java.FortranLexicalPrepass;
@@ -54,6 +55,7 @@ public class FrontEnd implements Callable<Boolean> {
    public FrontEnd(String[] args, String filename, String type)
    throws IOException {
       boolean riceCAF = false;
+      boolean lanlExtensions = false;
       
       File file = new File(filename);
       String path = file.getAbsolutePath();
@@ -74,15 +76,31 @@ public class FrontEnd implements Callable<Boolean> {
          }
       }
 
-      if (riceCAF == false) {
-         this.parser = new FortranParserExtras(tokens);
-      } else {
+      // check to see if using LANL parser extensions
+      //
+      for (int i = 0; i < args.length; i++) {
+         if (args[i].startsWith("--lanl")) {
+            lanlExtensions = true;
+         }
+      }
+
+      if (riceCAF == true) {
          // laksono 08.06.2010: only output if we have --verbose option set
    	 if (verbose) {
             System.out.println("FortranLexer: using Rice University's CAF extensions");
          }
          this.parser = new FortranParserRiceCAF(tokens);
       }
+      else if (lanlExtensions == true) {
+   	 if (verbose) {
+            System.out.println("FortranLexer: using LANL's research extensions");
+         }
+         this.parser = new FortranParserLANL(tokens);
+      }
+      else {
+         this.parser = new FortranParserExtras(tokens);
+      }
+
       this.parser.initialize(args, type, filename, path);
 
       this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
@@ -204,6 +222,7 @@ public class FrontEnd implements Callable<Boolean> {
       String type = "fortran.ofp.parser.java.FortranParserActionNull";
       int nArgs = 0;
       boolean rice_caf = false;
+      boolean lanl_extensions = false;
 
       includeDirs = new ArrayList<String>();
 
@@ -213,6 +232,11 @@ public class FrontEnd implements Callable<Boolean> {
          if (args[i].startsWith("--RiceCAF")) {
             newArgs.add(args[i]);
             rice_caf = true;
+            nArgs += 1;
+            continue;
+         } else if (args[i].startsWith("--lanl")) {
+            newArgs.add(args[i]);
+            lanl_extensions = true;
             nArgs += 1;
             continue;
          } else if (args[i].startsWith("--dump")) {
@@ -261,8 +285,11 @@ public class FrontEnd implements Callable<Boolean> {
       }
 
       for (int i = 0; i < args.length; i++) {
-         if (!rice_caf && (args[i].startsWith("--dump") | args[i].startsWith("--silent")
-               | args[i].startsWith("--verbose") | args[i].startsWith("--tokens")) ) {
+         // skip args that are not files
+         //
+         if (args[i].startsWith("--RiceCAF") | args[i].startsWith("--lanl") | 
+             args[i].startsWith("--dump")    | args[i].startsWith("--silent") |
+             args[i].startsWith("--verbose") | args[i].startsWith("--tokens")) {
             continue;
          } else if (args[i].startsWith("-I")) {
             /* Skip the include dir stuff; it's handled by the lexer. */
