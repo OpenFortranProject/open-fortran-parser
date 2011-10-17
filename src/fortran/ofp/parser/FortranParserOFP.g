@@ -263,12 +263,12 @@ type_declaration_stmt
     		{ action.type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.tk); }
     ;
 
-// Extension for the EXTEND attribute for dummy argument type declarations
-// in elemental procedures.  From R502-F08, R503-F03.
+// Extension for the HALO attribute for dummy argument type declarations
+// in CONCURRENT procedures.  From R502-F08, R503-F03.
 //
 attr_spec_extension
-    :  T_EXTEND
-           {action.attr_spec($T_EXTEND, IActionEnums.AttrSpec_EXTEND);}
+    :  T_HALO
+           {action.attr_spec($T_HALO, IActionEnums.AttrSpec_HALO);}
     ;
 
 /*
