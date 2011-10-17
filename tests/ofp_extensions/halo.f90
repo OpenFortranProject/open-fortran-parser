@@ -1,4 +1,4 @@
-pure elemental function run_fast(A)
-   real, HALO :: A(-1:1)
+pure CONCURRENT function run_fast(A)
+   real, HALO :: A(:,:)
 
 end function run_fast
