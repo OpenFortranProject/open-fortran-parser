@@ -543,6 +543,7 @@ T_IF            :       'IF'            ;
 T_IMAGES        :       'IMAGES'        ;
 T_IMPLICIT      :       'IMPLICIT'      ;
 T_IMPORT        :       'IMPORT'        ;
+T_IMPURE        :       'IMPURE'        ;
 T_IN            :       'IN'            ;
 T_INOUT         :       'INOUT'         ;
 T_INTENT        :       'INTENT'        ;
