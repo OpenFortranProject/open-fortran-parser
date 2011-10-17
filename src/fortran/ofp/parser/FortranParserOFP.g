@@ -572,6 +572,19 @@ scalar_int_expr
    ;
 
 
+/**
+ * Section/Clause 12: Procedures
+ */
+
+// Extension allowing CONCURRENT as a prefix-spec enabling syntax
+// for CONCURRENT procedures.  Extending R1226-F2008.
+//
+prefix_spec_extension
+   :  T_CONCURRENT
+          {action.t_prefix_spec($T_CONCURRENT);}
+   ;
+
+
 //----------------------------------------------------------------------------
 // additional rules following standard and useful for error checking
 //----------------------------------------------------------------------------
