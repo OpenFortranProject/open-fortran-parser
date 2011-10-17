@@ -5565,30 +5565,35 @@ proc_language_binding_spec
 // C1241 (R1227) A prefix shall not specify both ELEMENTAL AND RECURSIVE
 prefix
 @init{int specCount=1;}
-	:	prefix_spec ( prefix_spec{specCount++;} 
-            (prefix_spec{specCount++;} )? )?
-			{action.prefix(specCount);}
-	;
+   :  prefix_spec ( prefix_spec {specCount++;} )*
+          {action.prefix(specCount);}
+   ;
 
 t_prefix
 @init{int specCount=1;}
-	:	t_prefix_spec ( t_prefix_spec {specCount++;})?
-			{action.t_prefix(specCount);}
-	;
+   :  t_prefix_spec ( t_prefix_spec {specCount++;} )*
+           {action.t_prefix(specCount);}
+   ;
 
-// R1228
+// R1226-F08
 prefix_spec
-	:	declaration_type_spec
-			{action.prefix_spec(true);}
-	|	t_prefix_spec
-			{action.prefix_spec(false);}
-	;
+   :  declaration_type_spec
+          {action.prefix_spec(true);}
+   |  t_prefix_spec
+          {action.prefix_spec(false);}
+   ;
 
 t_prefix_spec
-	:	T_RECURSIVE	{action.t_prefix_spec($T_RECURSIVE);}
-	|	T_PURE		{action.t_prefix_spec($T_PURE);}
-	|	T_ELEMENTAL	{action.t_prefix_spec($T_ELEMENTAL);}
-	;
+   :  T_ELEMENTAL  {action.t_prefix_spec($T_ELEMENTAL);}
+   |  T_IMPURE     {action.t_prefix_spec($T_IMPURE);}
+   |  T_MODULE     {action.t_prefix_spec($T_MODULE);}
+   |  T_PURE       {action.t_prefix_spec($T_PURE);}
+   |  T_RECURSIVE  {action.t_prefix_spec($T_RECURSIVE);}
+   |  prefix_spec_extension
+   ;
+
+// language extension point
+prefix_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 
 // R1229
 suffix
@@ -5629,12 +5634,12 @@ end_function_stmt
 // specification_part made non-optional to remove END ambiguity (as can 
 // be empty)
 subroutine_subprogram
-	:	subroutine_stmt
-		specification_part
-		( execution_part )?
-		( internal_subprogram_part )?
-		end_subroutine_stmt
-	;
+   :   subroutine_stmt
+       specification_part
+       ( execution_part )?
+       ( internal_subprogram_part )?
+       end_subroutine_stmt
+   ;
 
 // R1232
 subroutine_stmt
