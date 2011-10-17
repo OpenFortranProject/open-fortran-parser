@@ -1,11 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 ##
 ## shell script to automatically get all of the jar files necessary
 ##
-CLASSPATH="`pwd`/antlr_jars/antlr.jar:`pwd`/antlr_jars/antlr-3.1.1.jar:`pwd`/antlr_jars/stringtemplate-3.2.jar:."
+ANTLR_VERSION=3.4-complete
+ANTLR_JAR=antlr-${ANTLR_VERSION}.jar
+ANTLR_URL=http://www.antlr.org/download/${ANTLR_JAR}
+CLASSPATH="`pwd`/antlr_jars/antlr.jar:`pwd`/antlr_jars/${ANTLR_JAR}:."
 
 echo $CLASSPATH
+echo ${ANTLR_JAR}
 
 if [ -d ./antlr_jars ]; then
     echo ""
@@ -17,25 +21,17 @@ else
     IFS=:
     
     WEBGETTER=none
+    WEB_ARGS=""
     
     for p in $PATH
       do
-
       if [ -d ./antlr_jars ]; then
           WEBGETTER=$WEBGETTER
       else
           if [ -x $p/wget ]; then
               WEBGETTER=$p/wget
-              $WEBGETTER http://www.antlr.org/download/antlr-3.1.1.jar
-              $WEBGETTER http://www.stringtemplate.org/download/stringtemplate-3.2.jar
-              $WEBGETTER http://www.antlr2.org/download/antlr-2.7.7.tar.gz
-              mkdir antlr_jars
-              mv antlr-3.1.1.jar antlr_jars
-              mv stringtemplate-3.2.jar antlr_jars
-              tar xzf antlr-2.7.7.tar.gz
-              mv antlr-2.7.7/antlr.jar antlr_jars
-              rm -rf antlr-2.7.7 antlr-2.7.7.tar.gz
-              
+              WEB_ARGS="--continue"
+              break
           fi
       fi
 
@@ -44,22 +40,20 @@ else
       else
           if [ -x $p/curl ]; then
               WEBGETTER=$p/curl
-              $WEBGETTER http://www.antlr.org/download/antlr-3.1.1.jar -o antlr-3.1.1.jar
-              $WEBGETTER http://www.stringtemplate.org/download/stringtemplate-3.2.jar -o stringtemplate-3.2.jar
-              $WEBGETTER http://www.antlr2.org/download/antlr-2.7.7.tar.gz -o antlr-2.7.7.tar.gz
-              mkdir antlr_jars
-              mv antlr-3.1.1.jar antlr_jars
-              mv stringtemplate-3.2.jar antlr_jars
-              tar xzf antlr-2.7.7.tar.gz
-              mv antlr-2.7.7/antlr.jar antlr_jars
-              rm -rf antlr-2.7.7 antlr-2.7.7.tar.gz
+              WEB_ARGS="-o${ANTLR_JAR}"
+              break
           fi
       fi
     done
     
     if [ $WEBGETTER = "none" ]; then
-	echo "You need to manually download the files."
-	return 1
+      echo "You need to manually download the files."
+      return 1
+    else
+      $WEBGETTER $WEB_ARGS "$ANTLR_URL"
+      mkdir antlr_jars
+      mv ${ANTLR_JAR} antlr_jars
+      cd antlr_jars && ln -s $ANTLR_JAR antlr.jar
     fi
     
 fi
