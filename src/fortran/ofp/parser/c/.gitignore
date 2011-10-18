@@ -1,0 +1,12 @@
+# Generated files #
+###################
+
+ActionEnums.h
+FortranParserAction.h
+FortranParserActionNull.c
+FortranParserActionPrint.c
+
+jni/FortranParserActionJNI.java
+jni/c_actions_jni.c
+jni/c_main_ex
+jni/*.o
