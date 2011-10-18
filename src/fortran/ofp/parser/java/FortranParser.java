@@ -94,6 +94,17 @@ public abstract class FortranParser extends Parser implements IFortranParser {
    public Token getRhsIToken(int i) {
       return null;
    }
+   
+   public boolean isTPrefixSpec(int token) {
+      if (token == FortranLexer.T_ELEMENTAL ||
+          token == FortranLexer.T_IMPURE    ||
+          token == FortranLexer.T_MODULE    ||
+          token == FortranLexer.T_PURE      ||
+          token == FortranLexer.T_RECURSIVE) {
+        return true;
+      }
+      return false;
+   }
  	
    /**
     * Check for include and end of file.  T_INCLUDE is not in the grammar
