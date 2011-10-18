@@ -37,6 +37,11 @@ import FortranParser08;
       gFortranParser08.eofAction();
    }
 
+   public boolean isTPrefixSpec(int token) {
+      if (token == FortranLexer.T_CONCURRENT) return true;
+      else return super.isTPrefixSpec(token);
+   }
+
 } // end members
 
 
