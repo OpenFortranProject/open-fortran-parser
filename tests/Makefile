@@ -27,7 +27,7 @@ PARDIR=../
 
 export CLASSPATH=$(OFP_CLASSPATH):$CLASSPATH
 
-TEST_DIRS=bug-reports rule-tests rule-f08-tests f08-tests caf_2.0
+TEST_DIRS=bug-reports rule-tests rule-f08-tests f08-tests caf_2.0 ofp_extensions
 
 define run-tests-recursive
 	@for dir in $(TEST_DIRS) ; do \
