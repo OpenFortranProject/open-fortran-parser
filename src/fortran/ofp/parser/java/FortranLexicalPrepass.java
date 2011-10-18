@@ -26,6 +26,7 @@ import org.antlr.runtime.*;
 
 public class FortranLexicalPrepass {
    private FortranLexer lexer;
+   private IFortranParser parser;
    private FortranTokenStream tokens;
    private Stack<Token> doLabels;
    private int sourceForm;
@@ -34,6 +35,7 @@ public class FortranLexicalPrepass {
                                 FortranTokenStream tokens, 
                                 IFortranParser parser) {
       this.lexer = lexer;
+      this.parser = parser;
       this.tokens = tokens;
       this.doLabels = new Stack<Token>();
    }
@@ -255,7 +257,7 @@ public class FortranLexicalPrepass {
    
    private boolean matchDataDecl(int lineStart, int lineEnd) {
       int tokenType = tokens.currLineLA(lineStart+1);
-      if (isIntrinsicType(tokenType) == true || isPrefixToken(tokenType) ||
+      if (isIntrinsicType(tokenType) == true || isTPrefixSpec(tokenType) ||
           ((tokenType == FortranLexer.T_TYPE || tokenType == FortranLexer.T_CLASS) &&
             tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN)) {
 
@@ -369,7 +371,7 @@ public class FortranLexicalPrepass {
       int bindOffset;
 
       // Move past the pure, elemental, and recursive keywords.
-      while ( isPrefixToken(tokens.currLineLA(lineStart+1)) ) {
+      while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) ) {
          lineStart++;
       }
 
@@ -1202,38 +1204,32 @@ public class FortranLexicalPrepass {
 		// First, skip over the pure, elemental, recursive tokens.
 		// Then skip type spec.
 		// Then skip over the pure, elemental, recursive tokens again
-		while ( isPrefixToken(tokens.currLineLA(lineStart+1)) )
+		while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) )
 			lineStart++;
 		
 		lineStart = skipTypeSpec(lineStart);
 
-		while ( isPrefixToken(tokens.currLineLA(lineStart+1)) )
+		while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) )
 			lineStart++;
 
 		return lineStart;
-   }// end skipPrefix()
+   } // end skipPrefix()
 
-	// Test to see if a token is one of pure, elemental, or recursive.
-	private boolean isPrefixToken(int token) {
-      if(token == FortranLexer.T_PURE ||
-         token == FortranLexer.T_ELEMENTAL ||
-         token == FortranLexer.T_RECURSIVE)
-         return true;
-      else
-         return false;
-   }// end isIntrinsicType()
+   // Test to see if a token is a t_prefix_spec.
+   private boolean isTPrefixSpec(int token) {
+      return parser.isTPrefixSpec(token);
+   } // end isTPrefixSpec()
 
    private boolean isFuncDecl(int lineStart, int lineEnd) {
-
-		// have to skip over any kind selector
-		lineStart = skipPrefix(lineStart);
+      // have to skip over any kind selector
+      lineStart = skipPrefix(lineStart);
 
       // Here, we know the first token is one of the intrinsic types.
       // Now, look at the second token to see if it is T_FUNCTION.
       // If it is, AND a keyword/identifier immediately follows it, 
       // then this cannot be a data decl and must be a function decl.
-      if(tokens.currLineLA(lineStart+1) == FortranLexer.T_FUNCTION) {
-         if(tokens.currLineLA(lineStart+2) == FortranLexer.T_IDENT ||
+      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_FUNCTION) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_IDENT ||
             (lexer.isKeyword(tokens.currLineLA(3))))
          {
             return true;
@@ -1241,7 +1237,7 @@ public class FortranLexicalPrepass {
       } 
 
       return false;
-   }// end isFuncDecl()
+   } // end isFuncDecl()
 
 	// True if this is a subroutine declaration.
 	private boolean isSubDecl(int lineStart, int lineEnd) {
