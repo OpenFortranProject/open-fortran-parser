@@ -266,10 +266,13 @@ public class FortranLexicalPrepass {
             return false;
          }
 
-         // Test to see if it's a function decl.  If it is not, then
-         // it has to be a data decl
+         // Test to see if it's a function decl or a module procedure stmt.
+         // If it is not, then it has to be a data decl.
          if (isFuncDecl(lineStart, lineEnd) == true) {
             fixupFuncDecl(lineStart, lineEnd);
+         }
+         else if (isModuleProcStmt(lineStart, lineEnd) == true) {
+            fixupModuleProcStmt(lineStart, lineEnd);
          }
          else {
             // should have a variable declaration here
@@ -1064,7 +1067,6 @@ public class FortranLexicalPrepass {
       return;
    } // end fixupDataDecl()
 
-
    /**
     * TODO:: make this handle the result clause and bind(c) attribute!
     */
@@ -1102,10 +1104,10 @@ public class FortranLexicalPrepass {
       // make it easier, and to make sure we catch the result clause id
       // then, afterwards, reset the type of the result and bind tokens
       convertToIdents(identOffset, lineEnd);
-      if(resultToken != null) {
+      if (resultToken != null) {
          resultToken.setType(FortranLexer.T_RESULT);
       }
-      if(bindToken != null) {
+      if (bindToken != null) {
          // this one probably not necessary because i don't think it
          // is actually considered a keyword by lexer.isKeyword()
 //          bindToken.setType(FortranLexer.T_BIND_LPAREN_C);
@@ -1114,8 +1116,11 @@ public class FortranLexicalPrepass {
       }
  
       return;
-   }// end fixupFuncDecl()
+   } // end fixupFuncDecl()
 
+   private void fixupModuleProcStmt(int lineStart, int lineEnd) {
+      convertToIdents(lineStart + 2, lineEnd);
+   }
 
    private boolean isIntrinsicType(int type) {
       if(type == FortranLexer.T_INTEGER ||
@@ -1199,20 +1204,22 @@ public class FortranLexicalPrepass {
    } // end skipTypeSpec()
 
 
-	// Skip whole prefix, not just the type declaration.
-	private int skipPrefix(int lineStart) {
-		// First, skip over the pure, elemental, recursive tokens.
-		// Then skip type spec.
-		// Then skip over the pure, elemental, recursive tokens again
-		while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) )
-			lineStart++;
+   // Skip whole prefix, not just the type declaration.
+   private int skipPrefix(int lineStart) {
+      // First, skip over the pure, elemental, recursive tokens.
+      // Then skip type spec.
+      // Then skip over the pure, elemental, recursive tokens again
+      while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) ) {
+         lineStart++;
+      }
 		
-		lineStart = skipTypeSpec(lineStart);
+      lineStart = skipTypeSpec(lineStart);
 
-		while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) )
-			lineStart++;
+      while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) ) {
+         lineStart++;
+      }
 
-		return lineStart;
+      return lineStart;
    } // end skipPrefix()
 
    // Test to see if a token is a t_prefix_spec.
@@ -1239,25 +1246,38 @@ public class FortranLexicalPrepass {
       return false;
    } // end isFuncDecl()
 
-	// True if this is a subroutine declaration.
-	private boolean isSubDecl(int lineStart, int lineEnd) {
+   // True if this is an mp-subprogram-stmt
+   private boolean isModuleProcStmt(int lineStart, int lineEnd) {
+      // look for MODULE PROCEDURE keywords
+      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_MODULE) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_PROCEDURE)
+         {
+            return true;
+         }
+      } 
 
-		// Skip the prefix.
-		lineStart = skipPrefix(lineStart);
+      return false;
+   } // end isFuncDecl()
 
-		// Look at the first token to see if it is T_SUBROUTINE.
-		// If it is, AND a keyword/identifier immediately follows it, 
-		// then this is a subroutine declaration.
-		if(tokens.currLineLA(lineStart+1) == FortranLexer.T_SUBROUTINE) {
-			if(tokens.currLineLA(lineStart+2) == FortranLexer.T_IDENT ||
-				lexer.isKeyword(tokens.currLineLA(lineStart+2)) ){
-				return true;
-			}
-		}
+   // True if this is a subroutine declaration.
+   private boolean isSubDecl(int lineStart, int lineEnd) {
 
-		return false;
+      // Skip the prefix.
+      lineStart = skipPrefix(lineStart);
 
-	}	// end isSubDecl()
+      // Look at the first token to see if it is T_SUBROUTINE.
+      // If it is, AND a keyword/identifier immediately follows it, 
+      // then this is a subroutine declaration.
+      if (tokens.currLineLA(lineStart+1) == FortranLexer.T_SUBROUTINE) {
+         if (tokens.currLineLA(lineStart+2) == FortranLexer.T_IDENT
+             || lexer.isKeyword(tokens.currLineLA(lineStart+2)) ) {
+            return true;
+         }
+      }
+
+      return false;
+
+   } // end isSubDecl()
 
    private boolean isValidDataEditDesc(String line, int lineIndex) {
       char firstChar;
