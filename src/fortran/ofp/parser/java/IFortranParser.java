@@ -30,6 +30,8 @@ public abstract interface IFortranParser {
    public void block_data()              throws RecognitionException;
    public void subroutine_subprogram()   throws RecognitionException;
    public void ext_function_subprogram() throws RecognitionException;
+   
+   public boolean isTPrefixSpec(int token);
 
    public IFortranParserAction getAction();
 
