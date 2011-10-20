@@ -21,7 +21,7 @@ JAR=jar
 BUILDDIR=../../../build
 PARDIR=../
 
-FLAGS=--OFP
+FLAGS=--LOPExt
 
 check: runRuleTestsCheck
 
