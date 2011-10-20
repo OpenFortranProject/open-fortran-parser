@@ -75,10 +75,10 @@ public class FrontEnd implements Callable<Boolean> {
          }
       }
 
-      // check to see if using OFP parser extensions
+      // check to see if using LOPe parser extensions
       //
       for (int i = 0; i < args.length; i++) {
-         if (args[i].startsWith("--OFP")) {
+         if (args[i].startsWith("--LOPExt")) {
             lanlExtensions = true;
          }
       }
@@ -92,7 +92,7 @@ public class FrontEnd implements Callable<Boolean> {
       }
       else if (lanlExtensions == true) {
    	 if (verbose) {
-            System.out.println("FortranLexer: using OFP's research extensions");
+            System.out.println("FortranLexer: using OFP's LOPe research extensions");
          }
          this.parser = new FortranParserOFP(tokens);
       }
@@ -242,7 +242,7 @@ public class FrontEnd implements Callable<Boolean> {
             rice_caf = true;
             nArgs += 1;
             continue;
-         } else if (args[i].startsWith("--OFP")) {
+         } else if (args[i].startsWith("--LOPExt")) {
             newArgs.add(args[i]);
             lanl_extensions = true;
             nArgs += 1;
@@ -295,7 +295,7 @@ public class FrontEnd implements Callable<Boolean> {
       for (int i = 0; i < args.length; i++) {
          // skip args that are not files
          //
-         if (args[i].startsWith("--RiceCAF") | args[i].startsWith("--OFP") | 
+         if (args[i].startsWith("--RiceCAF") | args[i].startsWith("--LOPExt") | 
              args[i].startsWith("--dump")    | args[i].startsWith("--silent") |
              args[i].startsWith("--verbose") | args[i].startsWith("--tokens")) {
             continue;
