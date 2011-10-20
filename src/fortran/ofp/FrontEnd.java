@@ -22,7 +22,6 @@ package fortran.ofp;
 import java.io.*;
 
 // the concrete parser classes
-//import fortran.ofp.parser.java.FortranParser08;
 import fortran.ofp.parser.java.FortranParserExtras;
 import fortran.ofp.parser.java.FortranParserRiceCAF;
 import fortran.ofp.parser.java.FortranParserOFP;
@@ -181,34 +180,43 @@ public class FrontEnd implements Callable<Boolean> {
          //
          // due to Sale's algorithm, we know that if the token matches
          // then the parser should be able to successfully match.
+         //
          if (firstToken != FortranLexer.EOF) {
-            if (firstToken == FortranLexer.T_MODULE
-                  && tokens.LA(lookAhead) != FortranLexer.T_PROCEDURE) {
-               // try matching a module
-               error = parseModule(tokens, parser, start);
-            } else if (firstToken == FortranLexer.T_SUBMODULE) {
-               // try matching a submodule
-               error = parseSubmodule(tokens, parser, start);
-            } else if ( firstToken == FortranLexer.T_BLOCKDATA
-                    || (firstToken == FortranLexer.T_BLOCK
-                        && tokens.LA(lookAhead) == FortranLexer.T_DATA)) {
-               // try matching block data
-               error = parseBlockData(tokens, parser, start);
-            } else if (tokens.lookForToken(FortranLexer.T_SUBROUTINE) == true) {
+            // CER (2011.10.18): Module is now (F2008) a prefix-spec so
+            // must look for subroutine and functions before module stmts.
+            // Part of fix for bug 3425005.
+            if (tokens.lookForToken(FortranLexer.T_SUBROUTINE) == true) {
                // try matching a subroutine
                error = parseSubroutine(tokens, parser, start);
-            } else if (tokens.lookForToken(FortranLexer.T_FUNCTION) == true) {
+            }
+            else if (tokens.lookForToken(FortranLexer.T_FUNCTION) == true) {
                // try matching a function
                error = parseFunction(tokens, parser, start);
-            } else {
+            }
+            else if (firstToken == FortranLexer.T_MODULE
+                     && tokens.LA(lookAhead) != FortranLexer.T_PROCEDURE) {
+               // try matching a module
+               error = parseModule(tokens, parser, start);
+            }
+            else if (firstToken == FortranLexer.T_SUBMODULE) {
+               // try matching a submodule
+               error = parseSubmodule(tokens, parser, start);
+            }
+            else if ( firstToken == FortranLexer.T_BLOCKDATA
+                  || (firstToken == FortranLexer.T_BLOCK
+                  && tokens.LA(lookAhead) == FortranLexer.T_DATA)) {
+               // try matching block data
+               error = parseBlockData(tokens, parser, start);
+            }
+            else {
                // what's left should be a main program
                error = parseMainProgram(tokens, parser, start);
-            }// end else(unhandled token)
-         }// end if(file had nothing but comments empty)
+            } // end else(unhandled token)
+         } // end if(file had nothing but comments empty)
       } catch (RecognitionException e) {
          e.printStackTrace();
          error = true;
-      }// end try/catch(parsing program unit)
+      } // end try/catch(parsing program unit)
 
       return error;
    } // end parseProgramUnit()
