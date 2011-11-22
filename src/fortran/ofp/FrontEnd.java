@@ -226,6 +226,7 @@ public class FrontEnd implements Callable<Boolean> {
       Boolean verbose = false;
       Boolean silent = true;
       Boolean dumpTokens = false;
+      String tokenFile = null;
       ArrayList<String> newArgs = new ArrayList<String>(0);
       String type = "fortran.ofp.parser.java.FortranParserActionNull";
       int nArgs = 0;
@@ -261,6 +262,11 @@ public class FrontEnd implements Callable<Boolean> {
          } else if (args[i].startsWith("--silent")) {
              type = "fortran.ofp.parser.java.FortranParserActionPrint";
              silent = true;
+             nArgs += 1;
+             continue;
+         } else if (args[i].startsWith("--tokenfile")) {
+             tokenFile = args[i+1];
+             dumpTokens = true;
              nArgs += 1;
              continue;
          } else if (args[i].startsWith("--tokens")) {
@@ -328,7 +334,11 @@ public class FrontEnd implements Callable<Boolean> {
             }
 
             if (dumpTokens) {
-               ofp.tokens.outputTokenList(ofp.parser.getAction());
+                if (tokenFile != null) {
+                	ofp.tokens.outputTokenList(tokenFile);
+                } else {
+            		ofp.tokens.outputTokenList(ofp.parser.getAction());
+                }
             }
             else {
                error |= ofp.call();
