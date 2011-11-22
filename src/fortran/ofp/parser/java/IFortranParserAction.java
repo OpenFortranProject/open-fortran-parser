@@ -4536,6 +4536,20 @@ public abstract interface IFortranParserAction {
    public abstract void
    rice_spawn_stmt(Token label, Token spawn, Token eos, boolean hasEvent);
    
+   /**
+    * LOPe extensions
+    */
+   public abstract void lope_halo_stmt(Token label, Token keyword, Token eos, int count);
+   public abstract void lope_halo_decl(Token id);
+
+   public abstract void lope_halo_spec(int count);
+   public abstract void lope_halo_spec_element(int type);
+
+   public abstract void lope_halo_boundary_spec(int count);
+   public abstract void lope_halo_boundary_spec_element(int type);
+
+   public abstract void lope_exchange_halo_stmt(Token label, Token keyword, Token eos);
+
    /** 
     * next_token
     * This action is not part of the Fortran grammar.  It is used to output the token stream.
