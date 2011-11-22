@@ -18,6 +18,8 @@
 package fortran.ofp.parser.java;
 
 import java.util.*;
+import java.io.FileOutputStream;
+
 import org.antlr.runtime.*;
 
 import fortran.ofp.parser.java.FortranToken;
@@ -65,6 +67,7 @@ public class FortranTokenStream extends LegacyCommonTokenStream {
       }
       return super.LT(k);
    }
+
 
 /*******OBSOLETE
    public void fixupFixedFormat() {
@@ -536,24 +539,39 @@ OBSOLETE*****/
 
 
    public void outputTokenList(IFortranParserAction actions) {
-      ArrayList<Token> tmpArrayList = null;
       List tmpList = null;
 		      
       tmpList = super.getTokens();
-      tmpArrayList = new ArrayList<Token>(tmpList.size());
       for (int i = 0; i < tmpList.size(); i++) {
-  	     try {
-            tmpArrayList.add((Token)tmpList.get(i));
+         Token tk = (Token) tmpList.get(i);
+         actions.next_token(tk);
+      }
+   } // end outputTokenList()
+
+
+   public void outputTokenList(String filename) {
+      FileOutputStream fos = null;
+      List tmpList = null;
+
+      tmpList = super.getTokens();
+      try {
+         fos = new FileOutputStream(filename);
+      } catch(Exception e) {
+         System.out.println("ERROR: couldn't open tokenfile " + filename);
+         e.printStackTrace();
+         System.exit(1);
+      }
+      for (int i = 0; i < tmpList.size(); i++) {
+         Token tk = (Token) tmpList.get(i);
+         try {
+            fos.write(tk.toString().getBytes());
+            fos.write('\n');
          } catch(Exception e) {
             e.printStackTrace();
             System.exit(1);
          }
       }
 	      
-      for (int i = 0; i < tmpArrayList.size(); i++) {
-         Token tk = tmpArrayList.get(i);
-         actions.next_token(tk);
-      }
    } // end printTokenList()
 
 
@@ -564,8 +582,6 @@ OBSOLETE*****/
       try {
          tk = (Token)(packedList.get(lookAhead-1));
       } catch(Exception e) {
-//         e.printStackTrace();
-//         System.exit(1);
     	  return -1;
       }
       return tk.getType();
