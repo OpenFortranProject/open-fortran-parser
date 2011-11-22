@@ -320,7 +320,11 @@ other_specification_stmt
    |   target_stmt
    |   volatile_stmt
    |   value_stmt
+   |   other_spec_stmt_extension
    ;
+
+// language extension point
+other_spec_stmt_extension : T_NO_LANGUAGE_EXTENSION ;
 
 /*
  * R213-F08 executable-construct
@@ -4134,11 +4138,10 @@ stmt_label_list
 pause_stmt
 @init {Token tmpToken=null;}
 @after{checkForInclude();}
-    :   (lbl1=label)? T_PAUSE (lbl2=label {tmpToken=lbl2;} 
+   :   (lbl1=label)? T_PAUSE (lbl2=label {tmpToken=lbl2;} 
                  | char_literal_constant {tmpToken=null;})? end_of_stmt 
-            { action.pause_stmt(lbl1, $T_PAUSE, tmpToken, 
-                                $end_of_stmt.tk); }
-    ;
+            { action.pause_stmt(lbl1, $T_PAUSE, tmpToken, $end_of_stmt.tk); }
+   ;
 
 // R847
 // ERR_CHK 847 scalar_numeric_expr replaced by expr
