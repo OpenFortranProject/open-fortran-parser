@@ -35,6 +35,8 @@ public interface IActionEnums {
 	static final public int DeclarationTypeSpecBase=500;
 	static final public int IntentSpecBase=600;
 	static final public int ArraySpecElementBase=700;
+	static final public int HaloSpecElementBase=750;
+	static final public int HaloBndSpecElementBase=760;
 	static final public int AttrSpecBase=800;
 	static final public int BindingStatementTypeBase=900;
 	static final public int ComponentDefTypeBase=1000;
@@ -129,6 +131,14 @@ public interface IActionEnums {
 		ArraySpecElementBase+4;
 	static final public int ArraySpecElement_colon=
 		ArraySpecElementBase+5;
+
+	static final public int
+        HaloSpecElement_expr_colon_asterisk_colon_expr=HaloSpecElementBase+0;
+
+	static final public int
+        HaloBoundarySpecElement_expr_colon_asterisk_colon_expr=HaloBndSpecElementBase+0;
+	static final public int
+        HaloBoundarySpecElement_cyclic=HaloBndSpecElementBase+1;
 
 	static final public int AttrSpec_none=AttrSpecBase+0;
 	static final public int AttrSpec_access=AttrSpecBase+1;
