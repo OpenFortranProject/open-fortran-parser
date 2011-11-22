@@ -8,9 +8,9 @@ FortranParser08.tokens
 FortranParserExtras.java
 FortranParserExtras.tokens
 FortranParserExtras_FortranParser08.java
-FortranParserOFP.java
-FortranParserOFP.tokens
-FortranParserOFP_FortranParser08.java
+FortranParserLOPe.java
+FortranParserLOPe.tokens
+FortranParserLOPe_FortranParser08.java
 FortranParserRiceCAF.java
 FortranParserRiceCAF.tokens
 FortranParserRiceCAF_FortranParser08.java
