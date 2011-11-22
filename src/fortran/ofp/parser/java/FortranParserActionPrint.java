@@ -5262,6 +5262,56 @@ public class FortranParserActionPrint implements IFortranParserAction {
       printRuleTrailer();
    }
    
+   /***********************************************************
+    * LOPe extensions
+    ***********************************************************/
+
+   public void lope_halo_stmt(Token label, Token keyword, Token eos, int count) {
+      printRuleHeader(535, "lope-halo-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+
+   public void lope_halo_decl(Token id)
+   {
+      printRuleHeader(535, "lope-halo-decl");
+      printParameter(id, "id");
+      printRuleTrailer();
+   }
+
+   public void lope_halo_spec(int count) {
+      printRuleHeader(510, "lope-halo-spec");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+   public void lope_halo_spec_element(int type) {
+      printRuleHeader(510, "lope-halo-spec-element");
+      printParameter(type, "type");
+      printRuleTrailer();
+   }
+
+   public void lope_halo_boundary_spec(int count) {
+      printRuleHeader(510, "lope-halo-boundary-spec");
+      printParameter(count, "count");
+      printRuleTrailer();
+   }
+   public void lope_halo_boundary_spec_element(int type) {
+      printRuleHeader(510, "lope-halo-boundary-spec-element");
+      printParameter(type, "type");
+      printRuleTrailer();
+   }
+
+   public void lope_exchange_halo_stmt(Token label, Token keyword, Token eos) {
+      printRuleHeader(535, "lope-exchange-halo-stmt");
+      if (label!=null) printParameter(label, "label");
+      if (printKeywords) printParameter(keyword, "keyword");
+      if (printKeywords) printParameter(eos, "eos");
+      printRuleTrailer();
+   }
+
    /**
     * next_token
     * This action is not part of the Fortran grammar.  It is used to output the token stream.
