@@ -617,9 +617,12 @@ T_COPOINTER     :       'COPOINTER'     ;
 T_COTARGET      :       'COTARGET'      ;
 // end Rice additions ----------------------------
 
-// begin LANL additions --------------------------
+// begin LOPe additions --------------------------
 T_HALO          :       'HALO'          ;
-// end LANL additions ----------------------------
+T_BOUNDARY      :       'BOUNDARY'      ;
+T_CYCLIC        :       'CYCLIC'        ;
+T_EXCHANGE_HALO :       'EXCHANGE_HALO' ;
+// end LOPe additions ----------------------------
 
 // these tokens (without blank characters) are from 3.3.2.2
 //
