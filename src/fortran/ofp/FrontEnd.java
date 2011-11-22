@@ -24,7 +24,7 @@ import java.io.*;
 // the concrete parser classes
 import fortran.ofp.parser.java.FortranParserExtras;
 import fortran.ofp.parser.java.FortranParserRiceCAF;
-import fortran.ofp.parser.java.FortranParserOFP;
+import fortran.ofp.parser.java.FortranParserLOPe;
 
 import fortran.ofp.parser.java.FortranLexer;
 import fortran.ofp.parser.java.FortranLexicalPrepass;
@@ -94,7 +94,7 @@ public class FrontEnd implements Callable<Boolean> {
    	 if (verbose) {
             System.out.println("FortranLexer: using OFP's LOPe research extensions");
          }
-         this.parser = new FortranParserOFP(tokens);
+         this.parser = new FortranParserLOPe(tokens);
       }
       else {
          this.parser = new FortranParserExtras(tokens);
