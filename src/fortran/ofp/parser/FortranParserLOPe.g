@@ -272,15 +272,23 @@ type_declaration_stmt
 // language extension point
 //
 other_spec_stmt_extension
-@init {Token lbl=null; int count=1;}
+@init {
+   Token lbl=null;
+   boolean hbs = false;
+   boolean hcf = false;
+   int count=1;
+}
 @after{checkForInclude();}
    :   (label {lbl=$label.tk;})?
        T_HALO
-       ( (T_COMMA T_BOUNDARY T_LPAREN halo_boundary_spec T_RPAREN )?
+       (
+         (  (T_COMMA T_BOUNDARY T_LPAREN halo_boundary_spec T_RPAREN {hbs=true;})?
+            (T_COMMA                     halo_copy_fn                {hcf=true;})?
+         )
          T_COLON_COLON
        )?
        halo_decl ( T_COMMA halo_decl {count++;})* end_of_stmt
-           { action.lope_halo_stmt(lbl, $T_HALO, $end_of_stmt.tk, count); }
+           { action.lope_halo_stmt(lbl, $T_HALO, hbs, hcf, $end_of_stmt.tk, count); }
    ;
 
 exchange_halo_stmt
@@ -289,6 +297,12 @@ exchange_halo_stmt
    :   //(label {lbl=$label.tk;})?
        T_EXCHANGE_HALO T_LPAREN expr T_RPAREN end_of_stmt
            { action.lope_exchange_halo_stmt(lbl, $T_EXCHANGE_HALO, $end_of_stmt.tk); }
+   ;
+
+halo_copy_fn
+@init{int count=0;}
+   :   T_COPY_FN T_EQUALS T_IDENT
+           {action.lope_halo_copy_fn($T_IDENT);}
    ;
 
 halo_boundary_spec
@@ -316,8 +330,9 @@ halo_boundary_spec_element
    ;
 
 halo_decl
-   :   T_IDENT T_LPAREN halo_spec T_RPAREN
-           {action.lope_halo_decl($T_IDENT);}
+@init{boolean hasHaloSpec=false;}
+   :   T_IDENT ( T_LPAREN halo_spec T_RPAREN {hasHaloSpec=true;})?
+           {action.lope_halo_decl($T_IDENT,hasHaloSpec);}
    ;
 
 // Extension for the HALO attribute for dummy argument type declarations
@@ -340,12 +355,14 @@ halo_spec
 // 			1 expr (perhaps, expr value would be for both sides of halo)?
 halo_spec_element
 @init{int type=IActionEnums.HaloSpecElement_expr_colon_asterisk_colon_expr;}
-	:   expr T_COLON
-             T_ASTERISK
-             T_COLON
-        expr
-                { action.lope_halo_spec_element(type); }
-	;
+   :   expr T_COLON
+            T_ASTERISK
+            T_COLON
+       expr
+               { action.lope_halo_spec_element(type); }
+   |   T_COLON
+               { action.lope_halo_spec_element(IActionEnums.HaloSpecElement_colon); }
+   ;
 
 /*
  * R510-F08 deferred-coshape-spec
