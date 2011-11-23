@@ -1,0 +1,14 @@
+# ANTLR generated files
+#######################
+
+CFortranTokenLexer.h
+CFortranTokenLexer.c
+CFortranTokenParser.h
+CFortranTokenParser.c
+CFortranToken.tokens
+
+# other generated files
+#######################
+
+*.o
+ftokens
