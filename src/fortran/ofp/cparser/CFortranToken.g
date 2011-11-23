@@ -14,20 +14,49 @@ options {
 #include <stdio.h>
 #include "CFortranTokenLexer.h"
 
-FILE * fp;
-char * text_chars;
-int    text_len;
+/* current working token
+ */
+pANTLR3_COMMON_TOKEN   token;
+pANTLR3_TOKEN_FACTORY  tfactory;
+pANTLR3_STRING_FACTORY sfactory;
+
+/* token list
+ */
+pANTLR3_VECTOR toklist;
+
+void printToken(pANTLR3_COMMON_TOKEN tok)
+{
+   printf("[");
+     printf("@\%d,", (int)tok->getTokenIndex(tok));
+     printf("\%d:", (int)tok->getStartIndex(tok));
+     printf("\%d=", (int)tok->getStopIndex(tok));
+     printf("'\%s',", tok->getText(tok)->chars);
+     printf("<\%d>,", (int)tok->getType(tok));
+     if (tok->getChannel(tok) > ANTLR3_TOKEN_DEFAULT_CHANNEL) {
+        printf("channel=\%d,", (int)tok->getChannel(tok));
+     }
+     printf("\%d:", (int)tok->getLine(tok));
+     printf("\%d", (int)tok->getCharPositionInLine(tok));
+   printf("]\n");
+}
 
 int main(int argc, char * argv[])
 {
+   int i;
+
    pANTLR3_INPUT_STREAM          input;
    pCFortranTokenLexer           lex;
    pANTLR3_COMMON_TOKEN_STREAM   tokens;
    pCFortranTokenParser          parser;
 
-   fp = fopen("tokens.src.out", "w");
-   text_chars = strdup(" ");
+   /* initialize
+    */
+   toklist  = antlr3VectorNew(0);
+   tfactory = antlr3TokenFactoryNew(input);
+   sfactory = antlr3StringFactoryNew( ANTLR3_ENC_8BIT );
 
+   /* initialize antlr structures
+    */
    input   = antlr3FileStreamNew               ( (pANTLR3_UINT8) argv[1], ANTLR3_ENC_8BIT );
    lex     = CFortranTokenLexerNew             ( input );
    tokens  = antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, TOKENSOURCE(lex) );
@@ -35,27 +64,38 @@ int main(int argc, char * argv[])
 
    parser->ftokens(parser);
 
-   // must manually clean up
-   //
+   /* print tokens
+    */
+   for (i = 0; i < toklist->size(toklist); i++) {
+      printToken((pANTLR3_COMMON_TOKEN) toklist->get(toklist, i));
+   }
+
+   /* must manually clean up
+    */
    parser ->free(parser);
    tokens ->free(tokens);
    lex    ->free(lex);
    input  ->close(input);
-
-   fclose(fp);
-   free(text_chars);
 
    return 0;
 }
 
 }
 
+/*
+ * parser rules
+ */
+
 ftokens  :  ftoken ftoken*
          ;
 
 ftoken
-@init  {printf("[");}
-@after {printf("]\n");}
+@init {
+   token = tfactory->newToken(tfactory);
+}
+@after {
+   toklist->add(toklist, token, NULL);
+}
    :   '['
         ftoken_index  ','
         start_index   ':'
@@ -72,7 +112,7 @@ ftoken_index
    :   '@' NUMBER
           {
               int index = atoi($NUMBER.text->chars);
-              printf("@\%d,", index);
+              token->setTokenIndex(token, (ANTLR3_MARKER)index);
           }
    ;             
 
@@ -80,7 +120,7 @@ ftoken_type
    :   '<' NUMBER '>'
           {
              int type = atoi($NUMBER.text->chars);
-             printf("<\%d>,", type);
+             token->setType(token, (ANTLR3_UINT32)type);
           }
    ;             
 
@@ -88,7 +128,7 @@ channel_spec
    :   'channel' '=' NUMBER
           {
              int channel = atoi($NUMBER.text->chars);
-             printf("channel=\%d,", channel);
+             token->setChannel(token, (ANTLR3_UINT32)channel);
           }
    ;             
 
@@ -96,52 +136,48 @@ start_index
    :   NUMBER
           {
              int start = atoi($NUMBER.text->chars);
-             text_len = start;
-             printf("\%d:", start);
+             token->setStartIndex(token, (ANTLR3_MARKER)start);
           }
    ;
 
 stop_index
    :   NUMBER
           {
-              int stop = atoi($NUMBER.text->chars);
-              text_len = 1 + stop - text_len;
-              printf("\%d=", stop);
+             int stop = atoi($NUMBER.text->chars);
+             token->setStopIndex(token, (ANTLR3_MARKER)stop);
           }
    ;
 
 line
    :   NUMBER
           {
-              int line = atoi($NUMBER.text->chars);
-              printf("\%d:", line);
+             int line = atoi($NUMBER.text->chars);
+             token->setLine(token, (ANTLR3_UINT32)line);
           }
    ;
 
 column
    :   NUMBER
           {
-              int col = atoi($NUMBER.text->chars);
-              printf("\%d", col);
+             int pos = atoi($NUMBER.text->chars);
+             token->setCharPositionInLine(token, (ANTLR3_UINT32)pos);
           }
    ;
 
 text
    :   T_CHAR_CONSTANT
           {
+              char * text_chars = strdup( & $T_CHAR_CONSTANT.text->chars [1] );
+              int    text_len   = strlen(text_chars);
+
+              /* 'delete' the trailing quote character */
+              text_chars[text_len-1] = '\0';
+              text_len -= 1;
+
+              pANTLR3_STRING str = sfactory->newSize(sfactory, text_len);
+              str->set(str, text_chars);
+              token->setText(token, str);
               free(text_chars);
-              text_chars = strdup(& $T_CHAR_CONSTANT.text->chars [1]);
-              char * term = strrchr(text_chars, '\'');
-//              text_chars[term] = '\0';
-              *term = '\0';
-              printf("\%s,", $T_CHAR_CONSTANT.text->chars);
-              // TODO - there should be a better way to output '\n' and what about '\t'?
-              if (text_chars[0] == '\\' && text_chars[1] == 'n') {
-                 fprintf(fp, "\n");
-              }
-              else {
-                 fprintf(fp, "\%s", text_chars);
-              }
           }
    ;
 
