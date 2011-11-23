@@ -619,6 +619,7 @@ T_COTARGET      :       'COTARGET'      ;
 
 // begin LOPe additions --------------------------
 T_HALO          :       'HALO'          ;
+T_COPY_FN       :       'COPY_FN'       ;
 T_BOUNDARY      :       'BOUNDARY'      ;
 T_CYCLIC        :       'CYCLIC'        ;
 T_EXCHANGE_HALO :       'EXCHANGE_HALO' ;
