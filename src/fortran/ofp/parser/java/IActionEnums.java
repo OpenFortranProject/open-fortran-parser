@@ -133,7 +133,9 @@ public interface IActionEnums {
 		ArraySpecElementBase+5;
 
 	static final public int
-        HaloSpecElement_expr_colon_asterisk_colon_expr=HaloSpecElementBase+0;
+        HaloSpecElement_colon=HaloSpecElementBase+0;
+	static final public int
+        HaloSpecElement_expr_colon_asterisk_colon_expr=HaloSpecElementBase+1;
 
 	static final public int
         HaloBoundarySpecElement_expr_colon_asterisk_colon_expr=HaloBndSpecElementBase+0;

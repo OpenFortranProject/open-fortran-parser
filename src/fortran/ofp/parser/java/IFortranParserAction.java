@@ -4539,8 +4539,14 @@ public abstract interface IFortranParserAction {
    /**
     * LOPe extensions
     */
-   public abstract void lope_halo_stmt(Token label, Token keyword, Token eos, int count);
-   public abstract void lope_halo_decl(Token id);
+   public abstract
+   void lope_halo_stmt(Token label, Token keyword,
+                       boolean hasHaloBoundarySpec,
+                       boolean hasHaloCopyFn, Token eos, int count);
+
+   public abstract void lope_halo_decl(Token id, boolean hasHaloSpec);
+
+   public abstract void lope_halo_copy_fn(Token id);
 
    public abstract void lope_halo_spec(int count);
    public abstract void lope_halo_spec_element(int type);
