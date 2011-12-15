@@ -42,9 +42,9 @@
 extern "C" {
 #endif
 
-
 pANTLR3_TOKEN_SOURCE   ofpTokenSourceNew(pANTLR3_UINT8 fileName, pANTLR3_VECTOR tokens);
 
+typedef	struct OFP_TOKEN_SOURCE_struct * pOFP_TOKEN_SOURCE;
 
 /** Definition of a token source, which has a pointer to a function that 
  *  returns the next token.  This implementation stores the tokens in a
