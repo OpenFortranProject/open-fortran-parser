@@ -21,7 +21,10 @@ OFPTokenSource.o: OFPTokenSource.c
 CFortranTokenLexer.c: CFortranToken.g
 	java org.antlr.Tool $<
 
-ftoken-parser.o: ftoken-parser.c
+CFortranTokenParser.c: CFortranToken.g
+	java org.antlr.Tool $<
+
+ftoken-parser.o: ftoken-parser.c CFortranTokenLexer.c CFortranTokenParser.c
 	cc -c $(CFLAGS) $<
 
 check: ftokens
