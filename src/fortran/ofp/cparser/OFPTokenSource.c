@@ -15,13 +15,13 @@ nextToken (pANTLR3_TOKEN_SOURCE ts)
 pANTLR3_TOKEN_SOURCE
 ofpTokenSourceNew(pANTLR3_UINT8 fileName, pANTLR3_VECTOR tokens)
 {
-    pANTLR3_TOKEN_SOURCE   ts;
-    pANTLR3_STRING         str;
+    pOFP_TOKEN_SOURCE    ts;
+    pANTLR3_STRING       str;
 
     /* Memory for the interface structure
      */
     //ts  = (pANTLR3_TOKEN_SOURCE) ANTLR3_MALLOC(sizeof(ANTLR3_TOKEN_SOURCE));
-    ts  = (pANTLR3_TOKEN_SOURCE) ANTLR3_MALLOC(sizeof(OFP_TOKEN_SOURCE));
+    ts  = (pOFP_TOKEN_SOURCE) ANTLR3_MALLOC(sizeof(OFP_TOKEN_SOURCE));
 
     ts->super    = ts;
     ts->index    = 0;
@@ -44,5 +44,5 @@ ofpTokenSourceNew(pANTLR3_UINT8 fileName, pANTLR3_VECTOR tokens)
 
     ts->nextToken = nextToken;
 
-    return ts;
+    return (pANTLR3_TOKEN_SOURCE) ts;
 }
