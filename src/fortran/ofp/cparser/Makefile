@@ -6,8 +6,8 @@ GEN_SRC_FILES = CFortranTokenLexer.h CFortranTokenParser.h \
 
 all: ftokens
 
-ftokens: CFortranTokenLexer.o CFortranTokenParser.o OFPTokenStream.o
-	cc -o $@ -m32 $< CFortranTokenParser.o OFPTokenStream.o $(LIBS)
+ftokens: ftoken-parser.o CFortranTokenLexer.o CFortranTokenParser.o OFPTokenSource.o
+	cc -o $@ -m32 $< CFortranTokenLexer.o CFortranTokenParser.o OFPTokenSource.o $(LIBS)
 
 CFortranTokenLexer.o: CFortranTokenLexer.c
 	cc -c $(CFLAGS) $<
@@ -15,11 +15,14 @@ CFortranTokenLexer.o: CFortranTokenLexer.c
 CFortranTokenParser.o: CFortranTokenParser.c
 	cc -c $(CFLAGS) $<
 
-OFPTokenstream.o: OFPTokenStream.c
+OFPTokenSource.o: OFPTokenSource.c
 	cc -c $(CFLAGS) $<
 
 CFortranTokenLexer.c: CFortranToken.g
 	java org.antlr.Tool $<
+
+ftoken-parser.o: ftoken-parser.c
+	cc -c $(CFLAGS) $<
 
 check: ftokens
 	ftokens test.tokens
