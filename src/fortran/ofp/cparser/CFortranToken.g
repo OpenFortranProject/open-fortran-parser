@@ -16,69 +16,14 @@ options {
 
 /* current working token
  */
-pANTLR3_COMMON_TOKEN   token;
-pANTLR3_TOKEN_FACTORY  tfactory;
-pANTLR3_STRING_FACTORY sfactory;
+pANTLR3_COMMON_TOKEN  token;
 
 /* token list
  */
-pANTLR3_VECTOR toklist;
+extern pANTLR3_VECTOR  tlist;
 
-void printToken(pANTLR3_COMMON_TOKEN tok)
-{
-   printf("[");
-     printf("@\%d,", (int)tok->getTokenIndex(tok));
-     printf("\%d:", (int)tok->getStartIndex(tok));
-     printf("\%d=", (int)tok->getStopIndex(tok));
-     printf("'\%s',", tok->getText(tok)->chars);
-     printf("<\%d>,", (int)tok->getType(tok));
-     if (tok->getChannel(tok) > ANTLR3_TOKEN_DEFAULT_CHANNEL) {
-        printf("channel=\%d,", (int)tok->getChannel(tok));
-     }
-     printf("\%d:", (int)tok->getLine(tok));
-     printf("\%d", (int)tok->getCharPositionInLine(tok));
-   printf("]\n");
-}
-
-int main(int argc, char * argv[])
-{
-   int i;
-
-   pANTLR3_INPUT_STREAM          input;
-   pCFortranTokenLexer           lex;
-   pANTLR3_COMMON_TOKEN_STREAM   tokens;
-   pCFortranTokenParser          parser;
-
-   /* initialize
-    */
-   toklist  = antlr3VectorNew(0);
-   tfactory = antlr3TokenFactoryNew(input);
-   sfactory = antlr3StringFactoryNew( ANTLR3_ENC_8BIT );
-
-   /* initialize antlr structures
-    */
-   input   = antlr3FileStreamNew               ( (pANTLR3_UINT8) argv[1], ANTLR3_ENC_8BIT );
-   lex     = CFortranTokenLexerNew             ( input );
-   tokens  = antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, TOKENSOURCE(lex) );
-   parser  = CFortranTokenParserNew            ( tokens );
-
-   parser->ftokens(parser);
-
-   /* print tokens
-    */
-   for (i = 0; i < toklist->size(toklist); i++) {
-      printToken((pANTLR3_COMMON_TOKEN) toklist->get(toklist, i));
-   }
-
-   /* must manually clean up
-    */
-   parser ->free(parser);
-   tokens ->free(tokens);
-   lex    ->free(lex);
-   input  ->close(input);
-
-   return 0;
-}
+extern pANTLR3_TOKEN_FACTORY   tfactory;
+extern pANTLR3_STRING_FACTORY  sfactory;
 
 }
 
@@ -94,7 +39,7 @@ ftoken
    token = tfactory->newToken(tfactory);
 }
 @after {
-   toklist->add(toklist, token, NULL);
+   tlist->add(tlist, token, NULL);
 }
    :   '['
         ftoken_index  ','
