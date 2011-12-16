@@ -2,7 +2,7 @@ parser grammar CFortranParser;
 
 options {
    language=C;
-   tokenVocab=CFortranLexer;
+   tokenVocab=FortranLexer;
 
    // If generating AST or a tree walker...
    //
