@@ -90,17 +90,16 @@ options {
 // Removed from grammar and called explicitly
 //
 
-/*
- * R1101-F08 main-program
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+/* R1101-F08 main-program
  *  is [ program-stmt ]
  *        [ specification-part ]
  *        [ execution-part ]
  *        [ internal-subprogram-part ]
  *        end-program-stmt
  */
-
-////////////
-// R1101-F08
+//
 //
 // We need a start rule as a entry point in the parser
 //
@@ -110,19 +109,20 @@ options {
 main_program
 @init
 {
-   ANTLR3_BOOLEAN hasProgramStmt = ANTLR3_FALSE;
-   int hasExecutionPart = 0;
-   int hasInternalSubprogramPart = 0;
-   //action.main_program__begin();
+   ANTLR3_BOOLEAN  hasProgramStmt              = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN  hasExecutionPart            = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN  hasInternalSubprogramPart   = ANTLR3_FALSE;
+   //c_action_main_program__begin();
 }
-   :   ( program_stmt {hasProgramStmt = 0;} )?
+@after
+{
+   //c_action_main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart);
+}
+   :   ( program_stmt {hasProgramStmt = ANTLR3_FALSE;} )?
 //       specification_part
 //       ( execution_part {hasExecutionPart = true;} )?
 //       ( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
 //       end_program_stmt
-//         {
-//           action.main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart);
-//         }
    ;
 
 
