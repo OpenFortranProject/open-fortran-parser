@@ -40,7 +40,7 @@ fparser.o: fparser.c CFortranParser.c
 	cc -c $(CFLAGS) $<
 
 check: fparser
-	fparser test-parser.tokens
+	@fparser test-parser.tokens test-parser.f90
 
 clean:
 	rm -f *.o fparser CFortranToken.tokens $(GEN_SRC_FILES) $(OBJS) fparser.o
