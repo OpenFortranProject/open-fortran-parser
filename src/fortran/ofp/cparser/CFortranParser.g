@@ -110,7 +110,7 @@ options {
 main_program
 @init
 {
-   int hasProgramStmt = 0;
+   ANTLR3_BOOLEAN hasProgramStmt = ANTLR3_FALSE;
    int hasExecutionPart = 0;
    int hasInternalSubprogramPart = 0;
    //action.main_program__begin();
