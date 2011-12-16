@@ -30,7 +30,7 @@ CFortranTokenParser.o: CFortranTokenParser.c
 CFortranParser.o: CFortranParser.c
 	cc -c $(CFLAGS) $<
 
-OFPTokenSource.o: OFPTokenSource.c
+OFPTokenSource.o: OFPTokenSource.c OFPTokenSource.h
 	cc -c $(CFLAGS) $<
 
 ftoken-parser.o: ftoken-parser.c CFortranTokenLexer.c CFortranTokenParser.c
