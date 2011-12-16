@@ -90,7 +90,7 @@ options {
 // Removed from grammar and called explicitly
 //
 
-//////////////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------------------
 //
 /* R1101-F08 main-program
  *  is [ program-stmt ]
@@ -101,11 +101,10 @@ options {
  */
 //
 //
-// We need a start rule as a entry point in the parser
+// This is one of the entry points to the parser.
 //
-// specification_part made non-optional to remove END ambiguity
-//   (as can be empty)
-//
+// specification_part made non-optional to remove END ambiguity (as it can be empty)
+//----------------------------------------------------------------------------------------
 main_program
 @init
 {
