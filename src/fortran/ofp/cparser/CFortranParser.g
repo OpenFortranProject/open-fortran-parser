@@ -10,11 +10,40 @@ options {
    ASTLabelType=pANTLR3_BASE_TREE;
 }
 
+/*
+ * This is the header for the Java target.
+ */
+///@header {
+///package fortran.ofp.parser.java;
+///}
+
 @members {
 
 #include    <stdio.h>
 
+/*
+ * These are the members for the Java target.
+ */
+///   int gCount1;
+///   int gCount2;
+///
+///   public void initialize(String[] args, String kind, String filename, String path)
+///   {
+///      action = FortranParserActionFactory.newAction(args, this, kind, filename);
+///      initialize(this, action, filename, path);
+///      action.start_of_file(filename, path);
+///   }
+///
+///   public void eofAction()
+///   {
+///      action.end_of_file(filename, pathname);
+///   }
+
 }
+
+//tokens {
+//   OFP_Program;
+//}
 
 /*
  * Section/Clause 1: Overview
@@ -90,20 +119,39 @@ options {
 // Removed from grammar and called explicitly
 //
 
+
+//----------------------------------------------------------------------------------------
+//
+/* R312-F08 label
+ *   is digit [digit [digit [digit [digit ]]]]
+ */
+//
+// This should be checked to make sure the label is five characters or less.
+//
+//----------------------------------------------------------------------------------------
+label
+   :  T_DIGIT_STRING
+          {
+              //action.label($T_DIGIT_STRING);
+          }
+   ;
+
+
 //----------------------------------------------------------------------------------------
 //
 /* R1101-F08 main-program
- *  is [ program-stmt ]
- *        [ specification-part ]
- *        [ execution-part ]
- *        [ internal-subprogram-part ]
- *        end-program-stmt
+ *   is [ program-stmt ]
+ *         [ specification-part ]
+ *         [ execution-part ]
+ *         [ internal-subprogram-part ]
+ *         end-program-stmt
  */
 //
 //
 // This is one of the entry points to the parser.
 //
 // specification_part made non-optional to remove END ambiguity (as it can be empty)
+//
 //----------------------------------------------------------------------------------------
 main_program
 @init
@@ -118,10 +166,13 @@ main_program
    //c_action_main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart);
 }
    :   ( program_stmt {hasProgramStmt = ANTLR3_FALSE;} )?
+
 //       specification_part
 //       ( execution_part {hasExecutionPart = true;} )?
 //       ( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
-//       end_program_stmt
+
+         end_program_stmt
+   -> ^(program_stmt)
    ;
 
 
@@ -132,15 +183,93 @@ main_program
  */
 
 
-// R1102
+//----------------------------------------------------------------------------------------
+//
+/* R1102-F08 program-stmt
+ *   is PROGRAM [ program-name ]
+ */
+//
 // T_IDENT inlined for program_name
+//
+//----------------------------------------------------------------------------------------
 program_stmt
-//@init {Token lbl = null;} // @init{INIT_TOKEN_NULL(lbl);}
-//@after{checkForInclude();}
-	:	/*(label {lbl=$label.tk;})?*/ T_PROGRAM T_IDENT //end_of_stmt
-//		{ action.program_stmt(lbl, $T_PROGRAM, $T_IDENT, $end_of_stmt.tk); }
-       {
-          printf("program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
-                                            $T_IDENT  ->getText($T_IDENT)  ->chars  );
-       }
-	;
+@init
+{
+   pANTLR3_COMMON_TOKEN  lbl = NULL;
+}
+@after
+{
+   //checkForInclude();
+}
+   :   (label {lbl=$label.start;})?
+       T_PROGRAM!  T_IDENT  end_of_stmt
+
+          {
+             //c_action_program_stmt(lbl, $T_PROGRAM, $T_IDENT, $end_of_stmt.start);
+             printf("program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
+                                               $T_IDENT  ->getText($T_IDENT)  ->chars  );
+          }
+
+   ;
+
+
+//----------------------------------------------------------------------------------------
+//
+/* R1103-F08 end-program-stmt
+ *   is END [ PROGRAM [ program-name ] ]
+ */
+//
+// T_IDENT inlined for program_name
+//
+//----------------------------------------------------------------------------------------
+end_program_stmt
+@init
+{
+   pANTLR3_COMMON_TOKEN  lbl = NULL;
+   pANTLR3_COMMON_TOKEN  id  = NULL;
+}
+@after
+{
+   //checkForInclude();
+}
+   :  (label {lbl=$label.start;})?
+      T_END  T_PROGRAM  (T_IDENT {id=$T_IDENT;})?   end_of_stmt
+
+         {
+             //action.end_program_stmt(lbl, $T_END, $T_PROGRAM, id, $end_of_stmt.start);
+             printf("end_program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
+                                                   $T_IDENT  ->getText($T_IDENT)  ->chars  );
+         }
+
+   |   (label {lbl=$label.start;})?
+       T_ENDPROGRAM     (T_IDENT {id=$T_IDENT;})?   end_of_stmt
+
+         {
+             //action.end_program_stmt(lbl, $T_ENDPROGRAM, null, id, $end_of_stmt.start);
+         }
+
+   |   (label {lbl=$label.start;})?
+       T_END                                        end_of_stmt
+
+         {
+             //action.end_program_stmt(lbl, $T_END, null, null, $end_of_stmt.start);
+         }
+
+   ;
+
+
+//----------------------------------------------------------------------------------------
+// This rule added to allow matching of T_EOS or EOF combination.
+//----------------------------------------------------------------------------------------
+end_of_stmt
+   :  T_EOS
+          {
+              //action.end_of_stmt($T_EOS);
+          }
+    ->
+   |  T_EOF
+          {
+             //action.end_of_stmt($T_EOF);
+          }
+    ->
+   ;
