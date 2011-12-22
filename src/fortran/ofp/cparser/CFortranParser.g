@@ -132,7 +132,7 @@ options {
 label
    :  T_DIGIT_STRING
           {
-              //action.label($T_DIGIT_STRING);
+              c_action_label($T_DIGIT_STRING);
           }
    ;
 
@@ -159,19 +159,20 @@ main_program
    ANTLR3_BOOLEAN  hasProgramStmt              = ANTLR3_FALSE;
    ANTLR3_BOOLEAN  hasExecutionPart            = ANTLR3_FALSE;
    ANTLR3_BOOLEAN  hasInternalSubprogramPart   = ANTLR3_FALSE;
-   //c_action_main_program__begin();
+   c_action_main_program__begin();
 }
 @after
 {
-   //c_action_main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart);
+   c_action_main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart);
 }
    :   ( program_stmt {hasProgramStmt = ANTLR3_FALSE;} )?
 
-//       specification_part
-//       ( execution_part {hasExecutionPart = true;} )?
-//       ( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
+       specification_part
+       ( execution_part {hasExecutionPart = true;} )?
+       ( internal_subprogram_part {hasInternalSubprogramPart = true;} )?
 
-         end_program_stmt
+       end_program_stmt
+
    -> ^(program_stmt)
    ;
 
@@ -199,13 +200,13 @@ program_stmt
 }
 @after
 {
-   //checkForInclude();
+   checkForInclude();
 }
    :   (label {lbl=$label.start;})?
        T_PROGRAM!  T_IDENT  end_of_stmt
 
           {
-             //c_action_program_stmt(lbl, $T_PROGRAM, $T_IDENT, $end_of_stmt.start);
+             c_action_program_stmt(lbl, $T_PROGRAM, $T_IDENT, $end_of_stmt.start);
              printf("program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
                                                $T_IDENT  ->getText($T_IDENT)  ->chars  );
           }
@@ -230,13 +231,13 @@ end_program_stmt
 }
 @after
 {
-   //checkForInclude();
+   checkForInclude();
 }
    :  (label {lbl=$label.start;})?
       T_END  T_PROGRAM  (T_IDENT {id=$T_IDENT;})?   end_of_stmt
 
           {
-             //action.end_program_stmt(lbl, $T_END, $T_PROGRAM, id, $end_of_stmt.start);
+             c_action_end_program_stmt(lbl, $T_END, $T_PROGRAM, id, $end_of_stmt.start);
              printf("end_program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
                                                    $T_IDENT  ->getText($T_IDENT)  ->chars  );
           }
@@ -245,14 +246,14 @@ end_program_stmt
        T_ENDPROGRAM     (T_IDENT {id=$T_IDENT;})?   end_of_stmt
 
           {
-             //action.end_program_stmt(lbl, $T_ENDPROGRAM, null, id, $end_of_stmt.start);
+             c_action_end_program_stmt(lbl, $T_ENDPROGRAM, null, id, $end_of_stmt.start);
           }
 
    |   (label {lbl=$label.start;})?
        T_END                                        end_of_stmt
 
           {
-             //action.end_program_stmt(lbl, $T_END, null, null, $end_of_stmt.start);
+             c_action_end_program_stmt(lbl, $T_END, null, null, $end_of_stmt.start);
           }
 
    ;
@@ -273,7 +274,7 @@ end_program_stmt
 module
 @after
 {
-   //c_action_module();
+   c_action_module();
 }
    :   module_stmt
 //       specification_part
@@ -293,17 +294,17 @@ module_stmt
 {
    pANTLR3_COMMON_TOKEN  lbl = NULL;
    pANTLR3_COMMON_TOKEN  id  = NULL;
-   //action.module_stmt__begin();
+   c_action_module_stmt__begin();
 }
 @after
 {
-   //checkForInclude();
+   checkForInclude();
 }
    :   (label {lbl=$label.start;})?
        T_MODULE!  ( T_IDENT {id=$T_IDENT;} )?   end_of_stmt
 
            {
-              //c_action_module_stmt(lbl, $T_MODULE, id, $end_of_stmt.start);
+              c_action_module_stmt(lbl, $T_MODULE, id, $end_of_stmt.start);
            }
 
    ;
@@ -324,44 +325,44 @@ end_module_stmt
 }
 @after
 {
-   //checkForInclude();
+   checkForInclude();
 }
    :   (label {lbl=$label.start;})?
        T_END!  T_MODULE!  (T_IDENT {id=$T_IDENT;})?  end_of_stmt
 
            {
-              //c_action_end_module_stmt(lbl, $T_END, $T_MODULE, id, $end_of_stmt.start);
+              c_action_end_module_stmt(lbl, $T_END, $T_MODULE, id, $end_of_stmt.start);
            }
 
    |   (label {lbl=$label.start;})?
        T_ENDMODULE!       (T_IDENT {id=$T_IDENT;})?  end_of_stmt
 
            {
-              //c_action_end_module_stmt(lbl, $T_ENDMODULE, null, id, $end_of_stmt.start);
+              c_action_end_module_stmt(lbl, $T_ENDMODULE, null, id, $end_of_stmt.start);
            }
 
    |   (label {lbl=$label.start;})?
        T_END                                         end_of_stmt
 
            {
-              //c_action_end_module_stmt(lbl, $T_END, null, id, $end_of_stmt.start);
+              c_action_end_module_stmt(lbl, $T_END, null, id, $end_of_stmt.start);
            }
 
    ;
 
 
-//----------------------------------------------------------------------------------------
+//========================================================================================
 // This rule added to allow matching of T_EOS or EOF combination.
 //----------------------------------------------------------------------------------------
 end_of_stmt
    :  T_EOS
           {
-             //c_action_end_of_stmt($T_EOS);
+             c_action_end_of_stmt($T_EOS);
           }
     ->
    |  T_EOF
           {
-            //c_action_end_of_stmt($T_EOF);
+            c_action_end_of_stmt($T_EOF);
           }
     ->
    ;
