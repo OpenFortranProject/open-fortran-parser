@@ -120,7 +120,7 @@ options {
 //
 
 
-//----------------------------------------------------------------------------------------
+//========================================================================================
 //
 /* R312-F08 label
  *   is digit [digit [digit [digit [digit ]]]]
@@ -137,7 +137,7 @@ label
    ;
 
 
-//----------------------------------------------------------------------------------------
+//========================================================================================
 //
 /* R1101-F08 main-program
  *   is [ program-stmt ]
@@ -183,7 +183,7 @@ main_program
  */
 
 
-//----------------------------------------------------------------------------------------
+//========================================================================================
 //
 /* R1102-F08 program-stmt
  *   is PROGRAM [ program-name ]
@@ -213,7 +213,7 @@ program_stmt
    ;
 
 
-//----------------------------------------------------------------------------------------
+//========================================================================================
 //
 /* R1103-F08 end-program-stmt
  *   is END [ PROGRAM [ program-name ] ]
@@ -235,25 +235,117 @@ end_program_stmt
    :  (label {lbl=$label.start;})?
       T_END  T_PROGRAM  (T_IDENT {id=$T_IDENT;})?   end_of_stmt
 
-         {
+          {
              //action.end_program_stmt(lbl, $T_END, $T_PROGRAM, id, $end_of_stmt.start);
              printf("end_program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
                                                    $T_IDENT  ->getText($T_IDENT)  ->chars  );
-         }
+          }
 
    |   (label {lbl=$label.start;})?
        T_ENDPROGRAM     (T_IDENT {id=$T_IDENT;})?   end_of_stmt
 
-         {
+          {
              //action.end_program_stmt(lbl, $T_ENDPROGRAM, null, id, $end_of_stmt.start);
-         }
+          }
 
    |   (label {lbl=$label.start;})?
        T_END                                        end_of_stmt
 
-         {
+          {
              //action.end_program_stmt(lbl, $T_END, null, null, $end_of_stmt.start);
-         }
+          }
+
+   ;
+
+
+//========================================================================================
+//
+/* R1104-F08 module
+ *   is module-stmt
+ *         [ specification-part ]
+ *         [ module-subprogram-part ]
+ *         end-module-stmt
+ */
+//
+// specification_part made non-optional to remove END ambiguity (as it can be empty)
+//
+//----------------------------------------------------------------------------------------
+module
+@after
+{
+   //c_action_module();
+}
+   :   module_stmt
+//       specification_part
+//       ( module_subprogram_part )?
+       end_module_stmt
+   ;
+
+//========================================================================================
+//
+/* R1105-F08 module-stmt
+ *   is MODULE module-name
+ */
+//
+//----------------------------------------------------------------------------------------
+module_stmt
+@init
+{
+   pANTLR3_COMMON_TOKEN  lbl = NULL;
+   pANTLR3_COMMON_TOKEN  id  = NULL;
+   //action.module_stmt__begin();
+}
+@after
+{
+   //checkForInclude();
+}
+   :   (label {lbl=$label.start;})?
+       T_MODULE!  ( T_IDENT {id=$T_IDENT;} )?   end_of_stmt
+
+           {
+              //c_action_module_stmt(lbl, $T_MODULE, id, $end_of_stmt.start);
+           }
+
+   ;
+
+
+//========================================================================================
+//
+/* R1106-F08 end-program-stmt
+ *   is END [ MODULE [ module-name ] ]
+ */
+//
+//----------------------------------------------------------------------------------------
+end_module_stmt
+@init
+{
+   pANTLR3_COMMON_TOKEN  lbl = NULL;
+   pANTLR3_COMMON_TOKEN  id  = NULL;
+}
+@after
+{
+   //checkForInclude();
+}
+   :   (label {lbl=$label.start;})?
+       T_END!  T_MODULE!  (T_IDENT {id=$T_IDENT;})?  end_of_stmt
+
+           {
+              //c_action_end_module_stmt(lbl, $T_END, $T_MODULE, id, $end_of_stmt.start);
+           }
+
+   |   (label {lbl=$label.start;})?
+       T_ENDMODULE!       (T_IDENT {id=$T_IDENT;})?  end_of_stmt
+
+           {
+              //c_action_end_module_stmt(lbl, $T_ENDMODULE, null, id, $end_of_stmt.start);
+           }
+
+   |   (label {lbl=$label.start;})?
+       T_END                                         end_of_stmt
+
+           {
+              //c_action_end_module_stmt(lbl, $T_END, null, id, $end_of_stmt.start);
+           }
 
    ;
 
@@ -264,12 +356,12 @@ end_program_stmt
 end_of_stmt
    :  T_EOS
           {
-              //action.end_of_stmt($T_EOS);
+             //c_action_end_of_stmt($T_EOS);
           }
     ->
    |  T_EOF
           {
-             //action.end_of_stmt($T_EOF);
+            //c_action_end_of_stmt($T_EOF);
           }
     ->
    ;
