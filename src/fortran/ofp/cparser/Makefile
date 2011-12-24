@@ -3,9 +3,13 @@ LIBS = -lantlr3c
 
 GEN_SRC_FILES = CFortranTokenLexer.h CFortranTokenParser.h \
                 CFortranTokenLexer.c CFortranTokenParser.c \
-                CFortranParser.h     CFortranParser.c
+                CFortranParser.h     CFortranParser.c      \
+                FTreeWalker.h        FTreeWalker.c
 
-OBJS = ftoken-parser.o CFortranTokenLexer.o CFortranTokenParser.o CFortranParser.o OFPTokenSource.o
+OBJS = ftoken-parser.o CFortranTokenLexer.o CFortranTokenParser.o  \
+       CFortranParser.o OFPTokenSource.o                           \
+       FortranParserActionNull.o                                   \
+       FTreeWalker.o
 
 all: fparser
 
@@ -16,6 +20,9 @@ CFortranTokenLexer.c: CFortranToken.g
 	java org.antlr.Tool $<
 
 CFortranTokenParser.c: CFortranToken.g
+	java org.antlr.Tool $<
+
+FTreeWalker.c: FTreeWalker.g
 	java org.antlr.Tool $<
 
 CFortranParser.c: CFortranParser.g
