@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include "OFPTokenSource.h"
 #include "CFortranParser.h"
+#include "FTreeWalker.h"
 
-pANTLR3_VECTOR    get_tokens(const char * token_file);
-void              printToken(pANTLR3_COMMON_TOKEN tok);
+pANTLR3_VECTOR   get_tokens(const char * token_file);
 
 int main(int argc, char * argv[])
 {
@@ -13,6 +13,8 @@ int main(int argc, char * argv[])
    pANTLR3_TOKEN_SOURCE           tsource;
    pANTLR3_COMMON_TOKEN_STREAM    tstream;
    pCFortranParser                parser;
+
+   CFortranParser_main_program_return main_ast;
    
    char * tok_file = argv[1];
    char * src_file = argv[2];
@@ -31,7 +33,7 @@ int main(int argc, char * argv[])
    /* print tokens
     */
    //   for (i = 0; i < tlist->size(tlist); i++) {
-   //      printToken((pANTLR3_COMMON_TOKEN) tlist->get(tlist, i));
+   //      print_token((pANTLR3_COMMON_TOKEN) tlist->get(tlist, i));
    //   }
 
    /* Parser phase
@@ -43,7 +45,31 @@ int main(int argc, char * argv[])
    tstream  =  antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, tsource );
    parser   = CFortranParserNew                  ( tstream );
 
-   parser->main_program(parser);
+   main_ast = parser->main_program(parser);
+
+   if (parser->pParser->rec->state->errorCount > 0)
+   {
+      fprintf(stderr, "The parser returned %d errors, tree walking aborted.\n", parser->pParser->rec->state->errorCount);
+   }
+   else
+   {
+      pANTLR3_COMMON_TREE_NODE_STREAM nodes;
+      pFTreeWalker tree_parser;
+
+      printf("Tree : %s\n", main_ast.tree->toStringTree(main_ast.tree)->chars);
+
+      nodes = antlr3CommonTreeNodeStreamNewTree(main_ast.tree, ANTLR3_SIZE_HINT);
+
+      tree_parser = FTreeWalkerNew(nodes);
+      tree_parser->main_program(tree_parser);
+
+      nodes       ->free(nodes);          nodes       = NULL;
+      tree_parser ->free(tree_parser);    tree_parser = NULL;
+   }
+
+   parser  ->free(parser);                parser      = NULL;
+   tstream ->free(tstream);               tstream     = NULL;
+   // TODO tsource ->free(tsource);               tsource     = NULL;
 
    return 0;
 }
