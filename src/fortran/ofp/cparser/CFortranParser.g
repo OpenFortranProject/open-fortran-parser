@@ -534,14 +534,14 @@ extended_intrinsic_op
 label
    :  T_DIGIT_STRING
           {
-              c_action_label($T_DIGIT_STRING);
+             c_action_label($T_DIGIT_STRING);
           }
    ;
 
 
 // c_action_label called here to store label in action class
 label_list
-@init{ int count=0;}
+@init{int count=0;}
     :  		{c_action_label_list__begin();}
 		lbl=label {count++;} 
             ( T_COMMA lbl=label {count++;} )*
@@ -2409,11 +2409,14 @@ common_stmt
 common_block_name returns [pANTLR3_COMMON_TOKEN id]
 @init
 {
-   pANTLR3_COMMON_TOKEN id;
+   retval.id = NULL;
 }
-	: T_SLASH_SLASH {id=NULL;}
-	| T_SLASH (T_IDENT)? T_SLASH {id=$T_IDENT;}
-	;
+   :   T_SLASH_SLASH
+   |   T_SLASH  T_IDENT?  T_SLASH
+           {
+              retval.id=$T_IDENT;
+           }
+   ;
 
 // R558
 // T_IDENT inlined for variable_name and proc_pointer_name
@@ -2503,10 +2506,11 @@ designator_or_func_ref
 substring_range_or_arg_list returns [ANTLR3_BOOLEAN isSubstringRange]
 @init
 {
-   int count = 0;
-   ANTLR3_BOOLEAN hasUpperBound = ANTLR3_FALSE;
-   ANTLR3_BOOLEAN isSubstringRange = ANTLR3_FALSE;
-   pANTLR3_COMMON_TOKEN keyword = NULL;
+   int                   count          = 0;
+   ANTLR3_BOOLEAN        hasUpperBound  = ANTLR3_FALSE;
+   pANTLR3_COMMON_TOKEN  keyword        = NULL;
+
+   retval.isSubstringRange = ANTLR3_FALSE;
 }
 @after
 {
@@ -2516,7 +2520,7 @@ substring_range_or_arg_list returns [ANTLR3_BOOLEAN isSubstringRange]
 			{
                 // hasLowerBound=false
                 c_action_substring_range(ANTLR3_FALSE, hasUpperBound);	
-                isSubstringRange=ANTLR3_TRUE;
+                retval.isSubstringRange=ANTLR3_TRUE;
 			}
    |        { 
                 /* mimic actual-arg-spec-list */
@@ -2524,7 +2528,7 @@ substring_range_or_arg_list returns [ANTLR3_BOOLEAN isSubstringRange]
 			}
        expr substr_range_or_arg_list_suffix
 			{
-                isSubstringRange = $substr_range_or_arg_list_suffix.isSubstringRange;
+                retval.isSubstringRange = $substr_range_or_arg_list_suffix.isSubstringRange;
 			}
    |        {
                 /* mimic actual-arg-spec-list */
@@ -2539,7 +2543,6 @@ substring_range_or_arg_list returns [ANTLR3_BOOLEAN isSubstringRange]
        ( T_COMMA actual_arg_spec {count++;} )*
 			{
                 c_action_actual_arg_spec_list(count);
-                isSubstringRange = ANTLR3_FALSE;
 			}
    |        {
                 /* mimic actual-arg-spec-list */
@@ -2554,16 +2557,16 @@ substring_range_or_arg_list returns [ANTLR3_BOOLEAN isSubstringRange]
         ( T_COMMA actual_arg_spec {count++;} )*
 			{
                 c_action_actual_arg_spec_list(count);
-                isSubstringRange = ANTLR3_FALSE;
 			}
 	;
 
 substr_range_or_arg_list_suffix returns [ANTLR3_BOOLEAN isSubstringRange]
 @init
 {
-   int            count            = 0;
-   ANTLR3_BOOLEAN hasUpperBound    = ANTLR3_FALSE;
-   ANTLR3_BOOLEAN isSubstringRange = ANTLR3_FALSE;
+   int             count          = 0;
+   ANTLR3_BOOLEAN  hasUpperBound  = ANTLR3_FALSE;
+
+   retval.isSubstringRange = ANTLR3_FALSE;
 }
 @after
 {
@@ -2577,7 +2580,7 @@ substr_range_or_arg_list_suffix returns [ANTLR3_BOOLEAN isSubstringRange]
             {
                 // hasLowerBound=true
                 c_action_substring_range(ANTLR3_TRUE, hasUpperBound);
-                isSubstringRange = ANTLR3_TRUE;
+                retval.isSubstringRange = ANTLR3_TRUE;
             }
    |
             {
@@ -2588,7 +2591,6 @@ substr_range_or_arg_list_suffix returns [ANTLR3_BOOLEAN isSubstringRange]
         ( T_COMMA actual_arg_spec {count++;} )*
             {
                 c_action_actual_arg_spec_list(count);
-                isSubstringRange = ANTLR3_FALSE;
             }  // actual_arg_spec_list
    ;
 
