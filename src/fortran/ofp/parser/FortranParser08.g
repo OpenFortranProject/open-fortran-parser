@@ -1218,13 +1218,12 @@ private_components_stmt
 
 // R448
 type_bound_procedure_part
-@init{int count=0; boolean hasBindingPrivateStmt = false;}
-	:	contains_stmt
-        ( binding_private_stmt {hasBindingPrivateStmt=true;})? 
-        proc_binding_stmt ( proc_binding_stmt {count++;})*
-			{action.type_bound_procedure_part(count, 
-                                              hasBindingPrivateStmt);}
-	;
+@init{int count=1; boolean hasBindingPrivateStmt=false;}
+   :   contains_stmt
+       ( binding_private_stmt  {hasBindingPrivateStmt=true;} )?
+       proc_binding_stmt ( proc_binding_stmt {count++;} )*
+           {action.type_bound_procedure_part(count,hasBindingPrivateStmt);}
+   ;
 
 // R449
 binding_private_stmt
@@ -2216,7 +2215,7 @@ saved_entity_list
 // R546, R555-F08
 // T_IDENT inlined for object_name
 target_stmt
-@init {Token lbl = null;int count=1;}
+@init {Token lbl = null;}
 @after{checkForInclude();}
    :   (label {lbl=$label.tk;})?
        T_TARGET ( T_COLON_COLON )? target_decl_list end_of_stmt
