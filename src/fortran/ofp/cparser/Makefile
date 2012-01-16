@@ -1,19 +1,23 @@
 CFLAGS = -g -m32 -I.
 LIBS = -lantlr3c
 
-GEN_SRC_FILES = CFortranTokenLexer.h CFortranTokenParser.h \
-                CFortranTokenLexer.c CFortranTokenParser.c \
-                CFortranParser.h     CFortranParser.c      \
-                FTreeWalker.h        FTreeWalker.c
+GEN_SRC_FILES = CFortranTokenLexer.c CFortranTokenParser.c \
+                CFortranParser.c     FTreeWalker.c
+
+GEN_HDR_FILES = CFortranTokenLexer.h CFortranTokenParser.h \
+                CFortranParser.h     FTreeWalker.h
 
 OBJS = ftoken-parser.o CFortranTokenLexer.o CFortranTokenParser.o  \
        CFortranParser.o OFPTokenSource.o                           \
        FortranParserActionNull.o                                   \
        FTreeWalker.o
 
-all: fparser
+all: fparser unparse
 
 fparser: fparser.o $(OBJS)
+	cc -o $@ -m32 $< $(OBJS) $(LIBS)
+
+unparse: unparse.o $(OBJS)
 	cc -o $@ -m32 $< $(OBJS) $(LIBS)
 
 CFortranTokenLexer.c: CFortranToken.g
@@ -43,11 +47,14 @@ OFPTokenSource.o: OFPTokenSource.c OFPTokenSource.h
 ftoken-parser.o: ftoken-parser.c CFortranTokenLexer.c CFortranTokenParser.c
 	cc -c $(CFLAGS) $<
 
-fparser.o: fparser.c CFortranParser.c
+fparser.o: fparser.c $(GEN_SRC_FILES)
 	cc -c $(CFLAGS) $<
 
-check: fparser
-	@fparser test-parser.tokens test-parser.f90
+unparse.o: unparse.c $(GEN_SRC_FILES)
+	cc -c $(CFLAGS) $<
+
+check: unparse
+	@unparse test-parser.tokens test-parser.f90
 
 clean:
-	rm -f *.o fparser CFortranToken.tokens $(GEN_SRC_FILES) $(OBJS) fparser.o
+	rm -f *.o fparser CFortranToken.tokens $(GEN_SRC_FILES) $(GEN_HDR_FILES) $(OBJS) fparser.o
