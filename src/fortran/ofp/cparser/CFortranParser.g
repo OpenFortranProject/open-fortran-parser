@@ -1,3 +1,11 @@
+//
+// TODO:
+//   1. Fix lexer so that the single quote "'" character can be in the text
+//   2. Fix to work without a program_stmt (just an end_program_stmt)
+//   3. Implement CheckForIncludes
+//   4. Implememt error handling
+//
+
 parser grammar CFortranParser;
 
 options {
@@ -11,6 +19,7 @@ options {
 }
 
 tokens {
+   LabelNameStmt;
    SgProgramHeaderStatement;
 }
 
@@ -5002,7 +5011,7 @@ main_program
 
        end_program_stmt
 
-   -> ^(SgProgramHeaderStatement program_stmt end_program_stmt)
+   -> ^(SgProgramHeaderStatement program_stmt? end_program_stmt)
    ;
 
 
@@ -5044,14 +5053,15 @@ program_stmt
    checkForInclude();
 }
    :   (label {lbl=$label.start;})?
-       T_PROGRAM!  T_IDENT  end_of_stmt
+       T_PROGRAM  T_IDENT  end_of_stmt
 
           {
              c_action_program_stmt(lbl, $T_PROGRAM, $T_IDENT, $end_of_stmt.start);
-//             printf("program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
-//                                               $T_IDENT  ->getText($T_IDENT)  ->chars  );
+             //printf("program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
+             //                                  $T_IDENT  ->getText($T_IDENT)  ->chars  );
           }
 
+   -> ^(LabelNameStmt T_IDENT label?)
    ;
 
 
@@ -5075,26 +5085,29 @@ end_program_stmt
    checkForInclude();
 }
    :  (label {lbl=$label.start;})?
-      T_END!  T_PROGRAM!  (T_IDENT {id=$T_IDENT;})?  end_of_stmt
+      T_END  T_PROGRAM  (T_IDENT {id=$T_IDENT;})?  end_of_stmt
 
           {
              c_action_end_program_stmt(lbl, $T_END, $T_PROGRAM, id, $end_of_stmt.start);
           }
 
+   -> ^(LabelNameStmt T_IDENT? label?)
    |   (label {lbl=$label.start;})?
-       T_ENDPROGRAM!     (T_IDENT {id=$T_IDENT;})?   end_of_stmt
+       T_ENDPROGRAM     (T_IDENT {id=$T_IDENT;})?  end_of_stmt
 
           {
              c_action_end_program_stmt(lbl, $T_ENDPROGRAM, NULL, id, $end_of_stmt.start);
           }
 
+   -> ^(LabelNameStmt T_IDENT? label?)
    |   (label {lbl=$label.start;})?
-       T_END!                                        end_of_stmt
+       T_END                                       end_of_stmt
 
           {
              c_action_end_program_stmt(lbl, $T_END, NULL, NULL, $end_of_stmt.start);
           }
 
+   -> ^(LabelNameStmt label?)
    ;
 
 
