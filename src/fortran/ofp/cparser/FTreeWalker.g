@@ -80,10 +80,11 @@ unparse(pANTLR3_BASE_TREE btn, ANTLR3_MARKER next)
  * Section/Clause 2: Fortran concepts
  */
 
+
 // R204
 specification_part
-   :   ( use_stmt )*
-       ( import_stmt )*
+   :   ( use_stmt              )*
+       ( import_stmt           )*
        ( declaration_construct )*
    ;
 
@@ -101,6 +102,7 @@ declaration_construct
    |   other_specification_stmt
    |   type_declaration_stmt
    |   stmt_function_stmt
+
    ;
 
 // R208
@@ -322,15 +324,13 @@ type_param_value
 
 // R403
 intrinsic_type_spec
-   :   T_INTEGER               ( kind_selector )?
-   |   T_REAL                  ( kind_selector )?
-   |   T_DOUBLE T_PRECISION
-   |   T_DOUBLEPRECISION
-   |   T_COMPLEX               ( kind_selector )?
-   |   T_DOUBLE T_COMPLEX
-   |   T_DOUBLECOMPLEX
-   |   T_CHARACTER             ( char_selector )?
-   |   T_LOGICAL               ( kind_selector )?
+   :   SgTypeInt       kind_selector?
+   |   SgTypeFloat     kind_selector?
+   |   SgTypeDouble
+   |   SgTypeComplex   kind_selector?
+   |   SgTypeDComplex                      // TODO - what is the real SgType?
+   |   SgTypeChar      char_selector?
+   |   SgTypeBool      kind_selector?
    ;
 
 // R404
@@ -796,9 +796,7 @@ scalar_int_variable
 
 // R501
 type_declaration_stmt
-   :   label? declaration_type_spec
-       ( (T_COMMA attr_spec )* T_COLON_COLON )?
-       entity_decl_list end_of_stmt
+   :   ^(SgVariableDeclaration declaration_type_spec entity_decl+ label?)
    ;
 
 // R502
@@ -839,19 +837,19 @@ attr_spec
 // language extension point
 attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 
+
 ////////////
 // R503-F08, R504-F03
 //
 entity_decl
-   :   T_IDENT ( T_LPAREN array_spec T_RPAREN  )?
-               ( T_LBRACKET coarray_spec T_RBRACKET  )?
-               ( T_ASTERISK char_length  )?
-               ( initialization  )?
+//   :   T_IDENT ( T_LPAREN array_spec T_RPAREN  )?
+//               ( T_LBRACKET coarray_spec T_RBRACKET  )?
+//               ( T_ASTERISK char_length  )?
+//               ( initialization  )?
+
+   :  ^(SgInitializedName T_IDENT array_spec?)
    ;
 
-entity_decl_list
-   :   entity_decl  ( T_COMMA entity_decl  )*
-   ;
 
 ////////////
 // R505-F03, R504-F08
@@ -2609,7 +2607,11 @@ v_list
 // R1101-F08 main-program
 //----------------------------------------------------------------------------------------
 main_program
-   :   ^(SgProgramHeaderStatement program_stmt? end_program_stmt)
+   :   ^(SgProgramHeaderStatement program_stmt? end_program_stmt
+           ^(SgFunctionDefinition 
+               ^(SgBasicBlock specification_part)
+            )
+        )
    ;
 
 
@@ -2622,7 +2624,7 @@ ext_function_subprogram
 // R1102-F08 program-stmt
 //----------------------------------------------------------------------------------------
 program_stmt
-   :  ^(LabelNameStmt T_IDENT label?)
+   :  ^(BeginStmt T_IDENT label?)
    ;
 
 
@@ -2630,7 +2632,7 @@ program_stmt
 // R1103-F08 end-program-stmt
 //----------------------------------------------------------------------------------------
 end_program_stmt
-   :  ^(LabelNameStmt T_IDENT? label?)
+   :  ^(EndStmt T_IDENT? label?)
    ;
 
 
