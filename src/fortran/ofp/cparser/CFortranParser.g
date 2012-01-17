@@ -19,8 +19,24 @@ options {
 }
 
 tokens {
-   LabelNameStmt;
+   BeginStmt;
+   EndStmt;
+
+   // Sage nodes
+   //
    SgProgramHeaderStatement;
+   SgFunctionDefinition;
+   SgBasicBlock;
+   SgVariableDeclaration;
+   SgInitializedName;
+
+   SgTypeInt;
+   SgTypeFloat;
+   SgTypeDouble;
+   SgTypeComplex;
+   SgTypeDComplex;     // TODO - what is the real SgType?
+   SgTypeChar;
+   SgTypeBool;
 }
 
 /*
@@ -154,12 +170,13 @@ void checkForInclude() {return;}
 // ERR_CHK 204 see ERR_CHK 207, implicit_part? removed (was after import_stmt*)
 specification_part
 @init{int numUseStmts=0; int numImportStmts=0; int numDeclConstructs=0;}
-	:	( use_stmt {numUseStmts++;})*
-		( import_stmt {numImportStmts++;})*
-		( declaration_construct {numDeclConstructs++;})*
-			{c_action_specification_part(numUseStmts, numImportStmts, 
-                                       0, numDeclConstructs);}
-	;
+   :   ( use_stmt               {numUseStmts++;}       )*
+       ( import_stmt            {numImportStmts++;}    )*
+       ( declaration_construct  {numDeclConstructs++;} )*
+           {
+              c_action_specification_part(numUseStmts, numImportStmts,0,numDeclConstructs);
+           }
+   ;
 
 // R205 implicit_part removed from grammar (see ERR_CHK 207)
 
@@ -590,43 +607,71 @@ type_param_value
 //	|	T_DOUBLECOMPLEX
 intrinsic_type_spec
 @init{ANTLR3_BOOLEAN hasKindSelector = ANTLR3_FALSE;}
-	:	T_INTEGER (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
-			{c_action_intrinsic_type_spec($T_INTEGER, NULL, 
-                                        IActionEnums_ IntrinsicTypeSpec_INTEGER,
-                                        hasKindSelector);}
-	|	T_REAL (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
-			{c_action_intrinsic_type_spec($T_REAL, NULL, 
-                                        IActionEnums_ IntrinsicTypeSpec_REAL, 
-                                        hasKindSelector);}
-	|	T_DOUBLE T_PRECISION
-			{c_action_intrinsic_type_spec($T_DOUBLE, $T_PRECISION, 
-                                        IActionEnums_ IntrinsicTypeSpec_DOUBLEPRECISION, 
-                                        ANTLR3_FALSE);}
-	|	T_DOUBLEPRECISION
-			{c_action_intrinsic_type_spec($T_DOUBLEPRECISION, NULL, 
-                                        IActionEnums_ IntrinsicTypeSpec_DOUBLEPRECISION, 
-                                        ANTLR3_FALSE);}
-	|	T_COMPLEX (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
-			{c_action_intrinsic_type_spec($T_COMPLEX, NULL, 
-                                        IActionEnums_ IntrinsicTypeSpec_COMPLEX,
-                                        hasKindSelector);}
-	|	T_DOUBLE T_COMPLEX
-			{c_action_intrinsic_type_spec($T_DOUBLE, $T_COMPLEX, 
-                                        IActionEnums_ IntrinsicTypeSpec_DOUBLECOMPLEX, 
-                                        ANTLR3_FALSE);}
-	|	T_DOUBLECOMPLEX
-			{c_action_intrinsic_type_spec($T_DOUBLECOMPLEX, NULL, 
-                                        IActionEnums_ IntrinsicTypeSpec_DOUBLECOMPLEX, 
-                                        ANTLR3_FALSE);}
-	|	T_CHARACTER (char_selector {hasKindSelector = ANTLR3_TRUE;})?
-			{c_action_intrinsic_type_spec($T_CHARACTER, NULL, 
-                                        IActionEnums_ IntrinsicTypeSpec_CHARACTER, 
-                                        hasKindSelector);}
-	|	T_LOGICAL (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
-			{c_action_intrinsic_type_spec($T_LOGICAL, NULL, 
-                                        IActionEnums_ IntrinsicTypeSpec_LOGICAL,
-                                        hasKindSelector);}
-	;
+   :   T_INTEGER (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
+           {
+              c_action_intrinsic_type_spec($T_INTEGER,NULL,IActionEnums_ IntrinsicTypeSpec_INTEGER,hasKindSelector);
+           }
+
+    -> SgTypeInt kind_selector?
+
+   |   T_REAL (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
+           {
+              c_action_intrinsic_type_spec($T_REAL,NULL,IActionEnums_ IntrinsicTypeSpec_REAL,hasKindSelector);
+           }
+
+    -> SgTypeFloat kind_selector?
+
+   |   T_DOUBLE T_PRECISION
+           {
+              c_action_intrinsic_type_spec($T_DOUBLE,$T_PRECISION,IActionEnums_ IntrinsicTypeSpec_DOUBLEPRECISION,ANTLR3_FALSE);
+           }
+
+    -> SgTypeDouble
+
+   |   T_DOUBLEPRECISION
+           {
+              c_action_intrinsic_type_spec($T_DOUBLEPRECISION,NULL,IActionEnums_ IntrinsicTypeSpec_DOUBLEPRECISION,ANTLR3_FALSE);
+           }
+
+    -> SgTypeDouble
+
+   |   T_COMPLEX (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
+           {
+              c_action_intrinsic_type_spec($T_COMPLEX,NULL,IActionEnums_ IntrinsicTypeSpec_COMPLEX,hasKindSelector);
+           }
+
+    -> SgTypeComplex kind_selector?
+
+   |   T_DOUBLE T_COMPLEX
+           {
+              c_action_intrinsic_type_spec($T_DOUBLE,$T_COMPLEX,IActionEnums_ IntrinsicTypeSpec_DOUBLECOMPLEX,ANTLR3_FALSE);
+           }
+
+    -> SgTypeDComplex
+
+   |   T_DOUBLECOMPLEX
+           {
+              c_action_intrinsic_type_spec($T_DOUBLECOMPLEX,NULL,IActionEnums_ IntrinsicTypeSpec_DOUBLECOMPLEX,ANTLR3_FALSE);
+           }
+
+    -> SgTypeDComplex
+
+   |   T_CHARACTER (char_selector {hasKindSelector = ANTLR3_TRUE;})?
+           {
+              c_action_intrinsic_type_spec($T_CHARACTER,NULL,IActionEnums_ IntrinsicTypeSpec_CHARACTER,hasKindSelector);
+           }
+
+    -> SgTypeChar char_selector?
+
+   |   T_LOGICAL (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
+           {
+              c_action_intrinsic_type_spec($T_LOGICAL,NULL,IActionEnums_ IntrinsicTypeSpec_LOGICAL,hasKindSelector);
+           }
+
+    -> SgTypeBool kind_selector?
+
+    ;
+
 
 // R404
 // ERR_CHK 404 scalar_int_initialization_expr replaced by expr
@@ -1528,24 +1573,25 @@ type_declaration_stmt
    :   (label {lbl=$label.start;})? declaration_type_spec
        ( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
        entity_decl_list end_of_stmt
-           { c_action_type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.start); }
+          {
+             c_action_type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.start);
+          }
+
+   -> ^(SgVariableDeclaration declaration_type_spec entity_decl_list label?)
+
    ;
 
 // R502
 declaration_type_spec
-	:	intrinsic_type_spec
-			{ c_action_declaration_type_spec(NULL, 
-                IActionEnums_ DeclarationTypeSpec_INTRINSIC); }
-	|	T_TYPE T_LPAREN	derived_type_spec T_RPAREN
-			{ c_action_declaration_type_spec($T_TYPE, 
-                IActionEnums_ DeclarationTypeSpec_TYPE); }
-	|	T_CLASS	T_LPAREN derived_type_spec T_RPAREN
-			{ c_action_declaration_type_spec($T_CLASS, 
-                IActionEnums_ DeclarationTypeSpec_CLASS); }
-	|	T_CLASS T_LPAREN T_ASTERISK T_RPAREN
-			{ c_action_declaration_type_spec($T_CLASS,
-                IActionEnums_ DeclarationTypeSpec_unlimited); }
-	;
+   :   intrinsic_type_spec
+            { c_action_declaration_type_spec(NULL,IActionEnums_ DeclarationTypeSpec_INTRINSIC); }
+   |   T_TYPE T_LPAREN derived_type_spec T_RPAREN
+            { c_action_declaration_type_spec($T_TYPE,IActionEnums_ DeclarationTypeSpec_TYPE); }
+   |   T_CLASS T_LPAREN derived_type_spec T_RPAREN
+            { c_action_declaration_type_spec($T_CLASS,IActionEnums_ DeclarationTypeSpec_CLASS); }
+   |   T_CLASS T_LPAREN T_ASTERISK T_RPAREN
+            { c_action_declaration_type_spec($T_CLASS,IActionEnums_ DeclarationTypeSpec_unlimited); }
+   ;
 
 
 /*
@@ -1651,14 +1697,22 @@ entity_decl
              c_action_entity_decl($T_IDENT, hasArraySpec,
                                 hasCoarraySpec, hasCharLength, hasInitialization);
           }
+   -> ^(SgInitializedName T_IDENT)
    ;
 
+
 entity_decl_list
-@init{int count = 0;}
-    :		{c_action_entity_decl_list__begin();}
-    	entity_decl {count += 1;} ( T_COMMA entity_decl {count += 1;} )*
-    		{c_action_entity_decl_list(count);}
-    ;
+@init
+{
+   int count = 0;
+   c_action_entity_decl_list__begin();
+}
+   :   entity_decl {count += 1;}  ( T_COMMA!  entity_decl  {count += 1;} )*
+          {
+             c_action_entity_decl_list(count);
+          }
+   ;
+
 
 /*
  * R505-F03 object-name
@@ -5011,7 +5065,11 @@ main_program
 
        end_program_stmt
 
-   -> ^(SgProgramHeaderStatement program_stmt? end_program_stmt)
+   -> ^(SgProgramHeaderStatement program_stmt? end_program_stmt
+          ^(SgFunctionDefinition 
+              ^(SgBasicBlock specification_part)
+           )
+       )
    ;
 
 
@@ -5061,7 +5119,7 @@ program_stmt
              //                                  $T_IDENT  ->getText($T_IDENT)  ->chars  );
           }
 
-   -> ^(LabelNameStmt T_IDENT label?)
+   -> ^(BeginStmt T_IDENT label?)
    ;
 
 
@@ -5091,7 +5149,8 @@ end_program_stmt
              c_action_end_program_stmt(lbl, $T_END, $T_PROGRAM, id, $end_of_stmt.start);
           }
 
-   -> ^(LabelNameStmt T_IDENT? label?)
+   -> ^(EndStmt T_IDENT? label?)
+
    |   (label {lbl=$label.start;})?
        T_ENDPROGRAM     (T_IDENT {id=$T_IDENT;})?  end_of_stmt
 
@@ -5099,7 +5158,8 @@ end_program_stmt
              c_action_end_program_stmt(lbl, $T_ENDPROGRAM, NULL, id, $end_of_stmt.start);
           }
 
-   -> ^(LabelNameStmt T_IDENT? label?)
+   -> ^(EndStmt T_IDENT? label?)
+
    |   (label {lbl=$label.start;})?
        T_END                                       end_of_stmt
 
@@ -5107,7 +5167,8 @@ end_program_stmt
              c_action_end_program_stmt(lbl, $T_END, NULL, NULL, $end_of_stmt.start);
           }
 
-   -> ^(LabelNameStmt label?)
+   -> ^(EndStmt label?)
+
    ;
 
 
