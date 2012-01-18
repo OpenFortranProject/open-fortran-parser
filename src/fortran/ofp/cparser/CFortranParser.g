@@ -276,9 +276,9 @@ internal_subprogram
 @after {
     c_action_internal_subprogram();
 }
-	:	( prefix )? function_subprogram
-	|	subroutine_subprogram
-	;
+   :   ( prefix )? function_subprogram
+   |   subroutine_subprogram
+   ;
 
 /*
  * R212-F08 other-specification-stmt   // NEW_NAME_2008 (was specification-stmt)
@@ -435,16 +435,18 @@ constant
    ;
 
 scalar_constant
-@after {
-    c_action_scalar_constant();
+@after
+{
+   c_action_scalar_constant();
 }
-    :    constant
-    ;
+   :    constant
+   ;
 
 // R306
 literal_constant
-@after {
-    c_action_literal_constant();
+@after
+{
+   c_action_literal_constant();
 }
    :   int_literal_constant
    |   real_literal_constant
@@ -461,17 +463,17 @@ literal_constant
 // C302 R308 int_constant shall be of type integer
 // inlined integer portion of constant
 int_constant
-	:	int_literal_constant	{ c_action_int_constant(NULL); }
-	|	T_IDENT					{ c_action_int_constant($T_IDENT); }
-	;
+   :   int_literal_constant    { c_action_int_constant(NULL); }
+   |   T_IDENT                 { c_action_int_constant($T_IDENT); }
+   ;
 
 // R309
 // C303 R309 char_constant shall be of type character
 // inlined character portion of constant
 char_constant
-	:	char_literal_constant	{ c_action_int_constant(NULL); }
-	|	T_IDENT					{ c_action_int_constant($T_IDENT); }
-	;
+   :   char_literal_constant   { c_action_int_constant(NULL); }
+   |   T_IDENT                 { c_action_int_constant($T_IDENT); }
+   ;
 
 // R310
 intrinsic_operator
@@ -493,11 +495,11 @@ intrinsic_operator
 // R311
 // removed defined_unary_op or defined_binary_op ambiguity with T_DEFINED_OP
 defined_operator
-	:	T_DEFINED_OP			
+   :   T_DEFINED_OP            
             { c_action_defined_operator($T_DEFINED_OP, ANTLR3_FALSE); }
-	|	extended_intrinsic_op	
+   |   extended_intrinsic_op   
             { c_action_defined_operator($extended_intrinsic_op.start, ANTLR3_TRUE); }
-	;
+   ;
 
 // R312
 extended_intrinsic_op
@@ -534,7 +536,7 @@ label_list
    c_action_label_list__begin();
 }
    :   lbl=label {count++;}  ( T_COMMA lbl=label {count++;} )*
-      	   {
+           {
               c_action_label_list(count);
            }
    ;
@@ -547,20 +549,21 @@ label_list
 
 // R401
 type_spec
-@after {
+@after
+{
     c_action_type_spec();
 }
-	:	intrinsic_type_spec
-	|	derived_type_spec
-	;
+   :   intrinsic_type_spec
+   |   derived_type_spec
+   ;
 
 // R402
 // ERR_CHK 402 scalar_int_expr replaced by expr
 type_param_value
-	:	expr		{ c_action_type_param_value(ANTLR3_TRUE, ANTLR3_FALSE, ANTLR3_FALSE); }
-	|	T_ASTERISK	{ c_action_type_param_value(ANTLR3_FALSE, ANTLR3_TRUE, ANTLR3_FALSE); }
-	|	T_COLON 	{ c_action_type_param_value(ANTLR3_FALSE, ANTLR3_FALSE, ANTLR3_TRUE); }
-	;
+   :   expr        { c_action_type_param_value(ANTLR3_TRUE, ANTLR3_FALSE, ANTLR3_FALSE); }
+   |   T_ASTERISK  { c_action_type_param_value(ANTLR3_FALSE, ANTLR3_TRUE, ANTLR3_FALSE); }
+   |   T_COLON     { c_action_type_param_value(ANTLR3_FALSE, ANTLR3_FALSE, ANTLR3_TRUE); }
+   ;
 
 // inlined scalar_int_expr C101 shall be a scalar
 
@@ -568,8 +571,8 @@ type_param_value
 
 // R403
 // Nonstandard Extension: source BLAS
-//	|	T_DOUBLE T_COMPLEX
-//	|	T_DOUBLECOMPLEX
+//  |   T_DOUBLE T_COMPLEX
+//  |   T_DOUBLECOMPLEX
 intrinsic_type_spec
 @init{ANTLR3_BOOLEAN hasKindSelector = ANTLR3_FALSE;}
    :   T_INTEGER (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
@@ -635,36 +638,36 @@ intrinsic_type_spec
 
     -> SgTypeBool kind_selector?
 
-    ;
+   ;
 
 
 // R404
 // ERR_CHK 404 scalar_int_initialization_expr replaced by expr
 // Nonstandard extension: source common practice
-//	| T_ASTERISK T_DIGIT_STRING  // e.g., COMPLEX*16	
+//  | T_ASTERISK T_DIGIT_STRING  // e.g., COMPLEX*16    
 // TODO - check to see if second alternative is where it should go
 kind_selector
 @init{pANTLR3_COMMON_TOKEN tk1=NULL; pANTLR3_COMMON_TOKEN tk2=NULL;}
-    : T_LPAREN (T_KIND T_EQUALS {tk1=$T_KIND; tk2=$T_EQUALS;})? expr T_RPAREN
-    	{ c_action_kind_selector(tk1, tk2, ANTLR3_TRUE); } 
-    | T_ASTERISK T_DIGIT_STRING
-    	{ c_action_kind_selector($T_ASTERISK, $T_DIGIT_STRING, ANTLR3_FALSE); }	
-    ;
+   :  T_LPAREN (T_KIND T_EQUALS {tk1=$T_KIND; tk2=$T_EQUALS;})? expr T_RPAREN
+         { c_action_kind_selector(tk1, tk2, ANTLR3_TRUE); } 
+   |  T_ASTERISK T_DIGIT_STRING
+         { c_action_kind_selector($T_ASTERISK, $T_DIGIT_STRING, ANTLR3_FALSE); } 
+   ;
 
 // R405
 signed_int_literal_constant
 @init{pANTLR3_COMMON_TOKEN sign = NULL;} 
-	:	(T_PLUS {sign=$T_PLUS;} | T_MINUS {sign=$T_MINUS;})?
-		int_literal_constant
-			{ c_action_signed_int_literal_constant(sign); }
-	;
+   :   (T_PLUS {sign=$T_PLUS;} | T_MINUS {sign=$T_MINUS;})?
+       int_literal_constant
+            { c_action_signed_int_literal_constant(sign); }
+   ;
 
 // R406
 int_literal_constant
 @init{pANTLR3_COMMON_TOKEN kind = NULL;} 
-	:	T_DIGIT_STRING (T_UNDERSCORE kind_param {kind = $kind_param.start;})?
-			{c_action_int_literal_constant($T_DIGIT_STRING, kind);}
-	;
+   :   T_DIGIT_STRING (T_UNDERSCORE kind_param {kind = $kind_param.start;})?
+            {c_action_int_literal_constant($T_DIGIT_STRING, kind);}
+   ;
 
 // R407
 // T_IDENT inlined for scalar_int_constant_name
@@ -683,10 +686,10 @@ kind_param
 
 // R411
 boz_literal_constant
-	:	BINARY_CONSTANT { c_action_boz_literal_constant($BINARY_CONSTANT); }
-	|	OCTAL_CONSTANT { c_action_boz_literal_constant($OCTAL_CONSTANT); }
-	|	HEX_CONSTANT { c_action_boz_literal_constant($HEX_CONSTANT); }
-	;
+   :   BINARY_CONSTANT { c_action_boz_literal_constant($BINARY_CONSTANT); }
+   |   OCTAL_CONSTANT  { c_action_boz_literal_constant($OCTAL_CONSTANT); }
+   |   HEX_CONSTANT    { c_action_boz_literal_constant($HEX_CONSTANT); }
+   ;
 
 // R412 binary-constant converted to terminal
 
@@ -699,21 +702,21 @@ boz_literal_constant
 // R416
 signed_real_literal_constant
 @init{pANTLR3_COMMON_TOKEN sign = NULL;} 
-	:	(T_PLUS {sign=$T_PLUS;} | T_MINUS {sign=$T_MINUS;})?
-		real_literal_constant
-			{c_action_signed_real_literal_constant(sign);}
-	;
+   :   (T_PLUS {sign=$T_PLUS;} | T_MINUS {sign=$T_MINUS;})?
+       real_literal_constant
+            {c_action_signed_real_literal_constant(sign);}
+   ;
 
 // R417 modified to use terminal
 // Grammar Modified slightly to prevent problems with input such as: 
 // if(1.and.1) then ... 
 real_literal_constant
 @init{pANTLR3_COMMON_TOKEN kind = NULL;} 
-//		WARNING must parse T_REAL_CONSTANT in action (look for D)
-    :   T_REAL_CONSTANT (T_UNDERSCORE kind_param {kind = $kind_param.start;})? 
+//      WARNING must parse T_REAL_CONSTANT in action (look for D)
+   :   T_REAL_CONSTANT (T_UNDERSCORE kind_param {kind = $kind_param.start;})? 
             { c_action_real_literal_constant($T_REAL_CONSTANT, kind); }
         
-    ;
+   ;
 
 // R418 significand converted to fragment
 
@@ -723,33 +726,34 @@ real_literal_constant
 
 // R421
 complex_literal_constant
-@after {
+@after
+{
     c_action_complex_literal_constant();
 }
-	:	T_LPAREN real_part T_COMMA imag_part T_RPAREN
-	;
+   :   T_LPAREN real_part T_COMMA imag_part T_RPAREN
+   ;
 
 // R422
 // ERR_CHK 422 named_constant replaced by T_IDENT
 real_part
-	:	signed_int_literal_constant	 
+   :   signed_int_literal_constant  
             { c_action_real_part(ANTLR3_TRUE, ANTLR3_FALSE, NULL); }
-	|	signed_real_literal_constant 
+   |   signed_real_literal_constant 
             { c_action_real_part(ANTLR3_FALSE, ANTLR3_TRUE, NULL); }
-	|	T_IDENT					     
+   |   T_IDENT                      
             { c_action_real_part(ANTLR3_FALSE, ANTLR3_FALSE, $T_IDENT); }
-	;
+   ;
 
 // R423
 // ERR_CHK 423 named_constant replaced by T_IDENT
 imag_part
-	:	signed_int_literal_constant		
+   :   signed_int_literal_constant     
             { c_action_imag_part(ANTLR3_TRUE, ANTLR3_FALSE, NULL); }
-	|	signed_real_literal_constant	
+   |   signed_real_literal_constant    
             { c_action_imag_part(ANTLR3_FALSE, ANTLR3_TRUE, NULL); }
-	|	T_IDENT							
+   |   T_IDENT                         
             { c_action_imag_part(ANTLR3_FALSE, ANTLR3_FALSE, $T_IDENT); }
-	;
+   ;
 
 // R424
 // ERR_CHK 424a scalar_int_initialization_expr replaced by expr
@@ -824,13 +828,13 @@ scalar_int_literal_constant
 // R427
 // char_literal_constant
 // // options {k=2;}
-// 	:	T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
+//   :   T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
 //         // removed the T_UNDERSCORE because underscores are valid characters 
 //         // for identifiers, which means the lexer would match the T_IDENT and 
 //         // T_UNDERSCORE as one token (T_IDENT).
-// 	|	T_IDENT T_CHAR_CONSTANT
-// 	|	T_CHAR_CONSTANT
-//     ;
+//   |   T_IDENT T_CHAR_CONSTANT
+//   |   T_CHAR_CONSTANT
+//   ;
 char_literal_constant
    :   T_DIGIT_STRING T_UNDERSCORE T_CHAR_CONSTANT
           { c_action_char_literal_constant($T_DIGIT_STRING, NULL, $T_CHAR_CONSTANT); }
@@ -848,39 +852,40 @@ char_literal_constant
 // deleted in F95.
 //
 hollerith_literal_constant
-    :   T_HOLLERITH
+   :   T_HOLLERITH
             { c_action_hollerith_literal_constant($T_HOLLERITH); }
-    ;
+   ;
 
 // R428
 logical_literal_constant
 @init{pANTLR3_COMMON_TOKEN kind = NULL;} 
-	:	T_TRUE ( T_UNDERSCORE kind_param {kind = $kind_param.start;})?
-			{c_action_logical_literal_constant($T_TRUE, ANTLR3_TRUE, kind);}
-	|	T_FALSE ( T_UNDERSCORE kind_param {kind = $kind_param.start;})?
-			{c_action_logical_literal_constant($T_FALSE, ANTLR3_FALSE, kind);}
-	;
+   :   T_TRUE ( T_UNDERSCORE kind_param {kind = $kind_param.start;})?
+            {c_action_logical_literal_constant($T_TRUE, ANTLR3_TRUE, kind);}
+   |   T_FALSE ( T_UNDERSCORE kind_param {kind = $kind_param.start;})?
+            {c_action_logical_literal_constant($T_FALSE, ANTLR3_FALSE, kind);}
+   ;
 
 // R429
-//	( component_part )? inlined as ( component_def_stmt )*
+//  ( component_part )? inlined as ( component_def_stmt )*
 derived_type_def
-@after {
-    c_action_derived_type_def();
+@after
+{
+   c_action_derived_type_def();
 }
-	:	derived_type_stmt
-        // matches T_INTEGER possibilities in component_def_stmt
-		type_param_or_comp_def_stmt_list  
-		( private_or_sequence )*
-	  { /* ERR_CHK 429
-	     * if private_or_sequence present, component_def_stmt in 
-         * type_param_or_comp_def_stmt_list
-	     * is an error
-	     */
-	  }
-		( component_def_stmt )*
-		( type_bound_procedure_part )?
-		end_type_stmt
-	;
+   :   derived_type_stmt
+       // matches T_INTEGER possibilities in component_def_stmt
+       type_param_or_comp_def_stmt_list  
+       ( private_or_sequence )*
+             { /* ERR_CHK 429
+                * if private_or_sequence present, component_def_stmt in 
+                * type_param_or_comp_def_stmt_list
+                * is an error
+                */
+             }
+       ( component_def_stmt )*
+       ( type_bound_procedure_part )?
+       end_type_stmt
+   ;
 
 // Includes:
 //    ( type_param_def_stmt)*
@@ -892,28 +897,27 @@ type_param_or_comp_def_stmt_list
     c_action_type_param_or_comp_def_stmt_list();
 }
 ///options {k=1;}
-//	:	(T_INTEGER) => (kind_selector)? T_COMMA type_param_or_comp_def_stmt
-//			type_param_or_comp_def_stmt_list
-	:	(kind_selector)? T_COMMA type_param_or_comp_def_stmt
-			type_param_or_comp_def_stmt_list
-	|
-		{ /* ERR_CHK R435
-		   * type_param_def_stmt(s) must precede component_def_stmt(s)
-		   */
-		}
-	;
+//  :   (T_INTEGER) => (kind_selector)? T_COMMA type_param_or_comp_def_stmt
+//          type_param_or_comp_def_stmt_list
+   :   (kind_selector)?  T_COMMA  type_param_or_comp_def_stmt  type_param_or_comp_def_stmt_list
+   |
+        { /* ERR_CHK R435
+           * type_param_def_stmt(s) must precede component_def_stmt(s)
+           */
+        }
+   ;
 
 type_param_or_comp_def_stmt
-	:	type_param_attr_spec T_COLON_COLON type_param_decl_list end_of_stmt 
+   :   type_param_attr_spec T_COLON_COLON type_param_decl_list end_of_stmt 
             // TODO: See if this is reachable now that type_param_attr_spec is 
             // tokenized T_KIND or T_LEN. See R435
-			{c_action_type_param_or_comp_def_stmt($end_of_stmt.start,
-				IActionEnums_ TypeParamOrCompDef_typeParam);}
-	|	component_attr_spec_list T_COLON_COLON component_decl_list end_of_stmt 
+            {c_action_type_param_or_comp_def_stmt($end_of_stmt.start,
+                IActionEnums_ TypeParamOrCompDef_typeParam);}
+   |   component_attr_spec_list T_COLON_COLON component_decl_list end_of_stmt 
             // See R440
-			{c_action_type_param_or_comp_def_stmt($end_of_stmt.start,
-				IActionEnums_ TypeParamOrCompDef_compDef);}
-	;
+            {c_action_type_param_or_comp_def_stmt($end_of_stmt.start,
+                IActionEnums_ TypeParamOrCompDef_compDef);}
+   ;
 
 // R430
 // generic_name_list substituted for type_param_name_list
@@ -924,82 +928,107 @@ derived_type_stmt
     ANTLR3_BOOLEAN hasGenericNameList=ANTLR3_FALSE;
 }
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_TYPE
-		( ( T_COMMA type_attr_spec_list {hasTypeAttrSpecList=ANTLR3_TRUE;} )? 
-            T_COLON_COLON )? T_IDENT
-		    ( T_LPAREN generic_name_list T_RPAREN {hasGenericNameList=ANTLR3_TRUE;} )?
-            end_of_stmt
-			{c_action_derived_type_stmt(lbl, $T_TYPE, $T_IDENT, $end_of_stmt.start,
-                hasTypeAttrSpecList, hasGenericNameList);}
-	;
+   :   (label {lbl=$label.start;})? T_TYPE
+       ( ( T_COMMA type_attr_spec_list {hasTypeAttrSpecList=ANTLR3_TRUE;} )? 
+           T_COLON_COLON )? T_IDENT
+           ( T_LPAREN generic_name_list T_RPAREN {hasGenericNameList=ANTLR3_TRUE;} )?
+           end_of_stmt
+              {
+                 c_action_derived_type_stmt(lbl,$T_TYPE, $T_IDENT, $end_of_stmt.start,hasTypeAttrSpecList, hasGenericNameList);
+              }
+   ;
 
 type_attr_spec_list
-@init{int count = 0;}
-	:		{c_action_type_attr_spec_list__begin();}
-		type_attr_spec {count++;} ( T_COMMA type_attr_spec {count++;} )*
-			{c_action_type_attr_spec_list(count);}
-	;
+@init
+{
+   int count = 0;
+   c_action_type_attr_spec_list__begin();
+}
+   :   type_attr_spec {count++;} ( T_COMMA type_attr_spec {count++;} )*
+           {
+              c_action_type_attr_spec_list(count);
+           }
+   ;
 
 generic_name_list
-@init{int count = 0;}
-	:		{c_action_generic_name_list__begin();}
-		ident=T_IDENT
-			{
-				count++;
-				c_action_generic_name_list_part(ident);
-			} ( T_COMMA ident=T_IDENT 
-			{
-				count++;
-				c_action_generic_name_list_part(ident);
-			} )*
-			{c_action_generic_name_list(count);}
-	;
+@init
+{
+   int count = 0;
+   c_action_generic_name_list__begin();
+}
+   :   ident=T_IDENT
+            {
+               count++;
+               c_action_generic_name_list_part(ident);
+            }
+       ( T_COMMA ident=T_IDENT 
+            {
+               count++;
+               c_action_generic_name_list_part(ident);
+            }
+       )*
+            {
+               c_action_generic_name_list(count);
+            }
+   ;
 
 // R431
 // T_IDENT inlined for parent_type_name
 type_attr_spec
-	:	access_spec
-			{c_action_type_attr_spec(NULL, NULL, 
+   :   access_spec
+            {c_action_type_attr_spec(NULL, NULL, 
                                    IActionEnums_ TypeAttrSpec_access_spec);}
-	|	T_EXTENDS T_LPAREN T_IDENT T_RPAREN
-			{c_action_type_attr_spec($T_EXTENDS, $T_IDENT, 
+   |   T_EXTENDS T_LPAREN T_IDENT T_RPAREN
+            {c_action_type_attr_spec($T_EXTENDS, $T_IDENT, 
                                    IActionEnums_ TypeAttrSpec_extends);}
-	|	T_ABSTRACT
-			{c_action_type_attr_spec($T_ABSTRACT, NULL, 
+   |   T_ABSTRACT
+            {c_action_type_attr_spec($T_ABSTRACT, NULL, 
                                    IActionEnums_ TypeAttrSpec_abstract);}
-	|	T_BIND T_LPAREN T_IDENT /* 'C' */ T_RPAREN
-			{c_action_type_attr_spec($T_BIND, $T_IDENT, 
+   |   T_BIND T_LPAREN T_IDENT /* 'C' */ T_RPAREN
+            {c_action_type_attr_spec($T_BIND, $T_IDENT, 
                                    IActionEnums_ TypeAttrSpec_bind);}
-	;
+   ;
 
 // R432
 private_or_sequence
-@after {
+@after
+{
     c_action_private_or_sequence();
 }
-    :   private_components_stmt
-    |   sequence_stmt
-    ;
+   :   private_components_stmt
+   |   sequence_stmt
+   ;
 
 // R433
 end_type_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL;pANTLR3_COMMON_TOKEN id=NULL;} 
-@after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_END T_TYPE ( T_IDENT {id=$T_IDENT;})? 
-        end_of_stmt
-		{c_action_end_type_stmt(lbl, $T_END, $T_TYPE, id, $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_ENDTYPE ( T_IDENT {id=$T_IDENT;})? 
-        end_of_stmt
-		{c_action_end_type_stmt(lbl, $T_ENDTYPE, NULL, id, $end_of_stmt.start);}
-	;
+@init
+{
+   pANTLR3_COMMON_TOKEN lbl = NULL;
+   pANTLR3_COMMON_TOKEN id=NULL;
+}
+@after{
+   checkForInclude();
+}
+   :  (label {lbl=$label.start;})?
+      T_END  T_TYPE  ( T_IDENT {id=$T_IDENT;})?  end_of_stmt
+         {
+            c_action_end_type_stmt(lbl, $T_END, $T_TYPE, id, $end_of_stmt.start);
+         }
+
+   |  (label {lbl=$label.start;})?
+      T_ENDTYPE      ( T_IDENT {id=$T_IDENT;})?  end_of_stmt
+        {
+            c_action_end_type_stmt(lbl, $T_ENDTYPE, NULL, id, $end_of_stmt.start);
+        }
+   ;
 
 // R434
 sequence_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;} 
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_SEQUENCE end_of_stmt
-			{c_action_sequence_stmt(lbl, $T_SEQUENCE, $end_of_stmt.start);}
-	;
+   :   (label {lbl=$label.start;})? T_SEQUENCE end_of_stmt
+            {c_action_sequence_stmt(lbl, $T_SEQUENCE, $end_of_stmt.start);}
+   ;
 
 // R435 type_param_def_stmt inlined in type_param_or_comp_def_stmt_list
 
@@ -1008,16 +1037,16 @@ sequence_stmt
 // T_IDENT inlined for type_param_name
 type_param_decl
 @init{ ANTLR3_BOOLEAN hasInit=ANTLR3_FALSE; }
-    :    T_IDENT ( T_EQUALS expr {hasInit=ANTLR3_TRUE;})?
-			{c_action_type_param_decl($T_IDENT, hasInit);}
-    ;
+   :    T_IDENT ( T_EQUALS expr {hasInit=ANTLR3_TRUE;})?
+            {c_action_type_param_decl($T_IDENT, hasInit);}
+   ;
 
 type_param_decl_list
 @init{int count=0;}
-	:		{c_action_type_param_decl_list__begin();}
+   :       {c_action_type_param_decl_list__begin();}
         type_param_decl {count++;} ( T_COMMA type_param_decl {count++;} )*
-			{c_action_type_param_decl_list(count);}
-    ;
+            {c_action_type_param_decl_list(count);}
+   ;
 
 /*
  * R437-F08 component-attr-spec
@@ -1062,39 +1091,39 @@ component_attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 
 component_attr_spec_list
 @init{int count=1;}
-    :		{c_action_component_attr_spec_list__begin();}
+   :       {c_action_component_attr_spec_list__begin();}
         component_attr_spec ( T_COMMA component_attr_spec {count++;} )*
-    		{c_action_component_attr_spec_list(count);}
-    ;
+            {c_action_component_attr_spec_list(count);}
+   ;
 
 // R437
 // ADD isKind boolean.
 type_param_attr_spec
-	: 	T_IDENT /* { KIND | LEN } */ 
+   :   T_IDENT /* { KIND | LEN } */ 
             { c_action_type_param_attr_spec($T_IDENT); }
-	;
+   ;
 
 // R438 component_part inlined as ( component_def_stmt )* in R429
 
 // R439
 component_def_stmt
 @after{checkForInclude();}
-	:	data_component_def_stmt
-			{c_action_component_def_stmt(IActionEnums_ ComponentDefType_data);}
-	|	proc_component_def_stmt
-			{c_action_component_def_stmt(IActionEnums_ ComponentDefType_procedure);}
-	;
+   :   data_component_def_stmt
+            {c_action_component_def_stmt(IActionEnums_ ComponentDefType_data);}
+   |   proc_component_def_stmt
+            {c_action_component_def_stmt(IActionEnums_ ComponentDefType_procedure);}
+   ;
 
 
 // R440
 data_component_def_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasSpec=ANTLR3_FALSE; }
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? declaration_type_spec 
+   :    (label {lbl=$label.start;})? declaration_type_spec 
             ( ( T_COMMA component_attr_spec_list {hasSpec=ANTLR3_TRUE;})? 
             T_COLON_COLON )? component_decl_list end_of_stmt
-			{c_action_data_component_def_stmt(lbl, $end_of_stmt.start, hasSpec);}
-    ;
+            {c_action_data_component_def_stmt(lbl, $end_of_stmt.start, hasSpec);}
+   ;
 
 
 /*
@@ -1111,9 +1140,9 @@ data_component_def_stmt
 component_decl
 @init { 
     ANTLR3_BOOLEAN hasComponentArraySpec = ANTLR3_FALSE; 
-	ANTLR3_BOOLEAN hasCoarraySpec = ANTLR3_FALSE;
-	ANTLR3_BOOLEAN hasCharLength = ANTLR3_FALSE;
-	ANTLR3_BOOLEAN hasComponentInitialization = ANTLR3_FALSE;
+    ANTLR3_BOOLEAN hasCoarraySpec = ANTLR3_FALSE;
+    ANTLR3_BOOLEAN hasCharLength = ANTLR3_FALSE;
+    ANTLR3_BOOLEAN hasComponentInitialization = ANTLR3_FALSE;
 }
    :   T_IDENT (T_LPAREN component_array_spec T_RPAREN {hasComponentArraySpec=ANTLR3_TRUE;})?
                (T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=ANTLR3_TRUE;})?
@@ -1133,19 +1162,19 @@ component_decl_list
 
 // R443
 component_array_spec
-	:	explicit_shape_spec_list
-			{c_action_component_array_spec(ANTLR3_TRUE);}
-	|	deferred_shape_spec_list
-			{c_action_component_array_spec(ANTLR3_FALSE);}
-	;
+   :   explicit_shape_spec_list
+            {c_action_component_array_spec(ANTLR3_TRUE);}
+   |   deferred_shape_spec_list
+            {c_action_component_array_spec(ANTLR3_FALSE);}
+   ;
 
 // deferred_shape_spec replaced by T_COLON
 deferred_shape_spec_list
 @init{int count=0;}
-    :    	{c_action_deferred_shape_spec_list__begin();}
+   :       {c_action_deferred_shape_spec_list__begin();}
         T_COLON {count++;} ( T_COMMA T_COLON {count++;} )*
-        	{c_action_deferred_shape_spec_list(count);}
-    ;
+            {c_action_deferred_shape_spec_list(count);}
+   ;
 
 // R444
 // R447-F2008 can also be => initial_data_target, see NOTE 4.40 in J3/07-007
@@ -1154,54 +1183,54 @@ component_initialization
 @after {
     c_action_component_initialization();
 }
-	:	T_EQUALS expr
-	|	T_EQ_GT null_init
-	;
+   :   T_EQUALS expr
+   |   T_EQ_GT null_init
+   ;
 
 // R445
 proc_component_def_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasInterface=ANTLR3_FALSE;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_PROCEDURE T_LPAREN 
+   :   (label {lbl=$label.start;})? T_PROCEDURE T_LPAREN 
             ( proc_interface {hasInterface=ANTLR3_TRUE;})? T_RPAREN T_COMMA
-		    proc_component_attr_spec_list T_COLON_COLON proc_decl_list 
+            proc_component_attr_spec_list T_COLON_COLON proc_decl_list 
             end_of_stmt
-				{c_action_proc_component_def_stmt(lbl, $T_PROCEDURE, 
+                {c_action_proc_component_def_stmt(lbl, $T_PROCEDURE, 
                     $end_of_stmt.start, hasInterface);}
-	;
+   ;
 
 // R446
 // T_IDENT inlined for arg_name
 proc_component_attr_spec
 @init{ pANTLR3_COMMON_TOKEN id=NULL; }
-    :    T_POINTER
-			{c_action_proc_component_attr_spec($T_POINTER, id, 
+   :    T_POINTER
+            {c_action_proc_component_attr_spec($T_POINTER, id, 
                                              IActionEnums_ ProcComponentAttrSpec_pointer);}
-    |    T_PASS ( T_LPAREN T_IDENT T_RPAREN {id=$T_IDENT;} )?
-			{c_action_proc_component_attr_spec($T_PASS, id, 
+   |    T_PASS ( T_LPAREN T_IDENT T_RPAREN {id=$T_IDENT;} )?
+            {c_action_proc_component_attr_spec($T_PASS, id, 
                                              IActionEnums_ ProcComponentAttrSpec_pass);}
-    |    T_NOPASS
-			{c_action_proc_component_attr_spec($T_NOPASS, id, 
+   |    T_NOPASS
+            {c_action_proc_component_attr_spec($T_NOPASS, id, 
                                              IActionEnums_ ProcComponentAttrSpec_nopass);}
-    |    access_spec
-			{c_action_proc_component_attr_spec(NULL, id, IActionEnums_ ProcComponentAttrSpec_access_spec);}
-    ;
+   |    access_spec
+            {c_action_proc_component_attr_spec(NULL, id, IActionEnums_ ProcComponentAttrSpec_access_spec);}
+   ;
 
 proc_component_attr_spec_list
 @init{int count=0;}
-    :    	{c_action_proc_component_attr_spec_list__begin();}
+   :       {c_action_proc_component_attr_spec_list__begin();}
         proc_component_attr_spec {count++;} 
             ( T_COMMA proc_component_attr_spec {count++;})*
-        	{c_action_proc_component_attr_spec_list(count);}
-    ;
+            {c_action_proc_component_attr_spec_list(count);}
+   ;
 
 // R447
 private_components_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_PRIVATE end_of_stmt
-			{c_action_private_components_stmt(lbl, $T_PRIVATE, $end_of_stmt.start);}
-	;
+   :   (label {lbl=$label.start;})? T_PRIVATE end_of_stmt
+            {c_action_private_components_stmt(lbl, $T_PRIVATE, $end_of_stmt.start);}
+   ;
 
 //========================================================================================
 //
@@ -1218,14 +1247,14 @@ type_bound_procedure_part
    int count = 1;
    ANTLR3_BOOLEAN hasBindingPrivateStmt = ANTLR3_FALSE;
 }
-	:	contains_stmt
+   :   contains_stmt
         ( binding_private_stmt {hasBindingPrivateStmt=ANTLR3_TRUE;} )? 
         type_bound_proc_binding ( type_bound_proc_binding {count++;} )*
 
              {
                 c_action_type_bound_procedure_part(count,hasBindingPrivateStmt);
              }
-	;
+   ;
 
 //========================================================================================
 //
@@ -1283,80 +1312,85 @@ type_bound_proc_binding
 specific_binding
 @init {
     pANTLR3_COMMON_TOKEN interfaceName=NULL;
-	pANTLR3_COMMON_TOKEN bindingName=NULL; 
-	pANTLR3_COMMON_TOKEN procedureName=NULL;
-	ANTLR3_BOOLEAN hasBindingAttrList=ANTLR3_FALSE;
+    pANTLR3_COMMON_TOKEN bindingName=NULL; 
+    pANTLR3_COMMON_TOKEN procedureName=NULL;
+    ANTLR3_BOOLEAN hasBindingAttrList=ANTLR3_FALSE;
 } 
-    :   T_PROCEDURE (T_LPAREN tmpId1=T_IDENT T_RPAREN {interfaceName=tmpId1;})?
+   :   T_PROCEDURE (T_LPAREN tmpId1=T_IDENT T_RPAREN {interfaceName=tmpId1;})?
             ( ( T_COMMA binding_attr_list {hasBindingAttrList=ANTLR3_TRUE;})? 
                 T_COLON_COLON )?
             tmpId2=T_IDENT {bindingName=tmpId2;} 
             ( T_EQ_GT tmpId3=T_IDENT {procedureName=tmpId3;})?
-			{ c_action_specific_binding($T_PROCEDURE, interfaceName, bindingName,
+            { c_action_specific_binding($T_PROCEDURE, interfaceName, bindingName,
                                       procedureName, hasBindingAttrList);}
-    ;
+   ;
 
 // R452
 // generic_name_list substituted for binding_name_list
 generic_binding
 @init{ANTLR3_BOOLEAN hasAccessSpec=ANTLR3_FALSE;}
-    :    T_GENERIC ( T_COMMA access_spec {hasAccessSpec=ANTLR3_TRUE;})? T_COLON_COLON 
-            generic_spec T_EQ_GT generic_name_list
-			{c_action_generic_binding($T_GENERIC, hasAccessSpec);}
-    ;
+   :    T_GENERIC ( T_COMMA access_spec {hasAccessSpec=ANTLR3_TRUE;})? T_COLON_COLON 
+        generic_spec T_EQ_GT generic_name_list
+            {c_action_generic_binding($T_GENERIC, hasAccessSpec);}
+   ;
 
 // R453
 // T_IDENT inlined for arg_name
 binding_attr
 @init{pANTLR3_COMMON_TOKEN id = NULL;}
-    : T_PASS ( T_LPAREN T_IDENT T_RPAREN {id=$T_IDENT;})?
+   :  T_PASS ( T_LPAREN T_IDENT T_RPAREN {id=$T_IDENT;})?
         { c_action_binding_attr($T_PASS, IActionEnums_ AttrSpec_PASS, id); }
-    | T_NOPASS			
+   |  T_NOPASS          
         { c_action_binding_attr($T_NOPASS, IActionEnums_ AttrSpec_NOPASS, id); }
-    | T_NON_OVERRIDABLE	
+   |  T_NON_OVERRIDABLE 
         { c_action_binding_attr($T_NON_OVERRIDABLE, 
                               IActionEnums_ AttrSpec_NON_OVERRIDABLE, id); }
-    | T_DEFERRED		
+   |  T_DEFERRED        
         { c_action_binding_attr($T_DEFERRED, IActionEnums_ AttrSpec_DEFERRED, 
                               id); }
-    | access_spec		
+   |  access_spec       
         { c_action_binding_attr(NULL, IActionEnums_ AttrSpec_none, id); }
-    ;
+   ;
 
 binding_attr_list
-@init{int count=0;}
-    :		{c_action_binding_attr_list__begin();}
-        binding_attr {count++;} ( T_COMMA binding_attr {count++;} )*
-    		{c_action_binding_attr_list(count);}
-    ;
+@init
+{
+   int count=0;
+   c_action_binding_attr_list__begin();
+}
+   :   binding_attr {count++;} ( T_COMMA binding_attr {count++;} )*
+          {
+             c_action_binding_attr_list(count);
+          }
+   ;
 
 // R454
 // generic_name_list substituted for final_subroutine_name_list
 final_binding
-	:	T_FINAL ( T_COLON_COLON )? generic_name_list 
+   :   T_FINAL ( T_COLON_COLON )? generic_name_list 
             { c_action_final_binding($T_FINAL); }
-	;
+   ;
 
 // R455
 derived_type_spec
 @init{ANTLR3_BOOLEAN hasList = ANTLR3_FALSE;}
-    : T_IDENT ( T_LPAREN type_param_spec_list {hasList=ANTLR3_TRUE;} T_RPAREN )?
-    	{ c_action_derived_type_spec($T_IDENT, hasList); }
-    ;
+   : T_IDENT ( T_LPAREN type_param_spec_list {hasList=ANTLR3_TRUE;} T_RPAREN )?
+        { c_action_derived_type_spec($T_IDENT, hasList); }
+   ;
 
 // R456
 type_param_spec
 @init{ pANTLR3_COMMON_TOKEN keyWord=NULL; }
-    : ( keyword T_EQUALS {keyWord=$keyword.start;})? type_param_value
-			{c_action_type_param_spec(keyWord);}
-    ;
+   :  ( keyword T_EQUALS {keyWord=$keyword.start;})? type_param_value
+            {c_action_type_param_spec(keyWord);}
+   ;
 
 type_param_spec_list
 @init{int count=0;}
-    :    	{c_action_type_param_spec_list__begin();} 
+   :       {c_action_type_param_spec_list__begin();} 
         type_param_spec {count++;}( T_COMMA type_param_spec {count++;})*
-        	{c_action_type_param_spec_list(count);} 
-    ;
+            {c_action_type_param_spec_list(count);} 
+   ;
 
 // R457
 // inlined derived_type_spec (R662) to remove ambiguity using backtracking
@@ -1369,106 +1403,106 @@ type_param_spec_list
 // remove the backtracking on this rule.
 structure_constructor
 // options {backtrack=true;}
-//     : T_IDENT T_LPAREN type_param_spec_list T_RPAREN
-// 		T_LPAREN
-// 		( component_spec_list )?
-// 		T_RPAREN
-//     | T_IDENT
-// 		T_LPAREN
-// 		( component_spec_list )?
-// 		T_RPAREN
-    : T_IDENT T_LPAREN type_param_spec_list T_RPAREN
-		(T_LPAREN
-		( component_spec_list )?
-		T_RPAREN)?
+//    : T_IDENT T_LPAREN type_param_spec_list T_RPAREN
+//      T_LPAREN
+//      ( component_spec_list )?
+//      T_RPAREN
+//    | T_IDENT
+//      T_LPAREN
+//      ( component_spec_list )?
+//      T_RPAREN
+   : T_IDENT T_LPAREN type_param_spec_list T_RPAREN
+        (T_LPAREN
+        ( component_spec_list )?
+        T_RPAREN)?
         { c_action_structure_constructor($T_IDENT); }
-	;
+   ;
 
 // R458
 component_spec
 @init { pANTLR3_COMMON_TOKEN keyWord = NULL; }
-    :   ( keyword T_EQUALS { keyWord=$keyword.start; })? component_data_source
+   :   ( keyword T_EQUALS { keyWord=$keyword.start; })? component_data_source
             { c_action_component_spec(keyWord); }
-    ;
+   ;
 
 component_spec_list
 @init{int count=0;}
-    :    	{c_action_component_spec_list__begin();} 
+   :       {c_action_component_spec_list__begin();} 
         component_spec {count++;}( T_COMMA component_spec {count++;})*
-        	{c_action_component_spec_list(count);} 
-    ;
+            {c_action_component_spec_list(count);} 
+   ;
 
 // R459
 // is (expr | data-target | proc-target)
 // data_target isa expr so data_target deleted
 // proc_target isa expr so proc_target deleted
 component_data_source
-	:	expr 
+   :   expr 
             { c_action_component_data_source(); }
-	;
+   ;
 
 // R460
 enum_def
 @init{ int numEls=1; }
-	:	enum_def_stmt
-		enumerator_def_stmt
-		( enumerator_def_stmt {numEls++;})*
-		end_enum_stmt
-			{c_action_enum_def(numEls);}
-	;
+   :   enum_def_stmt
+        enumerator_def_stmt
+        ( enumerator_def_stmt {numEls++;})*
+        end_enum_stmt
+            {c_action_enum_def(numEls);}
+   ;
 
 // R461
 enum_def_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_ENUM T_COMMA T_BIND T_LPAREN 
+   :   (label {lbl=$label.start;})? T_ENUM T_COMMA T_BIND T_LPAREN 
             T_IDENT /* 'C' */ T_RPAREN end_of_stmt
-			{c_action_enum_def_stmt(lbl, $T_ENUM, $T_BIND, $T_IDENT, 
+            {c_action_enum_def_stmt(lbl, $T_ENUM, $T_BIND, $T_IDENT, 
                 $end_of_stmt.start);}
-	;
+   ;
 
 // R462
 enumerator_def_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_ENUMERATOR ( T_COLON_COLON )? 
+   :   (label {lbl=$label.start;})? T_ENUMERATOR ( T_COLON_COLON )? 
             enumerator_list end_of_stmt
-			{c_action_enumerator_def_stmt(lbl, $T_ENUMERATOR, $end_of_stmt.start);}
-	;
+            {c_action_enumerator_def_stmt(lbl, $T_ENUMERATOR, $end_of_stmt.start);}
+   ;
 
 // R463
 // ERR_CHK 463 scalar_int_initialization_expr replaced by expr
 // ERR_CHK 463 named_constant replaced by T_IDENT
 enumerator
 @init{ANTLR3_BOOLEAN hasExpr = ANTLR3_FALSE;}
-    :   T_IDENT ( T_EQUALS expr { hasExpr = ANTLR3_TRUE; })?
+   :   T_IDENT ( T_EQUALS expr { hasExpr = ANTLR3_TRUE; })?
             { c_action_enumerator($T_IDENT, hasExpr); }
-    ;
+   ;
 
 enumerator_list
 @init{int count=0;}
-    :    	{c_action_enumerator_list__begin();} 
+   :       {c_action_enumerator_list__begin();} 
         enumerator {count++;}( T_COMMA enumerator {count++;})*
-        	{c_action_enumerator_list(count);} 
-    ;
+            {c_action_enumerator_list(count);} 
+   ;
 
 // R464
 end_enum_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_END T_ENUM end_of_stmt 
+   :   (label {lbl=$label.start;})? T_END T_ENUM end_of_stmt 
             { c_action_end_enum_stmt(lbl, $T_END, $T_ENUM, $end_of_stmt.start); }
-	|	(label {lbl=$label.start;})? T_ENDENUM end_of_stmt 
+   |   (label {lbl=$label.start;})? T_ENDENUM end_of_stmt 
             { c_action_end_enum_stmt(lbl, $T_ENDENUM, NULL, $end_of_stmt.start); }
-	;
+   ;
 
 // R465
 array_constructor
-	:	T_LPAREN T_SLASH ac_spec T_SLASH T_RPAREN
-			{ c_action_array_constructor(); }
-	|	T_LBRACKET ac_spec T_RBRACKET
-			{ c_action_array_constructor(); }
-	;
+   :   T_LPAREN T_SLASH ac_spec T_SLASH T_RPAREN
+            { c_action_array_constructor(); }
+   |   T_LBRACKET ac_spec T_RBRACKET
+            { c_action_array_constructor(); }
+   ;
 
 // R466
 // refactored to remove optional from lhs
@@ -1477,9 +1511,9 @@ options {backtrack=true;}
 @after {
     c_action_ac_spec();
 }
-    : type_spec T_COLON_COLON (ac_value_list)?
-    | ac_value_list
-    ;
+   : type_spec T_COLON_COLON (ac_value_list)?
+   | ac_value_list
+   ;
 
 // R467 left_square_bracket inlined as T_LBRACKET
 
@@ -1491,39 +1525,39 @@ options {backtrack=true;}
 @after {
     c_action_ac_value();
 }
-	:	expr
-	|	ac_implied_do
-	;
+   :   expr
+   |   ac_implied_do
+   ;
 
 ac_value_list
 @init{int count=0;}
-    :    	{c_action_ac_value_list__begin();} 
+   :       {c_action_ac_value_list__begin();} 
         ac_value {count++;}( T_COMMA ac_value {count++;})*
-        	{c_action_ac_value_list(count);} 
-    ;
+            {c_action_ac_value_list(count);} 
+   ;
 
 // R470
 ac_implied_do
-	:	T_LPAREN ac_value_list T_COMMA ac_implied_do_control T_RPAREN
-			{c_action_ac_implied_do();}
-	;
+   :   T_LPAREN ac_value_list T_COMMA ac_implied_do_control T_RPAREN
+            {c_action_ac_implied_do();}
+   ;
 
 // R471
 // ERR_CHK 471a scalar_int_expr replaced by expr
 // ERR_CHK 471b ac_do_variable replaced by do_variable
 ac_implied_do_control
 @init{ANTLR3_BOOLEAN hasStride=ANTLR3_FALSE;}
-    :    do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr {hasStride=ANTLR3_TRUE;})?
-			{c_action_ac_implied_do_control(hasStride);}
-    ;
+   :    do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr {hasStride=ANTLR3_TRUE;})?
+            {c_action_ac_implied_do_control(hasStride);}
+   ;
 
 // R472 inlined ac_do_variable as scalar_int_variable (and finally T_IDENT) 
 // in R471
 // C493 (R472) ac-do-variable shall be a named variable
 scalar_int_variable
-    :   variable
+   :   variable
             { c_action_scalar_int_variable(); }
-    ;
+   ;
 
 
 /**
@@ -1608,7 +1642,7 @@ attr_spec
            {c_action_attr_spec($T_INTENT, IActionEnums_ AttrSpec_INTENT);}
    |   T_INTRINSIC
            {c_action_attr_spec($T_INTRINSIC, IActionEnums_ AttrSpec_INTRINSIC);}
-   |   language_binding_spec		
+   |   language_binding_spec        
            {c_action_attr_spec(NULL, IActionEnums_ AttrSpec_language_binding);}
    |   T_OPTIONAL
            {c_action_attr_spec($T_OPTIONAL, IActionEnums_ AttrSpec_OPTIONAL);}
@@ -1627,13 +1661,13 @@ attr_spec
    |   T_VOLATILE
            {c_action_attr_spec($T_VOLATILE, IActionEnums_ AttrSpec_VOLATILE);}
 // TODO are T_KIND and T_LEN correct?
-    |   T_KIND
+   |   T_KIND
            {c_action_attr_spec($T_KIND, IActionEnums_ AttrSpec_KIND);}
-    |   T_LEN
+   |   T_LEN
            {c_action_attr_spec($T_LEN, IActionEnums_ AttrSpec_LEN);}
-    |   attr_spec_extension
-	;
-	
+   |   attr_spec_extension
+   ;
+    
 // language extension point
 attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 
@@ -1699,17 +1733,17 @@ object_name
 // R506
 // ERR_CHK 506 initialization_expr replaced by expr
 initialization
-	:	T_EQUALS expr		{ c_action_initialization(ANTLR3_TRUE, ANTLR3_FALSE); }
-	|	T_EQ_GT null_init	{ c_action_initialization(ANTLR3_FALSE, ANTLR3_TRUE); }
-	;
+   :   T_EQUALS expr       { c_action_initialization(ANTLR3_TRUE, ANTLR3_FALSE); }
+   |   T_EQ_GT null_init   { c_action_initialization(ANTLR3_FALSE, ANTLR3_TRUE); }
+   ;
 
 // R507
 // C506 The function-reference shall be a reference to the NULL intrinsic 
 // function with no arguments.
 null_init
-	:	T_IDENT /* 'NULL' */ T_LPAREN T_RPAREN
-			{ c_action_null_init($T_IDENT); }
-	;
+   :   T_IDENT /* 'NULL' */ T_LPAREN T_RPAREN
+            { c_action_null_init($T_IDENT); }
+   ;
 
 /*
  * R509-F08 coarray-spec
@@ -1734,67 +1768,80 @@ coarray_spec
 
 // R508
 access_spec
-	:	T_PUBLIC
-			{c_action_access_spec($T_PUBLIC,  IActionEnums_ AttrSpec_PUBLIC);}
-	|	T_PRIVATE
-			{c_action_access_spec($T_PRIVATE, IActionEnums_ AttrSpec_PRIVATE);}
-	;
+   :   T_PUBLIC
+            {c_action_access_spec($T_PUBLIC,  IActionEnums_ AttrSpec_PUBLIC);}
+   |   T_PRIVATE
+            {c_action_access_spec($T_PRIVATE, IActionEnums_ AttrSpec_PRIVATE);}
+   ;
 
 // R509
 // ERR_CHK 509 scalar_char_initialization_expr replaced by expr
 language_binding_spec
 @init{ANTLR3_BOOLEAN hasName = ANTLR3_FALSE;}
-    :	T_BIND T_LPAREN T_IDENT /* 'C' */ 
+   :   T_BIND T_LPAREN T_IDENT /* 'C' */ 
             (T_COMMA name T_EQUALS expr {hasName=ANTLR3_TRUE;})? T_RPAREN
-    		{ c_action_language_binding_spec($T_BIND, $T_IDENT, hasName); }
-    ;
+            { c_action_language_binding_spec($T_BIND, $T_IDENT, hasName); }
+   ;
 
 // R510
 array_spec
 @init{int count=0;}
-	:	array_spec_element {count++;}
-		(T_COMMA array_spec_element {count++;})*
-			{c_action_array_spec(count);}
-	;
+   :   array_spec_element {count++;}
+        (T_COMMA array_spec_element {count++;})*
+            {c_action_array_spec(count);}
+   ;
 
 // Array specifications can consist of these beasts. Note that we can't 
 // mix/match arbitrarily, so we have to check validity in actions.
-// Types: 	0 expr (e.g. 3 or m+1)
-// 			1 expr: (e.g. 3:)
-// 			2 expr:expr (e.g. 3:5 or 7:(m+1))
-// 			3 expr:* (e.g. 3:* end of assumed size)
-// 			4 *  (end of assumed size)
-// 			5 :	 (could be part of assumed or deferred shape)
+// Types:   0 expr (e.g. 3 or m+1)
+//          1 expr: (e.g. 3:)
+//          2 expr:expr (e.g. 3:5 or 7:(m+1))
+//          3 expr:* (e.g. 3:* end of assumed size)
+//          4 *  (end of assumed size)
+//          5 :  (could be part of assumed or deferred shape)
 array_spec_element
-@init{int type=IActionEnums_ ArraySpecElement_expr;}
-	:   expr ( T_COLON {type=IActionEnums_ ArraySpecElement_expr_colon;}
-        	(  expr {type=IActionEnums_ ArraySpecElement_expr_colon_expr;}
-        	 | T_ASTERISK 
-                {type=IActionEnums_ ArraySpecElement_expr_colon_asterisk;} )?
+@init
+{
+   int type=IActionEnums_ ArraySpecElement_expr;
+}
+   :   expr
+       ( T_COLON            {type=IActionEnums_ ArraySpecElement_expr_colon;}
+          (  expr           {type=IActionEnums_ ArraySpecElement_expr_colon_expr;}
+             | T_ASTERISK   {type=IActionEnums_ ArraySpecElement_expr_colon_asterisk;}
           )?
-			{ c_action_array_spec_element(type); }
-	|   T_ASTERISK
-			{ c_action_array_spec_element(IActionEnums_ ArraySpecElement_asterisk); }
-	|	T_COLON
-			{ c_action_array_spec_element(IActionEnums_ ArraySpecElement_colon); }
-	;
+       )?
+            {
+               c_action_array_spec_element(type);
+            }
+
+   |   T_ASTERISK
+            {
+               c_action_array_spec_element(IActionEnums_ ArraySpecElement_asterisk);
+            }
+
+   |   T_COLON
+            {
+               c_action_array_spec_element(IActionEnums_ ArraySpecElement_colon);
+            }
+   ;
+
 
 // R511
 // refactored to remove conditional from lhs and inlined lower_bound and 
 // upper_bound
 explicit_shape_spec
 @init{ANTLR3_BOOLEAN hasUpperBound=ANTLR3_FALSE;}
-    : 	expr (T_COLON expr {hasUpperBound=ANTLR3_TRUE;})?
-			{c_action_explicit_shape_spec(hasUpperBound);}
-	;
+   :   expr (T_COLON expr {hasUpperBound=ANTLR3_TRUE;})?
+            {c_action_explicit_shape_spec(hasUpperBound);}
+   ;
 
 explicit_shape_spec_list
 @init{ int count=0;}
-	:		{c_action_explicit_shape_spec_list__begin();}
-     	explicit_shape_spec {count++;} 
+   :       {c_action_explicit_shape_spec_list__begin();}
+        explicit_shape_spec {count++;} 
             ( T_COMMA explicit_shape_spec {count++;})*
-			{c_action_explicit_shape_spec_list(count);}
-    ;
+            {c_action_explicit_shape_spec_list(count);}
+   ;
 
 // R512 lower_bound was specification_expr inlined as expr
 
@@ -1809,40 +1856,40 @@ explicit_shape_spec_list
 
 // R517
 intent_spec
-	:	T_IN		{ c_action_intent_spec($T_IN, NULL, 
+   :   T_IN        { c_action_intent_spec($T_IN, NULL, 
                 IActionEnums_ IntentSpec_IN); }
-	|	T_OUT		{ c_action_intent_spec($T_OUT, NULL, 
+   |   T_OUT       { c_action_intent_spec($T_OUT, NULL, 
                 IActionEnums_ IntentSpec_OUT); }
-	|	T_IN T_OUT	{ c_action_intent_spec($T_IN, $T_OUT, 
+   |   T_IN T_OUT  { c_action_intent_spec($T_IN, $T_OUT, 
                 IActionEnums_ IntentSpec_INOUT); }
-	|	T_INOUT		{ c_action_intent_spec($T_INOUT, NULL, 
+   |   T_INOUT     { c_action_intent_spec($T_INOUT, NULL, 
                 IActionEnums_ IntentSpec_INOUT); }
-	;
+   ;
 
 // R518
 access_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;ANTLR3_BOOLEAN hasList=ANTLR3_FALSE;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? access_spec ( ( T_COLON_COLON )? 
+   :    (label {lbl=$label.start;})? access_spec ( ( T_COLON_COLON )? 
             access_id_list {hasList=ANTLR3_TRUE;})? end_of_stmt
-			{ c_action_access_stmt(lbl,$end_of_stmt.start,hasList); }
-    ;
+            { c_action_access_stmt(lbl,$end_of_stmt.start,hasList); }
+   ;
 
 // R519
 // T_IDENT inlined for use_name
 // generic_spec can be T_IDENT so T_IDENT deleted
 // TODO - can this only be T_IDENTS?  generic_spec is more than that..
 access_id
-	:	generic_spec
+   :   generic_spec
             { c_action_access_id(); }
-	;
+   ;
 
 access_id_list
 @init{ int count=0;}
-    :  		{c_action_access_id_list__begin();}
-		access_id {count++;} ( T_COMMA access_id {count++;} )*
-      		{c_action_access_id_list(count);}
-    ;
+   :       {c_action_access_id_list__begin();}
+        access_id {count++;} ( T_COMMA access_id {count++;} )*
+            {c_action_access_id_list(count);}
+   ;
 
 ////////////
 // R520-F03, R526-F08
@@ -1884,69 +1931,69 @@ allocatable_decl_list
 asynchronous_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_ASYNCHRONOUS ( T_COLON_COLON )?
-		generic_name_list end_of_stmt
-			{c_action_asynchronous_stmt(lbl,$T_ASYNCHRONOUS,$end_of_stmt.start);}
-	;
+   :   (label {lbl=$label.start;})? T_ASYNCHRONOUS ( T_COLON_COLON )?
+        generic_name_list end_of_stmt
+            {c_action_asynchronous_stmt(lbl,$T_ASYNCHRONOUS,$end_of_stmt.start);}
+   ;
 
 // R522
 bind_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? language_binding_spec
-		( T_COLON_COLON )? bind_entity_list end_of_stmt
-			{ c_action_bind_stmt(lbl, $end_of_stmt.start); }
-	;
+   :   (label {lbl=$label.start;})? language_binding_spec
+        ( T_COLON_COLON )? bind_entity_list end_of_stmt
+            { c_action_bind_stmt(lbl, $end_of_stmt.start); }
+   ;
 
 // R523
 // T_IDENT inlined for entity_name and common_block_name
 bind_entity
-	:	T_IDENT 
+   :   T_IDENT 
         { c_action_bind_entity($T_IDENT, ANTLR3_FALSE); }// isCommonBlockName=false
-	|	T_SLASH T_IDENT T_SLASH 
+   |   T_SLASH T_IDENT T_SLASH 
         { c_action_bind_entity($T_IDENT, ANTLR3_TRUE); }// isCommonBlockname=true
-	;
+   ;
 
 bind_entity_list
 @init{ int count=0;}
-    :  		{c_action_bind_entity_list__begin();}
-		bind_entity {count++;} ( T_COMMA bind_entity {count++;} )*
-      		{c_action_bind_entity_list(count);}
-    ;
+   :       {c_action_bind_entity_list__begin();}
+        bind_entity {count++;} ( T_COMMA bind_entity {count++;} )*
+            {c_action_bind_entity_list(count);}
+   ;
 
 // R524
 data_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; int count=1;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_DATA data_stmt_set ( ( T_COMMA )? 
+   :   (label {lbl=$label.start;})? T_DATA data_stmt_set ( ( T_COMMA )? 
             data_stmt_set {count++;})* end_of_stmt
-			{ c_action_data_stmt(lbl, $T_DATA, $end_of_stmt.start, count); }
-    ;
+            { c_action_data_stmt(lbl, $T_DATA, $end_of_stmt.start, count); }
+   ;
 
 // R525
 data_stmt_set
-	:	data_stmt_object_list
-		T_SLASH
-		data_stmt_value_list
-		T_SLASH
+   :   data_stmt_object_list
+        T_SLASH
+        data_stmt_value_list
+        T_SLASH
             { c_action_data_stmt_set(); }
-	;
+   ;
 
 // R526
 data_stmt_object
 @after {
     c_action_data_stmt_object();
 }
-	:	variable
-	|	data_implied_do
-	;
+   :   variable
+   |   data_implied_do
+   ;
 
 data_stmt_object_list
 @init{ int count=0;}
-    :  		{c_action_data_stmt_object_list__begin();}
-		data_stmt_object {count++;} ( T_COMMA data_stmt_object {count++;} )*
-      		{c_action_data_stmt_object_list(count);}
-    ;
+   :       {c_action_data_stmt_object_list__begin();}
+        data_stmt_object {count++;} ( T_COMMA data_stmt_object {count++;} )*
+            {c_action_data_stmt_object_list(count);}
+   ;
 
 
 // R527
@@ -1956,10 +2003,10 @@ data_implied_do
 @init {
     ANTLR3_BOOLEAN hasThirdExpr = ANTLR3_FALSE;
 }
-    : T_LPAREN data_i_do_object_list T_COMMA T_IDENT T_EQUALS
+   : T_LPAREN data_i_do_object_list T_COMMA T_IDENT T_EQUALS
         expr T_COMMA expr ( T_COMMA expr { hasThirdExpr = ANTLR3_TRUE; })? T_RPAREN
         { c_action_data_implied_do($T_IDENT, hasThirdExpr); }
-    ;
+   ;
 
 // R528
 // data_ref inlined for scalar_structure_component and array_element
@@ -1967,16 +2014,16 @@ data_i_do_object
 @after {
     c_action_data_i_do_object();
 }
-	:	data_ref
-	|	data_implied_do
-	;
+   :   data_ref
+   |   data_implied_do
+   ;
 
 data_i_do_object_list
 @init{ int count=0;}
-    :  		{c_action_data_i_do_object_list__begin();}
-		data_i_do_object {count++;} ( T_COMMA data_i_do_object {count++;} )*
-      		{c_action_data_i_do_object_list(count);}
-    ;
+   :       {c_action_data_i_do_object_list__begin();}
+        data_i_do_object {count++;} ( T_COMMA data_i_do_object {count++;} )*
+            {c_action_data_i_do_object_list(count);}
+   ;
 
 // R529 data_i_do_variable was scalar_int_variable inlined as T_IDENT
 // C556 (R529) The data-i-do-variable shall be a named variable.
@@ -2006,10 +2053,10 @@ options {backtrack=true; k=3;}
 
 data_stmt_value_list
 @init{ int count=0;}
-    :  		{c_action_data_stmt_value_list__begin();}
-		data_stmt_value {count++;} ( T_COMMA data_stmt_value {count++;} )*
-      		{c_action_data_stmt_value_list(count);}
-    ;
+   :       {c_action_data_stmt_value_list__begin();}
+        data_stmt_value {count++;} ( T_COMMA data_stmt_value {count++;} )*
+            {c_action_data_stmt_value_list(count);}
+   ;
 
 // R531 data_stmt_repeat inlined as (int_literal_constant | designator) in R530
 // ERRCHK 531 int_constant shall be a scalar_int_constant
@@ -2018,9 +2065,9 @@ data_stmt_value_list
 // scalar_int_constant_subobject replaced by designator
 
 scalar_int_constant
-    :   int_constant
+   :   int_constant
             { c_action_scalar_int_constant(); }
-    ;
+   ;
 
 // R532
 // scalar_constant_subobject replaced by designator
@@ -2037,15 +2084,15 @@ options {backtrack=true; k=3;}
 @after {
     c_action_data_stmt_constant();
 }
-	:	designator
-	|	signed_int_literal_constant
-    |   signed_real_literal_constant
-	|	complex_literal_constant
-	|	logical_literal_constant
-	|	char_literal_constant
-	|	boz_literal_constant
-	|	structure_constructor // is null_init if 'NULL()'
-	;
+   :   designator
+   |   signed_int_literal_constant
+   |   signed_real_literal_constant
+   |   complex_literal_constant
+   |   logical_literal_constant
+   |   char_literal_constant
+   |   boz_literal_constant
+   |   structure_constructor // is null_init if 'NULL()'
+   ;
 
 
 /*
@@ -2095,10 +2142,10 @@ codimension_decl_list
 dimension_stmt
 @init {pANTLR3_COMMON_TOKEN lbl=NULL; int count=1;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_DIMENSION ( T_COLON_COLON )? 
+   :   (label {lbl=$label.start;})? T_DIMENSION ( T_COLON_COLON )? 
         dimension_decl ( T_COMMA dimension_decl {count++;})* end_of_stmt
-			{ c_action_dimension_stmt(lbl, $T_DIMENSION, $end_of_stmt.start, count); }
-    ;
+            { c_action_dimension_stmt(lbl, $T_DIMENSION, $end_of_stmt.start, count); }
+   ;
 
 // R535-subrule
 dimension_decl
@@ -2111,46 +2158,46 @@ dimension_decl
 intent_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_INTENT T_LPAREN intent_spec T_RPAREN 
+   :   (label {lbl=$label.start;})? T_INTENT T_LPAREN intent_spec T_RPAREN 
             ( T_COLON_COLON )? generic_name_list end_of_stmt
-			{c_action_intent_stmt(lbl,$T_INTENT,$end_of_stmt.start);}
-	;
+            {c_action_intent_stmt(lbl,$T_INTENT,$end_of_stmt.start);}
+   ;
 
 // R537
 // generic_name_list substituted for dummy_arg_name_list
 optional_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:   (label {lbl=$label.start;})? T_OPTIONAL ( T_COLON_COLON )? 
+   :   (label {lbl=$label.start;})? T_OPTIONAL ( T_COLON_COLON )? 
             generic_name_list end_of_stmt
-			{ c_action_optional_stmt(lbl, $T_OPTIONAL, $end_of_stmt.start); }
-		
-	;
+            { c_action_optional_stmt(lbl, $T_OPTIONAL, $end_of_stmt.start); }
+        
+   ;
 
 // R538
 parameter_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_PARAMETER T_LPAREN 
+   :   (label {lbl=$label.start;})? T_PARAMETER T_LPAREN 
             named_constant_def_list T_RPAREN end_of_stmt
-			{c_action_parameter_stmt(lbl,$T_PARAMETER,$end_of_stmt.start);}
-	;
+            {c_action_parameter_stmt(lbl,$T_PARAMETER,$end_of_stmt.start);}
+   ;
 
 named_constant_def_list
 @init{ int count=0;}
-    :  		{c_action_named_constant_def_list__begin();}
-		named_constant_def {count++;} 
+   :       {c_action_named_constant_def_list__begin();}
+        named_constant_def {count++;} 
             ( T_COMMA named_constant_def {count++;} )*
-      		{c_action_named_constant_def_list(count);}
-    ;
+            {c_action_named_constant_def_list(count);}
+   ;
 
 // R539
 // ERR_CHK 539 initialization_expr replaced by expr
 // ERR_CHK 539 named_constant replaced by T_IDENT
 named_constant_def
-	:	T_IDENT T_EQUALS expr
-			{c_action_named_constant_def($T_IDENT);}
-	;
+   :   T_IDENT T_EQUALS expr
+            {c_action_named_constant_def($T_IDENT);}
+   ;
 
 /*
  * R550-F08
@@ -2199,10 +2246,10 @@ pointer_decl_list
 // T_IDENT inlined as object_name and proc_entity_name (removing second alt)
 pointer_decl
 @init{ANTLR3_BOOLEAN hasSpecList=ANTLR3_FALSE;}
-    :    T_IDENT ( T_LPAREN deferred_shape_spec_list T_RPAREN 
+   :    T_IDENT ( T_LPAREN deferred_shape_spec_list T_RPAREN 
             {hasSpecList=ANTLR3_TRUE;})?
-			{c_action_pointer_decl($T_IDENT,hasSpecList);}
-    ;
+            {c_action_pointer_decl($T_IDENT,hasSpecList);}
+   ;
 
 cray_pointer_assoc_list
 @init{int count=0;}
@@ -2221,36 +2268,36 @@ cray_pointer_assoc
 protected_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_PROTECTED ( T_COLON_COLON )? 
+   :   (label {lbl=$label.start;})? T_PROTECTED ( T_COLON_COLON )? 
             generic_name_list end_of_stmt
-			{c_action_protected_stmt(lbl,$T_PROTECTED,$end_of_stmt.start);}
-	;
+            {c_action_protected_stmt(lbl,$T_PROTECTED,$end_of_stmt.start);}
+   ;
 
 // R543
 save_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasSavedEntityList=ANTLR3_FALSE;}
 @after{checkForInclude();}
-    : (label {lbl=$label.start;})? T_SAVE ( ( T_COLON_COLON )? 
+   : (label {lbl=$label.start;})? T_SAVE ( ( T_COLON_COLON )? 
             saved_entity_list {hasSavedEntityList=ANTLR3_TRUE;})? end_of_stmt
-		    {c_action_save_stmt(lbl,$T_SAVE,$end_of_stmt.start,hasSavedEntityList);}
-    ;
+            {c_action_save_stmt(lbl,$T_SAVE,$end_of_stmt.start,hasSavedEntityList);}
+   ;
 
 // R544
 // T_IDENT inlined for object_name, proc_pointer_name (removing second alt), 
 // and common_block_name
 saved_entity
-	:	id=T_IDENT
-			{c_action_saved_entity(id, ANTLR3_FALSE);}
-	|	T_SLASH id=T_IDENT T_SLASH
-			{c_action_saved_entity(id, ANTLR3_TRUE);}	// is common block name
-	;
+   :   id=T_IDENT
+            {c_action_saved_entity(id, ANTLR3_FALSE);}
+   |   T_SLASH id=T_IDENT T_SLASH
+            {c_action_saved_entity(id, ANTLR3_TRUE);}   // is common block name
+   ;
 
 saved_entity_list
 @init{ int count=0;}
-    :  		{c_action_saved_entity_list__begin();}
-		saved_entity {count++;} ( T_COMMA saved_entity {count++;} )*
-      		{c_action_saved_entity_list(count);}
-    ;
+   :       {c_action_saved_entity_list__begin();}
+        saved_entity {count++;} ( T_COMMA saved_entity {count++;} )*
+            {c_action_saved_entity_list(count);}
+   ;
 
 
 // R545 proc_pointer_name was name inlined as T_IDENT
@@ -2268,7 +2315,7 @@ target_stmt
 }
    :   (label {lbl=$label.start;})?
        T_TARGET ( T_COLON_COLON )? target_decl_list end_of_stmt
-			{c_action_target_stmt(lbl,$T_TARGET,$end_of_stmt.start);}
+            {c_action_target_stmt(lbl,$T_TARGET,$end_of_stmt.start);}
    ;
 
 /*
@@ -2300,110 +2347,117 @@ target_decl_list
 value_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_VALUE ( T_COLON_COLON )? 
+   :   (label {lbl=$label.start;})? T_VALUE ( T_COLON_COLON )? 
             generic_name_list end_of_stmt
-		    {c_action_value_stmt(lbl,$T_VALUE,$end_of_stmt.start);}
-	;
+            {c_action_value_stmt(lbl,$T_VALUE,$end_of_stmt.start);}
+   ;
 
 // R548
 // generic_name_list substituted for object_name_list
 volatile_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_VOLATILE ( T_COLON_COLON )? 
+   :   (label {lbl=$label.start;})? T_VOLATILE ( T_COLON_COLON )? 
             generic_name_list end_of_stmt
-		    {c_action_volatile_stmt(lbl,$T_VOLATILE,$end_of_stmt.start);}
-	;
+            {c_action_volatile_stmt(lbl,$T_VOLATILE,$end_of_stmt.start);}
+   ;
 
 // R549
 implicit_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_IMPLICIT implicit_spec_list end_of_stmt
-			{c_action_implicit_stmt(lbl, $T_IMPLICIT, NULL, $end_of_stmt.start, 
+   :   (label {lbl=$label.start;})? T_IMPLICIT implicit_spec_list end_of_stmt
+            {c_action_implicit_stmt(lbl, $T_IMPLICIT, NULL, $end_of_stmt.start, 
                 ANTLR3_TRUE);} // hasImplicitSpecList=true
-	|	(label {lbl=$label.start;})? T_IMPLICIT T_NONE end_of_stmt
-			{c_action_implicit_stmt(lbl, $T_IMPLICIT, $T_NONE, $end_of_stmt.start, 
+   |   (label {lbl=$label.start;})? T_IMPLICIT T_NONE end_of_stmt
+            {c_action_implicit_stmt(lbl, $T_IMPLICIT, $T_NONE, $end_of_stmt.start, 
                 ANTLR3_FALSE);} // hasImplicitSpecList=false
-	;
+   ;
 
 // R550
 implicit_spec
-	:	declaration_type_spec T_LPAREN letter_spec_list T_RPAREN
+   :   declaration_type_spec T_LPAREN letter_spec_list T_RPAREN
         { c_action_implicit_spec(); }
-	;
+   ;
 
 implicit_spec_list
 @init{ int count=0;}
-    :  		{c_action_implicit_spec_list__begin();}
-		implicit_spec {count++;} ( T_COMMA implicit_spec {count++;} )*
-      		{c_action_implicit_spec_list(count);}
-    ;
+   :       {c_action_implicit_spec_list__begin();}
+        implicit_spec {count++;} ( T_COMMA implicit_spec {count++;} )*
+            {c_action_implicit_spec_list(count);}
+   ;
 
 
 // R551
 // TODO: here, we'll accept a T_IDENT, and then we'll have to do error 
 // checking on it.  
 letter_spec 
-    : id1=T_IDENT ( T_MINUS id2=T_IDENT )? 
-        { c_action_letter_spec(id1, id2); }
-    ;
+   :  id1=T_IDENT ( T_MINUS id2=T_IDENT )? 
+         {
+            c_action_letter_spec(id1, id2);
+         }
+   ;
 
 letter_spec_list
-@init{ int count=0;}
-    :  		{c_action_letter_spec_list__begin();}
-		letter_spec {count++;} ( T_COMMA letter_spec {count++;} )*
-      		{c_action_letter_spec_list(count);}
-    ;
+@init
+{
+   int count=0;
+   c_action_letter_spec_list__begin();
+}
+   :   letter_spec {count++;} ( T_COMMA letter_spec {count++;} )*
+          {
+             c_action_letter_spec_list(count);
+          }
+   ;
 
 // R552
 // T_IDENT inlined for namelist_group_name
 namelist_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;int count =1;}
 @after{checkForInclude();}
-    :	(label {lbl=$label.start;})? T_NAMELIST T_SLASH nlName=T_IDENT T_SLASH
-			{c_action_namelist_group_name(nlName);}
-    	namelist_group_object_list
-		( ( T_COMMA )?  T_SLASH nlName=T_IDENT T_SLASH
-			{c_action_namelist_group_name(nlName);}
-		namelist_group_object_list {count++;})* end_of_stmt
-			{c_action_namelist_stmt(lbl,$T_NAMELIST,$end_of_stmt.start,count);}
-    ;
+   :   (label {lbl=$label.start;})? T_NAMELIST T_SLASH nlName=T_IDENT T_SLASH
+            {c_action_namelist_group_name(nlName);}
+        namelist_group_object_list
+        ( ( T_COMMA )?  T_SLASH nlName=T_IDENT T_SLASH
+            {c_action_namelist_group_name(nlName);}
+        namelist_group_object_list {count++;})* end_of_stmt
+            {c_action_namelist_stmt(lbl,$T_NAMELIST,$end_of_stmt.start,count);}
+   ;
 
 // R553 namelist_group_object was variable_name inlined as T_IDENT
 
 // T_IDENT inlined for namelist_group_object
 namelist_group_object_list
 @init{ int count=0;}
-    :  		{c_action_namelist_group_object_list__begin();}
-		goName=T_IDENT {c_action_namelist_group_object(goName); count++;}
-		    ( T_COMMA goName=T_IDENT 
+   :       {c_action_namelist_group_object_list__begin();}
+        goName=T_IDENT {c_action_namelist_group_object(goName); count++;}
+            ( T_COMMA goName=T_IDENT 
             {c_action_namelist_group_object(goName); count++;} )*
-      		{c_action_namelist_group_object_list(count);}
-    ;
+            {c_action_namelist_group_object_list(count);}
+   ;
 
 // R554
 equivalence_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_EQUIVALENCE equivalence_set_list 
+   :   (label {lbl=$label.start;})? T_EQUIVALENCE equivalence_set_list 
             end_of_stmt
-			{c_action_equivalence_stmt(lbl, $T_EQUIVALENCE, $end_of_stmt.start);}
-	;
+            {c_action_equivalence_stmt(lbl, $T_EQUIVALENCE, $end_of_stmt.start);}
+   ;
 
 // R555
 equivalence_set
-	:	T_LPAREN equivalence_object T_COMMA equivalence_object_list T_RPAREN
+   :   T_LPAREN equivalence_object T_COMMA equivalence_object_list T_RPAREN
         { c_action_equivalence_set(); }
-	;
+   ;
 
 
 equivalence_set_list
 @init{ int count=0;}
-    :  		{c_action_equivalence_set_list__begin();}
-		equivalence_set {count++;} ( T_COMMA equivalence_set {count++;} )*
-      		{c_action_equivalence_set_list(count);}
-    ;
+   :       {c_action_equivalence_set_list__begin();}
+        equivalence_set {count++;} ( T_COMMA equivalence_set {count++;} )*
+            {c_action_equivalence_set_list(count);}
+   ;
 
 // R556
 // T_IDENT inlined for variable_name
@@ -2411,16 +2465,16 @@ equivalence_set_list
 // data_ref isa T_IDENT so T_IDENT deleted (removing first alt)
 // substring isa data_ref so data_ref deleted (removing second alt)
 equivalence_object
-	:	substring { c_action_equivalence_object(); }
-	;
+   :   substring { c_action_equivalence_object(); }
+   ;
 
 equivalence_object_list
 @init{ int count=0;}
-    :  		{c_action_equivalence_object_list__begin();}
-		equivalence_object {count++;} 
+   :       {c_action_equivalence_object_list__begin();}
+        equivalence_object {count++;} 
             ( T_COMMA equivalence_object {count++;} )*
-      		{c_action_equivalence_object_list(count);}
-    ;
+            {c_action_equivalence_object_list(count);}
+   ;
 
 // R557
 // c_action_common_block_name must be called here because it needs
@@ -2428,15 +2482,15 @@ equivalence_object_list
 common_stmt
 @init {pANTLR3_COMMON_TOKEN lbl=NULL; int numBlocks=1;} 
 @after{checkForInclude();}
-    : (label {lbl=$label.start;})? 
-		T_COMMON ( cb_name=common_block_name )?
-			{ c_action_common_block_name(cb_name); }
-		common_block_object_list
-		( ( T_COMMA )? cb_name=common_block_name
-			{ c_action_common_block_name(cb_name); }
-		common_block_object_list {numBlocks++;} )* end_of_stmt
-			{c_action_common_stmt(lbl, $T_COMMON, $end_of_stmt.start, numBlocks);}
-    ;
+   : (label {lbl=$label.start;})? 
+        T_COMMON ( cb_name=common_block_name )?
+            { c_action_common_block_name(cb_name); }
+        common_block_object_list
+        ( ( T_COMMA )? cb_name=common_block_name
+            { c_action_common_block_name(cb_name); }
+        common_block_object_list {numBlocks++;} )* end_of_stmt
+            {c_action_common_stmt(lbl, $T_COMMON, $end_of_stmt.start, numBlocks);}
+   ;
 
 // T_SLASH_SLASH must be a option in case there are no spaces slashes, '//'
 common_block_name returns [pANTLR3_COMMON_TOKEN id]
@@ -2456,18 +2510,18 @@ common_block_name returns [pANTLR3_COMMON_TOKEN id]
 // T_IDENT covered by first alt so second deleted
 common_block_object
 @init{ANTLR3_BOOLEAN hasShapeSpecList=ANTLR3_FALSE;}
-    : T_IDENT ( T_LPAREN explicit_shape_spec_list T_RPAREN 
+   : T_IDENT ( T_LPAREN explicit_shape_spec_list T_RPAREN 
             {hasShapeSpecList=ANTLR3_TRUE;})?
-			{c_action_common_block_object($T_IDENT,hasShapeSpecList);}
-    ;
+            {c_action_common_block_object($T_IDENT,hasShapeSpecList);}
+   ;
 
 common_block_object_list
 @init{ int count=0;}
-    :  		{c_action_common_block_object_list__begin();}
-		common_block_object {count++;} 
+   :       {c_action_common_block_object_list__begin();}
+        common_block_object {count++;} 
             ( T_COMMA common_block_object {count++;} )*
-      		{c_action_common_block_object_list(count);}
-    ;
+            {c_action_common_block_object_list(count);}
+   ;
 
 
 /**
@@ -2484,24 +2538,24 @@ variable
 
 // R603
 //  :   object-name             // T_IDENT (data-ref isa T_IDENT)
-//	|	array-element           // R616 is data-ref
-//	|	array-section           // R617 is data-ref [ (substring-range) ] 
-//	|	structure-component     // R614 is data-ref
-//	|	substring
+//  |   array-element           // R616 is data-ref
+//  |   array-section           // R617 is data-ref [ (substring-range) ] 
+//  |   structure-component     // R614 is data-ref
+//  |   substring
 // (substring-range) may be matched in data-ref
 // this rule is now identical to substring
 designator
 @init{ANTLR3_BOOLEAN hasSubstringRange = ANTLR3_FALSE;}
-	:	data_ref (T_LPAREN substring_range {hasSubstringRange=ANTLR3_TRUE;} T_RPAREN)?
-			{ c_action_designator(hasSubstringRange); }
-	|	char_literal_constant T_LPAREN substring_range T_RPAREN
-			{ hasSubstringRange=ANTLR3_TRUE; c_action_substring(hasSubstringRange); }
-	;
+   :   data_ref (T_LPAREN substring_range {hasSubstringRange=ANTLR3_TRUE;} T_RPAREN)?
+            { c_action_designator(hasSubstringRange); }
+   |   char_literal_constant T_LPAREN substring_range T_RPAREN
+            { hasSubstringRange=ANTLR3_TRUE; c_action_substring(hasSubstringRange); }
+   ;
 
 //
 // a function_reference is ambiguous with designator, ie, foo(b) could be an 
 // array element
-//	function_reference : procedure_designator T_LPAREN 
+//  function_reference : procedure_designator T_LPAREN 
 // ( actual_arg_spec_list )? T_RPAREN
 //                       procedure_designator isa data_ref
 // C1220 (R1217) The procedure-designator shall designate a function.
@@ -2515,26 +2569,26 @@ designator_or_func_ref
 @after {
     c_action_designator_or_func_ref();
 }
-	:	data_ref (T_LPAREN substring_range_or_arg_list
-					{
-						hasSubstringRangeOrArgList = ANTLR3_TRUE;
-						hasSubstringRange=
+   :   data_ref (T_LPAREN substring_range_or_arg_list
+                    {
+                        hasSubstringRangeOrArgList = ANTLR3_TRUE;
+                        hasSubstringRange=
                             $substring_range_or_arg_list.isSubstringRange;
-					}
-				  T_RPAREN)?
-			{
-				if (hasSubstringRangeOrArgList) {
-					if (hasSubstringRange) {
-						c_action_designator(hasSubstringRange);
-					} else {
+                    }
+                  T_RPAREN)?
+            {
+                if (hasSubstringRangeOrArgList) {
+                    if (hasSubstringRange) {
+                        c_action_designator(hasSubstringRange);
+                    } else {
                         // hasActualArgSpecList=true
-						c_action_function_reference(ANTLR3_TRUE);
-					}
-				}
-			}
-	|	char_literal_constant T_LPAREN substring_range T_RPAREN
-			{ hasSubstringRange=ANTLR3_TRUE; c_action_substring(hasSubstringRange); }
-	;
+                        c_action_function_reference(ANTLR3_TRUE);
+                    }
+                }
+            }
+   |   char_literal_constant T_LPAREN substring_range T_RPAREN
+            { hasSubstringRange=ANTLR3_TRUE; c_action_substring(hasSubstringRange); }
+   ;
 
 substring_range_or_arg_list returns [ANTLR3_BOOLEAN isSubstringRange]
 @init
@@ -2550,48 +2604,48 @@ substring_range_or_arg_list returns [ANTLR3_BOOLEAN isSubstringRange]
    c_action_substring_range_or_arg_list();
 }
    :   T_COLON (expr {hasUpperBound = ANTLR3_TRUE;})? // substring_range
-			{
+            {
                 // hasLowerBound=false
-                c_action_substring_range(ANTLR3_FALSE, hasUpperBound);	
+                c_action_substring_range(ANTLR3_FALSE, hasUpperBound);  
                 retval.isSubstringRange=ANTLR3_TRUE;
-			}
+            }
    |        { 
                 /* mimic actual-arg-spec-list */
                 c_action_actual_arg_spec_list__begin();  
-			}
+            }
        expr substr_range_or_arg_list_suffix
-			{
+            {
                 retval.isSubstringRange = $substr_range_or_arg_list_suffix.isSubstringRange;
-			}
+            }
    |        {
                 /* mimic actual-arg-spec-list */
                 c_action_actual_arg_spec_list__begin(); 
             }
        T_IDENT T_EQUALS expr
-			{
+            {
                 count++;
                 c_action_actual_arg(ANTLR3_TRUE, NULL);
                 c_action_actual_arg_spec($T_IDENT);
-			}
+            }
        ( T_COMMA actual_arg_spec {count++;} )*
-			{
+            {
                 c_action_actual_arg_spec_list(count);
-			}
+            }
    |        {
                 /* mimic actual-arg-spec-list */
                 c_action_actual_arg_spec_list__begin(); 
-			}
+            }
        ( T_IDENT T_EQUALS {keyword=$T_IDENT;} )? T_ASTERISK label
-			{
+            {
                 count++;
                 c_action_actual_arg(ANTLR3_FALSE, $label.start);
                 c_action_actual_arg_spec(keyword);
-			}
+            }
         ( T_COMMA actual_arg_spec {count++;} )*
-			{
+            {
                 c_action_actual_arg_spec_list(count);
-			}
-	;
+            }
+   ;
 
 substr_range_or_arg_list_suffix returns [ANTLR3_BOOLEAN isSubstringRange]
 @init
@@ -2618,8 +2672,8 @@ substr_range_or_arg_list_suffix returns [ANTLR3_BOOLEAN isSubstringRange]
    |
             {
                 count++;
-                c_action_actual_arg(ANTLR3_TRUE, NULL);	// hasExpr=true, label=null
-                c_action_actual_arg_spec(NULL);		    // keyword=null
+                c_action_actual_arg(ANTLR3_TRUE, NULL); // hasExpr=true, label=null
+                c_action_actual_arg_spec(NULL);         // keyword=null
             }
         ( T_COMMA actual_arg_spec {count++;} )*
             {
@@ -2629,43 +2683,43 @@ substr_range_or_arg_list_suffix returns [ANTLR3_BOOLEAN isSubstringRange]
 
 // R604
 logical_variable
-	:	variable
+   :   variable
             { c_action_logical_variable(); }
-	;
+   ;
 
 // R605
 default_logical_variable
-	:	variable
+   :   variable
             { c_action_default_logical_variable(); }
-	;
+   ;
 
 scalar_default_logical_variable
-	:	variable
+   :   variable
             { c_action_scalar_default_logical_variable(); }
-	;
+   ;
 
 // R606
 char_variable
-	:	variable
+   :   variable
             { c_action_char_variable(); }
-	;
+   ;
 
 // R607
 default_char_variable
-	:	variable
+   :   variable
             { c_action_default_char_variable(); }
-	;
+   ;
 
 scalar_default_char_variable
-	:	variable
+   :   variable
             { c_action_scalar_default_char_variable(); }
-	;
+   ;
 
 // R608
 int_variable
-	:	variable
+   :   variable
             { c_action_int_variable(); }
-	;
+   ;
 
 // R609
 // C608 (R610) parent_string shall be of type character
@@ -2674,11 +2728,11 @@ int_variable
 // ERR_CHK 609 ensure final () is (substring-range)
 substring
 @init{ANTLR3_BOOLEAN hasSubstringRange = ANTLR3_FALSE;}
-	:	data_ref (T_LPAREN substring_range {hasSubstringRange=ANTLR3_TRUE;} T_RPAREN)?
-			{ c_action_substring(hasSubstringRange); }
-	|	char_literal_constant T_LPAREN substring_range T_RPAREN
-			{ c_action_substring(ANTLR3_TRUE); }
-	;
+   :   data_ref (T_LPAREN substring_range {hasSubstringRange=ANTLR3_TRUE;} T_RPAREN)?
+            { c_action_substring(hasSubstringRange); }
+   |   char_literal_constant T_LPAREN substring_range T_RPAREN
+            { c_action_substring(ANTLR3_TRUE); }
+   ;
 
 // R610 parent_string inlined in R609 as (data_ref | char_literal_constant)
 // T_IDENT inlined for scalar_variable_name
@@ -2694,16 +2748,16 @@ substring_range
     ANTLR3_BOOLEAN hasLowerBound = ANTLR3_FALSE;
     ANTLR3_BOOLEAN hasUpperBound = ANTLR3_FALSE;
 }
-	:	(expr {hasLowerBound = ANTLR3_TRUE;})? T_COLON	(expr {hasUpperBound = ANTLR3_TRUE;})?
-			{ c_action_substring_range(hasLowerBound, hasUpperBound); }
-	;
+   :   (expr {hasLowerBound = ANTLR3_TRUE;})? T_COLON  (expr {hasUpperBound = ANTLR3_TRUE;})?
+            { c_action_substring_range(hasLowerBound, hasUpperBound); }
+   ;
 
 // R612
 data_ref
 @init{int numPartRefs = 0;}
-	:	part_ref {numPartRefs += 1;} ( T_PERCENT part_ref {numPartRefs += 1;})*
-			{c_action_data_ref(numPartRefs);}
-	;
+   :   part_ref {numPartRefs += 1;} ( T_PERCENT part_ref {numPartRefs += 1;})*
+            {c_action_data_ref(numPartRefs);}
+   ;
 
 /**
  * R612-F08 part-ref
@@ -2761,9 +2815,9 @@ data_ref
 // R622
 // ERR_CHK 622 int_expr replaced by expr
 vector_subscript
-	:	expr
+   :   expr
             { c_action_vector_subscript(); }
-	;
+   ;
 
 // R622 inlined vector_subscript as expr in R619
 // ERR_CHK 622 int_expr replaced by expr
@@ -2776,41 +2830,41 @@ allocate_stmt
        ANTLR3_BOOLEAN hasTypeSpec = ANTLR3_FALSE;
        ANTLR3_BOOLEAN hasAllocOptList = ANTLR3_FALSE;}
 @after{checkForInclude();}
-    :	(label {lbl=$label.start;})? T_ALLOCATE_STMT_1 T_ALLOCATE T_LPAREN
-		type_spec T_COLON_COLON
-		allocation_list 
-		( T_COMMA alloc_opt_list {hasAllocOptList=ANTLR3_TRUE;} )? T_RPAREN 
+   :   (label {lbl=$label.start;})? T_ALLOCATE_STMT_1 T_ALLOCATE T_LPAREN
+        type_spec T_COLON_COLON
+        allocation_list 
+        ( T_COMMA alloc_opt_list {hasAllocOptList=ANTLR3_TRUE;} )? T_RPAREN 
             end_of_stmt
-    		{
-    			hasTypeSpec = ANTLR3_TRUE;
-    			c_action_allocate_stmt(lbl, $T_ALLOCATE, $end_of_stmt.start, 
+            {
+                hasTypeSpec = ANTLR3_TRUE;
+                c_action_allocate_stmt(lbl, $T_ALLOCATE, $end_of_stmt.start, 
                                      hasTypeSpec, hasAllocOptList);
-    		}
-    |	(label {lbl=$label.start;})? T_ALLOCATE T_LPAREN
-    	allocation_list
-    	( T_COMMA alloc_opt_list {hasAllocOptList=ANTLR3_TRUE;} )? T_RPAREN 
+            }
+   |   (label {lbl=$label.start;})? T_ALLOCATE T_LPAREN
+        allocation_list
+        ( T_COMMA alloc_opt_list {hasAllocOptList=ANTLR3_TRUE;} )? T_RPAREN 
             end_of_stmt
-    		{
-    			c_action_allocate_stmt(lbl, $T_ALLOCATE, $end_of_stmt.start, 
+            {
+                c_action_allocate_stmt(lbl, $T_ALLOCATE, $end_of_stmt.start, 
                                      hasTypeSpec, hasAllocOptList);
-    		}
-    ;
+            }
+   ;
 
 // R624
 // ERR_CHK 624 source_expr replaced by expr
 // stat_variable and errmsg_variable replaced by designator
 alloc_opt
-	:	T_IDENT T_EQUALS expr
+   :   T_IDENT T_EQUALS expr
             /* {'STAT','ERRMSG'} are variables {SOURCE'} is expr */
-			{ c_action_alloc_opt($T_IDENT); }
-	;
+            { c_action_alloc_opt($T_IDENT); }
+   ;
 
 alloc_opt_list
 @init{ int count=0;}
-    :  		{c_action_alloc_opt_list__begin();}
-		alloc_opt {count++;} ( T_COMMA alloc_opt {count++;} )*
-      		{c_action_alloc_opt_list(count);}
-    ;
+   :       {c_action_alloc_opt_list__begin();}
+        alloc_opt {count++;} ( T_COMMA alloc_opt {count++;} )*
+            {c_action_alloc_opt_list(count);}
+   ;
 
 // R625 stat_variable was scalar_int_variable inlined in R624 and R636
 // R626 errmsg_variable was scalar_default_char_variable inlined in R624 
@@ -2851,10 +2905,10 @@ allocation_list
 
 allocate_object_list
 @init{ int count=0;}
-    :  		{c_action_allocate_object_list__begin();}
-		allocate_object {count++;} ( T_COMMA allocate_object {count++;} )*
-      		{c_action_allocate_object_list(count);}
-    ;
+   :       {c_action_allocate_object_list__begin();}
+        allocate_object {count++;} ( T_COMMA allocate_object {count++;} )*
+            {c_action_allocate_object_list(count);}
+   ;
 
 // R630
 // ERR_CHK 630a lower_bound_expr replaced by expr
@@ -2871,21 +2925,21 @@ allocate_object_list
 
 allocate_shape_spec
 @init{ANTLR3_BOOLEAN hasLowerBound = ANTLR3_FALSE; ANTLR3_BOOLEAN hasUpperBound = ANTLR3_TRUE;}
-	:	expr (T_COLON expr)?
-    		{	// note, allocate-shape-spec always has upper bound
-    			// grammar was refactored to remove left recursion, 
+   :   expr (T_COLON expr)?
+            {   // note, allocate-shape-spec always has upper bound
+                // grammar was refactored to remove left recursion, 
                 // looks deceptive
-    			c_action_allocate_shape_spec(hasLowerBound, hasUpperBound);
-    		}
-    ;
+                c_action_allocate_shape_spec(hasLowerBound, hasUpperBound);
+            }
+   ;
 
 allocate_shape_spec_list
 @init{ int count=0;}
-    :  		{c_action_allocate_shape_spec_list__begin();}
-		allocate_shape_spec {count++;} 
+   :       {c_action_allocate_shape_spec_list__begin();}
+        allocate_shape_spec {count++;} 
             ( T_COMMA allocate_shape_spec {count++;} )*
-      		{c_action_allocate_shape_spec_list(count);}
-    ;
+            {c_action_allocate_shape_spec_list(count);}
+   ;
 
 // R631 inlined lower_bound_expr was scalar_int_expr
 
@@ -2929,51 +2983,51 @@ allocate_coshape_spec_list
 nullify_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})?
-		T_NULLIFY T_LPAREN pointer_object_list T_RPAREN end_of_stmt
-			{ c_action_nullify_stmt(lbl, $T_NULLIFY, $end_of_stmt.start); }
-	;
+   :   (label {lbl=$label.start;})?
+        T_NULLIFY T_LPAREN pointer_object_list T_RPAREN end_of_stmt
+            { c_action_nullify_stmt(lbl, $T_NULLIFY, $end_of_stmt.start); }
+   ;
 
 // R634
 // T_IDENT inlined for variable_name and proc_pointer_name
 // data_ref inlined for structure_component
 // data_ref can be a T_IDENT so T_IDENT deleted
 pointer_object
-	:	data_ref
+   :   data_ref
             { c_action_pointer_object(); }
-	;
+   ;
 
 pointer_object_list
 @init{ int count=0;}
-    :  		{c_action_pointer_object_list__begin();}
-		pointer_object {count++;} ( T_COMMA pointer_object {count++;} )*
-      		{c_action_pointer_object_list(count);}
-    ;
+   :       {c_action_pointer_object_list__begin();}
+        pointer_object {count++;} ( T_COMMA pointer_object {count++;} )*
+            {c_action_pointer_object_list(count);}
+   ;
 
 // R635
 deallocate_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasDeallocOptList=ANTLR3_FALSE;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? T_DEALLOCATE T_LPAREN allocate_object_list 
+   :    (label {lbl=$label.start;})? T_DEALLOCATE T_LPAREN allocate_object_list 
             ( T_COMMA dealloc_opt_list {hasDeallocOptList=ANTLR3_TRUE;})? 
             T_RPAREN end_of_stmt
-			{c_action_deallocate_stmt(lbl, $T_DEALLOCATE, $end_of_stmt.start, 
+            {c_action_deallocate_stmt(lbl, $T_DEALLOCATE, $end_of_stmt.start, 
                 hasDeallocOptList);}
-    ;
+   ;
 
 // R636
 // stat_variable and errmsg_variable replaced by designator
 dealloc_opt
-	:	T_IDENT /* {'STAT','ERRMSG'} */ T_EQUALS designator
+   :   T_IDENT /* {'STAT','ERRMSG'} */ T_EQUALS designator
             { c_action_dealloc_opt($T_IDENT); }
-	;
+   ;
 
 dealloc_opt_list
 @init{ int count=0;}
-    :  		{c_action_dealloc_opt_list__begin();}
-		dealloc_opt {count++;} ( T_COMMA dealloc_opt {count++;} )*
-      		{c_action_dealloc_opt_list(count);}
-    ;
+   :       {c_action_dealloc_opt_list__begin();}
+        dealloc_opt {count++;} ( T_COMMA dealloc_opt {count++;} )*
+            {c_action_dealloc_opt_list(count);}
+   ;
 
 /**
  * Section/Clause 7: Expressions and assignment
@@ -2990,19 +3044,19 @@ dealloc_opt_list
 primary
 options {backtrack=true;}       // alt 1,4 ambiguous
 @after {c_action_primary();}
-	:	designator_or_func_ref
-	|	literal_constant
-	|	array_constructor
-	|	structure_constructor
-	|	T_LPAREN expr T_RPAREN {c_action_parenthesized_expr();}
-	;
+   :   designator_or_func_ref
+   |   literal_constant
+   |   array_constructor
+   |   structure_constructor
+   |   T_LPAREN expr T_RPAREN {c_action_parenthesized_expr();}
+   ;
 
 // R702
 level_1_expr
 @init{pANTLR3_COMMON_TOKEN tk = NULL;}
-    : (defined_unary_op {tk = $defined_unary_op.start;})? primary
-    		{c_action_level_1_expr(tk);}
-    ;
+   : (defined_unary_op {tk = $defined_unary_op.start;})? primary
+            {c_action_level_1_expr(tk);}
+   ;
 
 // R703
 defined_unary_op
@@ -3015,9 +3069,9 @@ defined_unary_op
 // inserted as R704 functionality
 power_operand
 @init{ANTLR3_BOOLEAN hasPowerOperand = ANTLR3_FALSE;}
-	: level_1_expr (power_op power_operand {hasPowerOperand = ANTLR3_TRUE;})?
-			{c_action_power_operand(hasPowerOperand);}
-	;	
+   : level_1_expr (power_op power_operand {hasPowerOperand = ANTLR3_TRUE;})?
+            {c_action_power_operand(hasPowerOperand);}
+   ;   
 
 // R704
 // see power_operand
@@ -3025,10 +3079,10 @@ mult_operand
 @init{int numMultOps = 0;}
 //    : level_1_expr ( power_op mult_operand )?
 //    : power_operand
-    : power_operand (mult_op power_operand
+   : power_operand (mult_op power_operand
             { c_action_mult_operand__mult_op($mult_op.start); numMultOps += 1; })*
-    		{ c_action_mult_operand(numMultOps); }
-    ;
+            { c_action_mult_operand(numMultOps); }
+   ;
 
 // R705-addition
 // This rule has been added so the unary plus/minus has the correct
@@ -3060,9 +3114,9 @@ level_2_expr
 // check notes on how to remove this left recursion  
 // (WARNING something like the following)
 //    : (add_op)? ( add_operand add_op )* add_operand
-    : add_operand ( concat_op add_operand {numConcatOps += 1;})*
-    		{c_action_level_2_expr(numConcatOps);}
-    ;
+   : add_operand ( concat_op add_operand {numConcatOps += 1;})*
+            {c_action_level_2_expr(numConcatOps);}
+   ;
 
 // R707
 power_op
@@ -3087,9 +3141,9 @@ level_3_expr
 @init{pANTLR3_COMMON_TOKEN relOp = NULL;}
 //    : ( level_3_expr concat_op )? level_2_expr
 //    : ( level_2_expr concat_op )* level_2_expr
-    : level_2_expr (rel_op level_2_expr {relOp = $rel_op.start;})?
-    		{c_action_level_3_expr(relOp);}
-    ;
+   : level_2_expr (rel_op level_2_expr {relOp = $rel_op.start;})?
+            {c_action_level_3_expr(relOp);}
+   ;
 
 // R711
 concat_op
@@ -3129,13 +3183,13 @@ and_operand
     int numAndOps = 0;
 }
 //    :    ( not_op )? level_3_expr
-	:	(not_op {hasNotOp0=ANTLR3_TRUE;})?
-    	level_3_expr
-		(and_op {hasNotOp1=ANTLR3_FALSE;} (not_op {hasNotOp1=ANTLR3_TRUE;})? level_3_expr
-				{c_action_and_operand__not_op(hasNotOp1); numAndOps += 1;}
-		)*
-				{c_action_and_operand(hasNotOp0, numAndOps);}
-    ;
+   :   (not_op {hasNotOp0=ANTLR3_TRUE;})?
+        level_3_expr
+        (and_op {hasNotOp1=ANTLR3_FALSE;} (not_op {hasNotOp1=ANTLR3_TRUE;})? level_3_expr
+                {c_action_and_operand__not_op(hasNotOp1); numAndOps += 1;}
+        )*
+                {c_action_and_operand(hasNotOp0, numAndOps);}
+   ;
 
 // R715
 // moved leading optional to or_operand
@@ -3143,9 +3197,9 @@ or_operand
 @init{int numOrOps = 0;}
 //    : ( or_operand and_op )? and_operand
 //    : ( and_operand and_op )* and_operand
-    : and_operand (or_op and_operand {numOrOps += 1;})*
-    		{ c_action_or_operand(numOrOps); }
-    ;
+   : and_operand (or_op and_operand {numOrOps += 1;})*
+            { c_action_or_operand(numOrOps); }
+   ;
 
 // R716
 // moved leading optional to or_operand
@@ -3154,12 +3208,12 @@ equiv_operand
 @init{int numEquivOps = 0;}
 //    : ( equiv_operand or_op )? or_operand
 //    : ( or_operand or_op )* or_operand
-    : or_operand 
+   : or_operand 
         (equiv_op or_operand
             {c_action_equiv_operand__equiv_op($equiv_op.start); numEquivOps += 1;}
         )*
-			{c_action_equiv_operand(numEquivOps);}
-    ;
+            {c_action_equiv_operand(numEquivOps);}
+   ;
 
 // R717
 // moved leading optional to equiv_operand
@@ -3167,11 +3221,11 @@ level_5_expr
 @init{int numDefinedBinaryOps = 0;}
 //    : ( level_5_expr equiv_op )? equiv_operand
 //    : ( equiv_operand equiv_op )* equiv_operand
-    : equiv_operand (defined_binary_op equiv_operand
+   : equiv_operand (defined_binary_op equiv_operand
             {c_action_level_5_expr__defined_binary_op($defined_binary_op.start); 
                 numDefinedBinaryOps += 1;} )*
-    		{c_action_level_5_expr(numDefinedBinaryOps);}
-    ;
+            {c_action_level_5_expr(numDefinedBinaryOps);}
+   ;
 
 // R718
 not_op
@@ -3199,9 +3253,9 @@ equiv_op
 expr
 //    : ( expr defined_binary_op )? level_5_expr
 //    : ( level_5_expr defined_binary_op )* level_5_expr
-    : level_5_expr
-    	{c_action_expr();}
-    ;
+   : level_5_expr
+        {c_action_expr();}
+   ;
 
 // R723
 defined_binary_op
@@ -3240,10 +3294,10 @@ defined_binary_op
 assignment_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_ASSIGNMENT_STMT variable
-		T_EQUALS expr end_of_stmt
-			{c_action_assignment_stmt(lbl, $end_of_stmt.start);}
-	;
+   :   (label {lbl=$label.start;})? T_ASSIGNMENT_STMT variable
+        T_EQUALS expr end_of_stmt
+            {c_action_assignment_stmt(lbl, $end_of_stmt.start);}
+   ;
 
 // R735
 // ERR_TEST 735 ensure that part_ref in data_ref doesn't capture the T_LPAREN
@@ -3259,54 +3313,54 @@ pointer_assignment_stmt
 options {backtrack=true;}
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-    : (label {lbl=$label.start;})? T_PTR_ASSIGNMENT_STMT data_ref T_EQ_GT 
+   : (label {lbl=$label.start;})? T_PTR_ASSIGNMENT_STMT data_ref T_EQ_GT 
             expr end_of_stmt
-			{c_action_pointer_assignment_stmt(lbl, $end_of_stmt.start,ANTLR3_FALSE,ANTLR3_FALSE);}
-    | (label {lbl=$label.start;})? T_PTR_ASSIGNMENT_STMT data_ref T_LPAREN 
+            {c_action_pointer_assignment_stmt(lbl, $end_of_stmt.start,ANTLR3_FALSE,ANTLR3_FALSE);}
+   | (label {lbl=$label.start;})? T_PTR_ASSIGNMENT_STMT data_ref T_LPAREN 
             bounds_spec_list T_RPAREN T_EQ_GT expr end_of_stmt
-			{c_action_pointer_assignment_stmt(lbl, $end_of_stmt.start, ANTLR3_TRUE,ANTLR3_FALSE);}
-    | (label {lbl=$label.start;})? T_PTR_ASSIGNMENT_STMT data_ref T_LPAREN 
+            {c_action_pointer_assignment_stmt(lbl, $end_of_stmt.start, ANTLR3_TRUE,ANTLR3_FALSE);}
+   | (label {lbl=$label.start;})? T_PTR_ASSIGNMENT_STMT data_ref T_LPAREN 
             bounds_remapping_list T_RPAREN T_EQ_GT expr end_of_stmt
-			{c_action_pointer_assignment_stmt(lbl, $end_of_stmt.start, ANTLR3_FALSE,ANTLR3_TRUE);}
-    ;
+            {c_action_pointer_assignment_stmt(lbl, $end_of_stmt.start, ANTLR3_FALSE,ANTLR3_TRUE);}
+   ;
 
 // R736
 // ERR_CHK 736 ensure ( T_IDENT | designator ending in T_PERCENT T_IDENT)
 // T_IDENT inlined for variable_name and data_pointer_component_name
 // variable replaced by designator
 data_pointer_object
-	:	designator
+   :   designator
             { c_action_data_pointer_object(); }
-	;
+   ;
 
 // R737
 // ERR_CHK 737 lower_bound_expr replaced by expr
 bounds_spec
-	:	expr T_COLON
+   :   expr T_COLON
             { c_action_bounds_spec(); }
-	;
+   ;
 
 bounds_spec_list
 @init{ int count=0;}
-    :  		{c_action_bounds_spec_list__begin();}
-		bounds_spec {count++;} ( T_COMMA bounds_spec {count++;} )*
-      		{c_action_bounds_spec_list(count);}
-    ;
+   :       {c_action_bounds_spec_list__begin();}
+        bounds_spec {count++;} ( T_COMMA bounds_spec {count++;} )*
+            {c_action_bounds_spec_list(count);}
+   ;
 
 // R738
 // ERR_CHK 738a lower_bound_expr replaced by expr
 // ERR_CHK 738b upper_bound_expr replaced by expr
 bounds_remapping
-	:	expr T_COLON expr
+   :   expr T_COLON expr
             { c_action_bounds_remapping(); }
-	;
+   ;
 
 bounds_remapping_list
 @init{ int count=0;}
-    :  		{c_action_bounds_remapping_list__begin();}
-		bounds_remapping {count++;} ( T_COMMA bounds_remapping {count++;} )*
-      		{c_action_bounds_remapping_list(count);}
-    ;
+   :       {c_action_bounds_remapping_list__begin();}
+        bounds_remapping {count++;} ( T_COMMA bounds_remapping {count++;} )*
+            {c_action_bounds_remapping_list(count);}
+   ;
 
 // R739 data_target inlined as expr in R459 and R735
 // expr can be designator (via primary) so variable deleted
@@ -3317,9 +3371,9 @@ bounds_remapping_list
 // proc_component_ref replaced by designator T_PERCENT T_IDENT replaced 
 // by designator
 proc_pointer_object
-	:	designator
+   :   designator
             { c_action_proc_pointer_object(); }
-	;
+   ;
 
 // R741 proc_component_ref inlined as designator T_PERCENT T_IDENT in R740, 
 // R742, R1219, and R1221
@@ -3342,11 +3396,11 @@ where_stmt
     c_action_where_stmt__begin();
 }
 @after{checkForInclude();}
-	:
-		(label {lbl=$label.start;})? T_WHERE_STMT T_WHERE
-		T_LPAREN expr T_RPAREN assignment_stmt
-			{c_action_where_stmt(lbl, $T_WHERE);}
-	;
+   :
+        (label {lbl=$label.start;})? T_WHERE_STMT T_WHERE
+        T_LPAREN expr T_RPAREN assignment_stmt
+            {c_action_where_stmt(lbl, $T_WHERE);}
+   ;
 
 // R744
 where_construct
@@ -3357,7 +3411,7 @@ where_construct
     int numElsewhereConstructs = 0;  
     ANTLR3_BOOLEAN hasElsewhere = ANTLR3_FALSE;
 }
-    :    where_construct_stmt ( where_body_construct {numConstructs += 1;} )*
+   :    where_construct_stmt ( where_body_construct {numConstructs += 1;} )*
           ( masked_elsewhere_stmt ( where_body_construct 
                 {numMaskedConstructs += 1;} )*
                 {hasMaskedElsewhere = ANTLR3_TRUE; 
@@ -3371,17 +3425,17 @@ where_construct
          end_where_stmt
                 {c_action_where_construct(numConstructs, hasMaskedElsewhere, 
                     hasElsewhere);}
-    ;
+   ;
 
 // R745
 // ERR_CHK 745 mask_expr replaced by expr
 where_construct_stmt
 @init {pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	:	( T_IDENT T_COLON {id=$T_IDENT;})? T_WHERE_CONSTRUCT_STMT T_WHERE 
+   :   ( T_IDENT T_COLON {id=$T_IDENT;})? T_WHERE_CONSTRUCT_STMT T_WHERE 
             T_LPAREN expr T_RPAREN end_of_stmt
-				{c_action_where_construct_stmt(id, $T_WHERE, $end_of_stmt.start);}
-    ;
+                {c_action_where_construct_stmt(id, $T_WHERE, $end_of_stmt.start);}
+   ;
 
 // R746
 // assignment_stmt inlined for where_assignment_stmt
@@ -3389,10 +3443,10 @@ where_body_construct
 @after {
     c_action_where_body_construct();
 }
-	:	assignment_stmt
-	|	where_stmt
-	|	where_construct
-	;
+   :   assignment_stmt
+   |   where_stmt
+   |   where_construct
+   ;
 
 // R747 where_assignment_stmt inlined as assignment_stmt in R743 and R746
 
@@ -3407,62 +3461,62 @@ where_body_construct
 masked_elsewhere_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_ELSE T_WHERE T_LPAREN expr T_RPAREN 
+   :   (label {lbl=$label.start;})? T_ELSE T_WHERE T_LPAREN expr T_RPAREN 
             ( T_IDENT {id=$T_IDENT;})? end_of_stmt 
-			{c_action_masked_elsewhere_stmt(lbl, $T_ELSE, $T_WHERE, id, 
+            {c_action_masked_elsewhere_stmt(lbl, $T_ELSE, $T_WHERE, id, 
                 $end_of_stmt.start);}
-	|	(label {lbl=$label.start;})? T_ELSEWHERE T_LPAREN expr T_RPAREN 
+   |   (label {lbl=$label.start;})? T_ELSEWHERE T_LPAREN expr T_RPAREN 
             ( T_IDENT {id=$T_IDENT;})? end_of_stmt 
-			{c_action_masked_elsewhere_stmt(lbl, $T_ELSEWHERE, NULL,id,
+            {c_action_masked_elsewhere_stmt(lbl, $T_ELSEWHERE, NULL,id,
                 $end_of_stmt.start);}
-	;
+   ;
 
 // R750
 elsewhere_stmt
 @init { pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;} 
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_ELSE T_WHERE 
+   :   (label {lbl=$label.start;})? T_ELSE T_WHERE 
             (T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_elsewhere_stmt(lbl, $T_ELSE, $T_WHERE, id, 
+            {c_action_elsewhere_stmt(lbl, $T_ELSE, $T_WHERE, id, 
                 $end_of_stmt.start);}
-	|	(label {lbl=$label.start;})? T_ELSEWHERE (T_IDENT {id=$T_IDENT;})? 
+   |   (label {lbl=$label.start;})? T_ELSEWHERE (T_IDENT {id=$T_IDENT;})? 
             end_of_stmt 
-			{c_action_elsewhere_stmt(lbl, $T_ELSEWHERE, NULL, id, 
+            {c_action_elsewhere_stmt(lbl, $T_ELSEWHERE, NULL, id, 
                 $end_of_stmt.start);}
-	;
+   ;
 
 // R751
 end_where_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_END T_WHERE ( T_IDENT {id=$T_IDENT;} )? 
+   : (label {lbl=$label.start;})? T_END T_WHERE ( T_IDENT {id=$T_IDENT;} )? 
         end_of_stmt
-		{c_action_end_where_stmt(lbl, $T_END, $T_WHERE, id, $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_ENDWHERE ( T_IDENT {id=$T_IDENT;} )? 
+        {c_action_end_where_stmt(lbl, $T_END, $T_WHERE, id, $end_of_stmt.start);}
+   | (label {lbl=$label.start;})? T_ENDWHERE ( T_IDENT {id=$T_IDENT;} )? 
         end_of_stmt
-		{c_action_end_where_stmt(lbl, $T_ENDWHERE, NULL, id, $end_of_stmt.start);}
-	;
+        {c_action_end_where_stmt(lbl, $T_ENDWHERE, NULL, id, $end_of_stmt.start);}
+   ;
 
 // R752
 forall_construct
 @after {
     c_action_forall_construct(); 
 }
-	:	forall_construct_stmt
-		( forall_body_construct )*
-		end_forall_stmt
-	;
+   :   forall_construct_stmt
+        ( forall_body_construct )*
+        end_forall_stmt
+   ;
 
 // R753
 forall_construct_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id = NULL;} 
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;})? 
+   :    (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;})? 
             T_FORALL_CONSTRUCT_STMT T_FORALL 
             forall_header end_of_stmt
-				{c_action_forall_construct_stmt(lbl, id, $T_FORALL, 
+                {c_action_forall_construct_stmt(lbl, id, $T_FORALL, 
                     $end_of_stmt.start);}
-    ;
+   ;
 
 // R754
 // ERR_CHK 754 scalar_mask_expr replaced by expr
@@ -3470,59 +3524,59 @@ forall_header
 @after {
     c_action_forall_header();
 }
-    : T_LPAREN forall_triplet_spec_list ( T_COMMA expr )? T_RPAREN
-    ;
+   : T_LPAREN forall_triplet_spec_list ( T_COMMA expr )? T_RPAREN
+   ;
 
 // R755
 // T_IDENT inlined for index_name
 // expr inlined for subscript and stride
 forall_triplet_spec
 @init{ANTLR3_BOOLEAN hasStride=ANTLR3_FALSE;}
-    : T_IDENT T_EQUALS expr T_COLON expr ( T_COLON expr {hasStride=ANTLR3_TRUE;})?
-			{c_action_forall_triplet_spec($T_IDENT,hasStride);}
-    ;
+   : T_IDENT T_EQUALS expr T_COLON expr ( T_COLON expr {hasStride=ANTLR3_TRUE;})?
+            {c_action_forall_triplet_spec($T_IDENT,hasStride);}
+   ;
 
 
 forall_triplet_spec_list
 @init{ int count=0;}
-    :  		{c_action_forall_triplet_spec_list__begin();}
-		forall_triplet_spec {count++;} 
+   :       {c_action_forall_triplet_spec_list__begin();}
+        forall_triplet_spec {count++;} 
             ( T_COMMA forall_triplet_spec {count++;} )*
-      		{c_action_forall_triplet_spec_list(count);}
-    ;
+            {c_action_forall_triplet_spec_list(count);}
+   ;
 
 // R756
 forall_body_construct
 @after {
     c_action_forall_body_construct();
 }
-	:	forall_assignment_stmt
-	|	where_stmt
-	|	where_construct
-	|	forall_construct
-	|	forall_stmt
-	;
+   :   forall_assignment_stmt
+   |   where_stmt
+   |   where_construct
+   |   forall_construct
+   |   forall_stmt
+   ;
 
 // R757
 forall_assignment_stmt
 @after{checkForInclude();}
-	:	assignment_stmt
-			{c_action_forall_assignment_stmt(ANTLR3_FALSE);}
-	|	pointer_assignment_stmt
-			{c_action_forall_assignment_stmt(ANTLR3_TRUE);}
-	;
+   :   assignment_stmt
+            {c_action_forall_assignment_stmt(ANTLR3_FALSE);}
+   |   pointer_assignment_stmt
+            {c_action_forall_assignment_stmt(ANTLR3_TRUE);}
+   ;
 
 // R758
 end_forall_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_END T_FORALL ( T_IDENT {id=$T_IDENT;})? 
+   : (label {lbl=$label.start;})? T_END T_FORALL ( T_IDENT {id=$T_IDENT;})? 
         end_of_stmt
-		{c_action_end_forall_stmt(lbl, $T_END, $T_FORALL, id, $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_ENDFORALL ( T_IDENT {id=$T_IDENT;})? 
+        {c_action_end_forall_stmt(lbl, $T_END, $T_FORALL, id, $end_of_stmt.start);}
+   | (label {lbl=$label.start;})? T_ENDFORALL ( T_IDENT {id=$T_IDENT;})? 
         end_of_stmt
-		{c_action_end_forall_stmt(lbl, $T_ENDFORALL, NULL, id, $end_of_stmt.start);}
-	;
+        {c_action_end_forall_stmt(lbl, $T_ENDFORALL, NULL, id, $end_of_stmt.start);}
+   ;
 
 // R759
 // T_FORALL_STMT token is inserted by scanner to remove need for backtracking
@@ -3532,11 +3586,11 @@ forall_stmt
     c_action_forall_stmt__begin();
 }
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_FORALL_STMT T_FORALL
-		forall_header
-		forall_assignment_stmt
-			{c_action_forall_stmt(lbl, $T_FORALL);}
-	;
+   :   (label {lbl=$label.start;})? T_FORALL_STMT T_FORALL
+        forall_header
+        forall_assignment_stmt
+            {c_action_forall_stmt(lbl, $T_FORALL);}
+   ;
 
 
 /**
@@ -3549,63 +3603,63 @@ block
 @after {
     c_action_block();
 }
-	:	( execution_part_construct )*
-	;
+   :   ( execution_part_construct )*
+   ;
 
 // R802
 if_construct
 @after {
     c_action_if_construct();
 }
-    :   if_then_stmt block ( else_if_stmt block )* ( else_stmt block )? 
+   :   if_then_stmt block ( else_if_stmt block )* ( else_stmt block )? 
             end_if_stmt
-    ;
+   ;
 
 // R803
 // ERR_CHK 803 scalar_logical_expr replaced by expr
 if_then_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-    : (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;} )? T_IF 
+   : (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;} )? T_IF 
             T_LPAREN expr T_RPAREN T_THEN end_of_stmt
-			{c_action_if_then_stmt(lbl, id, $T_IF, $T_THEN, $end_of_stmt.start);}
-    ;
+            {c_action_if_then_stmt(lbl, id, $T_IF, $T_THEN, $end_of_stmt.start);}
+   ;
 
 // R804
 // ERR_CHK 804 scalar_logical_expr replaced by expr
 else_if_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_ELSE T_IF
+   : (label {lbl=$label.start;})? T_ELSE T_IF
         T_LPAREN expr T_RPAREN T_THEN ( T_IDENT {id=$T_IDENT;} )? end_of_stmt
-			{c_action_else_if_stmt(lbl, $T_ELSE, $T_IF, $T_THEN, id, 
+            {c_action_else_if_stmt(lbl, $T_ELSE, $T_IF, $T_THEN, id, 
                 $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_ELSEIF
+   | (label {lbl=$label.start;})? T_ELSEIF
         T_LPAREN expr T_RPAREN T_THEN ( T_IDENT {id=$T_IDENT;} )? end_of_stmt
-			{c_action_else_if_stmt(lbl, $T_ELSEIF, NULL, $T_THEN, id, 
+            {c_action_else_if_stmt(lbl, $T_ELSEIF, NULL, $T_THEN, id, 
                 $end_of_stmt.start);}
-	;
+   ;
 
 // R805
 else_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_ELSE ( T_IDENT {id=$T_IDENT;} )? 
+   :   (label {lbl=$label.start;})? T_ELSE ( T_IDENT {id=$T_IDENT;} )? 
             end_of_stmt
-			{c_action_else_stmt(lbl, $T_ELSE, id, $end_of_stmt.start);}
-	;
+            {c_action_else_stmt(lbl, $T_ELSE, id, $end_of_stmt.start);}
+   ;
 
 // R806
 end_if_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_END T_IF ( T_IDENT {id=$T_IDENT;} )? 
+   : (label {lbl=$label.start;})? T_END T_IF ( T_IDENT {id=$T_IDENT;} )? 
         end_of_stmt
-			{c_action_end_if_stmt(lbl, $T_END, $T_IF, id, $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_ENDIF    ( T_IDENT {id=$T_IDENT;} )? 
+            {c_action_end_if_stmt(lbl, $T_END, $T_IF, id, $end_of_stmt.start);}
+   | (label {lbl=$label.start;})? T_ENDIF    ( T_IDENT {id=$T_IDENT;} )? 
             end_of_stmt
-			{c_action_end_if_stmt(lbl, $T_ENDIF, NULL, id, $end_of_stmt.start);}
-	;
+            {c_action_end_if_stmt(lbl, $T_ENDIF, NULL, id, $end_of_stmt.start);}
+   ;
 
 // R807
 // ERR_CHK 807 scalar_logical_expr replaced by expr
@@ -3616,10 +3670,10 @@ if_stmt
     c_action_if_stmt__begin();
 }
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_IF_STMT T_IF T_LPAREN expr T_RPAREN 
-			action_stmt
-				{c_action_if_stmt(lbl, $T_IF);}
-	;
+   :   (label {lbl=$label.start;})? T_IF_STMT T_IF T_LPAREN expr T_RPAREN 
+            action_stmt
+                {c_action_if_stmt(lbl, $T_IF);}
+   ;
 
 /*
  * R807-F08 block-construct
@@ -3773,43 +3827,43 @@ case_construct
 @after {
     c_action_case_construct();
 }
-    :    select_case_stmt ( case_stmt block )* end_select_stmt
-    ;
+   :    select_case_stmt ( case_stmt block )* end_select_stmt
+   ;
 
 // R809
 // ERR_CHK 809 case_expr replaced by expr
 select_case_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL; pANTLR3_COMMON_TOKEN tk1 = NULL; pANTLR3_COMMON_TOKEN tk2 = NULL;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;})?
+   :    (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;})?
         (T_SELECT T_CASE {tk1=$T_SELECT; tk2=$T_CASE;} 
             | T_SELECTCASE {tk1=$T_SELECTCASE; tk2=NULL;} )
             T_LPAREN expr T_RPAREN end_of_stmt
-			{c_action_select_case_stmt(lbl, id, tk1, tk2, $end_of_stmt.start);}
-    ;
+            {c_action_select_case_stmt(lbl, id, tk1, tk2, $end_of_stmt.start);}
+   ;
 
 // R810
 case_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_CASE case_selector
-		    ( T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{ c_action_case_stmt(lbl, $T_CASE, id, $end_of_stmt.start);}
-	;
+   :   (label {lbl=$label.start;})? T_CASE case_selector
+            ( T_IDENT {id=$T_IDENT;})? end_of_stmt
+            { c_action_case_stmt(lbl, $T_CASE, id, $end_of_stmt.start);}
+   ;
 
 // R811
 end_select_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_END T_SELECT (T_IDENT {id=$T_IDENT;})? 
+   : (label {lbl=$label.start;})? T_END T_SELECT (T_IDENT {id=$T_IDENT;})? 
         end_of_stmt
-			{c_action_end_select_stmt(lbl, $T_END, $T_SELECT, id, 
+            {c_action_end_select_stmt(lbl, $T_END, $T_SELECT, id, 
                 $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_ENDSELECT    (T_IDENT {id=$T_IDENT;})? 
+   | (label {lbl=$label.start;})? T_ENDSELECT    (T_IDENT {id=$T_IDENT;})? 
         end_of_stmt
-			{c_action_end_select_stmt(lbl, $T_ENDSELECT, NULL, id, 
+            {c_action_end_select_stmt(lbl, $T_ENDSELECT, NULL, id, 
                 $end_of_stmt.start);}
-	;
+   ;
 
 // R812 inlined case_expr with expr was either scalar_int_expr 
 // scalar_char_expr scalar_logical_expr
@@ -3818,69 +3872,69 @@ end_select_stmt
 
 // R813
 case_selector
-	:	T_LPAREN
-		case_value_range_list
-		T_RPAREN
+   :   T_LPAREN
+        case_value_range_list
+        T_RPAREN
             { c_action_case_selector(NULL); }
-	|	T_DEFAULT
+   |   T_DEFAULT
             { c_action_case_selector($T_DEFAULT); }
-	;
+   ;
 
 // R814
 case_value_range
 @after {
     c_action_case_value_range();
 }
-	:	T_COLON case_value
-	|	case_value case_value_range_suffix
-	;
+   :   T_COLON case_value
+   |   case_value case_value_range_suffix
+   ;
 
 case_value_range_suffix
 @after {
     c_action_case_value_range_suffix();
 }
-	:	T_COLON ( case_value )?
-	|	{ /* empty */ }
-	;
+   :   T_COLON ( case_value )?
+   |   { /* empty */ }
+   ;
 
 case_value_range_list
 @init{ int count=0;}
-    :  		{c_action_case_value_range_list__begin();}
-		case_value_range {count++;} ( T_COMMA case_value_range {count++;} )*
-      		{c_action_case_value_range_list(count);}
-    ;
+   :       {c_action_case_value_range_list__begin();}
+        case_value_range {count++;} ( T_COMMA case_value_range {count++;} )*
+            {c_action_case_value_range_list(count);}
+   ;
 
 // R815
 // ERR_CHK 815 expr either scalar_int_initialization_expr 
 // scalar_char_initialization_expr scalar_logical_initialization_expr
 case_value
-	:	expr
+   :   expr
             { c_action_case_value(); }
-	;
+   ;
 
 // R816
 associate_construct
-	:	associate_stmt
-		block
-		end_associate_stmt
+   :   associate_stmt
+        block
+        end_associate_stmt
             { c_action_associate_construct(); }
-	;
+   ;
 
 // R817
 associate_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-    :   (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;})? 
+   :   (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;})? 
             T_ASSOCIATE T_LPAREN association_list T_RPAREN end_of_stmt
-			{c_action_associate_stmt(lbl, id, $T_ASSOCIATE, $end_of_stmt.start);}
-    ;
+            {c_action_associate_stmt(lbl, id, $T_ASSOCIATE, $end_of_stmt.start);}
+   ;
 
 association_list
 @init{ int count=0;}
-    :  		{c_action_association_list__begin();}
-		association {count++;} ( T_COMMA association {count++;} )*
-      		{c_action_association_list(count);}
-    ;
+   :       {c_action_association_list__begin();}
+        association {count++;} ( T_COMMA association {count++;} )*
+            {c_action_association_list(count);}
+   ;
 
 /*
  * R818-08 loop-control
@@ -3909,55 +3963,55 @@ loop_control
 // R818
 // T_IDENT inlined for associate_name
 association
-	:	T_IDENT T_EQ_GT selector
+   :   T_IDENT T_EQ_GT selector
             { c_action_association($T_IDENT); }
-	;
+   ;
 
 // R819
 // expr can be designator (via primary) so variable deleted
 selector
-	:	expr
+   :   expr
             { c_action_selector(); }
-	;
+   ;
 
 // R820
 end_associate_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	:   (label {lbl=$label.start;})? T_END T_ASSOCIATE 
+   :   (label {lbl=$label.start;})? T_END T_ASSOCIATE 
             (T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_end_associate_stmt(lbl, $T_END, $T_ASSOCIATE, id, 
+            {c_action_end_associate_stmt(lbl, $T_END, $T_ASSOCIATE, id, 
                 $end_of_stmt.start);}
-	|   (label {lbl=$label.start;})? T_ENDASSOCIATE  
+   |   (label {lbl=$label.start;})? T_ENDASSOCIATE  
             (T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_end_associate_stmt(lbl, $T_ENDASSOCIATE, NULL, id, 
+            {c_action_end_associate_stmt(lbl, $T_ENDASSOCIATE, NULL, id, 
                                        $end_of_stmt.start);}
-	;
+   ;
 
 // R821
 select_type_construct
-    :   select_type_stmt ( type_guard_stmt block )* end_select_type_stmt
+   :   select_type_stmt ( type_guard_stmt block )* end_select_type_stmt
             { c_action_select_type_construct(); }
-    ;
+   ;
 
 // R822
 // T_IDENT inlined for select_construct_name and associate_name
 select_type_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN selectConstructName=NULL; 
-	   pANTLR3_COMMON_TOKEN associateName=NULL;}
+       pANTLR3_COMMON_TOKEN associateName=NULL;}
 @after{checkForInclude();}
-    : (label {lbl=$label.start;})?
-		( idTmp=T_IDENT T_COLON {selectConstructName=idTmp;})? select_type
+   : (label {lbl=$label.start;})?
+        ( idTmp=T_IDENT T_COLON {selectConstructName=idTmp;})? select_type
         T_LPAREN ( idTmpx=T_IDENT T_EQ_GT {associateName=idTmpx;} )?
-		selector T_RPAREN end_of_stmt
-			{c_action_select_type_stmt(lbl, selectConstructName, associateName, 
+        selector T_RPAREN end_of_stmt
+            {c_action_select_type_stmt(lbl, selectConstructName, associateName, 
                                      $end_of_stmt.start);}
-    ;
+   ;
 
 select_type
-    : T_SELECT T_TYPE { c_action_select_type($T_SELECT, $T_TYPE); }
-    | T_SELECTTYPE { c_action_select_type($T_SELECTTYPE, NULL); }
-    ;
+   : T_SELECT T_TYPE { c_action_select_type($T_SELECT, $T_TYPE); }
+   | T_SELECTTYPE { c_action_select_type($T_SELECTTYPE, NULL); }
+   ;
 
 // R823
 // T_IDENT inlined for select_construct_name
@@ -3969,53 +4023,55 @@ select_type
 type_guard_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN selectConstructName=NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_TYPE id1=T_IDENT 
+   :   (label {lbl=$label.start;})? T_TYPE id1=T_IDENT 
             T_LPAREN type_spec T_RPAREN
-		    ( idTmp=T_IDENT {selectConstructName=idTmp;})? end_of_stmt
-			{c_action_type_guard_stmt(lbl, $T_TYPE, id1, selectConstructName, 
+            ( idTmp=T_IDENT {selectConstructName=idTmp;})? end_of_stmt
+            {c_action_type_guard_stmt(lbl, $T_TYPE, id1, selectConstructName, 
                                     $end_of_stmt.start);}
-	|	(label {lbl=$label.start;})? T_CLASS id1=T_IDENT 
+   |   (label {lbl=$label.start;})? T_CLASS id1=T_IDENT 
             T_LPAREN type_spec T_RPAREN
-		    ( idTmp=T_IDENT {selectConstructName=idTmp;})? end_of_stmt
-			{c_action_type_guard_stmt(lbl, $T_CLASS, id1, selectConstructName, 
+            ( idTmp=T_IDENT {selectConstructName=idTmp;})? end_of_stmt
+            {c_action_type_guard_stmt(lbl, $T_CLASS, id1, selectConstructName, 
                                     $end_of_stmt.start);}
-	|	(label {lbl=$label.start;})? T_CLASS	T_DEFAULT
-		( idTmp=T_IDENT {selectConstructName=idTmp;})? end_of_stmt
-			{c_action_type_guard_stmt(lbl, $T_CLASS, $T_DEFAULT, 
+   |   (label {lbl=$label.start;})? T_CLASS    T_DEFAULT
+        ( idTmp=T_IDENT {selectConstructName=idTmp;})? end_of_stmt
+            {c_action_type_guard_stmt(lbl, $T_CLASS, $T_DEFAULT, 
                                     selectConstructName, $end_of_stmt.start);}
-	;
+   ;
 
 // R824
 // T_IDENT inlined for select_construct_name
 end_select_type_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_END T_SELECT 
+   :   (label {lbl=$label.start;})? T_END T_SELECT 
             ( T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_end_select_type_stmt(lbl, $T_END, $T_SELECT, id, 
+            {c_action_end_select_type_stmt(lbl, $T_END, $T_SELECT, id, 
                 $end_of_stmt.start);}
-	|	(label {lbl=$label.start;})? T_ENDSELECT    
+   |   (label {lbl=$label.start;})? T_ENDSELECT    
             ( T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_end_select_type_stmt(lbl, $T_ENDSELECT, NULL, id, 
+            {c_action_end_select_type_stmt(lbl, $T_ENDSELECT, NULL, id, 
                 $end_of_stmt.start);}
-	;
+   ;
 
 // R825
 // deleted second alternative, nonblock_do_construct, to reduce backtracking, see comments for R835 on how
 // termination of nested loops must be handled.
 do_construct
-	:	block_do_construct
+   :   block_do_construct
             { c_action_do_construct(); }
-	;
+   ;
 
 // R826
 // do_block replaced by block
 block_do_construct
-	:	do_stmt
-		block
-		end_do
-            { c_action_block_do_construct(); }
-	;
+   :   do_stmt
+       block
+       end_do
+           {
+              c_action_block_do_construct();
+           }
+   ;
 
 // R827
 // label_do_stmt and nonlabel_do_stmt inlined
@@ -4025,12 +4081,12 @@ do_stmt
        pANTLR3_COMMON_TOKEN digitString=NULL;
        ANTLR3_BOOLEAN hasLoopControl=ANTLR3_FALSE;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;})? T_DO 
-			( T_DIGIT_STRING {digitString=$T_DIGIT_STRING;})? 
-			( loop_control {hasLoopControl=ANTLR3_TRUE;})? end_of_stmt
-				{c_action_do_stmt(lbl, id, $T_DO, digitString, $end_of_stmt.start, 
+   :   (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;})? T_DO 
+            ( T_DIGIT_STRING {digitString=$T_DIGIT_STRING;})? 
+            ( loop_control {hasLoopControl=ANTLR3_TRUE;})? end_of_stmt
+                {c_action_do_stmt(lbl, id, $T_DO, digitString, $end_of_stmt.start, 
                                 hasLoopControl);}
-	;
+   ;
 
 // R828
 // T_IDENT inlined for do_construct_name
@@ -4038,12 +4094,12 @@ do_stmt
 label_do_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL; ANTLR3_BOOLEAN hasLoopControl=ANTLR3_FALSE;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;} )? 
-			T_DO T_DIGIT_STRING ( loop_control {hasLoopControl=ANTLR3_TRUE;})? 
+   :   (label {lbl=$label.start;})? ( T_IDENT T_COLON {id=$T_IDENT;} )? 
+            T_DO T_DIGIT_STRING ( loop_control {hasLoopControl=ANTLR3_TRUE;})? 
             end_of_stmt
-			{c_action_label_do_stmt(lbl, id, $T_DO, $T_DIGIT_STRING, 
+            {c_action_label_do_stmt(lbl, id, $T_DO, $T_DIGIT_STRING, 
                                   $end_of_stmt.start, hasLoopControl);}
-	;
+   ;
 
 // R829 inlined in R827
 // T_IDENT inlined for do_construct_name
@@ -4051,9 +4107,9 @@ label_do_stmt
 // R831
 // do_variable is scalar-int-variable-name
 do_variable
-	:	T_IDENT
+   :   T_IDENT
             { c_action_do_variable($T_IDENT); }
-	;
+   ;
 
 // R832 do_block was block inlined in R826
 
@@ -4067,22 +4123,22 @@ end_do
 @after {
     c_action_end_do();
 }
-	:	end_do_stmt
-	|	do_term_action_stmt
-	;
+   :   end_do_stmt
+   |   do_term_action_stmt
+   ;
 
 // R834
 // T_IDENT inlined for do_construct_name
 end_do_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_END T_DO ( T_IDENT {id=$T_IDENT;})? 
+   : (label {lbl=$label.start;})? T_END T_DO ( T_IDENT {id=$T_IDENT;})? 
             end_of_stmt
-			{c_action_end_do_stmt(lbl, $T_END, $T_DO, id, $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_ENDDO    ( T_IDENT {id=$T_IDENT;})? 
+            {c_action_end_do_stmt(lbl, $T_END, $T_DO, id, $end_of_stmt.start);}
+   | (label {lbl=$label.start;})? T_ENDDO    ( T_IDENT {id=$T_IDENT;})? 
             end_of_stmt
-			{c_action_end_do_stmt(lbl, $T_ENDDO, NULL, id, $end_of_stmt.start);}
-	;
+            {c_action_end_do_stmt(lbl, $T_ENDDO, NULL, id, $end_of_stmt.start);}
+   ;
 
 // R835 nonblock_do_construct deleted as it was combined with 
 // block_do_construct to reduce backtracking
@@ -4106,7 +4162,7 @@ do_term_action_stmt
 @init {pANTLR3_COMMON_TOKEN endToken = NULL; pANTLR3_COMMON_TOKEN doToken = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
     // for a labeled statement which closes a DO, we insert a T_LABEL_DO_TERMINAL during the Sale's prepass.
-    :   label T_LABEL_DO_TERMINAL 
+   :   label T_LABEL_DO_TERMINAL 
         (action_stmt
          | ( (T_END T_DO {endToken=$T_END; doToken=$T_DO;} | T_ENDDO {endToken=$T_ENDDO; doToken=NULL;}) 
                 (T_IDENT {id=$T_IDENT;})?)
@@ -4116,9 +4172,9 @@ do_term_action_stmt
                                         
     // for an outer shared DO closed implicitly, we insert a T_LABEL_DO_TERMINAL_INSERTED during the Sale's prepass.
     // the inserted token's text is the closing statement's label.
-    | T_LABEL_DO_TERMINAL_INSERTED
+   | T_LABEL_DO_TERMINAL_INSERTED
             {c_action_do_term_action_stmt($T_LABEL_DO_TERMINAL_INSERTED, NULL, NULL, NULL, NULL, ANTLR3_TRUE);}
-	;
+   ;
 
 // R839 outer_shared_do_construct removed because it caused ambiguity in 
 // R835 (see comment in R835)
@@ -4134,18 +4190,18 @@ do_term_action_stmt
 cycle_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id = NULL;} 
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_CYCLE (T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{ c_action_cycle_stmt(lbl, $T_CYCLE, id, $end_of_stmt.start); }
-	;
+   :   (label {lbl=$label.start;})? T_CYCLE (T_IDENT {id=$T_IDENT;})? end_of_stmt
+            { c_action_cycle_stmt(lbl, $T_CYCLE, id, $end_of_stmt.start); }
+   ;
 
 // R844
 // T_IDENT inlined for do_construct_name
 exit_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_EXIT (T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{ c_action_exit_stmt(lbl, $T_EXIT, id, $end_of_stmt.start); }
-	;
+   :   (label {lbl=$label.start;})? T_EXIT (T_IDENT {id=$T_IDENT;})? end_of_stmt
+            { c_action_exit_stmt(lbl, $T_EXIT, id, $end_of_stmt.start); }
+   ;
 
 // R845
 goto_stmt
@@ -4167,38 +4223,38 @@ goto_stmt
 computed_goto_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN goKeyword=NULL; pANTLR3_COMMON_TOKEN toKeyword=NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})?
-		(T_GO T_TO {goKeyword=$T_GO; toKeyword=$T_TO;} 
+   :   (label {lbl=$label.start;})?
+        (T_GO T_TO {goKeyword=$T_GO; toKeyword=$T_TO;} 
          | T_GOTO {goKeyword=$T_GOTO; toKeyword=NULL;}) 
             T_LPAREN label_list T_RPAREN ( T_COMMA )? expr end_of_stmt
-			{ c_action_computed_goto_stmt(lbl, goKeyword, toKeyword, 
+            { c_action_computed_goto_stmt(lbl, goKeyword, toKeyword, 
                 $end_of_stmt.start); }
-	;
+   ;
 
 // The ASSIGN statement is a deleted feature.
 assign_stmt 
 @after{checkForInclude();}
-    :   (lbl1=label)? T_ASSIGN lbl2=label T_TO name end_of_stmt 
+   :   (lbl1=label)? T_ASSIGN lbl2=label T_TO name end_of_stmt 
             { c_action_assign_stmt(lbl1, $T_ASSIGN, lbl2, $T_TO, $name.start, 
                                  $end_of_stmt.start); }
-    ;
+   ;
 
 // The assigned GOTO statement is a deleted feature.
 assigned_goto_stmt
 @init {pANTLR3_COMMON_TOKEN goKeyword=NULL; pANTLR3_COMMON_TOKEN toKeyword=NULL;}
 @after{checkForInclude();}
-    :   (label)? ( T_GOTO {goKeyword=$T_GOTO; toKeyword=NULL;}
+   :   (label)? ( T_GOTO {goKeyword=$T_GOTO; toKeyword=NULL;}
                    | T_GO T_TO {goKeyword=$T_GO; toKeyword=$T_TO;} ) 
             name (T_COMMA stmt_label_list)? end_of_stmt
             { c_action_assigned_goto_stmt($label.start, goKeyword, toKeyword, 
                                         $name.start, $end_of_stmt.start); }
-    ;
+   ;
 
 // Used with assigned_goto_stmt (deleted feature)
 stmt_label_list
-    :   T_LPAREN label ( T_COMMA label )* T_RPAREN 
+   :   T_LPAREN label ( T_COMMA label )* T_RPAREN 
             { c_action_stmt_label_list(); }
-    ;
+   ;
 
 // The PAUSE statement is a deleted feature.
 pause_stmt
@@ -4218,40 +4274,40 @@ pause_stmt
 // ERR_CHK 847 scalar_numeric_expr replaced by expr
 arithmetic_if_stmt
 @after{checkForInclude();}
-	:	(lbl=label)? T_ARITHMETIC_IF_STMT T_IF
-		T_LPAREN expr T_RPAREN label1=label
-		T_COMMA label2=label
-		T_COMMA label3=label end_of_stmt
-			{ c_action_arithmetic_if_stmt(lbl, $T_IF, label1, label2, label3, 
+   :   (lbl=label)? T_ARITHMETIC_IF_STMT T_IF
+        T_LPAREN expr T_RPAREN label1=label
+        T_COMMA label2=label
+        T_COMMA label3=label end_of_stmt
+            { c_action_arithmetic_if_stmt(lbl, $T_IF, label1, label2, label3, 
                                         $end_of_stmt.start); }
-	;
+   ;
 
 // R848 continue_stmt
 continue_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-    :	(label {lbl=$label.start;})? T_CONTINUE end_of_stmt
-			{ c_action_continue_stmt(lbl, $T_CONTINUE, $end_of_stmt.start); } 
-    ;
+   :   (label {lbl=$label.start;})? T_CONTINUE end_of_stmt
+            { c_action_continue_stmt(lbl, $T_CONTINUE, $end_of_stmt.start); } 
+   ;
 
 // R849
 stop_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasStopCode = ANTLR3_FALSE;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_STOP (stop_code {hasStopCode=ANTLR3_TRUE;})? 
+   :   (label {lbl=$label.start;})? T_STOP (stop_code {hasStopCode=ANTLR3_TRUE;})? 
             end_of_stmt
-			{ c_action_stop_stmt(lbl, $T_STOP, $end_of_stmt.start, hasStopCode); }
-	;
+            { c_action_stop_stmt(lbl, $T_STOP, $end_of_stmt.start, hasStopCode); }
+   ;
 
 // R850
 // ERR_CHK 850 T_DIGIT_STRING must be 5 digits or less
 stop_code
-    : scalar_char_constant
+   : scalar_char_constant
         { c_action_stop_code(NULL); }
 //     | Digit ( Digit ( Digit ( Digit ( Digit )? )? )? )?
-    | T_DIGIT_STRING
-    	{ c_action_stop_code($T_DIGIT_STRING); } 
-    ;
+   | T_DIGIT_STRING
+        { c_action_stop_code($T_DIGIT_STRING); } 
+   ;
 
 /*
  * R856-F08 errorstop-stmt
@@ -4299,10 +4355,10 @@ sync_all_stmt
 // R859-F08
 //
 sync_stat
-    :    T_IDENT T_EQUALS expr    // expr is a stat-variable or an errmsg-variable
+   :    T_IDENT T_EQUALS expr    // expr is a stat-variable or an errmsg-variable
              /* {'STAT','ERRMSG'} exprs are variables */
              { c_action_sync_stat($T_IDENT); }
-    ;
+   ;
 
 sync_stat_list
 @init{int count=0;}
@@ -4380,11 +4436,11 @@ sync_memory_stmt
 lock_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasLockStatList = ANTLR3_FALSE;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? T_LOCK T_LPAREN variable
+   :    (label {lbl=$label.start;})? T_LOCK T_LPAREN variable
              (T_COMMA lock_stat_list {hasLockStatList=ANTLR3_TRUE;})? T_RPAREN
              end_of_stmt
              { c_action_lock_stmt(lbl, $T_LOCK, $end_of_stmt.start, hasLockStatList); }
-    ;
+   ;
 
 /*
  * R864-F08 lock-stat
@@ -4404,10 +4460,10 @@ lock_stat
 
 lock_stat_list
 @init{int count=0;}
-    :       {c_action_lock_stat_list__begin();}
+   :       {c_action_lock_stat_list__begin();}
         lock_stat {count++;} ( T_COMMA lock_stat {count++;} )*
             {c_action_lock_stat_list(count);}
-    ;
+   ;
 
 /*
  * R865-F08 unlock-stmt
@@ -4428,9 +4484,9 @@ unlock_stmt
    ;
 
 scalar_char_constant
-    :    char_constant
+   :    char_constant
                 { c_action_scalar_char_constant(); }
-    ;
+   ;
 
 /**
  * Section/Clause 9: Input/output statements
@@ -4443,9 +4499,9 @@ io_unit
 @after {
     c_action_io_unit();
 }
-	:	expr
-	|	T_ASTERISK
-	;
+   :   expr
+   |   T_ASTERISK
+   ;
 
 // R902
 // ERR_CHK 902 scalar_int_expr replaced by expr
@@ -4453,8 +4509,8 @@ file_unit_number
 @after {
     c_action_file_unit_number();
 }
-	:	expr
-	;
+   :   expr
+   ;
 
 // R903 internal_file_variable was char_variable inlined (and then deleted) 
 // in R901
@@ -4463,17 +4519,17 @@ file_unit_number
 open_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_OPEN T_LPAREN connect_spec_list 
+   :   (label {lbl=$label.start;})? T_OPEN T_LPAREN connect_spec_list 
             T_RPAREN end_of_stmt
-			{c_action_open_stmt(lbl, $T_OPEN, $end_of_stmt.start);}
-	;
+            {c_action_open_stmt(lbl, $T_OPEN, $end_of_stmt.start);}
+   ;
 
 // R905
 // ERR_CHK 905 check expr type with identifier
 connect_spec
-    : expr
+   : expr
             { c_action_connect_spec(NULL); }
-    | T_IDENT
+   | T_IDENT
         /* {'UNIT','ACCESS','ACTION','ASYNCHRONOUS','BLANK','DECIMAL', */
         /* 'DELIM','ENCODING'} are expr */
         /* {'ERR'} is T_DIGIT_STRING */
@@ -4482,14 +4538,14 @@ connect_spec
         /* {'PAD','POSITION','RECL','ROUND','SIGN','STATUS'} are expr */
       T_EQUALS expr
             { c_action_connect_spec($T_IDENT); }
-    ;
+   ;
 
 connect_spec_list
 @init{ int count=0;}
-    :  		{c_action_connect_spec_list__begin();}
-		connect_spec {count++;} ( T_COMMA connect_spec {count++;} )*
-      		{c_action_connect_spec_list(count);}
-    ;
+   :       {c_action_connect_spec_list__begin();}
+        connect_spec {count++;} ( T_COMMA connect_spec {count++;} )*
+            {c_action_connect_spec_list(count);}
+   ;
 
 // inlined scalar_default_char_expr
 
@@ -4502,96 +4558,108 @@ connect_spec_list
 close_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_CLOSE T_LPAREN close_spec_list 
+   :   (label {lbl=$label.start;})? T_CLOSE T_LPAREN close_spec_list 
             T_RPAREN end_of_stmt
-			{c_action_close_stmt(lbl, $T_CLOSE, $end_of_stmt.start);}
-	;
+            {c_action_close_stmt(lbl, $T_CLOSE, $end_of_stmt.start);}
+   ;
 
 // R909
 // file_unit_number, scalar_int_variable, iomsg_variable, label replaced 
 // by expr
 close_spec
-	:	expr
+   :   expr
             { c_action_close_spec(NULL); }
-	|	T_IDENT /* {'UNIT','IOSTAT','IOMSG','ERR','STATUS'} */ T_EQUALS expr
+   |   T_IDENT /* {'UNIT','IOSTAT','IOMSG','ERR','STATUS'} */ T_EQUALS expr
             { c_action_close_spec($T_IDENT); }
-	;
+   ;
 
 close_spec_list
 @init{ int count=0;}
-    :  		{c_action_close_spec_list__begin();}
-		close_spec {count++;} ( T_COMMA close_spec {count++;} )*
-      		{c_action_close_spec_list(count);}
-    ;
+   :       {c_action_close_spec_list__begin();}
+        close_spec {count++;} ( T_COMMA close_spec {count++;} )*
+            {c_action_close_spec_list(count);}
+   ;
 
 // R910
 read_stmt
 options {k=3;}
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasInputItemList=ANTLR3_FALSE;}
 @after{checkForInclude();}
-    :    ((label)? T_READ T_LPAREN) => 
+   :    ((label)? T_READ T_LPAREN) => 
             (label {lbl=$label.start;})? T_READ T_LPAREN io_control_spec_list 
             T_RPAREN ( input_item_list {hasInputItemList=ANTLR3_TRUE;})? end_of_stmt
-			{c_action_read_stmt(lbl, $T_READ, $end_of_stmt.start, 
+            {c_action_read_stmt(lbl, $T_READ, $end_of_stmt.start, 
                 hasInputItemList);}
-    |    ((label)? T_READ) => 
+   |    ((label)? T_READ) => 
             (label {lbl=$label.start;})? T_READ format 
             ( T_COMMA input_item_list {hasInputItemList=ANTLR3_TRUE;})? end_of_stmt
-			{c_action_read_stmt(lbl, $T_READ, $end_of_stmt.start, 
+            {c_action_read_stmt(lbl, $T_READ, $end_of_stmt.start, 
                 hasInputItemList);}
-    ;
+   ;
 
 // R911
 write_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasOutputItemList=ANTLR3_FALSE;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_WRITE T_LPAREN io_control_spec_list 
+   :   (label {lbl=$label.start;})? T_WRITE T_LPAREN io_control_spec_list 
             T_RPAREN ( output_item_list {hasOutputItemList=ANTLR3_TRUE;})? end_of_stmt
-			{ c_action_write_stmt(lbl, $T_WRITE, $end_of_stmt.start, 
+            { c_action_write_stmt(lbl, $T_WRITE, $end_of_stmt.start, 
                 hasOutputItemList); }
-	;
+   ;
 
 // R912
 print_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasOutputItemList=ANTLR3_FALSE;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? T_PRINT format 
+   :    (label {lbl=$label.start;})? T_PRINT format 
             ( T_COMMA output_item_list {hasOutputItemList=ANTLR3_TRUE;})? end_of_stmt
-			{ c_action_print_stmt(lbl, $T_PRINT, $end_of_stmt.start, 
+            { c_action_print_stmt(lbl, $T_PRINT, $end_of_stmt.start, 
                 hasOutputItemList); }
-    ;
+   ;
+
 
 // R913
 // ERR_CHK 913 check expr type with identifier
 // io_unit and format are both (expr|'*') so combined
 io_control_spec
-        :	expr
-                // hasExpression=true
-        		{ c_action_io_control_spec(ANTLR3_TRUE, NULL, ANTLR3_FALSE); }	
-        |	T_ASTERISK
-                // hasAsterisk=true
-        		{ c_action_io_control_spec(ANTLR3_FALSE, NULL, ANTLR3_TRUE); }	
-        |	T_IDENT /* {'UNIT','FMT'} */ T_EQUALS T_ASTERISK
-                // hasAsterisk=true
-        		{ c_action_io_control_spec(ANTLR3_FALSE, $T_IDENT, ANTLR3_TRUE); }	
-        |	T_IDENT
-		    /* {'UNIT','FMT'} are expr 'NML' is T_IDENT} */
-		    /* {'ADVANCE','ASYNCHRONOUS','BLANK','DECIMAL','DELIM'} are expr */
-		    /* {'END','EOR','ERR'} are labels */
-		    /* {'ID','IOMSG',IOSTAT','SIZE'} are variables */
-		    /* {'PAD','POS','REC','ROUND','SIGN'} are expr */
-		T_EQUALS expr
-                // hasExpression=true
-        		{ c_action_io_control_spec(ANTLR3_TRUE, $T_IDENT, ANTLR3_FALSE); }	
-    ;
+   :   expr
+            {
+               // hasExpression=true
+               c_action_io_control_spec(ANTLR3_TRUE, NULL, ANTLR3_FALSE);
+            }
+
+   |   T_ASTERISK
+            {
+               // hasAsterisk=true
+               c_action_io_control_spec(ANTLR3_FALSE, NULL, ANTLR3_TRUE);
+            }
+
+   |   T_IDENT /* {'UNIT','FMT'} */ T_EQUALS T_ASTERISK
+            {
+               // hasAsterisk=true
+               c_action_io_control_spec(ANTLR3_FALSE, $T_IDENT, ANTLR3_TRUE);
+            }
+
+   |   T_IDENT
+            /* {'UNIT','FMT'} are expr 'NML' is T_IDENT} */
+            /* {'ADVANCE','ASYNCHRONOUS','BLANK','DECIMAL','DELIM'} are expr */
+            /* {'END','EOR','ERR'} are labels */
+            /* {'ID','IOMSG',IOSTAT','SIZE'} are variables */
+            /* {'PAD','POS','REC','ROUND','SIGN'} are expr */
+       T_EQUALS expr
+            {
+               // hasExpression=true
+               c_action_io_control_spec(ANTLR3_TRUE, $T_IDENT, ANTLR3_FALSE);
+            }
+   ;
 
 
 io_control_spec_list
 @init{ int count=0;}
-    :  		{c_action_io_control_spec_list__begin();}
-		io_control_spec {count++;} ( T_COMMA io_control_spec {count++;} )*
-      		{c_action_io_control_spec_list(count);}
-    ;
+   :       {c_action_io_control_spec_list__begin();}
+        io_control_spec {count++;} ( T_COMMA io_control_spec {count++;} )*
+            {c_action_io_control_spec_list(count);}
+   ;
 
 // R914
 // ERR_CHK 914 default_char_expr replaced by expr
@@ -4600,25 +4668,25 @@ format
 @after {
     c_action_format();
 }
-	:	expr
-	|	T_ASTERISK
-	;
+   :   expr
+   |   T_ASTERISK
+   ;
 
 // R915
 input_item
 @after {
     c_action_input_item();
 }
-	:	variable
-	|	io_implied_do
-	;
+   :   variable
+   |   io_implied_do
+   ;
 
 input_item_list
 @init{ int count=0;}
-    :  		{c_action_input_item_list__begin();}
-		input_item {count++;} ( T_COMMA input_item {count++;} )*
-      		{c_action_input_item_list(count);}
-    ;
+   :       {c_action_input_item_list__begin();}
+        input_item {count++;} ( T_COMMA input_item {count++;} )*
+            {c_action_input_item_list(count);}
+   ;
 
 // R916
 output_item
@@ -4626,202 +4694,202 @@ options {backtrack=true;}
 @after {
     c_action_output_item();
 }
-	:	expr
-	|	io_implied_do
-	;
+   :   expr
+   |   io_implied_do
+   ;
 
 
 output_item_list
 @init{ int count=0;}
-    :  		{c_action_output_item_list__begin();}
-		output_item {count++;} ( T_COMMA output_item {count++;} )*
-      		{c_action_output_item_list(count);}
-    ;
+   :       {c_action_output_item_list__begin();}
+        output_item {count++;} ( T_COMMA output_item {count++;} )*
+            {c_action_output_item_list(count);}
+   ;
 
 // R917
 io_implied_do
-	:	T_LPAREN io_implied_do_object io_implied_do_suffix T_RPAREN
+   :   T_LPAREN io_implied_do_object io_implied_do_suffix T_RPAREN
             { c_action_io_implied_do(); }
-	;
+   ;
 
 // R918
 // expr in output_item can be variable in input_item so input_item deleted
 io_implied_do_object
-	:	output_item
+   :   output_item
             { c_action_io_implied_do_object(); }
-	;
+   ;
 
 io_implied_do_suffix
 options {backtrack=true;}
-	:	T_COMMA io_implied_do_object io_implied_do_suffix
-	|	T_COMMA io_implied_do_control
-	;
+   :   T_COMMA io_implied_do_object io_implied_do_suffix
+   |   T_COMMA io_implied_do_control
+   ;
 
 // R919
 // ERR_CHK 919 scalar_int_expr replaced by expr
 io_implied_do_control
 @init{ANTLR3_BOOLEAN hasStride=ANTLR3_FALSE;}
-    : do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr {hasStride=ANTLR3_TRUE;})?
+   : do_variable T_EQUALS expr T_COMMA expr ( T_COMMA expr {hasStride=ANTLR3_TRUE;})?
             { c_action_io_implied_do_control(hasStride); }
-    ;
+   ;
 
 // R920
 // TODO: remove this?  it is never called.
 dtv_type_spec
-	:	T_TYPE
-		T_LPAREN
-		derived_type_spec
-		T_RPAREN
+   :   T_TYPE
+        T_LPAREN
+        derived_type_spec
+        T_RPAREN
             { c_action_dtv_type_spec($T_TYPE); }
-	|	T_CLASS
-		T_LPAREN
-		derived_type_spec
-		T_RPAREN
+   |   T_CLASS
+        T_LPAREN
+        derived_type_spec
+        T_RPAREN
             { c_action_dtv_type_spec($T_CLASS); }
-	;
+   ;
 
 // R921
 wait_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_WAIT T_LPAREN wait_spec_list T_RPAREN 
+   :   (label {lbl=$label.start;})? T_WAIT T_LPAREN wait_spec_list T_RPAREN 
             end_of_stmt
-			{c_action_wait_stmt(lbl, $T_WAIT, $end_of_stmt.start);}
-	;
+            {c_action_wait_stmt(lbl, $T_WAIT, $end_of_stmt.start);}
+   ;
 
 // R922
 // file_unit_number, scalar_int_variable, iomsg_variable, label replaced 
 // by expr
 wait_spec
-	:	expr
+   :   expr
             { c_action_wait_spec(NULL); }
-	|	T_IDENT /* {'UNIT','END','EOR','ERR','ID','IOMSG','IOSTAT'} */ 
+   |   T_IDENT /* {'UNIT','END','EOR','ERR','ID','IOMSG','IOSTAT'} */ 
             T_EQUALS expr
             { c_action_wait_spec($T_IDENT); }
-	;
+   ;
 
 
 wait_spec_list
 @init{ int count=0;}
-    :  		{c_action_wait_spec_list__begin();}
-		wait_spec {count++;} ( T_COMMA wait_spec {count++;} )*
-      		{c_action_wait_spec_list(count);}
-    ;
+   :       {c_action_wait_spec_list__begin();}
+        wait_spec {count++;} ( T_COMMA wait_spec {count++;} )*
+            {c_action_wait_spec_list(count);}
+   ;
 
 // R923
 backspace_stmt
 options {k=3;}
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	((label)? T_BACKSPACE T_LPAREN) => 
+   :   ((label)? T_BACKSPACE T_LPAREN) => 
             (label {lbl=$label.start;})? T_BACKSPACE T_LPAREN position_spec_list 
             T_RPAREN end_of_stmt
-			{c_action_backspace_stmt(lbl, $T_BACKSPACE, $end_of_stmt.start, ANTLR3_TRUE);}
-	|	((label)? T_BACKSPACE) => 
+            {c_action_backspace_stmt(lbl, $T_BACKSPACE, $end_of_stmt.start, ANTLR3_TRUE);}
+   |   ((label)? T_BACKSPACE) => 
             (label {lbl=$label.start;})? T_BACKSPACE file_unit_number end_of_stmt
-			{c_action_backspace_stmt(lbl, $T_BACKSPACE, $end_of_stmt.start, ANTLR3_FALSE);}
-	;
+            {c_action_backspace_stmt(lbl, $T_BACKSPACE, $end_of_stmt.start, ANTLR3_FALSE);}
+   ;
 
 // R924
 endfile_stmt
 options {k=3;}
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	((label)? T_END T_FILE T_LPAREN) => 
+   :   ((label)? T_END T_FILE T_LPAREN) => 
             (label {lbl=$label.start;})? T_END T_FILE T_LPAREN position_spec_list 
             T_RPAREN end_of_stmt
-			{c_action_endfile_stmt(lbl, $T_END, $T_FILE, $end_of_stmt.start, ANTLR3_TRUE);}
-	|	((label)? T_ENDFILE T_LPAREN) => 
+            {c_action_endfile_stmt(lbl, $T_END, $T_FILE, $end_of_stmt.start, ANTLR3_TRUE);}
+   |   ((label)? T_ENDFILE T_LPAREN) => 
             (label {lbl=$label.start;})? T_ENDFILE T_LPAREN position_spec_list 
             T_RPAREN end_of_stmt
-			{c_action_endfile_stmt(lbl, $T_ENDFILE, NULL, $end_of_stmt.start, 
+            {c_action_endfile_stmt(lbl, $T_ENDFILE, NULL, $end_of_stmt.start, 
                 ANTLR3_TRUE);}
-	|	((label)? T_END T_FILE) => 
+   |   ((label)? T_END T_FILE) => 
             (label {lbl=$label.start;})? T_END T_FILE file_unit_number end_of_stmt
-			{c_action_endfile_stmt(lbl, $T_END, $T_FILE, $end_of_stmt.start, 
+            {c_action_endfile_stmt(lbl, $T_END, $T_FILE, $end_of_stmt.start, 
                 ANTLR3_FALSE);}
-	|	((label)? T_ENDFILE) => 
+   |   ((label)? T_ENDFILE) => 
             (label {lbl=$label.start;})? T_ENDFILE file_unit_number end_of_stmt
-			{c_action_endfile_stmt(lbl, $T_ENDFILE, NULL, $end_of_stmt.start, 
+            {c_action_endfile_stmt(lbl, $T_ENDFILE, NULL, $end_of_stmt.start, 
                 ANTLR3_FALSE);}
-	;
+   ;
 
 // R925
 rewind_stmt
 options {k=3;}
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	((label)? T_REWIND T_LPAREN) => 
+   :   ((label)? T_REWIND T_LPAREN) => 
             (label {lbl=$label.start;})? T_REWIND T_LPAREN position_spec_list 
             T_RPAREN end_of_stmt
-			{c_action_rewind_stmt(lbl, $T_REWIND, $end_of_stmt.start, ANTLR3_TRUE);}
-	|	((label)? T_REWIND) => 
+            {c_action_rewind_stmt(lbl, $T_REWIND, $end_of_stmt.start, ANTLR3_TRUE);}
+   |   ((label)? T_REWIND) => 
             (label {lbl=$label.start;})? T_REWIND file_unit_number end_of_stmt
-			{c_action_rewind_stmt(lbl, $T_REWIND, $end_of_stmt.start, ANTLR3_FALSE);}
-	;
+            {c_action_rewind_stmt(lbl, $T_REWIND, $end_of_stmt.start, ANTLR3_FALSE);}
+   ;
 
 // R926
 // file_unit_number, scalar_int_variable, iomsg_variable, label replaced 
 // by expr
 position_spec
-	:	expr
+   :   expr
             { c_action_position_spec(NULL); }
-	|	T_IDENT /* {'UNIT','IOSTAT','IOMSG','ERR'} */ T_EQUALS expr
+   |   T_IDENT /* {'UNIT','IOSTAT','IOMSG','ERR'} */ T_EQUALS expr
             { c_action_position_spec($T_IDENT); }
-    ;
+   ;
 
 position_spec_list
 @init{ int count=0;}
-    :  		{c_action_position_spec_list__begin();}
-		position_spec {count++;} ( T_COMMA position_spec {count++;} )*
-      		{c_action_position_spec_list(count);}
-    ;
+   :       {c_action_position_spec_list__begin();}
+        position_spec {count++;} ( T_COMMA position_spec {count++;} )*
+            {c_action_position_spec_list(count);}
+   ;
 
 // R927
 flush_stmt
 options {k=3;}
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;} 
 @after{checkForInclude();}
-	:	((label)? T_FLUSH T_LPAREN) => 
+   :   ((label)? T_FLUSH T_LPAREN) => 
             (label {lbl=$label.start;})? T_FLUSH T_LPAREN flush_spec_list 
             T_RPAREN end_of_stmt
-			{c_action_flush_stmt(lbl, $T_FLUSH, $end_of_stmt.start, ANTLR3_TRUE);}
-	|	((label)? T_FLUSH) => 
+            {c_action_flush_stmt(lbl, $T_FLUSH, $end_of_stmt.start, ANTLR3_TRUE);}
+   |   ((label)? T_FLUSH) => 
             (label {lbl=$label.start;})? T_FLUSH file_unit_number end_of_stmt
-			{c_action_flush_stmt(lbl, $T_FLUSH, $end_of_stmt.start, ANTLR3_FALSE);}
-	;
+            {c_action_flush_stmt(lbl, $T_FLUSH, $end_of_stmt.start, ANTLR3_FALSE);}
+   ;
 
 // R928
 // file_unit_number, scalar_int_variable, iomsg_variable, label replaced 
 // by expr
 flush_spec
-	:	expr
+   :   expr
             { c_action_flush_spec(NULL); }
-	|	T_IDENT /* {'UNIT','IOSTAT','IOMSG','ERR'} */ T_EQUALS expr
+   |   T_IDENT /* {'UNIT','IOSTAT','IOMSG','ERR'} */ T_EQUALS expr
             { c_action_flush_spec($T_IDENT); }
-    ;
+   ;
 
 flush_spec_list
 @init{ int count=0;}
-    :  		{c_action_flush_spec_list__begin();}
-		flush_spec {count++;} ( T_COMMA flush_spec {count++;} )*
-      		{c_action_flush_spec_list(count);}
-    ;
+   :       {c_action_flush_spec_list__begin();}
+        flush_spec {count++;} ( T_COMMA flush_spec {count++;} )*
+            {c_action_flush_spec_list(count);}
+   ;
 
 // R929
 inquire_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_INQUIRE T_LPAREN inquire_spec_list 
+   :   (label {lbl=$label.start;})? T_INQUIRE T_LPAREN inquire_spec_list 
             T_RPAREN end_of_stmt
             {c_action_inquire_stmt(lbl, $T_INQUIRE, NULL, $end_of_stmt.start, 
                 ANTLR3_FALSE);}
-	|	(label {lbl=$label.start;})? T_INQUIRE_STMT_2 
+   |   (label {lbl=$label.start;})? T_INQUIRE_STMT_2 
             T_INQUIRE T_LPAREN T_IDENT /* 'IOLENGTH' */ T_EQUALS 
             scalar_int_variable T_RPAREN output_item_list end_of_stmt
-				{c_action_inquire_stmt(lbl, $T_INQUIRE, $T_IDENT, 
+                {c_action_inquire_stmt(lbl, $T_INQUIRE, $T_IDENT, 
                     $end_of_stmt.start, ANTLR3_TRUE);}
-	;
+   ;
 
 
 // R930
@@ -4829,25 +4897,25 @@ inquire_stmt
 // file_unit_number replaced by expr
 // scalar_default_char_variable replaced by designator
 inquire_spec
-	:	expr
+   :   expr
             { c_action_inquire_spec(NULL); }
-	|	T_IDENT 
+   |   T_IDENT 
         /* {'UNIT','FILE'} '=' expr portion, '=' designator portion below 
            {'ACCESS','ACTION','ASYNCHRONOUS','BLANK','DECIMAL',DELIM','DIRECT'}
            {'ENCODING','ERR','EXIST','FORM','FORMATTED','ID','IOMSG','IOSTAT'}
            {'NAME','NAMED','NEXTREC','NUMBER',OPENED','PAD','PENDING','POS'} 
            {'POSITION','READ','READWRITE','RECL','ROUND','SEQUENTIAL','SIGN'} 
            {'SIZE','STREAM','UNFORMATTED','WRITE'}  */
-		T_EQUALS expr
+        T_EQUALS expr
              { c_action_inquire_spec($T_IDENT); }
-	;
+   ;
 
 inquire_spec_list
 @init{ int count=0;}
-    :  		{c_action_inquire_spec_list__begin();}
-		inquire_spec {count++;} ( T_COMMA inquire_spec {count++;} )*
-      		{c_action_inquire_spec_list(count);}
-    ;
+   :       {c_action_inquire_spec_list__begin();}
+        inquire_spec {count++;} ( T_COMMA inquire_spec {count++;} )*
+            {c_action_inquire_spec_list(count);}
+   ;
 
 /**
  * Section/Clause 10: Input/output editing
@@ -4859,16 +4927,16 @@ inquire_spec_list
 format_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_FORMAT format_specification end_of_stmt
-			{c_action_format_stmt(lbl, $T_FORMAT, $end_of_stmt.start);}
-	;
+   :   (label {lbl=$label.start;})? T_FORMAT format_specification end_of_stmt
+            {c_action_format_stmt(lbl, $T_FORMAT, $end_of_stmt.start);}
+   ;
 
 // R1002
 format_specification
 @init{ ANTLR3_BOOLEAN hasFormatItemList=ANTLR3_FALSE; }
-	:	T_LPAREN ( format_item_list {hasFormatItemList=ANTLR3_TRUE;})? T_RPAREN
-			{c_action_format_specification(hasFormatItemList);}
-	;
+   :   T_LPAREN ( format_item_list {hasFormatItemList=ANTLR3_TRUE;})? T_RPAREN
+            {c_action_format_specification(hasFormatItemList);}
+   ;
 
 // R1003
 // r replaced by int_literal_constant replaced by char_literal_constant 
@@ -4876,26 +4944,26 @@ format_specification
 // char_string_edit_desc replaced by T_CHAR_CONSTANT
 format_item
 @init{ pANTLR3_COMMON_TOKEN descOrDigit=NULL; ANTLR3_BOOLEAN hasFormatItemList=ANTLR3_FALSE; }
-    :   T_DATA_EDIT_DESC 
-		    {c_action_format_item($T_DATA_EDIT_DESC,hasFormatItemList);}
-    |   T_CONTROL_EDIT_DESC
-		    {c_action_format_item($T_CONTROL_EDIT_DESC,hasFormatItemList);}
-    |   T_CHAR_STRING_EDIT_DESC
-		    {c_action_format_item($T_CHAR_STRING_EDIT_DESC,hasFormatItemList);}
-    |   (T_DIGIT_STRING {descOrDigit=$T_DIGIT_STRING;} )? T_LPAREN 
+   :   T_DATA_EDIT_DESC 
+            {c_action_format_item($T_DATA_EDIT_DESC,hasFormatItemList);}
+   |   T_CONTROL_EDIT_DESC
+            {c_action_format_item($T_CONTROL_EDIT_DESC,hasFormatItemList);}
+   |   T_CHAR_STRING_EDIT_DESC
+            {c_action_format_item($T_CHAR_STRING_EDIT_DESC,hasFormatItemList);}
+   |   (T_DIGIT_STRING {descOrDigit=$T_DIGIT_STRING;} )? T_LPAREN 
             format_item_list T_RPAREN
-		    {c_action_format_item(descOrDigit,hasFormatItemList);}
-    ;
+            {c_action_format_item(descOrDigit,hasFormatItemList);}
+   ;
 
 // the comma is not always required.  see J3/04-007, pg. 221, lines
 // 17-22
 // ERR_CHK
 format_item_list
 @init{ int count=1;}
-    :  		{c_action_format_item_list__begin();}
-		format_item ( (T_COMMA)? format_item {count++;} )*
-      		{c_action_format_item_list(count);}
-    ;
+   :       {c_action_format_item_list__begin();}
+        format_item ( (T_COMMA)? format_item {count++;} )*
+            {c_action_format_item_list(count);}
+   ;
 
 
 // the following rules, from here to the v_list, are the originals.  modifying 
@@ -4905,15 +4973,15 @@ format_item_list
 // // r replaced by int_literal_constant replaced by char_literal_constant replaced by T_CHAR_CONSTANT
 // // char_string_edit_desc replaced by T_CHAR_CONSTANT
 // format_item
-// 	:	T_DIGIT_STRING data_edit_desc
-// 	|	data_plus_control_edit_desc
-// 	|	T_CHAR_CONSTANT
-// 	|	(T_DIGIT_STRING)? T_LPAREN format_item_list T_RPAREN
-// 	;
+//  :   T_DIGIT_STRING data_edit_desc
+//  |   data_plus_control_edit_desc
+//  |   T_CHAR_CONSTANT
+//  |   (T_DIGIT_STRING)? T_LPAREN format_item_list T_RPAREN
+//  ;
 
 // format_item_list
-//     :    format_item ( T_COMMA format_item )*
-//     ;
+//    :    format_item ( T_COMMA format_item )*
+//    ;
 
 // // R1004 r inlined in R1003 and R1011 as int_literal_constant (then as DIGIT_STRING)
 // // C1004 (R1004) r shall not have a kind parameter associated with it
@@ -4923,24 +4991,24 @@ format_item_list
 // // char_literal_constant replaced by T_CHAR_CONSTANT
 // // ERR_CHK 1005 matching T_ID_OR_OTHER with alternatives will have to be done here
 // data_edit_desc
-//     : T_ID_OR_OTHER /* {'I','B','O','Z','F','E','EN','ES','G','L','A','D'} */ 
+//    : T_ID_OR_OTHER /* {'I','B','O','Z','F','E','EN','ES','G','L','A','D'} */ 
 //       T_DIGIT_STRING ( T_PERIOD T_DIGIT_STRING )?
 //       ( T_ID_OR_OTHER /* is 'E' */ T_DIGIT_STRING )?
-//     | T_ID_OR_OTHER /* is 'DT' */ T_CHAR_CONSTANT ( T_LPAREN v_list T_RPAREN )?
-//     | T_ID_OR_OTHER /* {'A','DT'},{'X','P' from control_edit_desc} */
-//     ;
+//    | T_ID_OR_OTHER /* is 'DT' */ T_CHAR_CONSTANT ( T_LPAREN v_list T_RPAREN )?
+//    | T_ID_OR_OTHER /* {'A','DT'},{'X','P' from control_edit_desc} */
+//    ;
 
 // data_plus_control_edit_desc
-// 	:	T_ID_OR_OTHER /* {'I','B','O','Z','F','E','EN','ES','G','L','A','D'},{T','TL','TR'} */ 
-// 		    T_DIGIT_STRING ( T_PERIOD T_DIGIT_STRING )?
-// 		    ( T_ID_OR_OTHER /* is 'E' */ T_DIGIT_STRING )?
-// 	|	T_ID_OR_OTHER /* is 'DT' */ T_CHAR_CONSTANT ( T_LPAREN v_list T_RPAREN )?
-// 	|	T_ID_OR_OTHER /* {'A','DT'},{'BN','BZ','RU','RD','RZ','RN','RC','RP','DC','DP'} */
+//  :   T_ID_OR_OTHER /* {'I','B','O','Z','F','E','EN','ES','G','L','A','D'},{T','TL','TR'} */ 
+//          T_DIGIT_STRING ( T_PERIOD T_DIGIT_STRING )?
+//          ( T_ID_OR_OTHER /* is 'E' */ T_DIGIT_STRING )?
+//  |   T_ID_OR_OTHER /* is 'DT' */ T_CHAR_CONSTANT ( T_LPAREN v_list T_RPAREN )?
+//  |   T_ID_OR_OTHER /* {'A','DT'},{'BN','BZ','RU','RD','RZ','RN','RC','RP','DC','DP'} */
 // // following only from control_edit_desc
-// 	|	( T_DIGIT_STRING )? T_SLASH
-// 	|	T_COLON
-// 	|	(T_PLUS|T_MINUS) T_DIGIT_STRING T_ID_OR_OTHER /* is 'P' */
-// 	;
+//  |   ( T_DIGIT_STRING )? T_SLASH
+//  |   T_COLON
+//  |   (T_PLUS|T_MINUS) T_DIGIT_STRING T_ID_OR_OTHER /* is 'P' */
+//  ;
 
 // R1006 w inlined in R1005 as int_literal_constant replaced by T_DIGIT_STRING
 
@@ -4954,20 +5022,20 @@ format_item_list
 
 v_list
 @init{int count=0;}
-    :  		{c_action_v_list__begin();}
-		(pm=T_PLUS|T_MINUS)? ds=T_DIGIT_STRING
-			{
-				count++;
-				c_action_v_list_part(pm, ds);
-			}
-		( T_COMMA (pm=T_PLUS|T_MINUS)? ds=T_DIGIT_STRING
-			{
-				count++;
-				c_action_v_list_part(pm, ds);
-			}
-		)*
-      		{c_action_v_list(count);}
-    ;
+   :       {c_action_v_list__begin();}
+        (pm=T_PLUS|T_MINUS)? ds=T_DIGIT_STRING
+            {
+                count++;
+                c_action_v_list_part(pm, ds);
+            }
+        ( T_COMMA (pm=T_PLUS|T_MINUS)? ds=T_DIGIT_STRING
+            {
+                count++;
+                c_action_v_list_part(pm, ds);
+            }
+        )*
+            {c_action_v_list(count);}
+   ;
 
 // R1011 control_edit_desc inlined/combined in R1005 and data_plus_control_edit_desc
 // r replaced by int_literal_constant replaced by T_DIGIT_STRING
@@ -5284,27 +5352,27 @@ use_stmt
     ANTLR3_BOOLEAN hasRenameList=ANTLR3_FALSE;
 }
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? T_USE 
+   :    (label {lbl=$label.start;})? T_USE 
             ( (T_COMMA module_nature {hasModuleNature=ANTLR3_TRUE;})? 
             T_COLON_COLON )? T_IDENT ( T_COMMA 
             rename_list {hasRenameList=ANTLR3_TRUE;})? end_of_stmt
-			{c_action_use_stmt(lbl, $T_USE, $T_IDENT, NULL, $end_of_stmt.start, 
+            {c_action_use_stmt(lbl, $T_USE, $T_IDENT, NULL, $end_of_stmt.start, 
                              hasModuleNature, hasRenameList, ANTLR3_FALSE);}
-    |    (label {lbl=$label.start;})? T_USE 
+   |    (label {lbl=$label.start;})? T_USE 
             ( ( T_COMMA module_nature {hasModuleNature=ANTLR3_TRUE;})? 
             T_COLON_COLON )? T_IDENT T_COMMA T_ONLY T_COLON ( only_list )? 
             end_of_stmt
-			{c_action_use_stmt(lbl, $T_USE, $T_IDENT, $T_ONLY, $end_of_stmt.start, 
+            {c_action_use_stmt(lbl, $T_USE, $T_IDENT, $T_ONLY, $end_of_stmt.start, 
                              hasModuleNature,hasRenameList,ANTLR3_TRUE);}
-    ;
+   ;
 
 // R1110
 module_nature
-	:	T_INTRINSIC
+   :   T_INTRINSIC
             { c_action_module_nature($T_INTRINSIC); }
-	|	T_NON_INTRINSIC
+   |   T_NON_INTRINSIC
             { c_action_module_nature($T_NON_INTRINSIC); }
-	;
+   ;
 
 //========================================================================================
 //
@@ -5361,10 +5429,10 @@ only
 
 only_list
 @init{ int count=0;}
-    :  		{c_action_only_list__begin();}
-		only {count++;} ( T_COMMA only {count++;} )*
-      		{c_action_only_list(count);}
-    ;
+   :       {c_action_only_list__begin();}
+        only {count++;} ( T_COMMA only {count++;} )*
+            {c_action_only_list(count);}
+   ;
 
 // R1113 only_use_name was use_name inlined as T_IDENT
 
@@ -5451,18 +5519,18 @@ block_data
 @after {
     c_action_block_data();
 }
-	:	block_data_stmt
-		specification_part
-		end_block_data_stmt
-	;
+   :   block_data_stmt
+        specification_part
+        end_block_data_stmt
+   ;
 
 // R1117
 block_data_stmt
 @init
-	{
-		pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id = NULL;
-		c_action_block_data_stmt__begin();
-	}
+    {
+        pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id = NULL;
+        c_action_block_data_stmt__begin();
+    }
 @after{checkForInclude();}
    :   (label {lbl=$label.start;})?
        T_BLOCK T_DATA (T_IDENT {id=$T_IDENT;})? end_of_stmt
@@ -5476,26 +5544,26 @@ block_data_stmt
 end_block_data_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id = NULL;}
 @after{checkForInclude();}
-	:   (label {lbl=$label.start;})? T_END T_BLOCK T_DATA 
+   :   (label {lbl=$label.start;})? T_END T_BLOCK T_DATA 
             ( T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_end_block_data_stmt(lbl, $T_END, $T_BLOCK, $T_DATA, id, 
+            {c_action_end_block_data_stmt(lbl, $T_END, $T_BLOCK, $T_DATA, id, 
                                         $end_of_stmt.start);}
-	|   (label {lbl=$label.start;})? T_ENDBLOCK T_DATA    
+   |   (label {lbl=$label.start;})? T_ENDBLOCK T_DATA    
             ( T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_end_block_data_stmt(lbl, $T_ENDBLOCK, NULL, $T_DATA, id, 
+            {c_action_end_block_data_stmt(lbl, $T_ENDBLOCK, NULL, $T_DATA, id, 
                                         $end_of_stmt.start);}
-	|   (label {lbl=$label.start;})? T_END T_BLOCKDATA    
+   |   (label {lbl=$label.start;})? T_END T_BLOCKDATA    
             ( T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_end_block_data_stmt(lbl, $T_END, $T_BLOCKDATA, NULL, id, 
+            {c_action_end_block_data_stmt(lbl, $T_END, $T_BLOCKDATA, NULL, id, 
                                         $end_of_stmt.start);}
-	|   (label {lbl=$label.start;})? T_ENDBLOCKDATA       
+   |   (label {lbl=$label.start;})? T_ENDBLOCKDATA       
             ( T_IDENT {id=$T_IDENT;})? end_of_stmt
-			{c_action_end_block_data_stmt(lbl, $T_ENDBLOCKDATA, NULL, NULL, id, 
+            {c_action_end_block_data_stmt(lbl, $T_ENDBLOCKDATA, NULL, NULL, id, 
                                         $end_of_stmt.start);}
-	|	(label {lbl=$label.start;})? T_END end_of_stmt
-			{c_action_end_block_data_stmt(lbl, $T_END, NULL, NULL, id, 
+   |   (label {lbl=$label.start;})? T_END end_of_stmt
+            {c_action_end_block_data_stmt(lbl, $T_END, NULL, NULL, id, 
                                         $end_of_stmt.start);}
-	;
+   ;
 
 /**
  * Section/Clause 12: Procedures
@@ -5506,176 +5574,176 @@ interface_block
 @after {
     c_action_interface_block();
 }
-	:	interface_stmt
-		( interface_specification )*
-		end_interface_stmt
-	;
+   :   interface_stmt
+        ( interface_specification )*
+        end_interface_stmt
+   ;
 
 // R1202
 interface_specification
 @after {
     c_action_interface_specification();
 }
-	:	interface_body
-	|	procedure_stmt
-	;
+   :   interface_body
+   |   procedure_stmt
+   ;
 
 // R1203 Note that the last argument to the action specifies whether this
 // is an abstract interface or not.
 interface_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasGenericSpec=ANTLR3_FALSE;}
 @after{checkForInclude();}
-	:		{c_action_interface_stmt__begin();}
-		(label {lbl=$label.start;})? T_INTERFACE ( generic_spec 
+   :       {c_action_interface_stmt__begin();}
+        (label {lbl=$label.start;})? T_INTERFACE ( generic_spec 
             {hasGenericSpec=ANTLR3_TRUE;})? end_of_stmt
-			{c_action_interface_stmt(lbl, NULL, $T_INTERFACE, $end_of_stmt.start, 
+            {c_action_interface_stmt(lbl, NULL, $T_INTERFACE, $end_of_stmt.start, 
                                    hasGenericSpec);}
-	|	(label {lbl=$label.start;})? T_ABSTRACT T_INTERFACE end_of_stmt
-			{c_action_interface_stmt(lbl, $T_ABSTRACT, $T_INTERFACE, 
+   |   (label {lbl=$label.start;})? T_ABSTRACT T_INTERFACE end_of_stmt
+            {c_action_interface_stmt(lbl, $T_ABSTRACT, $T_INTERFACE, 
                                    $end_of_stmt.start, hasGenericSpec);}
-	;
+   ;
 
 // R1204
 end_interface_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasGenericSpec=ANTLR3_FALSE;}
 @after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_END T_INTERFACE ( generic_spec 
+   : (label {lbl=$label.start;})? T_END T_INTERFACE ( generic_spec 
             {hasGenericSpec=ANTLR3_TRUE;})? end_of_stmt
-		    {c_action_end_interface_stmt(lbl, $T_END, $T_INTERFACE, 
+            {c_action_end_interface_stmt(lbl, $T_END, $T_INTERFACE, 
                 $end_of_stmt.start, hasGenericSpec);}
-	| (label {lbl=$label.start;})? T_ENDINTERFACE    ( generic_spec 
+   | (label {lbl=$label.start;})? T_ENDINTERFACE    ( generic_spec 
             {hasGenericSpec=ANTLR3_TRUE;})? end_of_stmt
-		    {c_action_end_interface_stmt(lbl, $T_ENDINTERFACE, NULL, 
+            {c_action_end_interface_stmt(lbl, $T_ENDINTERFACE, NULL, 
                 $end_of_stmt.start, hasGenericSpec);}
-	;
+   ;
 
 // R1205
 // specification_part made non-optional to remove END ambiguity (as can 
 // be empty)
 interface_body
-	:	(prefix)? function_stmt specification_part end_function_stmt
+   :   (prefix)? function_stmt specification_part end_function_stmt
             { c_action_interface_body(ANTLR3_TRUE); /* true for hasPrefix */ }
-	|	subroutine_stmt specification_part end_subroutine_stmt
+   |   subroutine_stmt specification_part end_subroutine_stmt
             { c_action_interface_body(ANTLR3_FALSE); /* false for hasPrefix */ }
-	;
+   ;
 
 // R1206
 // generic_name_list substituted for procedure_name_list
 procedure_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN module=NULL;} 
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? ( T_MODULE {module=$T_MODULE;})? 
+   :   (label {lbl=$label.start;})? ( T_MODULE {module=$T_MODULE;})? 
             T_PROCEDURE generic_name_list end_of_stmt
-			{c_action_procedure_stmt(lbl, module, $T_PROCEDURE, 
+            {c_action_procedure_stmt(lbl, module, $T_PROCEDURE, 
                 $end_of_stmt.start);}
-	;
+   ;
 
 // R1207
 // T_IDENT inlined for generic_name
 generic_spec
-	:	T_IDENT
-			{c_action_generic_spec(NULL, $T_IDENT, 
+   :   T_IDENT
+            {c_action_generic_spec(NULL, $T_IDENT, 
                                  IActionEnums_ GenericSpec_generic_name);}
-	|	T_OPERATOR T_LPAREN defined_operator T_RPAREN
-			{c_action_generic_spec($T_OPERATOR, NULL, 
+   |   T_OPERATOR T_LPAREN defined_operator T_RPAREN
+            {c_action_generic_spec($T_OPERATOR, NULL, 
                                  IActionEnums_ GenericSpec_OPERATOR);}
-	|	T_ASSIGNMENT T_LPAREN T_EQUALS T_RPAREN
-			{c_action_generic_spec($T_ASSIGNMENT, NULL, 
+   |   T_ASSIGNMENT T_LPAREN T_EQUALS T_RPAREN
+            {c_action_generic_spec($T_ASSIGNMENT, NULL, 
                                  IActionEnums_ GenericSpec_ASSIGNMENT);}
-	|	defined_io_generic_spec
+   |   defined_io_generic_spec
             { c_action_generic_spec(NULL, NULL, 
                 IActionEnums_ GenericSpec_dtio_generic_spec); }
-	;
+   ;
 
 // R1208
 // TODO - the name has been changed from dtio_generic_spec to defined_io_generic_spec
 // change the actions and enums as well
 defined_io_generic_spec
-	:	T_READ T_LPAREN T_FORMATTED T_RPAREN
-		{c_action_dtio_generic_spec($T_READ, $T_FORMATTED, 
+   :   T_READ T_LPAREN T_FORMATTED T_RPAREN
+        {c_action_dtio_generic_spec($T_READ, $T_FORMATTED, 
                                   IActionEnums_ DTIOGenericSpec_READ_FORMATTED);}
-	|	T_READ T_LPAREN T_UNFORMATTED T_RPAREN
-		{c_action_dtio_generic_spec($T_READ, $T_UNFORMATTED, 
+   |   T_READ T_LPAREN T_UNFORMATTED T_RPAREN
+        {c_action_dtio_generic_spec($T_READ, $T_UNFORMATTED, 
                                   IActionEnums_ DTIOGenericSpec_READ_UNFORMATTED);}
-	|	T_WRITE T_LPAREN T_FORMATTED T_RPAREN
-		{c_action_dtio_generic_spec($T_WRITE, $T_FORMATTED, 
+   |   T_WRITE T_LPAREN T_FORMATTED T_RPAREN
+        {c_action_dtio_generic_spec($T_WRITE, $T_FORMATTED, 
                                   IActionEnums_ DTIOGenericSpec_WRITE_FORMATTED);}
-	|	T_WRITE T_LPAREN T_UNFORMATTED T_RPAREN
-		{c_action_dtio_generic_spec($T_WRITE, $T_UNFORMATTED, 
+   |   T_WRITE T_LPAREN T_UNFORMATTED T_RPAREN
+        {c_action_dtio_generic_spec($T_WRITE, $T_UNFORMATTED, 
                                   IActionEnums_ DTIOGenericSpec_WRITE_UNFORMATTED);}
-	;
+   ;
 
 // R1209
 // generic_name_list substituted for import_name_list
 import_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasGenericNameList=ANTLR3_FALSE;}
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? T_IMPORT ( ( T_COLON_COLON )? 
+   :    (label {lbl=$label.start;})? T_IMPORT ( ( T_COLON_COLON )? 
             generic_name_list {hasGenericNameList=ANTLR3_TRUE;})? end_of_stmt
-			{c_action_import_stmt(lbl, $T_IMPORT, $end_of_stmt.start, 
+            {c_action_import_stmt(lbl, $T_IMPORT, $end_of_stmt.start, 
                 hasGenericNameList);}
-    ;
+   ;
 
 // R1210
 // generic_name_list substituted for external_name_list
 external_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_EXTERNAL ( T_COLON_COLON )? 
+   :   (label {lbl=$label.start;})? T_EXTERNAL ( T_COLON_COLON )? 
             generic_name_list end_of_stmt
-			{c_action_external_stmt(lbl, $T_EXTERNAL, $end_of_stmt.start);}
-	;
+            {c_action_external_stmt(lbl, $T_EXTERNAL, $end_of_stmt.start);}
+   ;
 
 // R1211
 procedure_declaration_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasProcInterface=ANTLR3_FALSE; int count=0;}
 @after{checkForInclude();}
-    : (label {lbl=$label.start;})? T_PROCEDURE T_LPAREN
-		( proc_interface {hasProcInterface=ANTLR3_TRUE;})? T_RPAREN
-       	( ( T_COMMA proc_attr_spec {count++;})* T_COLON_COLON )?
-		proc_decl_list end_of_stmt
-			{c_action_procedure_declaration_stmt(lbl, $T_PROCEDURE, 
+   : (label {lbl=$label.start;})? T_PROCEDURE T_LPAREN
+        ( proc_interface {hasProcInterface=ANTLR3_TRUE;})? T_RPAREN
+        ( ( T_COMMA proc_attr_spec {count++;})* T_COLON_COLON )?
+        proc_decl_list end_of_stmt
+            {c_action_procedure_declaration_stmt(lbl, $T_PROCEDURE, 
                 $end_of_stmt.start, hasProcInterface, count);}
-    ;
+   ;
 
 // R1212
 // T_IDENT inlined for interface_name
 proc_interface
-	:	T_IDENT					{ c_action_proc_interface($T_IDENT); }
-	|	declaration_type_spec	{ c_action_proc_interface(NULL); }
-	;
+   :   T_IDENT                 { c_action_proc_interface($T_IDENT); }
+   |   declaration_type_spec   { c_action_proc_interface(NULL); }
+   ;
 
 // R1213
 proc_attr_spec
-	:	access_spec
+   :   access_spec
             { c_action_proc_attr_spec(NULL, NULL, IActionEnums_ AttrSpec_none); }
-	|	proc_language_binding_spec
+   |   proc_language_binding_spec
             { c_action_proc_attr_spec(NULL, NULL, IActionEnums_ AttrSpec_none); }
-	|	T_INTENT T_LPAREN intent_spec T_RPAREN
+   |   T_INTENT T_LPAREN intent_spec T_RPAREN
             { c_action_proc_attr_spec($T_INTENT, NULL, 
                 IActionEnums_ AttrSpec_INTENT); }
-	|	T_OPTIONAL	
+   |   T_OPTIONAL  
             { c_action_proc_attr_spec($T_OPTIONAL, NULL, 
                 IActionEnums_ AttrSpec_OPTIONAL); }
-	|	T_POINTER	
+   |   T_POINTER   
             { c_action_proc_attr_spec($T_POINTER, NULL, 
                 IActionEnums_ AttrSpec_POINTER); }
-	|	T_SAVE		
+   |   T_SAVE      
             { c_action_proc_attr_spec($T_SAVE, NULL, 
                 IActionEnums_ AttrSpec_SAVE); }
 // TODO: are T_PASS, T_NOPASS, and T_DEFERRED correct?
 // From R453 binding-attr
-	|   T_PASS ( T_LPAREN T_IDENT T_RPAREN)?
+   |   T_PASS ( T_LPAREN T_IDENT T_RPAREN)?
             { c_action_proc_attr_spec($T_PASS, $T_IDENT, 
                 IActionEnums_ AttrSpec_PASS); }
-    |   T_NOPASS
+   |   T_NOPASS
             { c_action_proc_attr_spec($T_NOPASS, NULL, 
                 IActionEnums_ AttrSpec_NOPASS); }
-    |   T_DEFERRED
+   |   T_DEFERRED
             { c_action_proc_attr_spec($T_DEFERRED, NULL, 
                 IActionEnums_ AttrSpec_DEFERRED); }
-    |   proc_attr_spec_extension
-	;
+   |   proc_attr_spec_extension
+   ;
   
 // language extension point
 proc_attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
@@ -5684,16 +5752,16 @@ proc_attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 // T_IDENT inlined for procedure_entity_name
 proc_decl
 @init{ANTLR3_BOOLEAN hasNullInit = ANTLR3_FALSE;}
-    :	T_IDENT ( T_EQ_GT null_init {hasNullInit=ANTLR3_TRUE;} )?
-    		{ c_action_proc_decl($T_IDENT, hasNullInit); }
-    ;
+   :   T_IDENT ( T_EQ_GT null_init {hasNullInit=ANTLR3_TRUE;} )?
+            { c_action_proc_decl($T_IDENT, hasNullInit); }
+   ;
 
 proc_decl_list
 @init{ int count=0;}
-    :  		{c_action_proc_decl_list__begin();}
-		proc_decl {count++;} ( T_COMMA proc_decl {count++;} )*
-      		{c_action_proc_decl_list(count);}
-    ;
+   :       {c_action_proc_decl_list__begin();}
+        proc_decl {count++;} ( T_COMMA proc_decl {count++;} )*
+            {c_action_proc_decl_list(count);}
+   ;
 
 // R1215 interface_name was name inlined as T_IDENT
 
@@ -5702,11 +5770,11 @@ proc_decl_list
 intrinsic_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_INTRINSIC
-		( T_COLON_COLON )?
-		generic_name_list end_of_stmt
-			{c_action_intrinsic_stmt(lbl, $T_INTRINSIC, $end_of_stmt.start);}
-	;
+   :   (label {lbl=$label.start;})? T_INTRINSIC
+        ( T_COLON_COLON )?
+        generic_name_list end_of_stmt
+            {c_action_intrinsic_stmt(lbl, $T_INTRINSIC, $end_of_stmt.start);}
+   ;
 
 // R1217 function_reference replaced by designator_or_func_ref to reduce 
 // backtracking
@@ -5716,12 +5784,12 @@ intrinsic_stmt
 call_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasActualArgSpecList = ANTLR3_FALSE;} 
 @after{checkForInclude();}
-    :    (label {lbl=$label.start;})? T_CALL procedure_designator
+   :    (label {lbl=$label.start;})? T_CALL procedure_designator
             ( T_LPAREN (actual_arg_spec_list {hasActualArgSpecList=ANTLR3_TRUE;})? 
             T_RPAREN )? end_of_stmt
-         	{ c_action_call_stmt(lbl, $T_CALL, $end_of_stmt.start, 
+            { c_action_call_stmt(lbl, $T_CALL, $end_of_stmt.start, 
                 hasActualArgSpecList); }
-    ;
+   ;
 
 // R1219
 // ERR_CHK 1219 must be (T_IDENT | designator T_PERCENT T_IDENT)
@@ -5734,25 +5802,25 @@ call_stmt
 //                                      or proc-component-ref
 //                                      or data-ref % binding-name
 procedure_designator
-	:	data_ref
+   :   data_ref
             { c_action_procedure_designator(); }
-	;
+   ;
 
 // R1220
 actual_arg_spec
 @init{pANTLR3_COMMON_TOKEN keyword = NULL;}
-    :	(T_IDENT T_EQUALS {keyword=$T_IDENT;})? actual_arg
-    		{ c_action_actual_arg_spec(keyword); }
-    ;
+   :   (T_IDENT T_EQUALS {keyword=$T_IDENT;})? actual_arg
+            { c_action_actual_arg_spec(keyword); }
+   ;
 
 // TODO - delete greedy?
 actual_arg_spec_list
 options{greedy=false;}
 @init{int count = 0;}
-    :		{ c_action_actual_arg_spec_list__begin(); }
-    	actual_arg_spec {count++;} ( T_COMMA actual_arg_spec {count++;} )*
-    		{ c_action_actual_arg_spec_list(count); }
-    ;
+   :       { c_action_actual_arg_spec_list__begin(); }
+        actual_arg_spec {count++;} ( T_COMMA actual_arg_spec {count++;} )*
+            { c_action_actual_arg_spec_list(count); }
+   ;
 
 // R1221
 // ERR_CHK 1221 ensure ( expr | designator ending in T_PERCENT T_IDENT)
@@ -5763,11 +5831,11 @@ options{greedy=false;}
 // deleted
 actual_arg
 @init{ANTLR3_BOOLEAN hasExpr = ANTLR3_FALSE;}
-	:	expr				
+   :   expr                
             { hasExpr=ANTLR3_TRUE; c_action_actual_arg(hasExpr, NULL); }
-	|	T_ASTERISK label	
+   |   T_ASTERISK label    
             { c_action_actual_arg(hasExpr, $label.start); }
-	;
+   ;
 
 // R1222 alt_return_spec inlined as T_ASTERISK label in R1221
 
@@ -5780,13 +5848,13 @@ function_subprogram
     ANTLR3_BOOLEAN hasExePart = ANTLR3_FALSE;
     ANTLR3_BOOLEAN hasIntSubProg = ANTLR3_FALSE;
 }
-	:	function_stmt
-		specification_part
-		( execution_part { hasExePart=ANTLR3_TRUE; })?
-		( internal_subprogram_part { hasIntSubProg=ANTLR3_TRUE; })?
-		end_function_stmt
+   :   function_stmt
+        specification_part
+        ( execution_part { hasExePart=ANTLR3_TRUE; })?
+        ( internal_subprogram_part { hasIntSubProg=ANTLR3_TRUE; })?
+        end_function_stmt
             { c_action_function_subprogram(hasExePart, hasIntSubProg); }
-	;
+   ;
 
 // R1224
 // left factored optional prefix from function_stmt
@@ -5794,23 +5862,23 @@ function_subprogram
 function_stmt
 @init {
     pANTLR3_COMMON_TOKEN lbl = NULL; 
-	ANTLR3_BOOLEAN hasGenericNameList=ANTLR3_FALSE;
-	ANTLR3_BOOLEAN hasSuffix=ANTLR3_FALSE;
+    ANTLR3_BOOLEAN hasGenericNameList=ANTLR3_FALSE;
+    ANTLR3_BOOLEAN hasSuffix=ANTLR3_FALSE;
 }
 @after{checkForInclude();}
-    :  		{c_action_function_stmt__begin();} 
-		(label {lbl=$label.start;})? T_FUNCTION T_IDENT
-		    T_LPAREN ( generic_name_list {hasGenericNameList=ANTLR3_TRUE;})? T_RPAREN 
+   :       {c_action_function_stmt__begin();} 
+        (label {lbl=$label.start;})? T_FUNCTION T_IDENT
+            T_LPAREN ( generic_name_list {hasGenericNameList=ANTLR3_TRUE;})? T_RPAREN 
             ( suffix {hasSuffix=ANTLR3_TRUE;})? end_of_stmt
-			{c_action_function_stmt(lbl, $T_FUNCTION, $T_IDENT, $end_of_stmt.start, 
+            {c_action_function_stmt(lbl, $T_FUNCTION, $T_IDENT, $end_of_stmt.start, 
                                   hasGenericNameList,hasSuffix);}
-	;
+   ;
 
 // R1225
 proc_language_binding_spec
-	:	language_binding_spec
+   :   language_binding_spec
             { c_action_proc_language_binding_spec(); }
-	;
+   ;
 
 // R1226 dummy_arg_name was name inlined as T_IDENT
 
@@ -5855,34 +5923,34 @@ suffix
     pANTLR3_COMMON_TOKEN result = NULL;
     ANTLR3_BOOLEAN hasProcLangBindSpec = ANTLR3_FALSE;
 }
-	:	proc_language_binding_spec ( T_RESULT T_LPAREN result_name 
+   :   proc_language_binding_spec ( T_RESULT T_LPAREN result_name 
             T_RPAREN { result=$T_RESULT; })?
             { c_action_suffix(result, ANTLR3_TRUE); }
-	|	T_RESULT T_LPAREN result_name T_RPAREN 
+   |   T_RESULT T_LPAREN result_name T_RPAREN 
             ( proc_language_binding_spec { hasProcLangBindSpec = ANTLR3_TRUE; })?
             { c_action_suffix($T_RESULT, hasProcLangBindSpec); }
-    ;
+   ;
 
 result_name
-    :    name
+   :    name
             { c_action_result_name(); }
-    ;
+   ;
 
 // R1230
 end_function_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id = NULL;}
 @after{checkForInclude();}
-	: (label {lbl=$label.start;})? T_END T_FUNCTION ( T_IDENT {id=$T_IDENT;})? 
+   : (label {lbl=$label.start;})? T_END T_FUNCTION ( T_IDENT {id=$T_IDENT;})? 
         end_of_stmt
-		{c_action_end_function_stmt(lbl, $T_END, $T_FUNCTION, id, 
+        {c_action_end_function_stmt(lbl, $T_END, $T_FUNCTION, id, 
                                   $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_ENDFUNCTION    ( T_IDENT {id=$T_IDENT;})? 
+   | (label {lbl=$label.start;})? T_ENDFUNCTION    ( T_IDENT {id=$T_IDENT;})? 
         end_of_stmt
-		{c_action_end_function_stmt(lbl, $T_ENDFUNCTION, NULL, id, 
+        {c_action_end_function_stmt(lbl, $T_ENDFUNCTION, NULL, id, 
                                   $end_of_stmt.start);}
-	| (label {lbl=$label.start;})? T_END end_of_stmt
-		{c_action_end_function_stmt(lbl, $T_END, NULL, id, $end_of_stmt.start);}
-	;
+   | (label {lbl=$label.start;})? T_END end_of_stmt
+        {c_action_end_function_stmt(lbl, $T_END, NULL, id, $end_of_stmt.start);}
+   ;
 
 // R1231
 // specification_part made non-optional to remove END ambiguity (as can 
@@ -5898,51 +5966,51 @@ subroutine_subprogram
 // R1232
 subroutine_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasPrefix=ANTLR3_FALSE;
-	   ANTLR3_BOOLEAN hasDummyArgList=ANTLR3_FALSE;
-	   ANTLR3_BOOLEAN hasBindingSpec=ANTLR3_FALSE;
-	   ANTLR3_BOOLEAN hasArgSpecifier=ANTLR3_FALSE;}
+       ANTLR3_BOOLEAN hasDummyArgList=ANTLR3_FALSE;
+       ANTLR3_BOOLEAN hasBindingSpec=ANTLR3_FALSE;
+       ANTLR3_BOOLEAN hasArgSpecifier=ANTLR3_FALSE;}
 @after{checkForInclude();}
-    :		{c_action_subroutine_stmt__begin();}
-		(label {lbl=$label.start;})? (t_prefix {hasPrefix=ANTLR3_TRUE;})? T_SUBROUTINE 
+   :       {c_action_subroutine_stmt__begin();}
+        (label {lbl=$label.start;})? (t_prefix {hasPrefix=ANTLR3_TRUE;})? T_SUBROUTINE 
             T_IDENT ( T_LPAREN ( dummy_arg_list {hasDummyArgList=ANTLR3_TRUE;})? 
             T_RPAREN ( proc_language_binding_spec {hasBindingSpec=ANTLR3_TRUE;})? 
             {hasArgSpecifier=ANTLR3_TRUE;})? end_of_stmt
-      		{c_action_subroutine_stmt(lbl, $T_SUBROUTINE, $T_IDENT, 
+            {c_action_subroutine_stmt(lbl, $T_SUBROUTINE, $T_IDENT, 
                                     $end_of_stmt.start, 
                                     hasPrefix, hasDummyArgList, 
                                     hasBindingSpec, hasArgSpecifier);}
-    ;
+   ;
 
 // R1233
 // T_IDENT inlined for dummy_arg_name
 dummy_arg
 options{greedy=false; memoize=false;}
-	:	T_IDENT		{ c_action_dummy_arg($T_IDENT); }
-	|	T_ASTERISK	{ c_action_dummy_arg($T_ASTERISK); }
-	;
+   :   T_IDENT     { c_action_dummy_arg($T_IDENT); }
+   |   T_ASTERISK  { c_action_dummy_arg($T_ASTERISK); }
+   ;
 
 dummy_arg_list
 @init{ int count=0;}
-    :  		{c_action_dummy_arg_list__begin();}
-		dummy_arg {count++;} ( T_COMMA dummy_arg {count++;} )*
-      		{c_action_dummy_arg_list(count);}
-    ;
+   :       {c_action_dummy_arg_list__begin();}
+        dummy_arg {count++;} ( T_COMMA dummy_arg {count++;} )*
+            {c_action_dummy_arg_list(count);}
+   ;
 
 // R1234
 end_subroutine_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
 @after{checkForInclude();}
-    : (label {lbl=$label.start;})? T_END T_SUBROUTINE ( T_IDENT {id=$T_IDENT;})? 
+   : (label {lbl=$label.start;})? T_END T_SUBROUTINE ( T_IDENT {id=$T_IDENT;})? 
         end_of_stmt
-		{c_action_end_subroutine_stmt(lbl, $T_END, $T_SUBROUTINE, id, 
+        {c_action_end_subroutine_stmt(lbl, $T_END, $T_SUBROUTINE, id, 
                                     $end_of_stmt.start);}
-    | (label {lbl=$label.start;})? T_ENDSUBROUTINE    ( T_IDENT {id=$T_IDENT;})? 
+   | (label {lbl=$label.start;})? T_ENDSUBROUTINE    ( T_IDENT {id=$T_IDENT;})? 
         end_of_stmt
-		{c_action_end_subroutine_stmt(lbl, $T_ENDSUBROUTINE, NULL, id, 
+        {c_action_end_subroutine_stmt(lbl, $T_ENDSUBROUTINE, NULL, id, 
                                     $end_of_stmt.start);}
-    | (label {lbl=$label.start;})? T_END end_of_stmt
-		{c_action_end_subroutine_stmt(lbl, $T_END, NULL, id, $end_of_stmt.start);}
-    ;
+   | (label {lbl=$label.start;})? T_END end_of_stmt
+        {c_action_end_subroutine_stmt(lbl, $T_END, NULL, id, $end_of_stmt.start);}
+   ;
 
 // R1235
 // T_INDENT inlined for entry_name
@@ -5953,23 +6021,23 @@ entry_stmt
     ANTLR3_BOOLEAN hasSuffix=ANTLR3_FALSE;
 }
 @after{checkForInclude();}
-    :   (label {lbl=$label.start;})? T_ENTRY T_IDENT
+   :   (label {lbl=$label.start;})? T_ENTRY T_IDENT
             ( T_LPAREN ( dummy_arg_list {hasDummyArgList=ANTLR3_TRUE;} )? T_RPAREN 
             ( suffix {hasSuffix=ANTLR3_TRUE;})? )? end_of_stmt
             {c_action_entry_stmt(lbl, $T_ENTRY, $T_IDENT, $end_of_stmt.start, 
                                hasDummyArgList, hasSuffix);}
-    ;
+   ;
 
 // R1236
 // ERR_CHK 1236 scalar_int_expr replaced by expr
 return_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasScalarIntExpr=ANTLR3_FALSE;} 
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_RETURN ( expr {hasScalarIntExpr=ANTLR3_TRUE;})? 
+   :   (label {lbl=$label.start;})? T_RETURN ( expr {hasScalarIntExpr=ANTLR3_TRUE;})? 
             end_of_stmt
-			{c_action_return_stmt(lbl, $T_RETURN, $end_of_stmt.start, 
-                hasScalarIntExpr);}	
-	;
+            {c_action_return_stmt(lbl, $T_RETURN, $end_of_stmt.start, 
+                hasScalarIntExpr);} 
+   ;
 
 
 /*
@@ -6046,9 +6114,9 @@ end_mp_subprogram_stmt
 contains_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_CONTAINS end_of_stmt
-			{c_action_contains_stmt(lbl, $T_CONTAINS, $end_of_stmt.start);}	
-	;
+   :   (label {lbl=$label.start;})? T_CONTAINS end_of_stmt
+            {c_action_contains_stmt(lbl, $T_CONTAINS, $end_of_stmt.start);} 
+   ;
 
 
 // R1238
@@ -6063,12 +6131,12 @@ contains_stmt
 stmt_function_stmt
 @init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasGenericNameList=ANTLR3_FALSE;}
 @after{checkForInclude();}
-	:	(label {lbl=$label.start;})? T_STMT_FUNCTION T_IDENT T_LPAREN 
+   :   (label {lbl=$label.start;})? T_STMT_FUNCTION T_IDENT T_LPAREN 
             ( generic_name_list {hasGenericNameList=ANTLR3_TRUE;})? T_RPAREN 
             T_EQUALS expr end_of_stmt
-			{c_action_stmt_function_stmt(lbl, $T_IDENT, $end_of_stmt.start, 
+            {c_action_stmt_function_stmt(lbl, $T_IDENT, $end_of_stmt.start, 
                                        hasGenericNameList);}
-	;
+   ;
 
 
 //========================================================================================
