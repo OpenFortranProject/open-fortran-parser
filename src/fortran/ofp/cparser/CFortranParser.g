@@ -72,18 +72,18 @@ void checkForInclude() {return;}
 
 /* These are the members for the Java target.
  */
-///
-///   public void initialize(String[] args, String kind, String filename, String path)
-///   {
-///      action = FortranParserActionFactory.newAction(args, this, kind, filename);
-///      initialize(this, action, filename, path);
-///      action.start_of_file(filename, path);
-///   }
-///
-///   public void eofAction()
-///   {
-///      action.end_of_file(filename, pathname);
-///   }
+///JAVA
+///JAVA   public void initialize(String[] args, String kind, String filename, String path)
+///JAVA   {
+///JAVA      action = FortranParserActionFactory.newAction(args, this, kind, filename);
+///JAVA      initialize(this, action, filename, path);
+///JAVA      action.start_of_file(filename, path);
+///JAVA   }
+///JAVA
+///JAVA   public void eofAction()
+///JAVA   {
+///JAVA      action.end_of_file(filename, pathname);
+///JAVA   }
 
 }
 
@@ -166,24 +166,47 @@ void checkForInclude() {return;}
 //
 
 
-// R204
-// ERR_CHK 204 see ERR_CHK 207, implicit_part? removed (was after import_stmt*)
-specification_part
-@init{int numUseStmts=0; int numImportStmts=0; int numDeclConstructs=0;}
-   :   ( use_stmt               {numUseStmts++;}       )*
-       ( import_stmt            {numImportStmts++;}    )*
-       ( declaration_construct  {numDeclConstructs++;} )*
-           {
-              c_action_specification_part(numUseStmts, numImportStmts,0,numDeclConstructs);
-           }
-   ;
+////////////
+// R204-F08
+//
+// Implemented in "Extras" section
+//
+//----------------------------------------------------------------------------------------
+///JAVA specification_part
+///JAVA @init{int numUseStmts=0; int numImportStmts=0; int numDeclConstructs=0;}
+///JAVA    :   ( use_stmt               {numUseStmts++;}       )*
+///JAVA        ( import_stmt            {numImportStmts++;}    )*
+///JAVA        ( declaration_construct  {numDeclConstructs++;} )*
+///JAVA            {
+///JAVA               c_action_specification_part(numUseStmts,numImportStmts,0,numDeclConstructs);
+///JAVA            }
+///JAVA    ;
 
-// R205 implicit_part removed from grammar (see ERR_CHK 207)
 
-// R206 implicit_part_stmt removed from grammar (see ERR_CHK 207)
-
+//========================================================================================
 /*
- * R207-F08 declaration-construct
+ * R205-F08   implicit-part           is [ implicit-part-stmt ] ...
+ *                                       implicit-stmt
+ */
+//
+// R205 implicit_part removed from grammar (see ERR_CHK 207)
+//----------------------------------------------------------------------------------------
+
+
+//========================================================================================
+/*
+ * R206-F08   implicit-part-stmt      is implicit-stmt
+ *                                    or parameter-stmt
+ *                                    or format-stmt
+ *                                    or entry-stmt
+ */
+//
+// R206 implicit_part_stmt removed from grammar (see ERR_CHK 207)
+//----------------------------------------------------------------------------------------
+
+
+//========================================================================================
+/* R207-F08 declaration-construct
  *    is  derived-type-def
  *    or  entry-stmt
  *    or  enum-def                      // NEW_NAME_2008 (was enum-alias-def)
@@ -195,10 +218,7 @@ specification_part
  *    or  type-declaration-stmt
  *    or  stmt-function-stmt
  */
-
-////////////
-// R207-F08
-//
+//----------------------------------------------------------------------------------------
 declaration_construct
 @after {c_action_declaration_construct();}
    :   derived_type_def
@@ -213,25 +233,26 @@ declaration_construct
    |   stmt_function_stmt
    ;
 
+
 // R208
 execution_part
 @after {
     c_action_execution_part();
 }
-	:	executable_construct
-		( execution_part_construct )*
-	;
+   :   executable_construct
+       ( execution_part_construct )*
+   ;
 
 // R209
 execution_part_construct
 @after {
     c_action_execution_part_construct();
 }
-	:	executable_construct  
-	|	format_stmt
-	|	entry_stmt
-	|	data_stmt
-	;
+   :   executable_construct  
+   |   format_stmt
+   |   entry_stmt
+   |   data_stmt
+   ;
 
 /*
  * R210-F08 internal-subprogram-part
@@ -311,133 +332,73 @@ other_specification_stmt
    |   other_spec_stmt_extension
    ;
 
+
 // language extension point
 other_spec_stmt_extension : T_NO_LANGUAGE_EXTENSION ;
 
-/*
- * R213-F08 executable-construct
- *    is  action-stmt
- *    or  associate-construct
- *    or  block-construct               // NEW_TO_2008
- *    or  case-construct
- *    or  critical-construct            // NEW_TO_2008
- *    or  do-construct
- *    or  forall-construct
- *    or  if-construct
- *    or  select-type-construct
- *    or  where-construct
- */
 
 ////////////
 // R213-F03
 //
 // This rule is overridden in FortranParserExtras grammar
 //
-executable_construct
-@after {c_action_executable_construct();}
-   :   action_stmt
-   |   associate_construct
-   |   case_construct
-   |   do_construct
-   |   forall_construct
-   |   if_construct
-   |   select_type_construct
-   |   where_construct
-   ;
+///JAVA executable_construct
+///JAVA @after {c_action_executable_construct();}
+///JAVA    :   action_stmt
+///JAVA    |   associate_construct
+///JAVA    |   case_construct
+///JAVA    |   do_construct
+///JAVA    |   forall_construct
+///JAVA    |   if_construct
+///JAVA    |   select_type_construct
+///JAVA    |   where_construct
+///JAVA    ;
 
 
-/*
- * R214-F08 action-stmt
- *    is  allocate-stmt
- *    or  assignment-stmt
- *    or  backspace-stmt
- *    or  call-stmt
- *    or  close-stmt
- *    or  continue-stmt
- *    or  cycle-stmt
- *    or  deallocate-stmt
- *    or  end-function-stmt
- *    or  end-mp-subprogram-stmt        // NEW_TO_2008
- *    or  end-program-stmt
- *    or  end-subroutine-stmt
- *    or  endfile-stmt
- *    or  errorstop-stmt                // NEW_TO_2008
- *    or  exit-stmt
- *    or  flush-stmt
- *    or  forall-stmt
- *    or  goto-stmt
- *    or  if-stmt
- *    or  inquire-stmt
- *    or  lock-stmt                     // NEW_TO_2008
- *    or  nullify-stmt
- *    or  open-stmt
- *    or  pointer-assignment-stmt
- *    or  print-stmt
- *    or  read-stmt
- *    or  return-stmt
- *    or  rewind-stmt
- *    or  stop-stmt
- *    or  sync-all-stmt                 // NEW_TO_2008
- *    or  sync-images-stmt              // NEW_TO_2008
- *    or  sync-memory-stmt              // NEW_TO_2008
- *    or  unlock-stmt                   // NEW_TO_2008
- *    or  wait-stmt
- *    or  where-stmt
- *    or  write-stmt
- *    or  arithmetic-if-stmt
- *    or  computed-goto-stmt
- */
+////////////
+// R214-F08
+//
+// Implemented in "Extras" section
+//
+//----------------------------------------------------------------------------------------
+///JAVA action_stmt
+///JAVA @after {
+///JAVA     c_action_action_stmt();
+///JAVA     checkForInclude();
+///JAVA }
+///JAVA    :   allocate_stmt
+///JAVA    |   assignment_stmt
+///JAVA    |   backspace_stmt
+///JAVA    |   call_stmt
+///JAVA    |   close_stmt
+///JAVA    |   continue_stmt
+///JAVA    |   cycle_stmt
+///JAVA    |   deallocate_stmt
+///JAVA    |   endfile_stmt
+///JAVA    |   exit_stmt
+///JAVA    |   flush_stmt
+///JAVA    |   forall_stmt
+///JAVA    |   goto_stmt
+///JAVA    |   if_stmt
+///JAVA    |   inquire_stmt  
+///JAVA    |   nullify_stmt
+///JAVA    |   open_stmt
+///JAVA    |   pointer_assignment_stmt
+///JAVA    |   print_stmt
+///JAVA    |   read_stmt
+///JAVA    |   return_stmt
+///JAVA    |   rewind_stmt
+///JAVA    |   stop_stmt
+///JAVA    |   wait_stmt
+///JAVA    |   where_stmt
+///JAVA    |   write_stmt
+///JAVA    |   arithmetic_if_stmt
+///JAVA    |   computed_goto_stmt
+///JAVA    |   assign_stmt 
+///JAVA    |   assigned_goto_stmt
+///JAVA    |   pause_stmt
+///JAVA    ;
 
-// R214
-// C201 (R208) An execution-part shall not contain an end-function-stmt, end-program-stmt, or
-//             end-subroutine-stmt.  (But they can be in a branch target statement, which
-//             is not in the grammar, so the end-xxx-stmts deleted.)
-// TODO continue-stmt is ambiguous with same in end-do, check for label and if
-// label matches do-stmt label, then match end-do there
-// the original generated rules do not allow the label, so add (label)?
-action_stmt
-@after {
-    c_action_action_stmt();
-    checkForInclude();
-}
-// Removed backtracking by inserting extra tokens in the stream by the 
-// prepass that signals whether we have an assignment-stmt, a 
-// pointer-assignment-stmt, or an arithmetic if.  this approach may work for
-// other parts of backtracking also.  however, need to see if there is a way
-// to define tokens w/o defining them in the lexer so that the lexer doesn't
-// have to add them to it's parsing..  02.05.07
-	:	allocate_stmt
-	|	assignment_stmt
-	|	backspace_stmt
-	|	call_stmt
-	|	close_stmt
-	|	continue_stmt
-	|	cycle_stmt
-	|	deallocate_stmt
-	|	endfile_stmt
-	|	exit_stmt
-	|	flush_stmt
-	|	forall_stmt
-	|	goto_stmt
-	|	if_stmt
-    |   inquire_stmt  
-	|	nullify_stmt
-	|	open_stmt
-	|	pointer_assignment_stmt
-	|	print_stmt
-	|	read_stmt
-	|	return_stmt
-	|	rewind_stmt
-	|	stop_stmt
-	|	wait_stmt
-	|	where_stmt
-	|	write_stmt
-	|	arithmetic_if_stmt
-	|	computed_goto_stmt
-    |   assign_stmt 
-    |   assigned_goto_stmt
-    |   pause_stmt
-	;
 
 //========================================================================================
 // R215
@@ -567,12 +528,16 @@ label
 
 // c_action_label called here to store label in action class
 label_list
-@init{int count=0;}
-    :  		{c_action_label_list__begin();}
-		lbl=label {count++;} 
-            ( T_COMMA lbl=label {count++;} )*
-      		{c_action_label_list(count);}
-    ;
+@init
+{
+   int count=0;
+   c_action_label_list__begin();
+}
+   :   lbl=label {count++;}  ( T_COMMA lbl=label {count++;} )*
+      	   {
+              c_action_label_list(count);
+           }
+   ;
 
 
 /**
@@ -1566,20 +1531,25 @@ scalar_int_variable
  */
 
 
-// R501
-type_declaration_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL; int numAttrSpecs = 0;}
-@after{checkForInclude();}
-   :   (label {lbl=$label.start;})? declaration_type_spec
-       ( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
-       entity_decl_list end_of_stmt
-          {
-             c_action_type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.start);
-          }
-
-   -> ^(SgVariableDeclaration declaration_type_spec entity_decl_list label?)
-
-   ;
+////////////
+// R501-F08
+//
+// Implemented in "Extras" section
+//
+//----------------------------------------------------------------------------------------
+///JAVA type_declaration_stmt
+///JAVA @init {pANTLR3_COMMON_TOKEN lbl = NULL; int numAttrSpecs = 0;}
+///JAVA @after{checkForInclude();}
+///JAVA    :   (label {lbl=$label.start;})? declaration_type_spec
+///JAVA        ( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
+///JAVA        entity_decl_list end_of_stmt
+///JAVA           {
+///JAVA              c_action_type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.start);
+///JAVA           }
+///JAVA 
+///JAVA    -> ^(SgVariableDeclaration declaration_type_spec entity_decl_list label?)
+///JAVA 
+///JAVA    ;
 
 // R502
 declaration_type_spec
@@ -2743,38 +2713,43 @@ data_ref
 ////////////
 // R612-F08, R613-F03
 //
-// This rule is implemented in the FortranParserExtras grammar
+// Implemented in "Extras" section
 //
-part_ref
-   :   T_IDENT
-           {SYSTEM_ERR_PRINT("ERROR: part_ref implemented in FortranParserExtras.java\n");}
-   ;
+//----------------------------------------------------------------------------------------
+///JAVA part_ref
+///JAVA    :   T_IDENT
+///JAVA            {SYSTEM_ERR_PRINT("ERROR: part_ref implemented in FortranParserExtras.java\n");}
+///JAVA    ;
 
 
+////////////
 // R614 structure_component inlined as data_ref
+//
 
+////////////
 // R615 type_param_inquiry inlined in R701 then deleted as can be designator
 // T_IDENT inlined for type_param_name
+//
 
+////////////
 // R616 array_element inlined as data_ref
+//
 
+////////////
 // R617 array_section inlined in R603
+//
 
+////////////
 // R618 subscript inlined as expr
 // ERR_CHK 618 scalar_int_expr replaced by expr
+//
 
-
-/**
- * R620-F08 section-subscript
- *   is  subscript
- *   or  subscript-triplet
- *   or  vector-subscript
- */
 
 ////////////
 // R620-F08, R619-F03
 //
-// This rule is implemented in FortranParserExtras grammar
+// Implemented in "Extras" section
+//
 
 
 // R620 subscript_triplet inlined in R619
@@ -2842,15 +2817,18 @@ alloc_opt_list
 // and R636
 // R627 inlined source_expr was expr
 
+
 ////////////
-// R631-F08, R628-F03
+// R631-F08
 //
-// This rule is implemented in the FortranParserExtras grammar
+// Implemented in "Extras" section
 //
-allocation
-   :   T_IDENT
-           {SYSTEM_ERR_PRINT("ERROR: allocation implemented in FortranParserExtras.java\n");}
-   ;
+//----------------------------------------------------------------------------------------
+///JAVA allocation
+///JAVA    :   T_IDENT
+///JAVA            {SYSTEM_ERR_PRINT("ERROR: allocation implemented in FortranParserExtras.java\n");}
+///JAVA    ;
+
 
 allocation_list
 @init{ int count=0;}
@@ -2859,21 +2837,17 @@ allocation_list
            {c_action_allocation_list(count);}
    ;
 
-/**
- * R632-F08 allocate-object
- *   is  variable-name
- *       structure-component
- */
 
 ////////////
 // R636-F08, R629-F03
 //
-// This rule is implemented in the FortranParserExtras grammar
+// Implemented in "Extras" section
 //
-allocate_object
-   :   T_IDENT
-           {SYSTEM_ERR_PRINT("ERROR: allocate_object implemented in FortranParserExtras.java\n");}
-   ;
+//----------------------------------------------------------------------------------------
+///JAVA allocate_object
+///JAVA    :   T_IDENT
+///JAVA            {SYSTEM_ERR_PRINT("ERROR: allocate_object implemented in FortranParserExtras.java\n");}
+///JAVA    ;
 
 allocate_object_list
 @init{ int count=0;}
@@ -6111,4 +6085,649 @@ end_of_stmt
             c_action_end_of_stmt($T_EOF);
           }
     ->
+   ;
+
+
+//========================================================================================
+//========================================================================================
+// The "Extra" section of the Fortran 2008 grammar follows.  It is necessary to split
+// the grammar for the java parser.
+//========================================================================================
+//========================================================================================
+
+/**
+ * FortranParserExtras.g - this file is needed because adding more rules to FortranParser08
+ * currently will cause javac to fail with a "Code too large" error.  Removing some of
+ * the rules to an inherited grammar is a workaround to the problem.
+ */
+
+/*
+ * Section/Clause 2: Fortran concepts
+ */
+
+/*
+ * R204 specification-part
+ *    is [ use-stmt ] ... 
+ *       [ import-stmt ] ... 
+ *       [ implicit-part ] 
+ *       [ declaration-construct ] ... 
+ */
+
+/*
+ * C201-F08   (R208) An execution-part shall not contain an end-function-stmt,
+ *  end-mp-subprogram-stmt, end-program-stmt, or end-subroutine-stmt.
+ */
+
+
+//========================================================================================
+//
+/* R204-F08 specification-part
+ *   is [ use-stmt ] ...
+ *          [ import-stmt ] ...
+ *          [ implicit-part ]
+ *          [ declaration-construct ] ...
+ */
+//
+// ERR_CHK 204 see ERR_CHK 207, implicit_part? removed (was after import_stmt*)
+//
+//----------------------------------------------------------------------------------------
+specification_part
+@init
+{
+   int numUseStmts=0;
+   int numImportStmts=0;
+   gCount1=0;
+   gCount2=0;
+}
+   :   ( use_stmt               {numUseStmts++;}    )*
+       ( import_stmt            {numImportStmts++;} )*
+       implicit_part_recursion             // making nonoptional with predicates fixes ambiguity
+       ( declaration_construct  {gCount2++;}        )*
+           {
+              c_action_specification_part(numUseStmts,numImportStmts,gCount1,gCount2);
+           }
+   ;
+
+////////////
+// R205-F08
+// R206-F08 combined
+//
+implicit_part_recursion
+   :   ((label)? T_IMPLICIT)  => implicit_stmt  {gCount1++;} implicit_part_recursion
+   |   ((label)? T_PARAMETER) => parameter_stmt {gCount2++;} implicit_part_recursion
+   |   ((label)? T_FORMAT)    => format_stmt    {gCount2++;} implicit_part_recursion
+   |   ((label)? T_ENTRY)     => entry_stmt     {gCount2++;} implicit_part_recursion
+   |   // empty
+   ;
+
+
+//========================================================================================
+//
+/*
+ * R213-F08 executable-construct
+ *    is action-stmt
+ *    or associate-construct
+ *    or block-construct               // NEW_TO_2008
+ *    or case-construct
+ *    or critical-construct            // NEW_TO_2008
+ *    or do-construct
+ *    or forall-construct
+ *    or if-construct
+ *    or select-type-construct
+ *    or where-construct
+ */
+//
+//----------------------------------------------------------------------------------------
+executable_construct
+@after
+{
+   c_action_executable_construct();
+}
+   :   action_stmt
+   |   associate_construct
+   |   block_construct                 // NEW_TO_2008
+   |   case_construct
+   |   critical_construct              // NEW_TO_2008
+   |   do_construct
+   |   forall_construct
+   |   if_construct
+   |   select_type_construct
+   |   where_construct
+   ;
+
+
+//========================================================================================
+//
+/* R214-F08 action-stmt
+ *    is allocate-stmt
+ *    or assignment-stmt
+ *    or backspace-stmt
+ *    or call-stmt
+ *    or close-stmt
+ *    or continue-stmt
+ *    or cycle-stmt
+ *    or deallocate-stmt
+ *    or end-function-stmt
+ *    or end-mp-subprogram-stmt        // NEW_TO_2008
+ *    or end-program-stmt
+ *    or end-subroutine-stmt
+ *    or endfile-stmt
+ *    or errorstop-stmt                // NEW_TO_2008
+ *    or exit-stmt
+ *    or flush-stmt
+ *    or forall-stmt
+ *    or goto-stmt
+ *    or if-stmt
+ *    or inquire-stmt
+ *    or lock-stmt                     // NEW_TO_2008
+ *    or nullify-stmt
+ *    or open-stmt
+ *    or pointer-assignment-stmt
+ *    or print-stmt
+ *    or read-stmt
+ *    or return-stmt
+ *    or rewind-stmt
+ *    or stop-stmt
+ *    or sync-all-stmt                 // NEW_TO_2008
+ *    or sync-images-stmt              // NEW_TO_2008
+ *    or sync-memory-stmt              // NEW_TO_2008
+ *    or unlock-stmt                   // NEW_TO_2008
+ *    or wait-stmt
+ *    or where-stmt
+ *    or write-stmt
+ *    or arithmetic-if-stmt
+ *    or computed-goto-stmt
+ */
+//
+//
+// C201-F08   (R208) An execution-part shall not contain an end-function-stmt,
+//  end-mp-subprogram-stmt, end-program-stmt, or end-subroutine-stmt.
+//
+//     (But they can be in a branch target statement, which is not in the grammar,
+//      so the end-xxx-stmts deleted.)
+// TODO continue-stmt is ambiguous with same in end-do, check for label and if
+// label matches do-stmt label, then match end-do there
+// the original generated rules do not allow the label, so add (label)?
+//
+//----------------------------------------------------------------------------------------
+action_stmt
+@after
+{
+   c_action_action_stmt();
+}
+// Removed backtracking by inserting extra tokens in the stream by the prepass
+// that signals whether we have an assignment-stmt, a pointer-assignment-stmt,
+// or an arithmetic if.  This approach may work for other parts of backtracking
+// also.  However, need to see if there is a way to define tokens w/o defining
+// them in the lexer so that the lexer doesn't have to add them to it's parsing.
+//  02.05.07
+   :   allocate_stmt
+   |   assignment_stmt
+   |   backspace_stmt
+   |   call_stmt
+   |   close_stmt
+   |   continue_stmt
+   |   cycle_stmt
+   |   deallocate_stmt
+//////////
+// These end functions are not needed because the initiating constructs are called
+// explicitly to avoid ambiguities.
+//   |   end_function_stmt
+//   |   end_mp_subprogram_stmt        // NEW_TO_2008
+//   |   end_program_stmt
+//   |   end_subroutine_stmt
+   |   endfile_stmt
+   |   errorstop_stmt                // NEW_TO_2008
+   |   exit_stmt
+   |   flush_stmt
+   |   forall_stmt
+   |   goto_stmt
+   |   if_stmt
+   |   inquire_stmt  
+   |   lock_stmt                     // NEW_TO_2008
+   |   nullify_stmt
+   |   open_stmt
+   |   pointer_assignment_stmt
+   |   print_stmt
+   |   read_stmt
+   |   return_stmt
+   |   rewind_stmt
+   |   stop_stmt
+   |   sync_all_stmt                 // NEW_TO_2008
+   |   sync_images_stmt              // NEW_TO_2008
+   |   sync_memory_stmt              // NEW_TO_2008
+   |   unlock_stmt                   // NEW_TO_2008
+   |   wait_stmt
+   |   where_stmt
+   |   write_stmt
+   |   arithmetic_if_stmt
+   |   computed_goto_stmt
+   |   assign_stmt                   // ADDED?
+   |   assigned_goto_stmt            // ADDED?
+   |   pause_stmt                    // ADDED?
+   ;
+
+
+/**
+ * Section/Clause 3: Lexical tokens and source form
+ */
+
+
+/*
+ * Section/Clause 4: Types
+ */
+
+
+/*
+ * Section/Clause 5: Attribute declarations and specifications
+ */
+
+//========================================================================================
+//
+/* R501-F08 type-declaration-stmt
+ *    is declaration-type-spec [[, attr-spec ]... :: ] entity-decl-list
+ */
+//
+//----------------------------------------------------------------------------------------
+type_declaration_stmt
+@init
+{
+   pANTLR3_COMMON_TOKEN lbl = NULL;
+   int numAttrSpecs = 0;
+}
+@after
+{
+   checkForInclude();
+}
+   :   (label {lbl=$label.start;})?
+       declaration_type_spec
+       ( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
+       entity_decl_list  end_of_stmt
+          {
+             c_action_type_declaration_stmt(lbl,numAttrSpecs,$end_of_stmt.start);
+          }
+
+   -> ^(SgVariableDeclaration declaration_type_spec entity_decl_list label?)
+
+   ;
+
+/*
+ * R510-F08 deferred-coshape-spec
+ *    is :
+ */
+
+////////////
+// R510-F08
+//
+// deferred_coshape_spec is replaced by array_spec (see R509-F08)
+//
+
+/*
+ * R511-08 explicit-coshape-spec
+ *    is [ [ lower-cobound : ] upper-cobound, ]...
+ *           [ lower-cobound : ] *
+ */
+
+////////////
+// R511-F08
+//
+// explicit_coshape_spec is replaced by array_spec (see R509-F08)
+//
+
+
+/**
+ * Section/Clause 6: Use of data objects
+ */               
+
+
+//========================================================================================
+//
+/*
+ * R612-F08 part-ref
+ *    is part-name [ ( section-subscript-list ) ] [ image-selector]
+ */
+//
+// T_IDENT inlined for part_name
+// with k=2, this path is chosen over T_LPAREN substring_range T_RPAREN
+// TODO error: if a function call, should match id rather than 
+// (section_subscript_list)
+// a = foo(b) is ambiguous YUK...
+//
+//----------------------------------------------------------------------------------------
+part_ref
+options {k=2;}
+@init
+{
+   ANTLR3_BOOLEAN hasSSL = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasImageSelector = ANTLR3_FALSE;
+}
+   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+                             (image_selector {hasImageSelector=ANTLR3_TRUE;})?
+           {
+              hasSSL=ANTLR3_TRUE;
+              c_action_part_ref($T_IDENT, hasSSL, hasImageSelector);
+           }
+
+   |   (T_IDENT T_LBRACKET) => T_IDENT image_selector
+           {
+              hasImageSelector=ANTLR3_TRUE;
+              c_action_part_ref($T_IDENT, hasSSL, hasImageSelector);
+           }
+
+   |   T_IDENT
+           {
+              c_action_part_ref($T_IDENT, hasSSL, hasImageSelector);
+           }
+   ;
+
+
+part_ref_no_image_selector
+options{k=2;}
+@init{ANTLR3_BOOLEAN hasSSL = ANTLR3_FALSE; ANTLR3_BOOLEAN hasImageSelector = ANTLR3_FALSE;}
+   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
+           {hasSSL=ANTLR3_TRUE; c_action_part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   |   T_IDENT
+           {c_action_part_ref($T_IDENT, hasSSL, hasImageSelector);}
+   ;
+
+
+
+//========================================================================================
+/* R620-F08 section-subscript
+ *    is subscript
+ *    or subscript-triplet
+ *    or vector-subscript
+ */
+//
+// expr inlined for subscript, vector_subscript, and stride (thus deleted option 3)
+// refactored first optional expr from subscript_triplet modified to also match
+// actual_arg_spec_list to reduce ambiguities and need for backtracking
+//
+//----------------------------------------------------------------------------------------
+section_subscript returns [ANTLR3_BOOLEAN isEmpty]
+@init
+{
+   ANTLR3_BOOLEAN hasLowerBounds = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasUpperBounds = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasStride = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasExpr = ANTLR3_FALSE;
+   retval.isEmpty = ANTLR3_FALSE;
+}
+   :   expr section_subscript_ambiguous
+
+   |   T_COLON (expr {hasUpperBounds=ANTLR3_TRUE;})? (T_COLON expr {hasStride=ANTLR3_TRUE;})?
+           {
+              c_action_section_subscript(hasLowerBounds, hasUpperBounds, hasStride, ANTLR3_FALSE);
+           }
+
+   |   T_COLON_COLON expr
+           {
+              hasStride=ANTLR3_TRUE;
+              c_action_section_subscript(hasLowerBounds, hasUpperBounds, hasStride, ANTLR3_FALSE);
+           }
+
+   |   T_IDENT T_EQUALS expr    // could be an actual-arg, see R1220
+           {
+              hasExpr=ANTLR3_TRUE;
+              c_action_actual_arg(hasExpr, NULL); 
+              c_action_actual_arg_spec($T_IDENT);
+           }
+
+   |   T_IDENT T_EQUALS T_ASTERISK label // could be an actual-arg, see R1220
+           {
+              c_action_actual_arg(hasExpr, $label.start);
+              c_action_actual_arg_spec($T_IDENT);
+           }
+
+   |   T_ASTERISK label /* could be an actual-arg, see R1220 */
+           {
+              c_action_actual_arg(hasExpr, $label.start); c_action_actual_arg_spec(NULL);
+           }
+
+   |       
+           {
+              retval.isEmpty = ANTLR3_TRUE; /* empty could be an actual-arg, see R1220 */
+           }
+   ;
+
+section_subscript_ambiguous
+@init {
+   ANTLR3_BOOLEAN hasLowerBound = ANTLR3_TRUE;
+   ANTLR3_BOOLEAN hasUpperBound = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasStride = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN isAmbiguous = ANTLR3_FALSE; 
+}
+   :   T_COLON (expr {hasUpperBound=ANTLR3_TRUE;})? (T_COLON expr {hasStride=ANTLR3_TRUE;})?
+           { c_action_section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);}
+       // this alternative is necessary because if alt1 above has no expr
+       // following the first : and there is the optional second : with no 
+       // WS between the two, the lexer will make a T_COLON_COLON token 
+       // instead of two T_COLON tokens.  in this case, the second expr is
+       // required.  for an example, see J3/04-007, Note 7.44.
+   |  T_COLON_COLON expr
+           { hasStride=ANTLR3_TRUE; 
+             c_action_section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);}
+   |       { /* empty, could be an actual-arg, see R1220 */
+             isAmbiguous=ANTLR3_TRUE; 
+             c_action_section_subscript(hasLowerBound, hasUpperBound, hasStride, isAmbiguous);
+           }
+   ;
+
+
+//========================================================================================
+/* R620-F08 section-subscript
+ *    is subscript
+ *    or subscript-triplet
+ *    or vector-subscript
+ */
+//
+// This rule must be kept here with part-ref, otherwise parsing errors will occur.
+// It is unknown why this happens.
+//
+//----------------------------------------------------------------------------------------
+section_subscript_list
+@init
+{
+   int count = 0;
+   c_action_section_subscript_list__begin();
+}
+   :   isEmpty=section_subscript
+           {
+              if (isEmpty.start == ANTLR3_FALSE) count += 1;
+           }
+       (T_COMMA section_subscript {count += 1;})*
+           {
+              c_action_section_subscript_list(count);
+           }
+   ;
+
+
+/*
+ * R624-F08 image-selector
+ *    is lbracket cosubscript-list rbracket
+ */
+
+////////////
+// R624-F08
+//
+image_selector
+   :   T_LBRACKET cosubscript_list T_RBRACKET
+           {c_action_image_selector($T_LBRACKET, $T_RBRACKET);}
+   ;
+
+/*
+ * R625-F08 cosubscript
+ *    is scalar-int-expr
+ */
+
+////////////
+// R625-F08
+//
+cosubscript
+   :   scalar_int_expr
+   ;
+
+cosubscript_list
+@init{int count=0;}
+   :       {c_action_cosubscript_list__begin();}
+       cosubscript {count++;} ( T_COMMA cosubscript {count++;} )*
+           {c_action_cosubscript_list(count, NULL);}
+   ;
+
+
+//========================================================================================
+//
+/*
+ * R631-08 allocation
+ *    is allocate-object [ ( allocate-shape-spec-list ) ]
+ *                       [ lbracket allocate-coarray-spec rbracket ]  // NEW_TO_2008
+ */
+//
+//
+// SAD NOTE 1: In ROSE, there is no IR for allocations. That is, there is no place in the AST to hold the
+// 'allocate_shape_spec_list' and 'allocate_coarray_spec' if any. The only way to preserve them is
+// to encode them in the 'allocate_object' itself, i.e. as part of an expression.
+//
+// SAD NOTE 2: In this rule, an 'allocate_shape_spec_list' would never be recognized. Its corresponding action
+// 'action.allocate_shape_spec' is a no-op in ROSE. Shape specs are parsed by the 'allocate_object' rule
+// as a section subscript list within a part ref. Sigh! On the other hand, this is just as well because
+// there is no other way to represent the shape specs (see Sad Note 1).
+//
+//----------------------------------------------------------------------------------------
+allocation
+@init
+{
+   ANTLR3_BOOLEAN hasAllocateShapeSpecList = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasAllocateCoarraySpec = ANTLR3_FALSE;
+}
+   :   (allocate_object T_LBRACKET)
+          => allocate_object T_LBRACKET allocate_coarray_spec T_RBRACKET
+                 {
+                    hasAllocateCoarraySpec=ANTLR3_TRUE;
+                    c_action_allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);
+                 }
+// This option (with allocate_shape_spec_list) is caught by the allocate object.  If so,
+// the section-subscript-list must be changed into a allocate-shape-spec-list)
+//
+//   |   (allocate_object T_LPAREN)
+//          => allocate_object T_LPAREN allocate_shape_spec_list {hasAllocateShapeSpecList=ANTLR3_TRUE;}
+//                             T_RPAREN
+//                             T_LBRACKET allocate_coarray_spec {hasAllocateCoarraySpec=ANTLR3_TRUE;}
+//                             T_RBRACKET
+//                 {c_action_allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);}
+   |   (allocate_object)
+          => allocate_object
+                 {
+                    c_action_allocation(hasAllocateShapeSpecList, hasAllocateCoarraySpec);
+                 }
+   ;
+
+
+//========================================================================================
+//
+/* R632-F08 allocate-object
+ *    is variable-name
+ *    structure-component
+ */
+//
+// C644 (R632) An allocate-object shall not be a coindexed object.
+//
+// T_IDENT inlined for variable_name
+// data_ref inlined for structure_component
+// data_ref isa T_IDENT so T_IDENT deleted
+// data_ref inlined and part_ref_no_image_selector called directly
+//
+//----------------------------------------------------------------------------------------
+allocate_object
+@init
+{
+   int numPartRefs = 0;
+}
+   :   part_ref_no_image_selector {numPartRefs += 1;}
+       (T_PERCENT part_ref_no_image_selector {numPartRefs += 1;})*
+           {
+              c_action_data_ref(numPartRefs); c_action_allocate_object();
+           }
+   ;
+
+
+/*
+ * R636-F08 allocate-coarray-spec
+ *    is   [ allocate-coshape-spec-list , ] [ lower-bound-expr : ] *
+ */
+
+////////////
+// R636-F08
+//
+allocate_coarray_spec
+options{k=3;}
+@after {c_action_allocate_coarray_spec();}
+   :   (T_ASTERISK)              => T_ASTERISK
+   |   (expr T_COLON T_ASTERISK) => expr T_COLON T_ASTERISK
+   ;
+
+
+/**
+ * Section/Clause 7: Expressions and assignment
+ */
+
+/*
+ * R724-F08 logical-expr
+ *    is expr
+ */
+
+////////////
+// R724-F08, R724-F03
+//
+logical_expr
+   :   expr
+   ;
+
+scalar_logical_expr
+   :   expr
+   ;
+
+
+/*
+ * R726-08 int-expr
+ *    is   expr
+ */
+
+////////////
+// R726-F08, R727-F03
+//
+int_expr
+   :   expr
+   ;
+
+scalar_int_expr
+   :   expr
+   ;
+
+
+//----------------------------------------------------------------------------
+// additional rules following standard and useful for error checking
+//----------------------------------------------------------------------------
+
+scalar_variable
+   :   expr
+   ;
+
+
+/**
+ * Section/Clause 8: Execution control
+ */
+
+
+/*
+ * R866-F08 lock-variable
+ *    is scalar-variable
+ */
+ 
+////////////
+// R866-F08
+//
+lock_variable
+   :   scalar_variable
+          { c_action_lock_variable(); }
    ;
