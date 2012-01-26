@@ -7,12 +7,14 @@ GEN_SRC_FILES = CFortranTokenLexer.c CFortranTokenParser.c \
 GEN_HDR_FILES = CFortranTokenLexer.h CFortranTokenParser.h \
                 CFortranParser.h     FTreeWalker.h
 
-OBJS = ftoken-parser.o CFortranTokenLexer.o CFortranTokenParser.o  \
+OBJS = OFP_Type.o support.o                                        \
+       ftoken-parser.o                                             \
+       CFortranTokenLexer.o CFortranTokenParser.o                  \
        CFortranParser.o OFPTokenSource.o                           \
        FortranParserActionNull.o                                   \
        FTreeWalker.o
 
-all: fparser unparse
+all: fparser unparse $(OBJS)
 
 fparser: fparser.o $(OBJS)
 	cc -o $@ -m32 $< $(OBJS) $(LIBS)
@@ -52,6 +54,10 @@ fparser.o: fparser.c $(GEN_SRC_FILES)
 
 unparse.o: unparse.c $(GEN_SRC_FILES)
 	cc -c $(CFLAGS) $<
+
+OFP_Type.o: OFP_Type.c OFP_Type.h
+	cc -c $(CFLAGS) $<
+
 
 check: unparse
 	@unparse test-parser.tokens test-parser.f90
