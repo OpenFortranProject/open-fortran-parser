@@ -179,7 +179,11 @@ ext_function_subprogram
 			{action.ext_function_subprogram(hasPrefix);}
     ;
 
+////////////
 // R204
+//
+// This rule is overridden in FortranParserExtras grammar
+//
 // ERR_CHK 204 see ERR_CHK 207, implicit_part? removed (was after import_stmt*)
 specification_part
 @init{int numUseStmts=0; int numImportStmts=0; int numDeclConstructs=0;}
@@ -400,7 +404,11 @@ executable_construct
  *    or computed-goto-stmt
  */
 
+////////////
 // R214
+//
+// This rule is overridden in FortranParserExtras grammar
+//
 // C201 (R208) An execution-part shall not contain an end-function-stmt, end-program-stmt, or
 //             end-subroutine-stmt.  (But they can be in a branch target statement, which
 //             is not in the grammar, so the end-xxx-stmts deleted.)
@@ -1501,7 +1509,11 @@ scalar_int_variable
  */
 
 
+////////////
 // R501
+//
+// This rule is overridden in FortranParserExtras grammar
+//
 type_declaration_stmt
 @init {Token lbl = null; int numAttrSpecs = 0;}
 @after{checkForInclude();}
