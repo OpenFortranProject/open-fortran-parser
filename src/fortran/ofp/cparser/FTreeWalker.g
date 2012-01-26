@@ -8,6 +8,8 @@ options {
 
 @members {
 
+#include  "OFP_Type.h"
+
 static      pANTLR3_VECTOR      tlist;
 static      ANTLR3_MARKER       next_token;
 
@@ -295,12 +297,6 @@ extended_intrinsic_op
 //----------------------------------------------------------------------------------------
 label
    :  T_DIGIT_STRING
-   ;
-
-
-// c_action_label called here to store label in action class
-label_list
-   :   label  ( T_COMMA label )*
    ;
 
 
@@ -2162,7 +2158,7 @@ computed_goto_stmt
    :   label?
         (T_GO T_TO  
         | T_GOTO ) 
-            T_LPAREN label_list T_RPAREN ( T_COMMA )? expr end_of_stmt
+            T_LPAREN label+ T_RPAREN ( T_COMMA )? expr end_of_stmt
    ;
 
 // The ASSIGN statement is a deleted feature.
@@ -2275,7 +2271,7 @@ sync_memory_stmt
 //
 lock_stmt
    :    label? T_LOCK T_LPAREN variable
-             (T_COMMA lock_stat_list )? T_RPAREN
+             (T_COMMA lock_stat+ )? T_RPAREN
              end_of_stmt
    ;
 
@@ -2285,10 +2281,6 @@ lock_stmt
 lock_stat 
    :   T_ACQUIRED_LOCK T_EQUALS expr    // expr is a scalar-logical-variable
    |   sync_stat
-   ;
-
-lock_stat_list
-   :   lock_stat  ( T_COMMA lock_stat  )*
    ;
 
 ////////////
@@ -2692,10 +2684,10 @@ use_stmt
    :    label? T_USE 
             ( (T_COMMA module_nature )? 
             T_COLON_COLON )? T_IDENT ( T_COMMA 
-            rename_list )? end_of_stmt
+            fortran_rename+ )? end_of_stmt
    |    label? T_USE 
             ( ( T_COMMA module_nature )? 
-            T_COLON_COLON )? T_IDENT T_COMMA T_ONLY T_COLON ( only_list )? 
+            T_COLON_COLON )? T_IDENT T_COMMA T_ONLY T_COLON ( only+ )? 
             end_of_stmt
    ;
 
@@ -2714,18 +2706,10 @@ fortran_rename
        T_OPERATOR T_LPAREN T_DEFINED_OP T_RPAREN
    ;
 
-rename_list
-   :   fortran_rename  ( T_COMMA fortran_rename  )*
-   ;
-
 // R1112
 only
    :   generic_spec        
    |   fortran_rename      
-   ;
-
-only_list
-   :   only  ( T_COMMA only  )*
    ;
 
 ////////////
@@ -3024,7 +3008,7 @@ subroutine_subprogram
 // R1232
 subroutine_stmt
    :   label? (t_prefix )? T_SUBROUTINE 
-            T_IDENT ( T_LPAREN ( dummy_arg_list )? 
+            T_IDENT ( T_LPAREN ( dummy_arg+ )? 
             T_RPAREN ( proc_language_binding_spec )? 
             )? end_of_stmt
    ;
@@ -3033,10 +3017,6 @@ subroutine_stmt
 dummy_arg
    :   T_IDENT     
    |   T_ASTERISK  
-   ;
-
-dummy_arg_list
-   :   dummy_arg  ( T_COMMA dummy_arg  )*
    ;
 
 // R1234
@@ -3049,7 +3029,7 @@ end_subroutine_stmt
 // R1235
 entry_stmt
    :   label? T_ENTRY T_IDENT
-            ( T_LPAREN ( dummy_arg_list  )? T_RPAREN 
+            ( T_LPAREN ( dummy_arg+  )? T_RPAREN 
             ( suffix )? )? end_of_stmt
    ;
 
