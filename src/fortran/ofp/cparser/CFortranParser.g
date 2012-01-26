@@ -1154,11 +1154,16 @@ component_decl
    ;
 
 component_decl_list
-@init{int count=0;}
-   :       {c_action_component_decl_list__begin();}
-       component_decl {count++;} ( T_COMMA component_decl {count++;} )*
-           {c_action_component_decl_list(count);}
-   ;
+@init
+{
+   int count=0;
+   c_action_component_decl_list__begin();
+}
+   :   component_decl {count++;} ( T_COMMA component_decl {count++;} )*
+          {
+             c_action_component_decl_list(count);
+          }
+  ;
 
 // R443
 component_array_spec
@@ -1581,7 +1586,7 @@ scalar_int_variable
 ///JAVA              c_action_type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.start);
 ///JAVA           }
 ///JAVA 
-///JAVA    -> ^(SgVariableDeclaration declaration_type_spec entity_decl_list label?)
+///JAVA    -> ^(SgVariableDeclaration declaration_type_spec entity_decl+ label?)
 ///JAVA 
 ///JAVA    ;
 
@@ -6079,8 +6084,7 @@ mp_subprogram_stmt
 @after{checkForInclude();}
    :   (label {lbl=$label.start;})? T_MODULE T_PROCEDURE name end_of_stmt
           {
-             c_action_mp_subprogram_stmt(lbl, $T_MODULE,
-                                       $T_PROCEDURE, $name.start, $end_of_stmt.start);
+             c_action_mp_subprogram_stmt(lbl, $T_MODULE, $T_PROCEDURE, $name.start, $end_of_stmt.start);
           }
    ;
 
@@ -6094,7 +6098,12 @@ mp_subprogram_stmt
 // R1239-F08
 //
 end_mp_subprogram_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN t_proc = NULL; pANTLR3_COMMON_TOKEN t_name = NULL;}
+@init
+{
+   pANTLR3_COMMON_TOKEN lbl = NULL;
+   pANTLR3_COMMON_TOKEN t_proc = NULL;
+   pANTLR3_COMMON_TOKEN t_name = NULL;
+}
 @after{checkForInclude();}
    :   (label {lbl=$label.start;})?
        T_END (T_PROCEDURE (name {t_name=$name.start;})? {t_proc=$T_PROCEDURE;})?
@@ -6104,8 +6113,7 @@ end_mp_subprogram_stmt
        T_ENDPROCEDURE (name {t_name=$name.start;})?
        end_of_stmt
            {
-              c_action_end_mp_subprogram_stmt(lbl, $T_ENDPROCEDURE, NULL,
-                                            t_name, $end_of_stmt.start);
+              c_action_end_mp_subprogram_stmt(lbl, $T_ENDPROCEDURE, NULL, t_name, $end_of_stmt.start);
            }
    ;
 
@@ -6134,8 +6142,7 @@ stmt_function_stmt
    :   (label {lbl=$label.start;})? T_STMT_FUNCTION T_IDENT T_LPAREN 
             ( generic_name_list {hasGenericNameList=ANTLR3_TRUE;})? T_RPAREN 
             T_EQUALS expr end_of_stmt
-            {c_action_stmt_function_stmt(lbl, $T_IDENT, $end_of_stmt.start, 
-                                       hasGenericNameList);}
+            {c_action_stmt_function_stmt(lbl, $T_IDENT, $end_of_stmt.start, hasGenericNameList);}
    ;
 
 
