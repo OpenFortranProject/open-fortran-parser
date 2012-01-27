@@ -8,6 +8,24 @@
 #define NUM_NAME_BUCKETS   32
 
 
+/* the current type table
+ *   NOTE: a separate type table may be needed for each scope, this
+ *         will do for now
+ */
+static pOFP_TYPE_TABLE type_table;
+
+pOFP_TYPE_TABLE
+ofpGetTypeTable()
+{
+   return type_table;
+}
+void
+ofpPushTypeTable(pOFP_TYPE_TABLE table)
+{
+   type_table = table;
+}
+
+
 static void
 ofpTypeFree(pOFP_TYPE type)
 {
@@ -58,6 +76,7 @@ ofpTypeTableNew()
    }
 
    table->intrinsics = intrinsics;
+   table->free       = NULL;   // TODO - add free function
 
    for (itype = 0; itype < NUM_TYPE_BUCKETS; itype++) {
       /* create a kind vector for every intrinsic type
@@ -94,7 +113,7 @@ f       */
       }
    } // end loop over itype
 
-   return (pOFP_TYPE_TABLE) intrinsics;
+   return table;
 }
 
 /* Add a new type to the table (ignore if already present)
@@ -118,7 +137,7 @@ addType(pOFP_TYPE_TABLE table, pOFP_TYPE type)
    if (type->id != DERIVED) {
       pOFP_TYPE should_be_null = ranks->get(ranks, type->rank);
       if (should_be_null != NULL) {
-         /* help, should be a type here */
+         /* help, should not be a type here yet */
       }
       ranks->set(ranks, type->rank, type, (void (ANTLR3_CDECL *) (void *))ofpTypeFree, ANTLR3_TRUE);
       
@@ -131,14 +150,14 @@ addType(pOFP_TYPE_TABLE table, pOFP_TYPE type)
          /* help, should be a string table here */
       }
 
-      pOFP_TYPE null_type = names->get(names, type->name);
-
-      type = (pOFP_TYPE) names->get(names, (char*)name);
-
-
-      if (null_type == NULL) {
-         /* help, should be a string table here */
+      pOFP_TYPE should_be_null = names->get(names, type->name);
+      if (should_be_null != NULL) {
+         /* help, should not be a type here yet */
       }
+
+      type = (pOFP_TYPE) names->get(names, (char*)type->name);
+
+      names->put(names, type->name, type, (void (ANTLR3_CDECL *) (void *))type->free);
    }
 
 }

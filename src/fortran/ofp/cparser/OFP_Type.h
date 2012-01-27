@@ -18,6 +18,7 @@ typedef enum {
 } Intrinsic_Type_Spec;
 
 
+
 /* Structure representing a type
  */
 typedef struct OFP_TYPE_struct
@@ -71,6 +72,11 @@ getType(pOFP_TYPE_TABLE table, int id, int kind, int rank, const char * name);
  */
 void
 addType(pOFP_TYPE_TABLE table, pOFP_TYPE type);
+
+/* Access to the type table(s)
+ */
+pOFP_TYPE_TABLE   ofpGetTypeTable   ();
+void              ofpPushTypeTable  (pOFP_TYPE_TABLE table);
 
 
 #endif
