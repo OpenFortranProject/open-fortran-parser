@@ -13,6 +13,7 @@ options {
 static      pANTLR3_VECTOR      tlist;
 static      ANTLR3_MARKER       next_token;
 
+
 void FTreeWalker_set_tokens(pANTLR3_VECTOR lexer_tlist)
    {
       tlist       = lexer_tlist;
@@ -318,21 +319,20 @@ type_param_value
    |   T_COLON
    ;
 
-// R403
+// R404
 intrinsic_type_spec
-   :   SgTypeInt       kind_selector?
-   |   SgTypeFloat     kind_selector?
+   :   ^(SgTypeInt       kind_selector?)
+   |   ^(SgTypeFloat     kind_selector?)
    |   SgTypeDouble
-   |   SgTypeComplex   kind_selector?
+   |   ^(SgTypeComplex   kind_selector?)
    |   SgTypeDComplex                      // TODO - what is the real SgType?
-   |   SgTypeChar      char_selector?
-   |   SgTypeBool      kind_selector?
+   |   ^(SgTypeChar      char_selector?)
+   |   ^(SgTypeBool      kind_selector?)
    ;
 
 // R404
 kind_selector
-   : T_LPAREN (T_KIND T_EQUALS )? expr T_RPAREN
-   | T_ASTERISK T_DIGIT_STRING
+   :   ^(KindSelector expr)
    ;
 
 // R405
@@ -388,31 +388,14 @@ imag_part
    |   T_IDENT                         
    ;
 
-// R424
+// R420-F08
 char_selector
-   // length-selector without type-param-value
-   :   T_ASTERISK char_length (T_COMMA)?
-   // type-param-value but no LEN=
-   |   T_LPAREN type_param_value
-          (  T_COMMA (T_KIND T_EQUALS )? expr
-          )?
-       T_RPAREN
-   // type-param-value with LEN=
-   |   T_LPAREN T_LEN T_EQUALS type_param_value
-          (  T_COMMA T_KIND T_EQUALS expr
-          )?
-       T_RPAREN
-   // KIND= first
-   |   T_LPAREN T_KIND T_EQUALS expr
-          (  T_COMMA (T_LEN T_EQUALS )? type_param_value
-          )?
-       T_RPAREN
+   :   ^(CharSelector ^(KindSelector expr?) ^(LengthSelector type_param_value?))
    ;
 
-// R425
+// R421-F08
 length_selector
-   :   T_LPAREN ( T_LEN  T_EQUALS )? type_param_value T_RPAREN
-   |   T_ASTERISK char_length (T_COMMA)?
+   :   ^(LengthSelector type_param_value)
    ; 
 
 // R426
@@ -793,11 +776,15 @@ scalar_int_variable
 // R501
 type_declaration_stmt
    :   ^(SgVariableDeclaration declaration_type_spec entity_decl+ label?)
+{ printf("type_decl\n");}
    ;
 
 // R502
 declaration_type_spec
    :   intrinsic_type_spec
+{
+   printf("intrinsic_type_spec: create an intrinsic SgType here\n");
+}
    |   T_TYPE T_LPAREN derived_type_spec T_RPAREN
    |   T_CLASS T_LPAREN derived_type_spec T_RPAREN
    |   T_CLASS T_LPAREN T_ASTERISK T_RPAREN
