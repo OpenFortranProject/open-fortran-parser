@@ -19,8 +19,13 @@ options {
 }
 
 tokens {
+   // Imaginary nodes for intermediate processing
+   //
    BeginStmt;
    EndStmt;
+   KindSelector;      
+   CharSelector;
+   LengthSelector;
 
    // Sage nodes
    //
@@ -547,7 +552,15 @@ label_list
  */
 
 
-// R401
+// R401-F08
+// ERR_CHK 402 scalar_int_expr replaced by expr
+type_param_value
+   :   expr        { c_action_type_param_value(ANTLR3_TRUE, ANTLR3_FALSE, ANTLR3_FALSE); }
+   |   T_ASTERISK  { c_action_type_param_value(ANTLR3_FALSE, ANTLR3_TRUE, ANTLR3_FALSE); }
+   |   T_COLON     { c_action_type_param_value(ANTLR3_FALSE, ANTLR3_FALSE, ANTLR3_TRUE); }
+   ;
+
+// R402-F08
 type_spec
 @after
 {
@@ -557,19 +570,32 @@ type_spec
    |   derived_type_spec
    ;
 
-// R402
-// ERR_CHK 402 scalar_int_expr replaced by expr
-type_param_value
-   :   expr        { c_action_type_param_value(ANTLR3_TRUE, ANTLR3_FALSE, ANTLR3_FALSE); }
-   |   T_ASTERISK  { c_action_type_param_value(ANTLR3_FALSE, ANTLR3_TRUE, ANTLR3_FALSE); }
-   |   T_COLON     { c_action_type_param_value(ANTLR3_FALSE, ANTLR3_FALSE, ANTLR3_TRUE); }
+// R403-F08
+declaration_type_spec
+   :   intrinsic_type_spec
+           {
+              c_action_declaration_type_spec(NULL,IActionEnums_ DeclarationTypeSpec_INTRINSIC);
+           }
+   |   T_TYPE T_LPAREN derived_type_spec T_RPAREN
+           {
+              c_action_declaration_type_spec($T_TYPE,IActionEnums_ DeclarationTypeSpec_TYPE);
+           }
+   |   T_CLASS T_LPAREN derived_type_spec T_RPAREN
+           {
+              c_action_declaration_type_spec($T_CLASS,IActionEnums_ DeclarationTypeSpec_CLASS);
+           }
+   |   T_CLASS T_LPAREN T_ASTERISK T_RPAREN
+           {
+              c_action_declaration_type_spec($T_CLASS,IActionEnums_ DeclarationTypeSpec_unlimited);
+           }
    ;
+
 
 // inlined scalar_int_expr C101 shall be a scalar
 
 // inlined scalar_expr
 
-// R403
+// R404-F08
 // Nonstandard Extension: source BLAS
 //  |   T_DOUBLE T_COMPLEX
 //  |   T_DOUBLECOMPLEX
@@ -580,14 +606,14 @@ intrinsic_type_spec
               c_action_intrinsic_type_spec($T_INTEGER,NULL,IActionEnums_ IntrinsicTypeSpec_INTEGER,hasKindSelector);
            }
 
-    -> SgTypeInt kind_selector?
+    -> ^(SgTypeInt kind_selector?)
 
    |   T_REAL (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
            {
               c_action_intrinsic_type_spec($T_REAL,NULL,IActionEnums_ IntrinsicTypeSpec_REAL,hasKindSelector);
            }
 
-    -> SgTypeFloat kind_selector?
+    -> ^(SgTypeFloat kind_selector?)
 
    |   T_DOUBLE T_PRECISION
            {
@@ -641,18 +667,33 @@ intrinsic_type_spec
    ;
 
 
-// R404
+// R405-F08
 // ERR_CHK 404 scalar_int_initialization_expr replaced by expr
 // Nonstandard extension: source common practice
 //  | T_ASTERISK T_DIGIT_STRING  // e.g., COMPLEX*16    
 // TODO - check to see if second alternative is where it should go
 kind_selector
-@init{pANTLR3_COMMON_TOKEN tk1=NULL; pANTLR3_COMMON_TOKEN tk2=NULL;}
-   :  T_LPAREN (T_KIND T_EQUALS {tk1=$T_KIND; tk2=$T_EQUALS;})? expr T_RPAREN
-         { c_action_kind_selector(tk1, tk2, ANTLR3_TRUE); } 
-   |  T_ASTERISK T_DIGIT_STRING
-         { c_action_kind_selector($T_ASTERISK, $T_DIGIT_STRING, ANTLR3_FALSE); } 
+@init
+{
+   pANTLR3_COMMON_TOKEN tk1 = NULL;
+   pANTLR3_COMMON_TOKEN tk2 = NULL;
+}
+   :   T_LPAREN (T_KIND T_EQUALS {tk1=$T_KIND; tk2=$T_EQUALS;})? expr T_RPAREN
+           {
+              c_action_kind_selector(tk1, tk2, ANTLR3_TRUE);
+           }
+
+    -> ^(KindSelector expr)
+
+   |   T_ASTERISK T_DIGIT_STRING
+           {
+              c_action_kind_selector($T_ASTERISK, $T_DIGIT_STRING, ANTLR3_FALSE);
+           }
+
+    -> ^(KindSelector T_DIGIT_STRING)
+
    ;
+
 
 // R405
 signed_int_literal_constant
@@ -805,13 +846,19 @@ char_selector
           }
    ;
 
-// R425
+// R421-F08
 length_selector
 @init {pANTLR3_COMMON_TOKEN len = NULL;}
    :   T_LPAREN ( T_LEN { len=$T_LEN; } T_EQUALS )? type_param_value T_RPAREN
           { c_action_length_selector(len, IActionEnums_ KindLenParam_len, ANTLR3_FALSE); }
+
+    -> ^(LengthSelector type_param_value)
+
    |   T_ASTERISK char_length (T_COMMA)?
           { c_action_length_selector(len, IActionEnums_ KindLenParam_none, ANTLR3_TRUE); }
+
+    -> ^(LengthSelector char_length)
+
    ; 
 
 // R426
@@ -1589,18 +1636,6 @@ scalar_int_variable
 ///JAVA    -> ^(SgVariableDeclaration declaration_type_spec entity_decl+ label?)
 ///JAVA 
 ///JAVA    ;
-
-// R502
-declaration_type_spec
-   :   intrinsic_type_spec
-            { c_action_declaration_type_spec(NULL,IActionEnums_ DeclarationTypeSpec_INTRINSIC); }
-   |   T_TYPE T_LPAREN derived_type_spec T_RPAREN
-            { c_action_declaration_type_spec($T_TYPE,IActionEnums_ DeclarationTypeSpec_TYPE); }
-   |   T_CLASS T_LPAREN derived_type_spec T_RPAREN
-            { c_action_declaration_type_spec($T_CLASS,IActionEnums_ DeclarationTypeSpec_CLASS); }
-   |   T_CLASS T_LPAREN T_ASTERISK T_RPAREN
-            { c_action_declaration_type_spec($T_CLASS,IActionEnums_ DeclarationTypeSpec_unlimited); }
-   ;
 
 
 /*
