@@ -1,6 +1,7 @@
 #ifndef	OFP_TYPE_H
 #define	OFP_TYPE_H
 
+#include <antlr3basetree.h>
 #include <antlr3collections.h>
 
 #define KIND_DEFAULT 0
@@ -18,7 +19,6 @@ typedef enum {
 } Intrinsic_Type_Spec;
 
 
-
 /* Structure representing a type
  */
 typedef struct OFP_TYPE_struct
@@ -30,7 +30,7 @@ typedef struct OFP_TYPE_struct
 
    /** Pointer to function to delete this type
     */
-   void		(*free)	    (struct OFP_TYPE_struct * type);
+   void    (*free)             (struct OFP_TYPE_struct * type);
 }
    OFP_TYPE, *pOFP_TYPE;
 
@@ -47,11 +47,16 @@ typedef struct OFP_TYPE_TABLE_struct
     */
    pANTLR3_VECTOR intrinsics;
 
+   /** Pointer to function to insert an intrinsic type into the table
+    */
+   void     (*putIntrinsic)     (struct OFP_TYPE_TABLE_struct * table, pANTLR3_BASE_TREE tree);
+
    /** Pointer to function to completely delete this table
     */
-   void		(*free)	    (struct OFP_TYPE_TABLE_struct * type);
+   void     (*free)             (struct OFP_TYPE_TABLE_struct * type);
 }
    OFP_TYPE_TABLE, *pOFP_TYPE_TABLE;
+
 
 /* Create a type table
  */
