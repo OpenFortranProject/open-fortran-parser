@@ -6189,12 +6189,12 @@ end_of_stmt
           {
              c_action_end_of_stmt($T_EOS);
           }
-    ->
+    -> T_EOS
    |  T_EOF
           {
             c_action_end_of_stmt($T_EOF);
           }
-    ->
+    -> T_EOS
    ;
 
 
