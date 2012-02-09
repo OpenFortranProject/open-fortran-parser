@@ -782,14 +782,13 @@ scalar_int_variable
 // R501
 type_declaration_stmt
    :   ^(SgVariableDeclaration declaration_type_spec entity_decl+ label?)
-{ printf("type_decl\n");}
    ;
 
 // R502
 declaration_type_spec
    :   intrinsic_type_spec
 {
-   printf("intrinsic_type_spec: create an intrinsic SgType here\n");
+//   printf("intrinsic_type_spec: create an intrinsic SgType here\n");
 }
    |   T_TYPE T_LPAREN derived_type_spec T_RPAREN
    |   T_CLASS T_LPAREN derived_type_spec T_RPAREN
@@ -3080,5 +3079,4 @@ stmt_function_stmt
 //----------------------------------------------------------------------------------------
 end_of_stmt
    :  T_EOS
-   |  T_EOF
    ;
