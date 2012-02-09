@@ -25,6 +25,13 @@ ofpPushTypeTable(pOFP_TYPE_TABLE table)
    type_table = table;
 }
 
+/** Insert an intrinsic type into the table
+ */
+static void
+ofpPutIntrinsicType(struct OFP_TYPE_TABLE_struct * table, pANTLR3_BASE_TREE tree)
+{
+   printf("ofpPutIntrinsicType: type==%d\n", tree->getType(tree));
+}
 
 static void
 ofpTypeFree(pOFP_TYPE type)
@@ -51,7 +58,7 @@ ofpTypeNew(int id, int kind, int rank, const char * name)
       type->name  = strdup(name);
    }
 
-   type->free = ofpTypeFree;
+   type->free          =  ofpTypeFree;
 
    return type;
 }
@@ -75,8 +82,9 @@ ofpTypeTableNew()
       return NULL;
    }
 
-   table->intrinsics = intrinsics;
-   table->free       = NULL;   // TODO - add free function
+   table->intrinsics    =  intrinsics;
+   table->putIntrinsic  =  ofpPutIntrinsicType;
+   table->free          =  NULL;   // TODO - add free function
 
    for (itype = 0; itype < NUM_TYPE_BUCKETS; itype++) {
       /* create a kind vector for every intrinsic type

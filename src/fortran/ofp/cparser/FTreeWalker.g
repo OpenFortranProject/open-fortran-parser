@@ -3,6 +3,7 @@ tree grammar FTreeWalker;
 options {
    language       = C;
    tokenVocab     = CFortranParser;
+   output         = AST;
    ASTLabelType   = pANTLR3_BASE_TREE;
 }
 
@@ -321,6 +322,11 @@ type_param_value
 
 // R404
 intrinsic_type_spec
+@after
+{
+   pOFP_TYPE_TABLE ttable = ofpGetTypeTable();
+   ttable->putIntrinsic(ttable, retval.tree);
+}
    :   ^(SgTypeInt       kind_selector?)
    |   ^(SgTypeFloat     kind_selector?)
    |   SgTypeDouble
