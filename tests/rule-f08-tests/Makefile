@@ -15,6 +15,7 @@
 # accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 
+CFORTRANPARSER=../../src/fortran/ofp/cparser/unparse
 JAVAC=javac
 JAVA=java
 JAR=jar
@@ -38,4 +39,13 @@ runTestsVerbose:
            if [ $$? != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
         done;
 
+runTestsCFortranParser:
+	@for file in junk.f* ; do \
+           echo "Running CFortranParser test $$file"; \
+           $(JAVA) fortran.ofp.FrontEnd $$file --tokenfile tempfile.tokens; \
+           $(CFORTRANPARSER) tempfile.tokens $$file; \
+           if [ $$? != 0 ]; then echo "FAILED while running test $$file"; exit 1; fi \
+        done;
+
 clean:
+	rm -f tempfile.tokens
