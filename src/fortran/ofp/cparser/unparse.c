@@ -3,6 +3,9 @@
 #include "CFortranParser.h"
 #include "support.h"
 
+#define PRINT_TOKENS 0
+#define PRINT_TREE   1
+
 pANTLR3_VECTOR   get_tokens        (const char * token_file);
 void             print_token       (pANTLR3_COMMON_TOKEN tok);
 void             print_token_text  (pANTLR3_COMMON_TOKEN tok);
@@ -34,11 +37,13 @@ int main(int argc, char * argv[])
 
    /* print tokens
     */
+#if PRINT_TOKENS == 1
    for (i = 0; i < tlist->size(tlist); i++) {
       //print_token_text((pANTLR3_COMMON_TOKEN) tlist->get(tlist, i));
       print_token((pANTLR3_COMMON_TOKEN) tlist->get(tlist, i));
    }
    printf("\n");
+#endif
 
    /* Parser phase
     *    - Call the parser with the token source which uses the token
@@ -62,7 +67,11 @@ int main(int argc, char * argv[])
 
       FTreeWalker_set_tokens(tlist);
 
+#if PRINT_TREE == 1
+      printf("\n");
       printf("Tree : %s\n", main_ast.tree->toStringTree(main_ast.tree)->chars);
+      printf("\n");
+#endif
 
       nodes = antlr3CommonTreeNodeStreamNewTree(main_ast.tree, ANTLR3_SIZE_HINT);
 

@@ -45,7 +45,7 @@ ftoken
         ftoken_index  ','
         start_index   ':'
         stop_index    '='
-        text          ','
+        text                /* trailing ',' moved to aid in termination of text */
         ftoken_type   ','
       ( channel_spec  ',' )?
         line          ':'
@@ -62,7 +62,7 @@ ftoken_index
    ;             
 
 ftoken_type
-   :   '<' NUMBER '>'
+   :   NUMBER '>'           /* leading '<' moved to aid in termination of text */
           {
              int type = atoi($NUMBER.text->chars);
              token->setType(token, (ANTLR3_UINT32)type);
@@ -110,14 +110,14 @@ column
    ;
 
 text
-   :   T_CHAR_CONSTANT
+   :   TEXT_PLUS_TERM
           {
-              char * text_chars = strdup( & $T_CHAR_CONSTANT.text->chars [1] );
+              char * text_chars = strdup( & $TEXT_PLUS_TERM.text->chars [1] );
               int    text_len   = strlen(text_chars);
 
-              /* 'delete' the trailing quote character */
-              text_chars[text_len-1] = '\0';
-              text_len -= 1;
+              /* 'delete' the terminating character sequence '\',<' */
+              text_chars[text_len-3] = '\0';
+              text_len -= 3;
 
               pANTLR3_STRING str = sfactory->newSize(sfactory, text_len);
               str->set(str, text_chars);
@@ -126,22 +126,19 @@ text
           }
    ;
 
-// R427 from char-literal-constant
-T_CHAR_CONSTANT
-   :   ('\'' ( SQ_Rep_Char )* '\'')+
-   |   ('\"' ( DQ_Rep_Char )* '\"')+
+TEXT_PLUS_TERM
+   :   '\'' .* '\',<'
    ;
 
 NUMBER
    :   Digit_String
    ;
 
-WS :  (' ' | '\r'| '\t' | '\n'| '\u000C')
+WS :  ('\n')
          {
              $channel = HIDDEN;
          }
    ;
-
 
 /*
  * fragments
@@ -151,32 +148,5 @@ WS :  (' ' | '\r'| '\t' | '\n'| '\u000C')
 fragment
 Digit_String : Digit+  ;
 
-// R302 alphanumeric_character
-fragment
-Alphanumeric_Character : Letter | Digit | '_' ;
-
-fragment
-Special_Character
-    :    ' ' .. '/' 
-    |    ':' .. '@' 
-    |    '[' .. '^' 
-    |    '`' 
-    |    '{' .. '~' 
-    ;
-
-fragment
-Rep_Char : ~('\'' | '\"') ;
-
-fragment
-SQ_Rep_Char : ~('\'') ;
-fragment
-DQ_Rep_Char : ~('\"') ;
-
-fragment
-Letter : ('a'..'z' | 'A'..'Z') ;
-
 fragment
 Digit : '0'..'9'  ;
-
-fragment
-STRING_CHARS  :  'a'..'z' ' ' ;
