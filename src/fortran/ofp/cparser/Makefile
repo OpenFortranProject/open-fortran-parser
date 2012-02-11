@@ -3,20 +3,24 @@ RULE=R102
 CFLAGS = -g -m32 -I.
 LIBS = -lantlr3c
 
-GEN_SRC_FILES = CFortranTokenLexer.c CFortranTokenParser.c \
-                CFortranParser.c     FTreeWalker.c
+GEN_SRC_FILES = CFortranTokenLexer.c CFortranTokenParser.c        \
+                CFortranParser.c     FTreeWalker.c                \
+                ImplicitNone.c       ImplicitNone_FTreeWalker.c
 
-GEN_HDR_FILES = CFortranTokenLexer.h CFortranTokenParser.h \
-                CFortranParser.h     FTreeWalker.h
+GEN_HDR_FILES = CFortranTokenLexer.h CFortranTokenParser.h        \
+                CFortranParser.h     FTreeWalker.h                \
+                ImplicitNone.h       ImplicitNone_FTreeWalker.h
 
-OBJS = OFP_Type.o support.o                                        \
-       ftoken-parser.o                                             \
-       CFortranTokenLexer.o CFortranTokenParser.o                  \
-       CFortranParser.o OFPTokenSource.o                           \
-       FortranParserActionNull.o                                   \
-       FTreeWalker.o
+OBJS = OFP_Type.o support.o                                       \
+       ftoken-parser.o                                            \
+       CFortranTokenLexer.o          CFortranTokenParser.o        \
+       CFortranParser.o              OFPTokenSource.o             \
+       FortranParserActionNull.o                                  \
+       FTreeWalker.o                                              
 
-all: fparser unparse $(OBJS)
+#       ImplicitNone.o                ImplicitNone_FTreeWalker.o
+
+all: unparse $(OBJS)
 
 fparser: fparser.o $(OBJS)
 	cc -o $@ -m32 $< $(OBJS) $(LIBS)
@@ -31,6 +35,9 @@ CFortranTokenParser.c: CFortranToken.g
 	java org.antlr.Tool $<
 
 FTreeWalker.c: FTreeWalker.g
+	java org.antlr.Tool $<
+
+ImplicitNone.c: ImplicitNone.g
 	java org.antlr.Tool $<
 
 CFortranParser.c: CFortranParser.g
