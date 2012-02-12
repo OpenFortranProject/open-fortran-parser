@@ -14,7 +14,6 @@ options {
 static      pANTLR3_VECTOR      tlist;
 static      ANTLR3_MARKER       next_token;
 
-
 void FTreeWalker_set_tokens(pANTLR3_VECTOR lexer_tlist)
    {
       tlist       = lexer_tlist;
@@ -84,12 +83,26 @@ unparse(pANTLR3_BASE_TREE btn, ANTLR3_MARKER next)
  * Section/Clause 2: Fortran concepts
  */
 
-
-// R204
+////////////
+// R204-F08
+//
 specification_part
-   :   ( use_stmt              )*
-       ( import_stmt           )*
-       ( declaration_construct )*
+   :   ( use_stmt                )*
+       ( import_stmt             )*
+       ( implicit_part_recursion )    // making nonoptional with predicates fixes ambiguity
+       ( declaration_construct   )*
+   ;
+
+////////////
+// R205-F08
+// R206-F08 combined
+//
+implicit_part_recursion
+   :   ((label)? T_IMPLICIT)  => implicit_stmt   implicit_part_recursion
+   |   ((label)? T_PARAMETER) => parameter_stmt  implicit_part_recursion
+   |   ((label)? T_FORMAT)    => format_stmt     implicit_part_recursion
+   |   ((label)? T_ENTRY)     => entry_stmt      implicit_part_recursion
+   |   // empty
    ;
 
 ////////////
@@ -325,7 +338,7 @@ intrinsic_type_spec
 @after
 {
    pOFP_TYPE_TABLE ttable = ofpGetTypeTable();
-   ttable->putIntrinsic(ttable, retval.tree);
+   //TODO - ttable->putIntrinsic(ttable, retval.tree);
 }
    :   ^(SgTypeInt       kind_selector?)
    |   ^(SgTypeFloat     kind_selector?)
@@ -338,7 +351,7 @@ intrinsic_type_spec
 
 // R404
 kind_selector
-   :   ^(KindSelector expr)
+   :   ^(OFPKindSelector expr)
    ;
 
 // R405
@@ -396,12 +409,12 @@ imag_part
 
 // R420-F08
 char_selector
-   :   ^(CharSelector ^(KindSelector expr?) ^(LengthSelector type_param_value?))
+   :   ^(OFPCharSelector ^(OFPKindSelector expr?) ^(OFPLengthSelector type_param_value?))
    ;
 
 // R421-F08
 length_selector
-   :   ^(LengthSelector type_param_value)
+   :   ^(OFPLengthSelector type_param_value)
    ; 
 
 // R426
@@ -467,7 +480,7 @@ type_attr_spec_list
    ;
 
 generic_name_list
-   :   T_IDENT ( T_COMMA T_IDENT )*
+   :   ^(OFPList T_IDENT+)
    ;
 
 // R431
@@ -2608,7 +2621,7 @@ ext_function_subprogram
 // R1102-F08 program-stmt
 //----------------------------------------------------------------------------------------
 program_stmt
-   :  ^(BeginStmt T_IDENT label?)
+   :  ^(OFPBeginStmt T_IDENT label?)
    ;
 
 
@@ -2616,7 +2629,7 @@ program_stmt
 // R1103-F08 end-program-stmt
 //----------------------------------------------------------------------------------------
 end_program_stmt
-   :  ^(EndStmt T_IDENT? label?)
+   :  ^(OFPEndStmt T_IDENT? label?)
    ;
 
 
