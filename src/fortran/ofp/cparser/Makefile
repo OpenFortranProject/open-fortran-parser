@@ -5,10 +5,12 @@ LIBS = -lantlr3c
 
 GEN_SRC_FILES = CFortranTokenLexer.c CFortranTokenParser.c        \
                 CFortranParser.c     FTreeWalker.c                \
+                Unparser.c           Unparser_FTreeWalker.c       \
                 ImplicitNone.c       ImplicitNone_FTreeWalker.c
 
 GEN_HDR_FILES = CFortranTokenLexer.h CFortranTokenParser.h        \
                 CFortranParser.h     FTreeWalker.h                \
+                Unparser.h           Unparser_FTreeWalker.h       \
                 ImplicitNone.h       ImplicitNone_FTreeWalker.h
 
 OBJS = OFP_Type.o support.o                                       \
@@ -16,7 +18,7 @@ OBJS = OFP_Type.o support.o                                       \
        CFortranTokenLexer.o          CFortranTokenParser.o        \
        CFortranParser.o              OFPTokenSource.o             \
        FortranParserActionNull.o                                  \
-       FTreeWalker.o                                              
+       Unparser.o                    Unparser_FTreeWalker.o
 
 #       ImplicitNone.o                ImplicitNone_FTreeWalker.o
 
@@ -35,6 +37,9 @@ CFortranTokenParser.c: CFortranToken.g
 	java org.antlr.Tool $<
 
 FTreeWalker.c: FTreeWalker.g
+	java org.antlr.Tool $<
+
+Unparser.c: Unparser.g
 	java org.antlr.Tool $<
 
 ImplicitNone.c: ImplicitNone.g
