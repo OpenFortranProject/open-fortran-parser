@@ -21,11 +21,12 @@ options {
 tokens {
    // Imaginary nodes for intermediate processing
    //
-   BeginStmt;
-   EndStmt;
-   KindSelector;      
-   CharSelector;
-   LengthSelector;
+   OFPList;
+   OFPBeginStmt;
+   OFPEndStmt;
+   OFPKindSelector;      
+   OFPCharSelector;
+   OFPLengthSelector;
 
    // Sage nodes
    //
@@ -683,14 +684,14 @@ kind_selector
               c_action_kind_selector(tk1, tk2, ANTLR3_TRUE);
            }
 
-    -> ^(KindSelector expr)
+    -> ^(OFPKindSelector expr)
 
    |   T_ASTERISK T_DIGIT_STRING
            {
               c_action_kind_selector($T_ASTERISK, $T_DIGIT_STRING, ANTLR3_FALSE);
            }
 
-    -> ^(KindSelector T_DIGIT_STRING)
+    -> ^(OFPKindSelector T_DIGIT_STRING)
 
    ;
 
@@ -852,12 +853,12 @@ length_selector
    :   T_LPAREN ( T_LEN { len=$T_LEN; } T_EQUALS )? type_param_value T_RPAREN
           { c_action_length_selector(len, IActionEnums_ KindLenParam_len, ANTLR3_FALSE); }
 
-    -> ^(LengthSelector type_param_value)
+    -> ^(OFPLengthSelector type_param_value)
 
    |   T_ASTERISK char_length (T_COMMA)?
           { c_action_length_selector(len, IActionEnums_ KindLenParam_none, ANTLR3_TRUE); }
 
-    -> ^(LengthSelector char_length)
+    -> ^(OFPLengthSelector char_length)
 
    ; 
 
@@ -1017,6 +1018,7 @@ generic_name_list
             {
                c_action_generic_name_list(count);
             }
+    -> ^(OFPList T_IDENT+)
    ;
 
 // R431
@@ -5201,7 +5203,7 @@ program_stmt
              //                                  $T_IDENT  ->getText($T_IDENT)  ->chars  );
           }
 
-   -> ^(BeginStmt T_IDENT label?)
+   -> ^(OFPBeginStmt T_IDENT label?)
    ;
 
 
@@ -5231,7 +5233,7 @@ end_program_stmt
              c_action_end_program_stmt(lbl, $T_END, $T_PROGRAM, id, $end_of_stmt.start);
           }
 
-   -> ^(EndStmt T_IDENT? label?)
+   -> ^(OFPEndStmt T_IDENT? label?)
 
    |   (label {lbl=$label.start;})?
        T_ENDPROGRAM     (T_IDENT {id=$T_IDENT;})?  end_of_stmt
@@ -5240,7 +5242,7 @@ end_program_stmt
              c_action_end_program_stmt(lbl, $T_ENDPROGRAM, NULL, id, $end_of_stmt.start);
           }
 
-   -> ^(EndStmt T_IDENT? label?)
+   -> ^(OFPEndStmt T_IDENT? label?)
 
    |   (label {lbl=$label.start;})?
        T_END                                       end_of_stmt
@@ -5249,7 +5251,7 @@ end_program_stmt
              c_action_end_program_stmt(lbl, $T_END, NULL, NULL, $end_of_stmt.start);
           }
 
-   -> ^(EndStmt label?)
+   -> ^(OFPEndStmt label?)
 
    ;
 
