@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "OFPTokenSource.h"
 #include "CFortranParser.h"
+#include "Unparser.h"
 #include "support.h"
 
 #define PRINT_TOKENS 0
@@ -63,7 +64,7 @@ int main(int argc, char * argv[])
    else
    {
       pANTLR3_COMMON_TREE_NODE_STREAM nodes;
-      pFTreeWalker tree_parser;
+      pUnparser tree_parser;
 
       FTreeWalker_set_tokens(tlist);
 
@@ -75,7 +76,7 @@ int main(int argc, char * argv[])
 
       nodes = antlr3CommonTreeNodeStreamNewTree(main_ast.tree, ANTLR3_SIZE_HINT);
 
-      tree_parser = OFPTreeWalkerNew(nodes);
+      tree_parser = OFPUnparserNew(nodes);
       tree_parser->main_program(tree_parser);
 
       nodes       ->free(nodes);          nodes       = NULL;
