@@ -98,7 +98,7 @@ specification_part
 // R206-F08 combined
 //
 implicit_part_recursion
-   :   ((label)? T_IMPLICIT)  => implicit_stmt   implicit_part_recursion
+   :   (SgImplicitStatement)  => implicit_stmt   implicit_part_recursion
    |   ((label)? T_PARAMETER) => parameter_stmt  implicit_part_recursion
    |   ((label)? T_FORMAT)    => format_stmt     implicit_part_recursion
    |   ((label)? T_ENTRY)     => entry_stmt      implicit_part_recursion
@@ -338,7 +338,7 @@ intrinsic_type_spec
 @after
 {
    pOFP_TYPE_TABLE ttable = ofpGetTypeTable();
-   //TODO - ttable->putIntrinsic(ttable, retval.tree);
+   ttable->putIntrinsic(ttable, retval.tree);
 }
    :   ^(SgTypeInt       kind_selector?)
    |   ^(SgTypeFloat     kind_selector?)
@@ -1206,25 +1206,18 @@ volatile_stmt
             generic_name_list end_of_stmt
    ;
 
-// R549
+// R560-F08
 implicit_stmt
-   :   label? T_IMPLICIT implicit_spec_list end_of_stmt
-             // hasImplicitSpecList=true
-   |   label? T_IMPLICIT T_NONE end_of_stmt
-             // hasImplicitSpecList=false
+   :   // implicit none if OFPList is empty
+       ^(SgImplicitStatement ^(OFPList implicit_spec*) label?)
    ;
 
-// R550
+// R561-F08
 implicit_spec
    :   declaration_type_spec T_LPAREN letter_spec_list T_RPAREN
    ;
 
-implicit_spec_list
-   :   implicit_spec  ( T_COMMA implicit_spec  )*
-   ;
-
-
-// R551
+// R562-F08
 letter_spec 
    :  T_IDENT ( T_MINUS T_IDENT )? 
    ;
