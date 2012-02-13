@@ -30,7 +30,10 @@ tokens {
 
    // Sage nodes
    //
+
+   SgImplicitStatement;
    SgProgramHeaderStatement;
+
    SgFunctionDefinition;
    SgBasicBlock;
    SgVariableDeclaration;
@@ -2404,33 +2407,58 @@ volatile_stmt
             {c_action_volatile_stmt(lbl,$T_VOLATILE,$end_of_stmt.start);}
    ;
 
-// R549
+// R560-F08
 implicit_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL;}
-@after{checkForInclude();}
-   :   (label {lbl=$label.start;})? T_IMPLICIT implicit_spec_list end_of_stmt
-            {c_action_implicit_stmt(lbl, $T_IMPLICIT, NULL, $end_of_stmt.start, 
-                ANTLR3_TRUE);} // hasImplicitSpecList=true
-   |   (label {lbl=$label.start;})? T_IMPLICIT T_NONE end_of_stmt
-            {c_action_implicit_stmt(lbl, $T_IMPLICIT, $T_NONE, $end_of_stmt.start, 
-                ANTLR3_FALSE);} // hasImplicitSpecList=false
+@init
+{
+   pANTLR3_COMMON_TOKEN lbl = NULL;
+}
+@after
+{
+   checkForInclude();
+}
+   :   (label {lbl=$label.start;})?
+       T_IMPLICIT implicit_spec_list end_of_stmt
+
+          {
+             c_action_implicit_stmt(lbl, $T_IMPLICIT, NULL, $end_of_stmt.start, ANTLR3_TRUE);
+          }
+
+    -> ^(SgImplicitStatement implicit_spec_list label?)
+
+   |   (label {lbl=$label.start;})?
+       T_IMPLICIT T_NONE end_of_stmt
+
+          {
+             c_action_implicit_stmt(lbl, $T_IMPLICIT, $T_NONE, $end_of_stmt.start, ANTLR3_FALSE);
+          }
+
+    -> ^(SgImplicitStatement OFPList label?)
    ;
 
-// R550
+// R561-F08
 implicit_spec
    :   declaration_type_spec T_LPAREN letter_spec_list T_RPAREN
         { c_action_implicit_spec(); }
    ;
 
 implicit_spec_list
-@init{ int count=0;}
-   :       {c_action_implicit_spec_list__begin();}
-        implicit_spec {count++;} ( T_COMMA implicit_spec {count++;} )*
-            {c_action_implicit_spec_list(count);}
+@init
+{
+   int count=0;
+   c_action_implicit_spec_list__begin();
+}
+   :   implicit_spec {count++;} ( T_COMMA implicit_spec {count++;} )*
+
+          {
+             c_action_implicit_spec_list(count);
+          }
+
+    -> ^(OFPList implicit_spec+)
    ;
 
 
-// R551
+// R562-F08
 // TODO: here, we'll accept a T_IDENT, and then we'll have to do error 
 // checking on it.  
 letter_spec 
@@ -5199,8 +5227,6 @@ program_stmt
 
           {
              c_action_program_stmt(lbl, $T_PROGRAM, $T_IDENT, $end_of_stmt.start);
-             //printf("program_stmt: \%s \%s\n", $T_PROGRAM->getText($T_PROGRAM)->chars,
-             //                                  $T_IDENT  ->getText($T_IDENT)  ->chars  );
           }
 
    -> ^(OFPBeginStmt T_IDENT label?)
