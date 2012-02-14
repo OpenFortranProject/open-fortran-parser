@@ -1209,7 +1209,8 @@ volatile_stmt
 // R560-F08
 implicit_stmt
    :   // implicit none if OFPList is empty
-       ^(SgImplicitStatement ^(OFPList implicit_spec*) label?)
+       ^(SgImplicitStatement ^(OFPList implicit_spec+) label?)
+   |   ^(SgImplicitStatement   OFPList                 label?)
    ;
 
 // R561-F08
