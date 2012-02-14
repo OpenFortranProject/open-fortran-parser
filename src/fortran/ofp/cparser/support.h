@@ -1,8 +1,14 @@
 #ifndef	OFP_SUPPORT_H
 #define	OFP_SUPPORT_H
 
-#include "Unparser.h"
+#include    <antlr3.h>
 
-pUnparser OFPUnparserNew (pANTLR3_COMMON_TREE_NODE_STREAM instream);
+
+/* Macros useful for checkers
+ */
+#define START_LINE (retval.start->getLine(retval.start))
+
+void  print_token_text  (pANTLR3_COMMON_TOKEN tok);
+void  print_token       (pANTLR3_COMMON_TOKEN tok);
 
 #endif
