@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "OFP_Type.h"
 #include "OFPTokenSource.h"
 #include "CFortranParser.h"
 #include "Unparser.h"
@@ -7,9 +8,13 @@
 #define PRINT_TOKENS 0
 #define PRINT_TREE   1
 
-pANTLR3_VECTOR   get_tokens        (const char * token_file);
-void             print_token       (pANTLR3_COMMON_TOKEN tok);
-void             print_token_text  (pANTLR3_COMMON_TOKEN tok);
+pUnparser       OFPUnparserNew  (pANTLR3_COMMON_TREE_NODE_STREAM instream);
+pANTLR3_VECTOR  get_tokens      (const char * token_file);
+
+
+void ofp_mismatch                 (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow);
+void ofp_reportError              (pANTLR3_BASE_RECOGNIZER recognizer);
+void ofp_displayRecognitionError  (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 * tokenNames);
 
 int main(int argc, char * argv[])
 {
@@ -18,9 +23,8 @@ int main(int argc, char * argv[])
    pANTLR3_VECTOR                 tlist;
    pANTLR3_TOKEN_SOURCE           tsource;
    pANTLR3_COMMON_TOKEN_STREAM    tstream;
+   pANTLR3_BASE_TREE              parser_ast_tree;
    pCFortranParser                parser;
-
-   CFortranParser_main_program_return main_ast;
    
    char * tok_file = argv[1];
    char * src_file = argv[2];
@@ -55,7 +59,12 @@ int main(int argc, char * argv[])
    tstream  =  antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, tsource );
    parser   = CFortranParserNew                  ( tstream );
 
-   main_ast = parser->main_program(parser);
+   parser->pParser->rec->recoverFromMismatchedToken = ofp_mismatch;
+   parser->pParser->rec->reportError                = ofp_reportError;
+   parser->pParser->rec->displayRecognitionError    = ofp_displayRecognitionError;
+
+   //   parser_ast_tree = parser->main_program(parser).tree;
+   parser_ast_tree = parser->subroutine_subprogram(parser).tree;
 
    if (parser->pParser->rec->state->errorCount > 0)
    {
@@ -70,14 +79,15 @@ int main(int argc, char * argv[])
 
 #if PRINT_TREE == 1
       printf("\n");
-      printf("Tree : %s\n", main_ast.tree->toStringTree(main_ast.tree)->chars);
+      printf("Tree : %s\n", parser_ast_tree->toStringTree(parser_ast_tree)->chars);
       printf("\n");
 #endif
 
-      nodes = antlr3CommonTreeNodeStreamNewTree(main_ast.tree, ANTLR3_SIZE_HINT);
+      nodes = antlr3CommonTreeNodeStreamNewTree(parser_ast_tree, ANTLR3_SIZE_HINT);
 
       tree_parser = OFPUnparserNew(nodes);
-      tree_parser->main_program(tree_parser);
+      //      tree_parser->main_program(tree_parser);
+      tree_parser->subroutine_subprogram(tree_parser);
 
       nodes       ->free(nodes);          nodes       = NULL;
       tree_parser ->free(tree_parser);    tree_parser = NULL;
@@ -90,29 +100,10 @@ int main(int argc, char * argv[])
    return 0;
 }
 
-
-void print_token_text(pANTLR3_COMMON_TOKEN tok)
+pUnparser OFPUnparserNew (pANTLR3_COMMON_TREE_NODE_STREAM instream)
 {
-   if (tok->getType(tok) == T_EOS) {
-      printf("\n");
-   }
-   else {
-      printf("\%s", tok->getText(tok)->chars);
-   }
-}
+   pOFP_TYPE_TABLE type_table = ofpTypeTableNew();
+   ofpPushTypeTable(type_table);
 
-void print_token(pANTLR3_COMMON_TOKEN tok)
-{
-   printf("[");
-     printf("@\%d,", (int)tok->getTokenIndex(tok));
-     printf("\%d:", (int)tok->getStartIndex(tok));
-     printf("\%d=", (int)tok->getStopIndex(tok));
-     printf("'\%s',", tok->getText(tok)->chars);
-     printf("<\%d>,", (int)tok->getType(tok));
-     if (tok->getChannel(tok) > ANTLR3_TOKEN_DEFAULT_CHANNEL) {
-        printf("channel=\%d,", (int)tok->getChannel(tok));
-     }
-     printf("\%d:", (int)tok->getLine(tok));
-     printf("\%d", (int)tok->getCharPositionInLine(tok));
-   printf("]\n");
+   return UnparserNew(instream);
 }
