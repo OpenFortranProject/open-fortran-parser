@@ -1,23 +1,36 @@
+#include "OFPFrontEnd.h"
+
 #include <stdio.h>
-#include "OFP_Type.h"
-#include "OFPTokenSource.h"
-#include "CFortranParser.h"
+//#include "OFP_Type.h"
+//#include "OFPTokenSource.h"
+//#include "CFortranParser.h"
 #include "Unparser.h"
-#include "support.h"
+//#include "support.h"
 
 #define PRINT_TOKENS 0
 #define PRINT_TREE   1
 
-pUnparser       OFPUnparserNew  (pANTLR3_COMMON_TREE_NODE_STREAM instream);
+pUnparser       ofpUnparserNew  (pANTLR3_COMMON_TREE_NODE_STREAM instream);
 pANTLR3_VECTOR  get_tokens      (const char * token_file);
 
 
+#ifdef NOT_YET
 void ofp_mismatch                 (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow);
 void ofp_reportError              (pANTLR3_BASE_RECOGNIZER recognizer);
 void ofp_displayRecognitionError  (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 * tokenNames);
+#endif
 
 int main(int argc, char * argv[])
 {
+   pOFPFrontEnd         parser;
+   pANTLR3_BASE_TREE    parser_ast_tree;
+
+   parser = ofpFrontEndNew(argc, argv);
+
+   parser_ast_tree = parser->program_unit(parser);
+
+#ifdef NOT_YET
+
    int i;
 
    pANTLR3_VECTOR                 tlist;
@@ -27,12 +40,6 @@ int main(int argc, char * argv[])
    pCFortranParser                parser;
    
    char * tok_file = argv[1];
-   char * src_file = argv[2];
-
-   if (argc < 3) {
-      printf("usage: unparse token_file src_file\n");
-      exit(1);
-   }
 
    /* Lexer phase
     *    - Call the token parser to read the tokens from the token file.
@@ -72,10 +79,15 @@ int main(int argc, char * argv[])
    }
    else
    {
+
+#endif
+
+   if (NULL != parser_ast_tree) {
+
       pANTLR3_COMMON_TREE_NODE_STREAM nodes;
       pUnparser tree_parser;
 
-      FTreeWalker_set_tokens(tlist);
+      FTreeWalker_set_tokens(parser->tlist);
 
 #if PRINT_TREE == 1
       printf("\n");
@@ -85,22 +97,24 @@ int main(int argc, char * argv[])
 
       nodes = antlr3CommonTreeNodeStreamNewTree(parser_ast_tree, ANTLR3_SIZE_HINT);
 
-      tree_parser = OFPUnparserNew(nodes);
-      //      tree_parser->main_program(tree_parser);
-      tree_parser->subroutine_subprogram(tree_parser);
+      tree_parser = ofpUnparserNew(nodes);
+      //tree_parser->main_program(tree_parser);
+      //tree_parser->subroutine_subprogram(tree_parser);
+      tree_parser->program_unit(tree_parser);
 
       nodes       ->free(nodes);          nodes       = NULL;
       tree_parser ->free(tree_parser);    tree_parser = NULL;
+
    }
 
    parser  ->free(parser);                parser      = NULL;
-   tstream ->free(tstream);               tstream     = NULL;
+   // tstream ->free(tstream);               tstream     = NULL;
    // TODO tsource ->free(tsource);               tsource     = NULL;
 
    return 0;
 }
 
-pUnparser OFPUnparserNew (pANTLR3_COMMON_TREE_NODE_STREAM instream)
+pUnparser ofpUnparserNew (pANTLR3_COMMON_TREE_NODE_STREAM instream)
 {
    pOFP_TYPE_TABLE type_table = ofpTypeTableNew();
    ofpPushTypeTable(type_table);

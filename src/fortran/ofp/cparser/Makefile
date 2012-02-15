@@ -1,5 +1,7 @@
 RULE=R102
 
+CC = gcc
+
 CFLAGS = -g -m32 -I.
 LIBS = -lantlr3c
 
@@ -13,10 +15,9 @@ GEN_HDR_FILES = CFortranTokenLexer.h CFortranTokenParser.h        \
                 Unparser.h           Unparser_FTreeWalker.h       \
                 ImplicitNone.h       ImplicitNone_FTreeWalker.h
 
-OBJS = OFP_Type.o support.o                                       \
-       ftoken-parser.o                                            \
-       CFortranTokenLexer.o          CFortranTokenParser.o        \
-       CFortranParser.o              OFPTokenSource.o             \
+OBJS = OFPFrontEnd.o OFP_Type.o support.o ftoken-parser.o \
+       CFortranTokenLexer.o CFortranTokenParser.o \
+       CFortranParser.o OFPTokenSource.o \
        FortranParserActionNull.o
 
 GEN_OBJS = Unparser.o                Unparser_FTreeWalker.o       \
@@ -24,8 +25,10 @@ GEN_OBJS = Unparser.o                Unparser_FTreeWalker.o       \
 
 all: unparse checkers $(OBJS)
 
-fparser: fparser.o $(OBJS)
-	cc -o $@ -m32 $< $(OBJS) $(LIBS)
+OFPFrontEnd.o: OFPFrontEnd.c OFPFrontEnd.h
+	$(CC) -c $(CFLAGS) $<
+
+unparse.o: OFPFrontEnd.c OFPFrontEnd.h
 
 unparse: unparse.o ofpbaserecognizer.o $(OBJS) Unparser.o Unparser_FTreeWalker.o
 	cc -o $@ -m32 $< ofpbaserecognizer.o $(OBJS) $(LIBS) Unparser.o Unparser_FTreeWalker.o

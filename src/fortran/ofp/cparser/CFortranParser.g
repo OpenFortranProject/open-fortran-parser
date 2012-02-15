@@ -158,9 +158,16 @@ void checkForInclude() {return;}
 ////////////
 // R202-F08
 //
-// Removed from grammar and called explicitly
+// WARNING: the order of these options are important for 
 //
 
+program_unit
+@init{printf("program_unit \%d\n", LA(1));}
+   :   (T_MODULE)       =>    module
+   |   (T_SUBMODULE)    => submodule
+//   |   {(T_SUBROUTINE == 155);}? => subroutine-subprogram
+   |                       main_program
+   ;
 
 /*
  * R203-F08 external-subprogram
