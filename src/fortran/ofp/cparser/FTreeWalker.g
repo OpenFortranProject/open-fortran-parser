@@ -2595,7 +2595,9 @@ v_list
  */
 
 program_unit
-   : main_program
+   :   main_program
+   |   subroutine_subprogram
+   |   ext_function_subprogram
    ;
 
 //========================================================================================
