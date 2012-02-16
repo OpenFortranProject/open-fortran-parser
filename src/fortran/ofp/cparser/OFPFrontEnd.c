@@ -31,6 +31,8 @@ pANTLR3_VECTOR  get_tokens      (const char * token_file);
 
 static  pANTLR3_BASE_TREE  ofpFrontEnd_program_unit  (pOFPFrontEnd parser);
 static  void               ofpFrontEnd_free          (pOFPFrontEnd parser);
+static  int                ofpGetProgramUnitType     (pANTLR3_INT_STREAM istream);
+
 
 #ifdef JAVA_TEXT
 
@@ -281,7 +283,7 @@ ofpFrontEndNew(int nArgs, char* argv[])
 static pANTLR3_BASE_TREE
 ofpFrontEnd_program_unit(pOFPFrontEnd fe)
 {
-   int                           i;
+   int                           program_type, i;
    char *                        ext;
    pANTLR3_TOKEN_SOURCE          tsource;
    pANTLR3_COMMON_TOKEN_STREAM   tstream;
@@ -325,8 +327,18 @@ ofpFrontEnd_program_unit(pOFPFrontEnd fe)
    tstream  =  antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, tsource );
    parser   =  CFortranParserNew                 ( tstream );
 
-   //   ast_tree = parser->main_program(parser).tree;
-   ast_tree = parser->program_unit(parser).tree;
+   program_type = ofpGetProgramUnitType(tstream->tstream->istream);
+
+   switch ( program_type ) 
+   {
+      case T_PROGRAM:            ast_tree = parser->main_program            (parser).tree;      break;
+      case T_SUBROUTINE:         ast_tree = parser->subroutine_subprogram   (parser).tree;      break;
+      case T_FUNCTION:           ast_tree = parser->ext_function_subprogram (parser).tree;      break;
+      case T_MODULE:             ast_tree = parser->module                  (parser).tree;      break;
+      case T_SUBMODULE:          ast_tree = parser->submodule               (parser).tree;      break;
+      case T_BLOCKDATA:          ast_tree = parser->block_data              (parser).tree;      break;
+   }
+
    if (parser->pParser->rec->state->errorCount > 0)
    {
       fprintf(stderr, "The parser returned %d errors, tree walking aborted.\n", parser->pParser->rec->state->errorCount);
@@ -549,3 +561,92 @@ ofpFrontEnd_free(pOFPFrontEnd fe)
 } // end class FrontEnd
 
 #endif
+
+
+static int
+lookForToken(pANTLR3_INT_STREAM istream, int token, int look_ahead)
+{
+   // TODO - implement
+   return 0;
+}
+
+
+static int
+ofpGetProgramUnitType(pANTLR3_INT_STREAM istream)
+{
+   uint look_ahead, first_token, next_token;
+
+   look_ahead = 1;
+   do
+   {
+      first_token = istream->_LA(istream, look_ahead);
+      look_ahead += 1;
+   }
+   while (first_token == LINE_COMMENT || first_token == T_EOS);
+
+   if (first_token == T_EOS)
+   {
+      /* we allow empty files as a main-program */
+      return T_PROGRAM;
+   }
+
+
+   // TODO - what is this for, won't parser ignore comments and blank lines? (from the Java impl)
+   //
+   // mark the location of the first token we're looking at
+   //start = tokens.mark();
+
+
+   /* skip a statement label if present (not used to disambiguate)
+    */
+   if (first_token == T_DIGIT_STRING)
+   {
+      look_ahead += 1;
+      first_token = istream->_LA(istream, look_ahead);
+      
+   }
+   next_token  = istream->_LA(istream, look_ahead + 1);
+
+   /* Do the easy stuff first.  Be careful about what is placed here and the
+    * order (see note below regarding bug 3425005).
+    */
+   switch ( first_token ) 
+   {
+      case T_PROGRAM:          return T_PROGRAM;
+      case T_SUBROUTINE:       return T_SUBROUTINE;
+      case T_FUNCTION:         return T_FUNCTION;
+      case T_SUBMODULE:        return T_SUBMODULE;
+      case T_BLOCKDATA:        return T_BLOCKDATA;
+      case T_BLOCK:
+         {
+            if (next_token == T_DATA)
+            {
+               return T_BLOCKDATA;
+            }
+         }
+      // T_MODULE handled later
+   }
+
+   /* Now look beyond beginning tokens for subroutines and functions.
+    *
+    * CER (2011.10.18): Module is now (F2008) a prefix-spec so must look for subroutine
+    * and functions before module stmts.  Part of fix for bug 3425005.
+    */
+
+   if      ( lookForToken(istream, T_SUBROUTINE, look_ahead) )
+   {
+      return T_SUBROUTINE;
+   }
+   else if ( lookForToken(istream, T_FUNCTION,   look_ahead) )
+   {
+      return T_FUNCTION;
+   }
+   else if (first_token == T_MODULE  &&  next_token != T_PROCEDURE)
+   {
+      return T_MODULE;
+   }
+
+   /* what's left should be a main program
+    */
+   return T_PROGRAM;
+}
