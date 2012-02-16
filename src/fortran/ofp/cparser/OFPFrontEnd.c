@@ -284,7 +284,6 @@ static pANTLR3_BASE_TREE
 ofpFrontEnd_program_unit(pOFPFrontEnd fe)
 {
    int                           program_type, i;
-   char *                        ext;
    pANTLR3_TOKEN_SOURCE          tsource;
    pANTLR3_COMMON_TOKEN_STREAM   tstream;
    pANTLR3_BASE_TREE             ast_tree;
@@ -296,8 +295,7 @@ ofpFrontEnd_program_unit(pOFPFrontEnd fe)
     *    - Call the token parser to read the tokens from the token file.
     */
 
-   ext = strrchr(fe->src_file->chars, '.');
-   fe->tok_file  =  fe->src_file->subString(fe->src_file, 0, ext - (char *) fe->src_file->chars);
+   fe->tok_file = fe->strFactory->newStr(fe->strFactory, fe->src_file->chars);
    if (NULL == fe->tok_file)
    {
       return NULL;
