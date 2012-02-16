@@ -98,8 +98,6 @@ int main(int argc, char * argv[])
       nodes = antlr3CommonTreeNodeStreamNewTree(parser_ast_tree, ANTLR3_SIZE_HINT);
 
       tree_parser = ofpUnparserNew(nodes);
-      //tree_parser->main_program(tree_parser);
-      //tree_parser->subroutine_subprogram(tree_parser);
       tree_parser->program_unit(tree_parser);
 
       nodes       ->free(nodes);          nodes       = NULL;
