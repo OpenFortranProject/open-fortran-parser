@@ -18,16 +18,13 @@ pANTLR3_VECTOR get_tokens(const char * token_file)
 
    /* initialize
     */
-   tlist     = antlr3VectorNew(0);
-   tfactory  = antlr3TokenFactoryNew(tinput);
-   sfactory  = antlr3StringFactoryNew( ANTLR3_ENC_8BIT );
-
-   /* initialize antlr structures
-    */
-   tinput   = antlr3FileStreamNew               ( (pANTLR3_UINT8) token_file, ANTLR3_ENC_8BIT );
-   tlexer   = CFortranTokenLexerNew             ( tinput );
-   tstream  = antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, TOKENSOURCE(tlexer) );
-   tparser  = CFortranTokenParserNew            ( tstream );
+   tlist     = antlr3VectorNew                   ( 0 );
+   tinput    = antlr3FileStreamNew               ( (pANTLR3_UINT8) token_file, ANTLR3_ENC_8BIT );
+   tfactory  = antlr3TokenFactoryNew             ( tinput );
+   sfactory  = antlr3StringFactoryNew            ( ANTLR3_ENC_8BIT );
+   tlexer    = CFortranTokenLexerNew             ( tinput );
+   tstream   = antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, TOKENSOURCE(tlexer) );
+   tparser   = CFortranTokenParserNew            ( tstream );
 
    tparser->ftokens(tparser);
 
