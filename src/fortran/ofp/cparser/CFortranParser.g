@@ -176,11 +176,11 @@ void checkForInclude() {return;}
 // Removed from grammar and called explicitly
 //
 
-program_unit[int type]
-   :   {type==0}?   main_program
-   |   {type==1}?   subroutine_subprogram
-   |   {type==2}?   ext_function_subprogram
-   ;
+//program_unit[int type]
+//   :   {type==0}?   main_program
+//   |   {type==1}?   subroutine_subprogram
+//   |   {type==2}?   ext_function_subprogram
+//   ;
 
 /*
  * R203-F08 external-subprogram
