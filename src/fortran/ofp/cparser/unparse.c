@@ -7,7 +7,6 @@
 #include "Unparser.h"
 //#include "support.h"
 
-#define PRINT_TOKENS 0
 #define PRINT_TREE   1
 
 pUnparser       ofpUnparserNew  (pANTLR3_COMMON_TREE_NODE_STREAM instream);
@@ -28,58 +27,12 @@ int main(int argc, char * argv[])
    parser = ofpFrontEndNew(argc, argv);
 
    parser_ast_tree = parser->program_unit(parser);
+   parser_ast_tree = parser->program_unit(parser);
 
 #ifdef NOT_YET
-
-   int i;
-
-   pANTLR3_VECTOR                 tlist;
-   pANTLR3_TOKEN_SOURCE           tsource;
-   pANTLR3_COMMON_TOKEN_STREAM    tstream;
-   pANTLR3_BASE_TREE              parser_ast_tree;
-   pCFortranParser                parser;
-   
-   char * tok_file = argv[1];
-
-   /* Lexer phase
-    *    - Call the token parser to read the tokens from the token file.
-    */
-
-   tlist = get_tokens(tok_file);
-
-   /* print tokens
-    */
-#if PRINT_TOKENS == 1
-   for (i = 0; i < tlist->size(tlist); i++) {
-      //print_token_text((pANTLR3_COMMON_TOKEN) tlist->get(tlist, i));
-      print_token((pANTLR3_COMMON_TOKEN) tlist->get(tlist, i));
-   }
-   printf("\n");
-#endif
-
-   /* Parser phase
-    *    - Call the parser with the token source which uses the token
-    *      list obtained from the token file.
-    */
-
-   tsource  =  ofpTokenSourceNew                 ( (pANTLR3_UINT8) src_file, tlist );
-   tstream  =  antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, tsource );
-   parser   = CFortranParserNew                  ( tstream );
-
    parser->pParser->rec->recoverFromMismatchedToken = ofp_mismatch;
    parser->pParser->rec->reportError                = ofp_reportError;
    parser->pParser->rec->displayRecognitionError    = ofp_displayRecognitionError;
-
-   //   parser_ast_tree = parser->main_program(parser).tree;
-   parser_ast_tree = parser->subroutine_subprogram(parser).tree;
-
-   if (parser->pParser->rec->state->errorCount > 0)
-   {
-      fprintf(stderr, "The parser returned %d errors, tree walking aborted.\n", parser->pParser->rec->state->errorCount);
-   }
-   else
-   {
-
 #endif
 
    if (NULL != parser_ast_tree) {
@@ -105,9 +58,7 @@ int main(int argc, char * argv[])
 
    }
 
-   parser  ->free(parser);                parser      = NULL;
-   // tstream ->free(tstream);               tstream     = NULL;
-   // TODO tsource ->free(tsource);               tsource     = NULL;
+   parser->free(parser);                  parser = NULL;
 
    return 0;
 }
