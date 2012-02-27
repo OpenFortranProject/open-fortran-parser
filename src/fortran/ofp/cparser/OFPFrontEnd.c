@@ -27,11 +27,11 @@
 
 /** Token parser implementation is in ftoken-parser.c to avoid clashes in antlr headers.
  */
-pANTLR3_VECTOR  get_tokens      (const char * token_file);
+pANTLR3_VECTOR  get_tokens                (const char * token_file);
+int             ofpGetProgramUnitType     (pANTLR3_INT_STREAM istream);
 
 static  pANTLR3_BASE_TREE  ofpFrontEnd_program_unit  (pOFPFrontEnd parser);
 static  void               ofpFrontEnd_free          (pOFPFrontEnd parser);
-static  int                ofpGetProgramUnitType     (pANTLR3_INT_STREAM istream);
 
 
 #ifdef JAVA_TEXT
@@ -569,7 +569,7 @@ lookForToken(pANTLR3_INT_STREAM istream, int token, int look_ahead)
 }
 
 
-static int
+int
 ofpGetProgramUnitType(pANTLR3_INT_STREAM istream)
 {
    uint look_ahead, first_token, next_token;
