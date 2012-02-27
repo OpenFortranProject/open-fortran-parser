@@ -109,6 +109,70 @@ void checkForInclude() {return;}
 ///JAVA      action.end_of_file(filename, pathname);
 ///JAVA   }
 
+/** Common shared return value
+ */
+typedef struct CFortranParser_shared_return_struct
+{
+    /** Generic return elements for ANTLR3 rules that are not in tree parsers or returning trees
+     */
+    pANTLR3_COMMON_TOKEN    start;
+    pANTLR3_COMMON_TOKEN    stop;
+    pANTLR3_BASE_TREE	tree;
+   
+}
+    CFortranParser_shared_return;
+
+int
+ofpGetProgramUnitType(pANTLR3_INT_STREAM istream);
+
+/** Hand coded start rule
+ */
+static CFortranParser_shared_return
+program_rule_start(pCFortranParser ctx)
+{
+   int program_type;
+   CFortranParser_shared_return retval;
+
+   CFortranParser_program_unit_return program_unit_ret;
+
+   pANTLR3_BASE_TREE root;
+
+   /* Initialize rule variables
+    */
+   root = NULL;
+
+   program_unit_ret.tree = NULL;
+   retval.start = LT(1); retval.stop = retval.start;
+
+   retval.tree  = NULL;
+
+   root = (pANTLR3_BASE_TREE)(ADAPTOR->nilNode(ADAPTOR));
+
+   while (1)
+   {
+      program_type = ofpGetProgramUnitType(ISTREAM);
+
+      program_unit_ret = program_unit(ctx);
+
+      FOLLOWPOP();
+      if  (HASEXCEPTION())
+      {
+         //goto ruleprogramEx;
+      }
+      if (HASFAILED())
+      {
+         return retval;
+      }
+
+      ADAPTOR->addChild(ADAPTOR, root, program_unit_ret.tree);
+
+
+   }
+
+   return retval;
+}
+
+
 }
 
 //tokens {
@@ -153,6 +217,9 @@ void checkForInclude() {return;}
  *    is  program-unit 
  *        [ program-unit ] ... 
  */
+program
+   :  program_unit+
+   ;
 
 ////////////
 // R201-F08
@@ -176,11 +243,9 @@ void checkForInclude() {return;}
 // Removed from grammar and called explicitly
 //
 
-//program_unit[int type]
-//   :   {type==0}?   main_program
-//   |   {type==1}?   subroutine_subprogram
-//   |   {type==2}?   ext_function_subprogram
-//   ;
+program_unit
+   :   subroutine_subprogram
+   ;
 
 /*
  * R203-F08 external-subprogram
