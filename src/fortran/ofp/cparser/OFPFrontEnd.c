@@ -27,11 +27,13 @@
 
 /** Token parser implementation is in ftoken-parser.c to avoid clashes in antlr headers.
  */
-pANTLR3_VECTOR  get_tokens                (const char * token_file);
-int             ofpGetProgramUnitType     (pANTLR3_INT_STREAM istream);
+pANTLR3_VECTOR   get_tokens               (const char * token_file);
+int              ofpGetProgramUnitType    (pANTLR3_INT_STREAM istream);
 
-static  pANTLR3_BASE_TREE  ofpFrontEnd_program_unit  (pOFPFrontEnd parser);
-static  void               ofpFrontEnd_free          (pOFPFrontEnd parser);
+CFortranParser_shared_return  program_rule_start    (pCFortranParser ctx);
+
+static  pANTLR3_BASE_TREE     ofpFrontEnd_program   (pOFPFrontEnd parser);
+static  void                  ofpFrontEnd_free      (pOFPFrontEnd parser);
 
 
 #ifdef JAVA_TEXT
@@ -274,16 +276,16 @@ ofpFrontEndNew(int nArgs, char* argv[])
    /** Install base functionality
     */
 
-   fe->program_unit  =  ofpFrontEnd_program_unit;
-   fe->free          =  ofpFrontEnd_free;
+   fe->program    =  ofpFrontEnd_program;
+   fe->free       =  ofpFrontEnd_free;
 
    return fe;
 }
 
 static pANTLR3_BASE_TREE
-ofpFrontEnd_program_unit(pOFPFrontEnd fe)
+ofpFrontEnd_program(pOFPFrontEnd fe)
 {
-   int                           program_type, i;
+   int                           i;
    pANTLR3_TOKEN_SOURCE          tsource;
    pANTLR3_COMMON_TOKEN_STREAM   tstream;
    pANTLR3_BASE_TREE             ast_tree;
@@ -325,17 +327,9 @@ ofpFrontEnd_program_unit(pOFPFrontEnd fe)
    tstream  =  antlr3CommonTokenStreamSourceNew  ( ANTLR3_SIZE_HINT, tsource );
    parser   =  CFortranParserNew                 ( tstream );
 
-   program_type = ofpGetProgramUnitType(tstream->tstream->istream);
-
-   switch ( program_type ) 
-   {
-      case T_PROGRAM:            ast_tree = parser->main_program            (parser).tree;      break;
-      case T_SUBROUTINE:         ast_tree = parser->subroutine_subprogram   (parser).tree;      break;
-      case T_FUNCTION:           ast_tree = parser->ext_function_subprogram (parser).tree;      break;
-      case T_MODULE:             ast_tree = parser->module                  (parser).tree;      break;
-      case T_SUBMODULE:          ast_tree = parser->submodule               (parser).tree;      break;
-      case T_BLOCKDATA:          ast_tree = parser->block_data              (parser).tree;      break;
-   }
+   // temporary
+   //   ast_tree = parser->program(parser).tree;
+   ast_tree = program_rule_start(parser).tree;
 
    if (parser->pParser->rec->state->errorCount > 0)
    {
@@ -575,6 +569,13 @@ ofpGetProgramUnitType(pANTLR3_INT_STREAM istream)
    uint look_ahead, first_token, next_token;
 
    look_ahead = 1;
+
+   first_token = istream->_LA(istream, look_ahead);
+   if (first_token == ANTLR3_TOKEN_EOF) 
+   {
+      return ANTLR3_TOKEN_EOF;
+   }
+
    do
    {
       first_token = istream->_LA(istream, look_ahead);
@@ -593,7 +594,6 @@ ofpGetProgramUnitType(pANTLR3_INT_STREAM istream)
    //
    // mark the location of the first token we're looking at
    //start = tokens.mark();
-
 
    /* skip a statement label if present (not used to disambiguate)
     */
