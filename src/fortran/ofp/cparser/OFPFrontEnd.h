@@ -23,13 +23,26 @@
 #include <antlr3.h>
 #include "OFP_Type.h"
 
+/** Common shared return value
+ */
+typedef struct CFortranParser_shared_return_struct
+{
+    /** Generic return elements for ANTLR3 rules that are not in tree parsers or returning trees
+     */
+    pANTLR3_COMMON_TOKEN    start;
+    pANTLR3_COMMON_TOKEN    stop;
+    pANTLR3_BASE_TREE       tree;
+   
+}
+    CFortranParser_shared_return;
+
 typedef struct OFPFrontEnd_struct
 {
    /** Generic return elements for ANTLR3 rules that are not in tree parsers or returning trees
     */
    pANTLR3_COMMON_TOKEN    start;
    pANTLR3_COMMON_TOKEN    stop;
-   pANTLR3_BASE_TREE	   tree;
+   pANTLR3_BASE_TREE	      tree;
    pANTLR3_VECTOR          tlist;
 
    pANTLR3_STRING_FACTORY  strFactory;
@@ -42,16 +55,18 @@ typedef struct OFPFrontEnd_struct
 
    /** Pointer to a function parses a program unit.
     */
-   pANTLR3_BASE_TREE    (*program_unit)    (struct OFPFrontEnd_struct * fe);
+   pANTLR3_BASE_TREE    (*program)      (struct OFPFrontEnd_struct * fe);
 
    /** Pointer to a function that knows how to free resources of the OFP parser.                            
     */
-   void                (*free)             (struct OFPFrontEnd_struct * fe);
+   void                 (*free)         (struct OFPFrontEnd_struct * fe);
 
 }
    OFPFrontEnd, *pOFPFrontEnd;
 
-pOFPFrontEnd ofpFrontEndNew(int nArgs, char* argv[]);
+
+pOFPFrontEnd ofpFrontEndNew          (int nArgs, char* argv[]);
+int          ofpGetProgramUnitType   (pANTLR3_INT_STREAM istream);
 
 
 #endif
