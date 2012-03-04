@@ -3,7 +3,7 @@
 #include <stdio.h>
 //#include "OFP_Type.h"
 //#include "OFPTokenSource.h"
-//#include "CFortranParser.h"
+#include "CFortranParser.h"
 #include "Unparser.h"
 //#include "support.h"
 
@@ -11,7 +11,6 @@
 
 pUnparser       ofpUnparserNew  (pANTLR3_COMMON_TREE_NODE_STREAM instream);
 pANTLR3_VECTOR  get_tokens      (const char * token_file);
-
 
 #ifdef NOT_YET
 void ofp_mismatch                 (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow);
@@ -26,8 +25,7 @@ int main(int argc, char * argv[])
 
    parser = ofpFrontEndNew(argc, argv);
 
-   parser_ast_tree = parser->program_unit(parser);
-   parser_ast_tree = parser->program_unit(parser);
+   parser_ast_tree = parser->program(parser);
 
 #ifdef NOT_YET
    parser->pParser->rec->recoverFromMismatchedToken = ofp_mismatch;
