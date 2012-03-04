@@ -73,6 +73,7 @@ tokens {
 @members {
 
 #include "../parser/c/ActionEnums.h"
+#include "OFPFrontEnd.h"
 #include    <stdio.h>
 
 /* Remove prefix necessary for Java target
@@ -109,64 +110,134 @@ void checkForInclude() {return;}
 ///JAVA      action.end_of_file(filename, pathname);
 ///JAVA   }
 
-/** Common shared return value
- */
-typedef struct CFortranParser_shared_return_struct
-{
-    /** Generic return elements for ANTLR3 rules that are not in tree parsers or returning trees
-     */
-    pANTLR3_COMMON_TOKEN    start;
-    pANTLR3_COMMON_TOKEN    stop;
-    pANTLR3_BASE_TREE	tree;
-   
-}
-    CFortranParser_shared_return;
-
-int
-ofpGetProgramUnitType(pANTLR3_INT_STREAM istream);
 
 /** Hand coded start rule
  */
-static CFortranParser_shared_return
+CFortranParser_shared_return
 program_rule_start(pCFortranParser ctx)
 {
-   int program_type;
-   CFortranParser_shared_return retval;
-
-   CFortranParser_program_unit_return program_unit_ret;
+   int program_type, count, finished;
 
    pANTLR3_BASE_TREE root;
+
+   CFortranParser_shared_return retval, program_unit_ret;
+
+   CFortranParser_main_program_return               main_program_ret;
+   CFortranParser_subroutine_subprogram_return      subroutine_subprogram_ret;
+   CFortranParser_ext_function_subprogram_return    ext_function_subprogram_ret;
+   CFortranParser_module_return                     module_ret;
+   CFortranParser_submodule_return                  submodule_ret;
+   CFortranParser_block_data_return                 block_data_ret;
 
    /* Initialize rule variables
     */
    root = NULL;
 
-   program_unit_ret.tree = NULL;
-   retval.start = LT(1); retval.stop = retval.start;
+   main_program_ret             .tree  =  NULL;
+   subroutine_subprogram_ret    .tree  =  NULL;
+   ext_function_subprogram_ret  .tree  =  NULL;
+   module_ret                   .tree  =  NULL;
+   submodule_ret                .tree  =  NULL;
+   block_data_ret               .tree  =  NULL;
 
    retval.tree  = NULL;
+   retval.start = LT(1);
+   retval.stop  = retval.start;
 
    root = (pANTLR3_BASE_TREE)(ADAPTOR->nilNode(ADAPTOR));
 
-   while (1)
+   finished  =  0;
+   count     =  0;
+   while (!finished)
    {
       program_type = ofpGetProgramUnitType(ISTREAM);
 
-      program_unit_ret = program_unit(ctx);
-
-      FOLLOWPOP();
-      if  (HASEXCEPTION())
+      switch ( program_type ) 
       {
-         //goto ruleprogramEx;
+         case T_PROGRAM:
+            main_program_ret             =  main_program(ctx);
+            program_unit_ret.tree        =  main_program_ret.tree;
+            program_unit_ret.start       =  main_program_ret.start;
+            program_unit_ret.stop        =  main_program_ret.stop;               break;
+         case T_SUBROUTINE:
+            subroutine_subprogram_ret    =  subroutine_subprogram(ctx);
+            program_unit_ret.tree        =  subroutine_subprogram_ret.tree;
+            program_unit_ret.start       =  subroutine_subprogram_ret.start;
+            program_unit_ret.stop        =  subroutine_subprogram_ret.stop;      break;
+         case T_FUNCTION:
+            ext_function_subprogram_ret  =  ext_function_subprogram(ctx);
+            program_unit_ret.tree        =  ext_function_subprogram_ret.tree;
+            program_unit_ret.start       =  ext_function_subprogram_ret.start;
+            program_unit_ret.stop        =  ext_function_subprogram_ret.stop;    break;
+         case T_MODULE:
+            module_ret                   =  module(ctx);
+            program_unit_ret.tree        =  module_ret.tree;
+            program_unit_ret.start       =  module_ret.start;
+            program_unit_ret.stop        =  module_ret.stop;                     break;
+         case T_SUBMODULE:
+            submodule_ret                =  submodule(ctx);
+            program_unit_ret.tree        =  submodule_ret.tree;
+            program_unit_ret.start       =  submodule_ret.start;
+            program_unit_ret.stop        =  submodule_ret.stop;                  break;
+         case T_BLOCKDATA:
+            block_data_ret               =  block_data(ctx);
+            program_unit_ret.tree        =  block_data_ret.tree;
+            program_unit_ret.start       =  block_data_ret.start;
+            program_unit_ret.stop        =  block_data_ret.stop;                 break;
+         default:
+            /* EOF or error condition */
+            finished = 1;
+      }
+
+      /* 
+       */
+      // don't think we need FOLLOWPUSH and FOLLOWPOP();
+      if (HASEXCEPTION())
+      {
+         goto ruleprogramEx;
       }
       if (HASFAILED())
       {
          return retval;
       }
 
-      ADAPTOR->addChild(ADAPTOR, root, program_unit_ret.tree);
+      if (!finished)
+      {
+         /* add program_unit to the tree structure */
+         count += 1;
+         ADAPTOR->addChild(ADAPTOR, root, program_unit_ret.tree);
+      }
 
+      if (count == 0)
+      {
+         /* mismatchedSetEx()
+          */
+         CONSTRUCTEX();
+         EXCEPTION->type = ANTLR3_EARLY_EXIT_EXCEPTION;
+         EXCEPTION->name = (void *)ANTLR3_EARLY_EXIT_NAME;
 
+         goto ruleprogramEx;
+      }
+
+   }
+
+   // This is where rules clean up and exit
+   //
+//   goto ruleprogramEx; /* Prevent compiler warnings */
+   ruleprogramEx: ;
+
+   retval.stop = LT(-1);
+
+   if (HASEXCEPTION())
+   {
+      PREPORTERROR();
+      PRECOVER();
+      retval.tree = (pANTLR3_BASE_TREE)(ADAPTOR->errorNode(ADAPTOR, INPUT, retval.start, LT(-1), EXCEPTION));
+   }
+   else
+   {
+      retval.tree = (pANTLR3_BASE_TREE)(ADAPTOR->rulePostProcessing(ADAPTOR, root));
+      ADAPTOR->setTokenBoundaries(ADAPTOR, retval.tree, retval.start, retval.stop);
    }
 
    return retval;
@@ -1092,15 +1163,15 @@ generic_name_list
    int count = 0;
    c_action_generic_name_list__begin();
 }
-   :   ident=T_IDENT
+   :   id=T_IDENT
             {
                count++;
-               c_action_generic_name_list_part(ident);
+               c_action_generic_name_list_part(id);
             }
-       ( T_COMMA ident=T_IDENT 
+       ( T_COMMA id=T_IDENT 
             {
                count++;
-               c_action_generic_name_list_part(ident);
+               c_action_generic_name_list_part(id);
             }
        )*
             {
@@ -2494,28 +2565,21 @@ volatile_stmt
 
 // R560-F08
 implicit_stmt
-@init
-{
-   pANTLR3_COMMON_TOKEN lbl = NULL;
-}
 @after
 {
    checkForInclude();
 }
-   :   (label {lbl=$label.start;})?
-       T_IMPLICIT implicit_spec_list end_of_stmt
-
+   :   lbl=label?  T_IMPLICIT  implicit_spec_list  end_of_stmt
           {
-             c_action_implicit_stmt(lbl, $T_IMPLICIT, NULL, $end_of_stmt.start, ANTLR3_TRUE);
+             c_action_implicit_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_IMPLICIT,NULL,$end_of_stmt.start,ANTLR3_TRUE);
           }
 
     -> ^(SgImplicitStatement implicit_spec_list label?)
 
-   |   (label {lbl=$label.start;})?
-       T_IMPLICIT T_NONE end_of_stmt
+   |   lbl=label?  T_IMPLICIT T_NONE               end_of_stmt
 
           {
-             c_action_implicit_stmt(lbl, $T_IMPLICIT, $T_NONE, $end_of_stmt.start, ANTLR3_FALSE);
+             c_action_implicit_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_IMPLICIT,$T_NONE,$end_of_stmt.start,ANTLR3_FALSE);
           }
 
     -> ^(SgImplicitStatement OFPList label?)
@@ -5299,19 +5363,14 @@ ext_function_subprogram
 //
 //----------------------------------------------------------------------------------------
 program_stmt
-@init
-{
-   pANTLR3_COMMON_TOKEN  lbl = NULL;
-}
 @after
 {
    checkForInclude();
 }
-   :   (label {lbl=$label.start;})?
-       T_PROGRAM  T_IDENT  end_of_stmt
+   :   lbl=label?  T_PROGRAM  T_IDENT  end_of_stmt
 
           {
-             c_action_program_stmt(lbl, $T_PROGRAM, $T_IDENT, $end_of_stmt.start);
+             c_action_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_PROGRAM,$T_IDENT,$end_of_stmt.start);
           }
 
    -> ^(OFPBeginStmt T_IDENT label?)
@@ -5328,38 +5387,30 @@ program_stmt
 //
 //----------------------------------------------------------------------------------------
 end_program_stmt
-@init
-{
-   pANTLR3_COMMON_TOKEN  lbl = NULL;
-   pANTLR3_COMMON_TOKEN  id  = NULL;
-}
 @after
 {
    checkForInclude();
 }
-   :  (label {lbl=$label.start;})?
-      T_END  T_PROGRAM  (T_IDENT {id=$T_IDENT;})?  end_of_stmt
+   :   lbl=label?  T_END  T_PROGRAM  id=T_IDENT?  end_of_stmt
 
           {
-             c_action_end_program_stmt(lbl, $T_END, $T_PROGRAM, id, $end_of_stmt.start);
+             c_action_end_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,$T_PROGRAM,id,$end_of_stmt.start);
           }
 
    -> ^(OFPEndStmt T_IDENT? label?)
 
-   |   (label {lbl=$label.start;})?
-       T_ENDPROGRAM     (T_IDENT {id=$T_IDENT;})?  end_of_stmt
+   |   lbl=label?  T_ENDPROGRAM     id=T_IDENT?  end_of_stmt
 
           {
-             c_action_end_program_stmt(lbl, $T_ENDPROGRAM, NULL, id, $end_of_stmt.start);
+             c_action_end_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_ENDPROGRAM,NULL,id,$end_of_stmt.start);
           }
 
    -> ^(OFPEndStmt T_IDENT? label?)
 
-   |   (label {lbl=$label.start;})?
-       T_END                                       end_of_stmt
+   |   lbl=label?  T_END                         end_of_stmt
 
           {
-             c_action_end_program_stmt(lbl, $T_END, NULL, NULL, $end_of_stmt.start);
+             c_action_end_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,NULL,NULL,$end_of_stmt.start);
           }
 
    -> ^(OFPEndStmt label?)
@@ -6114,24 +6165,46 @@ subroutine_subprogram
        ( execution_part )?
        ( internal_subprogram_part )?
        end_subroutine_stmt
+
+   -> ^(SgProcedureHeaderStatement subroutine_stmt end_subroutine_stmt
+          ^(SgFunctionDefinition 
+              ^(SgBasicBlock specification_part)
+           )
+       )
    ;
 
 // R1232
 subroutine_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasPrefix=ANTLR3_FALSE;
-       ANTLR3_BOOLEAN hasDummyArgList=ANTLR3_FALSE;
-       ANTLR3_BOOLEAN hasBindingSpec=ANTLR3_FALSE;
-       ANTLR3_BOOLEAN hasArgSpecifier=ANTLR3_FALSE;}
+@init
+{
+   ANTLR3_BOOLEAN hasPrefix       = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasDummyArgList = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasBindingSpec  = ANTLR3_FALSE;
+   ANTLR3_BOOLEAN hasArgSpecifier = ANTLR3_FALSE;
+   c_action_subroutine_stmt__begin();
+}
 @after{checkForInclude();}
-   :       {c_action_subroutine_stmt__begin();}
-        (label {lbl=$label.start;})? (t_prefix {hasPrefix=ANTLR3_TRUE;})? T_SUBROUTINE 
-            T_IDENT ( T_LPAREN ( dummy_arg_list {hasDummyArgList=ANTLR3_TRUE;})? 
-            T_RPAREN ( proc_language_binding_spec {hasBindingSpec=ANTLR3_TRUE;})? 
-            {hasArgSpecifier=ANTLR3_TRUE;})? end_of_stmt
-            {c_action_subroutine_stmt(lbl, $T_SUBROUTINE, $T_IDENT, 
-                                    $end_of_stmt.start, 
-                                    hasPrefix, hasDummyArgList, 
-                                    hasBindingSpec, hasArgSpecifier);}
+   :   lbl=label?
+       ( t_prefix {hasPrefix=ANTLR3_TRUE;} )?
+       T_SUBROUTINE T_IDENT
+       ( T_LPAREN
+            (
+               dummy_arg_list             {hasDummyArgList=ANTLR3_TRUE;}
+            )? 
+         T_RPAREN
+            (
+               proc_language_binding_spec {hasBindingSpec=ANTLR3_TRUE;}
+            )?
+                                          {hasArgSpecifier=ANTLR3_TRUE;}
+       )?
+       end_of_stmt
+
+            {
+               c_action_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_SUBROUTINE,$T_IDENT,$end_of_stmt.start,hasPrefix, hasDummyArgList,hasBindingSpec,hasArgSpecifier);
+            }
+
+   -> ^(OFPBeginStmt T_IDENT label?)
+
    ;
 
 // R1233
@@ -6151,18 +6224,31 @@ dummy_arg_list
 
 // R1234
 end_subroutine_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL; pANTLR3_COMMON_TOKEN id=NULL;}
-@after{checkForInclude();}
-   : (label {lbl=$label.start;})? T_END T_SUBROUTINE ( T_IDENT {id=$T_IDENT;})? 
-        end_of_stmt
-        {c_action_end_subroutine_stmt(lbl, $T_END, $T_SUBROUTINE, id, 
-                                    $end_of_stmt.start);}
-   | (label {lbl=$label.start;})? T_ENDSUBROUTINE    ( T_IDENT {id=$T_IDENT;})? 
-        end_of_stmt
-        {c_action_end_subroutine_stmt(lbl, $T_ENDSUBROUTINE, NULL, id, 
-                                    $end_of_stmt.start);}
-   | (label {lbl=$label.start;})? T_END end_of_stmt
-        {c_action_end_subroutine_stmt(lbl, $T_END, NULL, id, $end_of_stmt.start);}
+@after
+{
+   checkForInclude();
+}
+   :   lbl=label?  T_END T_SUBROUTINE  id=T_IDENT?  end_of_stmt
+          {
+             c_action_end_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,$T_SUBROUTINE,id,$end_of_stmt.start);
+          }
+
+   -> ^(OFPEndStmt T_IDENT? label?)
+
+   |   lbl=label?  T_ENDSUBROUTINE     id=T_IDENT?  end_of_stmt
+          {
+             c_action_end_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_ENDSUBROUTINE,NULL,id,$end_of_stmt.start);
+          }
+
+   -> ^(OFPEndStmt T_IDENT? label?)
+
+   |   lbl=label?  T_END                            end_of_stmt
+          {
+             c_action_end_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,NULL,id,$end_of_stmt.start);
+          }
+
+   -> ^(OFPEndStmt label?)
+
    ;
 
 // R1235
