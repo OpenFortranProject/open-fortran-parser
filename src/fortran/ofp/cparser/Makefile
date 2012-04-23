@@ -1,8 +1,14 @@
 RULE=R102
 
+# cc with Apple XCode uses clang which has unwelcome warning messages
+#
 CC = gcc
 
-CFLAGS = -g -m32 -I.
+# -m32 flag used in antlr3 build (for XCode)
+#
+ARCH = -m32
+
+CFLAGS = -g $(ARCH) -I.
 LIBS = -lantlr3c
 
 GEN_SRC_FILES = CFortranTokenLexer.c CFortranTokenParser.c        \
@@ -31,10 +37,10 @@ OFPFrontEnd.o: OFPFrontEnd.c OFPFrontEnd.h
 unparse.o: OFPFrontEnd.c OFPFrontEnd.h
 
 unparse: unparse.o ofpbaserecognizer.o $(OBJS) Unparser.o Unparser_FTreeWalker.o
-	cc -o $@ -m32 $< ofpbaserecognizer.o $(OBJS) $(LIBS) Unparser.o Unparser_FTreeWalker.o
+	$(CC) -o $@ $(ARCH) $< ofpbaserecognizer.o $(OBJS) $(LIBS) Unparser.o Unparser_FTreeWalker.o
 
 checkers: checkers.o $(OBJS) ImplicitNone.o ImplicitNone_FTreeWalker.o
-	cc -o $@ -m32 $< $(OBJS) $(LIBS) ImplicitNone.o ImplicitNone_FTreeWalker.o
+	$(CC) -o $@ $(ARCH) $< $(OBJS) $(LIBS) ImplicitNone.o ImplicitNone_FTreeWalker.o
 
 CFortranTokenLexer.c: CFortranToken.g
 	java org.antlr.Tool $<
@@ -55,28 +61,28 @@ CFortranParser.c: CFortranParser.g
 	java org.antlr.Tool $<
 
 CFortranTokenLexer.o: CFortranTokenLexer.c
-	cc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 CFortranTokenParser.o: CFortranTokenParser.c
-	cc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 CFortranParser.o: CFortranParser.c
-	cc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 OFPTokenSource.o: OFPTokenSource.c OFPTokenSource.h
-	cc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 ftoken-parser.o: ftoken-parser.c CFortranTokenLexer.c CFortranTokenParser.c
-	cc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 fparser.o: fparser.c $(GEN_SRC_FILES)
-	cc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 unparse.o: unparse.c $(GEN_SRC_FILES)
-	cc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 OFP_Type.o: OFP_Type.c OFP_Type.h
-	cc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 support.o: support.c support.h
 
