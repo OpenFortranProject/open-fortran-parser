@@ -86,7 +86,10 @@ while ($line=<JAVA>) {
 		else {
 # 			$line =~ s/boolean/bool/g;
 			$line =~ s/boolean/ofp_bool/g;
+                        # not all "final" strings should be converted to "const"
+			$line =~ s/_final/_FINAL/g;
 			$line =~ s/final/const/g;
+			$line =~ s/_FINAL/_final/g;
 			$line =~ s/public//g;
 			$line =~ s/^ //g;
 			$line =~ s/const  /const /g;
