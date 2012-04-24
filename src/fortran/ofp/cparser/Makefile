@@ -96,4 +96,8 @@ rulecheck: unparse
 	@unparse $(RULE).tokens $(RULE).f90
 
 clean:
-	rm -f *.o fparser CFortranToken.tokens $(GEN_SRC_FILES) $(GEN_HDR_FILES) $(OBJS) fparser.o
+	rm -f *.o fparser $(GEN_SRC_FILES) $(GEN_HDR_FILES) $(OBJS) fparser.o
+	rm -f CFortranParser.tokens CFortranToken.tokens FTreeWalker.tokens
+	rm -f ImplicitNone.tokens Unparser.tokens test-parser.f90.tokens
+
+
