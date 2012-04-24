@@ -886,8 +886,9 @@ access_spec
 
 // R509
 language_binding_spec
-   :   T_BIND T_LPAREN T_IDENT /* 'C' */ 
-            (T_COMMA name T_EQUALS expr )? T_RPAREN
+//   :   T_BIND T_LPAREN T_IDENT /* 'C' */ 
+//            (T_COMMA name T_EQUALS expr )? T_RPAREN
+   :  ^(OFPBind T_IDENT expr?)
    ;
 
 // R510
