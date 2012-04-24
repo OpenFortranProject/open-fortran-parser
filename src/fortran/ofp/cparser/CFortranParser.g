@@ -21,22 +21,30 @@ options {
 tokens {
    // Imaginary nodes for intermediate processing
    //
+   OFPBind;
+   OFPExecutionPart;
+   OFPInternalSubProgramPart;
+   OFPLabel;
    OFPList;
+   OFPPrefixList;
+   OFPSpecificationPart;
+   OFPSuffix;
+
    OFPBeginStmt;
    OFPEndStmt;
+
    OFPKindSelector;      
    OFPCharSelector;
    OFPLengthSelector;
 
-   OFPFunctionSubprogram;
-   OFPSubroutineSubprogram;
+//   OFPFunctionSubprogram;
+//   OFPSubroutineSubprogram;
    OFPModule;
    OFPSubmodule;
    OFPBlockData;
 
    // Sage nodes
    //
-
    SgSourceFile;
    SgGlobal;
    SgProgramHeaderStatement;
@@ -405,7 +413,7 @@ execution_part
     c_action_execution_part();
 }
    :   executable_construct
-       ( execution_part_construct )*
+       execution_part_construct*
    ;
 
 // R209
@@ -1978,10 +1986,17 @@ access_spec
 // R509
 // ERR_CHK 509 scalar_char_initialization_expr replaced by expr
 language_binding_spec
-@init{ANTLR3_BOOLEAN hasName = ANTLR3_FALSE;}
+@init
+{
+   ANTLR3_BOOLEAN hasName = ANTLR3_FALSE;
+}
    :   T_BIND T_LPAREN T_IDENT /* 'C' */ 
-            (T_COMMA name T_EQUALS expr {hasName=ANTLR3_TRUE;})? T_RPAREN
-            { c_action_language_binding_spec($T_BIND, $T_IDENT, hasName); }
+       (T_COMMA name T_EQUALS expr {hasName=ANTLR3_TRUE;})? T_RPAREN
+          {
+             c_action_language_binding_spec($T_BIND, $T_IDENT, hasName);
+          }
+
+//TODO   -> ^(OFPBind T_IDENT expr?)
    ;
 
 // R510
