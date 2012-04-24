@@ -1,14 +1,40 @@
 # ANTLR generated files
 #######################
 
-CFortranTokenLexer.h
+CFortranParser.c
+CFortranParser.h
+CFortranParser.tokens
+
 CFortranTokenLexer.c
-CFortranTokenParser.h
+CFortranTokenLexer.h
+
 CFortranTokenParser.c
+CFortranTokenParser.h
+
+FTreeWalker.c
+FTreeWalker.h
+FTreeWalker.tokens
+
+ImplicitNone.c
+ImplicitNone.h
+ImplicitNone_FTreeWalker.c
+ImplicitNone_FTreeWalker.h
+ImplicitNone.tokens
+
+Unparser.c
+Unparser.h
+Unparser_FTreeWalker.c
+Unparser_FTreeWalker.h
+Unparser.tokens
+
 CFortranToken.tokens
+test-parser.f90.tokens
 
 # other generated files
 #######################
 
 *.o
+
+checkers
 ftokens
+unparse
