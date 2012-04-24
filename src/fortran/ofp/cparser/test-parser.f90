@@ -9,7 +9,7 @@
 subroutine foo
 end subroutine
 
-subroutine bar
+subroutine bar() BIND(C)
 end subroutine bar
 
 ! end comment, will this fail program_unit loop?
