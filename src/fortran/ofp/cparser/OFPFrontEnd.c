@@ -291,8 +291,6 @@ ofpFrontEnd_program(pOFPFrontEnd fe)
    pANTLR3_BASE_TREE             ast_tree;
    pCFortranParser               parser;
 
-   printf("file is %s\n", fe->src_file->chars);
-
    /* Lexer phase
     *    - Call the token parser to read the tokens from the token file.
     */
@@ -303,8 +301,6 @@ ofpFrontEnd_program(pOFPFrontEnd fe)
       return NULL;
    }
    fe->tok_file->append(fe->tok_file, ".tokens");
-
-   printf("tok_file == %s\n", fe->tok_file->chars);
 
    fe->tlist = get_tokens(fe->tok_file->chars);
 
@@ -558,8 +554,16 @@ ofpFrontEnd_free(pOFPFrontEnd fe)
 static int
 lookForToken(pANTLR3_INT_STREAM istream, int token, int look_ahead)
 {
-   // TODO - implement
-   return 0;
+   int tk;
+
+   do
+   {
+      tk = istream->_LA(istream, look_ahead);
+      look_ahead += 1;
+   }
+   while(tk != T_EOS  &&  tk != EOF  &&  tk != token);
+
+   return (tk == token);
 }
 
 
