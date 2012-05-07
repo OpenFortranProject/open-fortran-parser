@@ -77,11 +77,12 @@ public class FortranLexicalPrepass {
             // generic-spec items should not be converted (unless an id), i.e., 
             // ASSIGNMENT(=) OPERATOR(T_DEFINED_OP), READ(UN/FORMATTED), WRITE()
             int idOffset = matchGenericSpec(i, end);
-            if (idOffset == i) {
-               // an ident
+            if (idOffset == i || idOffset == -1) {
+               // an ident (id could be ASSIGNMENT, for example, if idOffset==-1)
                tk.setType(FortranLexer.T_IDENT);
             }
-            else if (idOffset != -1) {
+            else
+            {
                // skip over tokens in parens from matchGenericSpec
                i = idOffset-1;
             }
@@ -257,7 +258,8 @@ public class FortranLexicalPrepass {
    
    private boolean matchDataDecl(int lineStart, int lineEnd) {
       int tokenType = tokens.currLineLA(lineStart+1);
-      if (isIntrinsicType(tokenType) == true || isTPrefixSpec(tokenType) ||
+
+      if (isIntrinsicType(tokenType) == true || isTPrefixSpec(lineStart, lineEnd) ||
           ((tokenType == FortranLexer.T_TYPE || tokenType == FortranLexer.T_CLASS) &&
             tokens.currLineLA(lineStart+2) == FortranLexer.T_LPAREN)) {
 
@@ -373,8 +375,8 @@ public class FortranLexicalPrepass {
    private boolean matchSub(int lineStart, int lineEnd) {
       int bindOffset;
 
-      // Move past the pure, elemental, and recursive keywords.
-      while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) ) {
+      // Move past the pure, elemental, recursive, and possibly module keywords.
+      while ( isTPrefixSpec(lineStart, lineEnd) ) {
          lineStart++;
       }
 
@@ -414,20 +416,23 @@ public class FortranLexicalPrepass {
             int nextNextToken = tokens.currLineLA(lineStart+3); // the next of the next token
 
             if (nextToken == FortranLexer.T_BLOCK &&
-                tokens.currLineLA(lineStart+3) == FortranLexer.T_DATA) {
-                  // end-block-data-stmt
-                  identOffset = lineStart+3;
+                tokens.currLineLA(lineStart+3) == FortranLexer.T_DATA)
+            {
+               // end-block-data-stmt
+               identOffset = lineStart+3;
             }
-            else if (nextToken == FortranLexer.T_INTERFACE) {
+            else if (nextToken == FortranLexer.T_INTERFACE)
+            {
                // have to accept a generic_spec
                identOffset = matchGenericSpec(lineStart+2, lineEnd);
-            }  else if (nextToken == FortranLexer.T_WITH &&
-                        nextNextToken == FortranLexer.T_TEAM) {
-                // Laksono 2009.03.03:
-                // We have the perfect match of "end with team", so push the token 4 steps
+            }
+            else if (nextToken == FortranLexer.T_WITH && nextNextToken == FortranLexer.T_TEAM)
+            {
+               // Laksono 2009.03.03:
+               // We have the perfect match of "end with team", so push the token 4 steps
                identOffset = lineStart+4;
-
-            } else {
+            }
+            else {
                // identifier is after the T_END and T_<construct>
                identOffset = lineStart+2;
             }
@@ -476,9 +481,11 @@ public class FortranLexicalPrepass {
     */
    private boolean matchModule(int lineStart, int lineEnd) {
       // convert everything after module to an identifier 
+      //
       convertToIdents(lineStart+1, lineEnd);
+
       return true;
-   }// end matchModule()
+   } // end matchModule()
 
 
    /**
@@ -1187,7 +1194,9 @@ public class FortranLexicalPrepass {
                 }
                 else
                 {
-                    // unbalanced parens -- currently can't get here because 'matchClosingParen' calls 'exit' if no match
+                    // unbalanced parens -- currently can't get here because
+                    // 'matchClosingParen' calls 'exit' if no match
+                    //
                     lineStart += 1;
                 }
             }
@@ -1205,17 +1214,17 @@ public class FortranLexicalPrepass {
 
 
    // Skip whole prefix, not just the type declaration.
-   private int skipPrefix(int lineStart) {
+   private int skipPrefix(int lineStart, int lineEnd) {
       // First, skip over the pure, elemental, recursive tokens.
       // Then skip type spec.
       // Then skip over the pure, elemental, recursive tokens again
-      while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) ) {
+      while ( isTPrefixSpec(lineStart, lineEnd) ) {
          lineStart++;
       }
 		
       lineStart = skipTypeSpec(lineStart);
 
-      while ( isTPrefixSpec(tokens.currLineLA(lineStart+1)) ) {
+      while ( isTPrefixSpec(lineStart, lineEnd) ) {
          lineStart++;
       }
 
@@ -1223,13 +1232,22 @@ public class FortranLexicalPrepass {
    } // end skipPrefix()
 
    // Test to see if a token is a t_prefix_spec.
-   private boolean isTPrefixSpec(int token) {
-      return parser.isTPrefixSpec(token);
+   //
+   private boolean isTPrefixSpec(int start, int end) {
+      // F2008 added MODULE to a prefix-spec so we must check for
+      // following subroutine or function to make sure the T_MODULE
+      // token isn't just a prefix-spec
+      //
+      if (isModuleStmt(start, end)) {
+         return false;
+      }
+
+      return parser.isTPrefixSpec(tokens.currLineLA(start+1));
    } // end isTPrefixSpec()
 
    private boolean isFuncDecl(int lineStart, int lineEnd) {
       // have to skip over any kind selector
-      lineStart = skipPrefix(lineStart);
+      lineStart = skipPrefix(lineStart, lineEnd);
 
       // Here, we know the first token is one of the intrinsic types.
       // Now, look at the second token to see if it is T_FUNCTION.
@@ -1246,6 +1264,21 @@ public class FortranLexicalPrepass {
       return false;
    } // end isFuncDecl()
 
+   // True if this is an module-stmt
+   private boolean isModuleStmt(int start, int end) {
+
+      // look for MODULE keyword and T_EOS following id
+      //
+      if (end >= start + 3) {
+         if (   tokens.currLineLA(start+1) == FortranLexer.T_MODULE
+             && tokens.currLineLA(start+3) == FortranLexer.T_EOS    ) {
+            return true;
+         }
+      }
+
+      return false;
+   } // end isModuleStmt()
+
    // True if this is an mp-subprogram-stmt
    private boolean isModuleProcStmt(int lineStart, int lineEnd) {
       // look for MODULE PROCEDURE keywords
@@ -1257,13 +1290,13 @@ public class FortranLexicalPrepass {
       } 
 
       return false;
-   } // end isFuncDecl()
+   } // end isModuleProcStmt()
 
    // True if this is a subroutine declaration.
    private boolean isSubDecl(int lineStart, int lineEnd) {
 
       // Skip the prefix.
-      lineStart = skipPrefix(lineStart);
+      lineStart = skipPrefix(lineStart, lineEnd);
 
       // Look at the first token to see if it is T_SUBROUTINE.
       // If it is, AND a keyword/identifier immediately follows it, 
@@ -1321,60 +1354,74 @@ public class FortranLexicalPrepass {
    } // end findFormatItemEnd()
 
 
-	private int matchVList(String line, int lineIndex) {
-		int tmpLineIndex;
-		int lineLength;
+   private int matchVList(String line, int lineIndex) {
+      int tmpLineIndex;
+      int lineLength;
 
-		/* Skip the 'dt'.  */
-		tmpLineIndex = lineIndex + 2;
+      /* Skip the 'dt'.  */
+      tmpLineIndex = lineIndex + 2;
 
-		lineLength = line.length();
+      lineLength = line.length();
 		
-		/* We could have a char-literal-constant here to skip.  */
-		if(line.charAt(tmpLineIndex) == '\'' ||
-			line.charAt(tmpLineIndex) == '"') {
-			tmpLineIndex++;
-			while(line.charAt(tmpLineIndex) != '\'' &&
-					line.charAt(tmpLineIndex) != '"' &&
-					tmpLineIndex < lineLength)
-				tmpLineIndex++;
-		}
+      /* We could have a char-literal-constant here to skip.  */
+      if (line.charAt(tmpLineIndex) == '\'' ||
+          line.charAt(tmpLineIndex) == '"')
+      {
+         tmpLineIndex++;
+         while (line.charAt(tmpLineIndex) != '\'' &&
+                line.charAt(tmpLineIndex) != '"' &&
+                tmpLineIndex < lineLength)
+         {
+            tmpLineIndex++;
+         }
+      }
 			
-		/* If we hit the end, there's an error in the line so just return.  */
-		if(tmpLineIndex == lineLength)
-			return lineIndex;
+      /* If we hit the end, there's an error in the line so just return. */
+      if (tmpLineIndex == lineLength)
+      {
+         return lineIndex;
+      }
 
-		/* Move off the closing quotation.  */
-		if(line.charAt(tmpLineIndex) == '\'' ||
-			line.charAt(tmpLineIndex) == '"')
-			tmpLineIndex++;
+      /* Move off the closing quotation.  */
+      if (line.charAt(tmpLineIndex) == '\'' ||
+          line.charAt(tmpLineIndex) == '"')
+      {
+         tmpLineIndex++;
+      }
 
-		/* Check for optional v-list and skip if present.  */
-		if(line.charAt(tmpLineIndex) == '(') {
-			tmpLineIndex++;
+      /* Check for optional v-list and skip if present.  */
+      if (line.charAt(tmpLineIndex) == '(')
+      {
+         tmpLineIndex++;
 
-			while(tmpLineIndex < lineLength &&
-					Character.isDigit(line.charAt(tmpLineIndex)))
-				tmpLineIndex++;
+         while (tmpLineIndex < lineLength && Character.isDigit(line.charAt(tmpLineIndex)))
+         {
+            tmpLineIndex++;
+         }
 
-			if(tmpLineIndex == lineLength)
-				/* There is an error in the line!  */
-				return lineIndex;
+         if (tmpLineIndex == lineLength)
+         {
+            /* There is an error in the line!  */
+            return lineIndex;
+         }
 
-			if(line.charAt(tmpLineIndex) == ')') {
-				tmpLineIndex++;
-				/* We successfully matched the v-list.  Return new index.  */
-				return tmpLineIndex;
-			} else {
-				System.err.println("Error: Unable to match v-list in " +
-										 "data-edit-desc!");
-				return lineIndex;
-			}
-		}
+         if (line.charAt(tmpLineIndex) == ')')
+         {
+            tmpLineIndex++;
+            /* We successfully matched the v-list.  Return new index.  */
+            return tmpLineIndex;
+         }
+         else
+         {
+            System.err.println("Error: Unable to match v-list in data-edit-desc!");
+            return lineIndex;
+         }
+      }
 
-		/* No v-list.  Return where we started.  */
-		return lineIndex;
-	}// end matchVList()
+      /* No v-list.  Return where we started.  */
+      return lineIndex;
+
+   } // end matchVList()
 
 
    private int getDataEditDesc(String line, int lineIndex, int lineEnd) {
@@ -1946,7 +1993,7 @@ public class FortranLexicalPrepass {
                 // for each extra matching labeled do with this labeled end do, 
                 // we need to add a T_LABEL_DO_TERMINAL_INSERTED to the token stream.
                 // the inserted token's text is the matched statement label.
-                if( ! tokens.appendToken(FortranLexer.T_LABEL_DO_TERMINAL_INSERTED, new String(firstToken.getText())) )
+                if ( ! tokens.appendToken(FortranLexer.T_LABEL_DO_TERMINAL_INSERTED, new String(firstToken.getText())) )
                 {
                     System.err.println("FATAL ERROR: couldn't add tokens in fixupLabeledEndDo!");
                     System.exit(1);
@@ -2395,10 +2442,12 @@ public class FortranLexicalPrepass {
     */
    private boolean matchLine(int lineStart, int lineEnd)
    {
-      if (matchDataDecl(lineStart, lineEnd) == true) {
+      if (matchDataDecl(lineStart, lineEnd) == true)
+      {
          return true;
       }
-      else if (matchDerivedTypeStmt(lineStart, lineEnd) == true) {
+      else if (matchDerivedTypeStmt(lineStart, lineEnd) == true)
+      {
          return true;
       }
 
