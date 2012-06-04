@@ -227,7 +227,7 @@ program_rule_start(pCFortranParser ctx)
          goto ruleprogramEx;
       }
 
-   }
+   } // end while (!finished)
 
    // This is where rules clean up and exit
    //
@@ -413,7 +413,7 @@ execution_part
     c_action_execution_part();
 }
    :   executable_construct
-       execution_part_construct*
+       execution_part_construct *
    ;
 
 // R209
@@ -3837,7 +3837,7 @@ block
 @after {
     c_action_block();
 }
-   :   ( execution_part_construct )*
+   :   execution_part_construct *
    ;
 
 // R802
@@ -6177,8 +6177,8 @@ end_function_stmt
 subroutine_subprogram
    :   subroutine_stmt
        specification_part
-       ( execution_part )?
-       ( internal_subprogram_part )?
+       execution_part ?
+       internal_subprogram_part ?
        end_subroutine_stmt
 
    -> ^(SgProcedureHeaderStatement subroutine_stmt end_subroutine_stmt
