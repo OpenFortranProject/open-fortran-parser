@@ -87,10 +87,7 @@ unparse(pANTLR3_BASE_TREE btn, ANTLR3_MARKER next)
 // R204-F08
 //
 specification_part
-   :   ( use_stmt                )*
-       ( import_stmt             )*
-       ( implicit_part_recursion )    // making nonoptional with predicates fixes ambiguity
-       ( declaration_construct   )*
+   :   use_stmt* import_stmt* implicit_part_recursion declaration_construct*
    ;
 
 ////////////
@@ -125,7 +122,7 @@ declaration_construct
 // R208
 execution_part
    :   executable_construct
-        ( execution_part_construct )*
+       execution_part_construct *
    ;
 
 // R209
@@ -340,13 +337,13 @@ intrinsic_type_spec
    pOFP_TYPE_TABLE ttable = ofpGetTypeTable();
    ttable->putIntrinsic(ttable, retval.tree);
 }
-   :   ^(SgTypeInt       kind_selector?)
-   |   ^(SgTypeFloat     kind_selector?)
-   |   SgTypeDouble
-   |   ^(SgTypeComplex   kind_selector?)
-   |   SgTypeDComplex                      // TODO - what is the real SgType?
-   |   ^(SgTypeChar      char_selector?)
-   |   ^(SgTypeBool      kind_selector?)
+   :   ^( SgTypeInt       kind_selector? )
+   |   ^( SgTypeFloat     kind_selector? )
+   |      SgTypeDouble
+   |   ^( SgTypeComplex   kind_selector? )
+   |      SgTypeDComplex                      // TODO - what is the real SgType?
+   |   ^( SgTypeChar      char_selector? )
+   |   ^( SgTypeBool      kind_selector? )
    ;
 
 // R404
@@ -886,9 +883,7 @@ access_spec
 
 // R509
 language_binding_spec
-//   :   T_BIND T_LPAREN T_IDENT /* 'C' */ 
-//            (T_COMMA name T_EQUALS expr )? T_RPAREN
-   :  ^(OFPBind T_IDENT expr?)
+   :   ^(OFPBind T_IDENT expr?)
    ;
 
 // R510
@@ -2595,6 +2590,18 @@ v_list
  * Section/Clause 11: Program units
  */
 
+// R201-F08 program
+program
+@after
+{
+   int next = LA(1);
+   if (next != ANTLR3_TOKEN_EOF) {
+      printf("ERROR return from program: LA(1)==\%d\n", next);
+   }
+}
+   :  program_unit+
+   ;
+
 program_unit
    :   main_program
    |   subroutine_subprogram
@@ -2937,8 +2944,8 @@ actual_arg
 function_subprogram
    :   function_stmt
         specification_part
-        ( execution_part )?
-        ( internal_subprogram_part )?
+        execution_part ?
+        internal_subprogram_part ?
         end_function_stmt
    ;
 
@@ -2956,11 +2963,11 @@ proc_language_binding_spec
 
 // R1227
 prefix
-   :  prefix_spec ( prefix_spec  )*
+   :   prefix_spec +
    ;
 
 t_prefix
-   :  t_prefix_spec ( t_prefix_spec  )*
+   :   t_prefix_spec +
    ;
 
 // R1226-F08
