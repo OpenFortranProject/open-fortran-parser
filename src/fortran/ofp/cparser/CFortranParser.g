@@ -5388,7 +5388,7 @@ program_stmt
              c_action_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_PROGRAM,$T_IDENT,$end_of_stmt.start);
           }
 
-   -> ^(OFPBeginStmt T_IDENT label?)
+   -> ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
    ;
 
 
@@ -5412,7 +5412,7 @@ end_program_stmt
              c_action_end_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,$T_PROGRAM,id,$end_of_stmt.start);
           }
 
-   -> ^(OFPEndStmt T_IDENT? label?)
+   -> ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
 
    |   lbl=label?  T_ENDPROGRAM     id=T_IDENT?  end_of_stmt
 
@@ -5420,7 +5420,7 @@ end_program_stmt
              c_action_end_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_ENDPROGRAM,NULL,id,$end_of_stmt.start);
           }
 
-   -> ^(OFPEndStmt T_IDENT? label?)
+   -> ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
 
    |   lbl=label?  T_END                         end_of_stmt
 
@@ -5428,7 +5428,7 @@ end_program_stmt
              c_action_end_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,NULL,NULL,$end_of_stmt.start);
           }
 
-   -> ^(OFPEndStmt label?)
+   -> ^(OFPEndStmt ^(OFPLabel label?))
 
    ;
 
