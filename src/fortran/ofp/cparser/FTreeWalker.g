@@ -1205,8 +1205,7 @@ volatile_stmt
 // R560-F08
 implicit_stmt
    :   // implicit none if OFPList is empty
-       ^(SgImplicitStatement ^(OFPList implicit_spec+) label?)
-   |   ^(SgImplicitStatement   OFPList                 label?)
+       ^(SgImplicitStatement ^(OFPLabel label?) ^(OFPList implicit_spec*))
    ;
 
 // R561-F08
@@ -2614,7 +2613,9 @@ program_unit
 main_program
    :   ^(SgProgramHeaderStatement program_stmt? end_program_stmt
            ^(SgFunctionDefinition 
-               ^(SgBasicBlock specification_part)
+               ^(SgBasicBlock
+                   specification_part
+                )
             )
         )
    ;
@@ -3011,11 +3012,12 @@ end_function_stmt
 
 // R1231
 subroutine_subprogram
-   :  ^(SgProcedureHeaderStatement subroutine_stmt end_subroutine_stmt
-          ^(SgFunctionDefinition 
-              ^(SgBasicBlock specification_part)
-           )
-       )
+   :   ^(SgProcedureHeaderStatement subroutine_stmt end_subroutine_stmt
+           ^(SgFunctionDefinition 
+               ^(SgBasicBlock specification_part
+                )
+            )
+        )
    ;
 
 // R1232
