@@ -6218,7 +6218,7 @@ subroutine_stmt
                c_action_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_SUBROUTINE,$T_IDENT,$end_of_stmt.start,hasPrefix, hasDummyArgList,hasBindingSpec,hasArgSpecifier);
             }
 
-   -> ^(OFPBeginStmt T_IDENT label?)
+   -> ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
 
    ;
 
@@ -6248,21 +6248,21 @@ end_subroutine_stmt
              c_action_end_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,$T_SUBROUTINE,id,$end_of_stmt.start);
           }
 
-   -> ^(OFPEndStmt T_IDENT? label?)
+   -> ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
 
    |   lbl=label?  T_ENDSUBROUTINE     id=T_IDENT?  end_of_stmt
           {
              c_action_end_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_ENDSUBROUTINE,NULL,id,$end_of_stmt.start);
           }
 
-   -> ^(OFPEndStmt T_IDENT? label?)
+   -> ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
 
    |   lbl=label?  T_END                            end_of_stmt
           {
              c_action_end_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,NULL,id,$end_of_stmt.start);
           }
 
-   -> ^(OFPEndStmt label?)
+   -> ^(OFPEndStmt ^(OFPLabel label?))
 
    ;
 
