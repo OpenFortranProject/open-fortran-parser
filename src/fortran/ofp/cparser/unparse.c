@@ -9,6 +9,11 @@
 
 #define PRINT_TREE   1
 
+// TODO - make this a method in Unparser
+void
+ofpUnparser_setOutStream(FILE * fp);
+
+static int      LA              (pANTLR3_COMMON_TREE_NODE_STREAM instream, int n);
 pUnparser       ofpUnparserNew  (pANTLR3_COMMON_TREE_NODE_STREAM instream);
 pANTLR3_VECTOR  get_tokens      (const char * token_file);
 
@@ -49,11 +54,15 @@ int main(int argc, char * argv[])
       nodes = antlr3CommonTreeNodeStreamNewTree(parser_ast_tree, ANTLR3_SIZE_HINT);
 
       tree_parser = ofpUnparserNew(nodes);
-      tree_parser->program_unit(tree_parser);
+
+      ofpUnparser_setOutStream(stdout);
+
+      /** unparse all of the program units
+       */
+      tree_parser->program(tree_parser);
 
       nodes       ->free(nodes);          nodes       = NULL;
       tree_parser ->free(tree_parser);    tree_parser = NULL;
-
    }
 
    parser->free(parser);                  parser = NULL;
@@ -61,10 +70,20 @@ int main(int argc, char * argv[])
    return 0;
 }
 
-pUnparser ofpUnparserNew (pANTLR3_COMMON_TREE_NODE_STREAM instream)
+pUnparser
+ofpUnparserNew (pANTLR3_COMMON_TREE_NODE_STREAM instream)
 {
    pOFP_TYPE_TABLE type_table = ofpTypeTableNew();
    ofpPushTypeTable(type_table);
 
    return UnparserNew(instream);
+}
+
+/**
+ * Return the current + i token in the stream
+ */
+static int
+LA (pANTLR3_COMMON_TREE_NODE_STREAM instream, int i)
+{
+   return instream->tnstream->istream->_LA(instream->tnstream->istream, i);
 }
