@@ -56,7 +56,7 @@ implicit_stmt
            printf("implicit_stmt rule: implicit none statement found\n");
       }
    :   // implicit none if OFPList is empty
-       ^(SgImplicitStatement ^(OFPList implicit_spec*) label?)
+       ^(SgImplicitStatement ^(OFPLabel label?) ^(OFPList implicit_spec*))
    ;
 
 
