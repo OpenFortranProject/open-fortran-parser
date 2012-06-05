@@ -2629,7 +2629,7 @@ ext_function_subprogram
 // R1102-F08 program-stmt
 //----------------------------------------------------------------------------------------
 program_stmt
-   :  ^(OFPBeginStmt T_IDENT label?)
+   :  ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
    ;
 
 
@@ -2637,7 +2637,7 @@ program_stmt
 // R1103-F08 end-program-stmt
 //----------------------------------------------------------------------------------------
 end_program_stmt
-   :  ^(OFPEndStmt T_IDENT? label?)
+   :  ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
    ;
 
 
@@ -3011,19 +3011,16 @@ end_function_stmt
 
 // R1231
 subroutine_subprogram
-   :   subroutine_stmt
-       specification_part
-       ( execution_part )?
-       ( internal_subprogram_part )?
-       end_subroutine_stmt
+   :  ^(SgProcedureHeaderStatement subroutine_stmt end_subroutine_stmt
+          ^(SgFunctionDefinition 
+              ^(SgBasicBlock specification_part)
+           )
+       )
    ;
 
 // R1232
 subroutine_stmt
-   :   label? (t_prefix )? T_SUBROUTINE 
-            T_IDENT ( T_LPAREN ( dummy_arg+ )? 
-            T_RPAREN ( proc_language_binding_spec )? 
-            )? end_of_stmt
+   :   ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
    ;
 
 // R1233
@@ -3034,9 +3031,7 @@ dummy_arg
 
 // R1234
 end_subroutine_stmt
-   :    label? T_END T_SUBROUTINE ( T_IDENT )?   end_of_stmt
-   |    label? T_ENDSUBROUTINE    ( T_IDENT )?   end_of_stmt
-   |    label? T_END                             end_of_stmt
+   :   ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
    ;
 
 // R1235
