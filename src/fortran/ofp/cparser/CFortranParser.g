@@ -1996,7 +1996,7 @@ language_binding_spec
              c_action_language_binding_spec($T_BIND, $T_IDENT, hasName);
           }
 
-//TODO   -> ^(OFPBind T_IDENT expr?)
+   -> ^(OFPBind T_IDENT expr?)
    ;
 
 // R510
@@ -2589,7 +2589,7 @@ implicit_stmt
              c_action_implicit_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_IMPLICIT,NULL,$end_of_stmt.start,ANTLR3_TRUE);
           }
 
-    -> ^(SgImplicitStatement implicit_spec_list label?)
+   -> ^(SgImplicitStatement ^(OFPLabel label?) implicit_spec_list)
 
    |   lbl=label?  T_IMPLICIT T_NONE               end_of_stmt
 
@@ -2597,7 +2597,7 @@ implicit_stmt
              c_action_implicit_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_IMPLICIT,$T_NONE,$end_of_stmt.start,ANTLR3_FALSE);
           }
 
-    -> ^(SgImplicitStatement OFPList label?)
+   -> ^(SgImplicitStatement ^(OFPLabel label?) OFPList)
    ;
 
 // R561-F08
@@ -5343,7 +5343,9 @@ main_program
 
    -> ^(SgProgramHeaderStatement program_stmt? end_program_stmt
           ^(SgFunctionDefinition 
-              ^(SgBasicBlock specification_part)
+              ^(SgBasicBlock
+                                specification_part
+               )
            )
        )
    ;
@@ -6183,7 +6185,8 @@ subroutine_subprogram
 
    -> ^(SgProcedureHeaderStatement subroutine_stmt end_subroutine_stmt
           ^(SgFunctionDefinition 
-              ^(SgBasicBlock specification_part)
+              ^(SgBasicBlock specification_part
+               )
            )
        )
    ;
