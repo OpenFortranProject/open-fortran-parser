@@ -13,7 +13,6 @@
 void
 ofpUnparser_setOutStream(FILE * fp);
 
-static int      LA              (pANTLR3_COMMON_TREE_NODE_STREAM instream, int n);
 pUnparser       ofpUnparserNew  (pANTLR3_COMMON_TREE_NODE_STREAM instream);
 pANTLR3_VECTOR  get_tokens      (const char * token_file);
 
@@ -79,6 +78,7 @@ ofpUnparserNew (pANTLR3_COMMON_TREE_NODE_STREAM instream)
    return UnparserNew(instream);
 }
 
+#ifdef PROBABLY_NOT_NEEDED
 /**
  * Return the current + i token in the stream
  */
@@ -87,3 +87,4 @@ LA (pANTLR3_COMMON_TREE_NODE_STREAM instream, int i)
 {
    return instream->tnstream->istream->_LA(instream->tnstream->istream, i);
 }
+#endif
