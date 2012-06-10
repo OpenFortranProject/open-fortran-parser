@@ -54,7 +54,7 @@ unparse(pANTLR3_BASE_TREE btn, ANTLR3_MARKER next)
          printf("unparse: node is nil\n");
          return;
       }
-      if (btn->getType(btn) == ANTLR3_TOKEN_DOWN || btn->getType(btn) == ANTLR3_TOKEN_DOWN) {
+      if (btn->getType(btn) == ANTLR3_TOKEN_DOWN || btn->getType(btn) == ANTLR3_TOKEN_UP) {
          printf("unparse: transition node type \%d found\n", btn->getType(btn));
          return;
       }
@@ -83,9 +83,9 @@ unparse(pANTLR3_BASE_TREE btn, ANTLR3_MARKER next)
  * Section/Clause 2: Fortran concepts
  */
 
-////////////
-// R204-F08
-//
+//========================================================================================
+// R204-F08 specification-part
+//----------------------------------------------------------------------------------------
 specification_part
    :   use_stmt* import_stmt* implicit_part_recursion declaration_construct*
    ;
@@ -1202,7 +1202,9 @@ volatile_stmt
             generic_name_list end_of_stmt
    ;
 
-// R560-F08
+//========================================================================================
+// R560-F08 implicit-stmt
+//----------------------------------------------------------------------------------------
 implicit_stmt
    :   // implicit none if OFPList is empty
        ^(SgImplicitStatement ^(OFPLabel label?) ^(OFPList implicit_spec*))
@@ -2614,7 +2616,7 @@ main_program
    :   ^(SgProgramHeaderStatement program_stmt? end_program_stmt
            ^(SgFunctionDefinition 
                ^(SgBasicBlock
-                   specification_part
+                  ^(OFPSpecificationPart       specification_part          )
                 )
             )
         )
@@ -3020,7 +3022,9 @@ subroutine_subprogram
         )
    ;
 
-// R1232
+//========================================================================================
+// R1234-F08 subroutine-stmt
+//----------------------------------------------------------------------------------------
 subroutine_stmt
    :   ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
    ;
@@ -3031,7 +3035,9 @@ dummy_arg
    |   T_ASTERISK  
    ;
 
-// R1234
+//========================================================================================
+// R1236-F08 end-subroutine-stmt
+//----------------------------------------------------------------------------------------
 end_subroutine_stmt
    :   ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
    ;
