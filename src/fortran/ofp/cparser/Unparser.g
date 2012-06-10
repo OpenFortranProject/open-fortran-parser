@@ -25,11 +25,12 @@ ofpUnparser_setOutStream(FILE * fp)
 }
 
 static void
-unparse_label(FILE * fp, pANTLR3_BASE_TREE tree)
+unparse_label(FILE * fp, pANTLR3_BASE_TREE ofpLabel)
 {
-   if (tree == NULL) return;
-   pANTLR3_COMMON_TOKEN label = tree->getToken(tree);
-   fprintf(fp, "\%s ", label->getText(label)->chars);
+   if (ofpLabel->getChildCount(ofpLabel) > 0) {
+      pANTLR3_BASE_TREE   label = ofpLabel->getChild(ofpLabel, 0);
+      fprintf(fp, "\%s ", label->getText(label)->chars);
+   }
 }
 
 static void
@@ -46,17 +47,69 @@ unparse_token(FILE * fp, pANTLR3_BASE_TREE tree)
    }
 }
 
+/**
+ * unparse_begin_stmt -> ^(OFPBeginStmt ^(OFPLable label?) name?)
+ */
+static void
+unparse_begin_stmt(FILE * fp, pANTLR3_BASE_TREE tree, const char * text)
+{
+   unparse_label(fp, tree->getChild(tree,0));
+   fprintf(fp, "\%s ", text);
+
+   if (tree->getChildCount(tree) > 1) {
+      pANTLR3_BASE_TREE   name = tree->getChild(tree, 1);
+      fprintf(fp, "\%s", name->getText(name)->chars);
+   }
+   fprintf(fp, "\n");
+}
+
+/**
+ * unparse_end_stmt -> ^(OFPEndStmt ^(OFPLable label?) name?)
+ */
+static void
+unparse_end_stmt(FILE * fp, pANTLR3_BASE_TREE tree, const char * text)
+{
+   pANTLR3_BASE_TREE name = tree->getChild(tree,1);
+
+   unparse_label(fp, tree->getChild(tree,0));
+
+   fprintf(fp, "End \%s \%s\n", text, name->getText(name)->chars);
+}
+
 } // end members
 
 
-// R560-F08
+//========================================================================================
+// R560-F08 implicit-stmt
+//----------------------------------------------------------------------------------------
 implicit_stmt
-@after
-      {
-           printf("implicit_stmt rule: implicit none statement found\n");
-      }
    :   // implicit none if OFPList is empty
        ^(SgImplicitStatement ^(OFPLabel label?) ^(OFPList implicit_spec*))
+          {
+             //unparse_label(out, $label.tree);
+             fprintf(out, "Implicit None");
+             fprintf(out, "\n");
+          }
+   ;
+
+
+//========================================================================================
+// R1101-F08 main-program
+//----------------------------------------------------------------------------------------
+main_program
+   :   ^(SgProgramHeaderStatement program_stmt? end_program_stmt
+                    {
+                       unparse_begin_stmt(out, $program_stmt.tree, "Program");
+                    }
+          ^(SgFunctionDefinition 
+               ^(SgBasicBlock
+                  ^(OFPSpecificationPart       specification_part          )
+                )
+            )
+                    {
+                       unparse_end_stmt(out, $end_program_stmt.tree, "Program");
+                    }
+        )
    ;
 
 
@@ -65,12 +118,6 @@ implicit_stmt
 //----------------------------------------------------------------------------------------
 program_stmt
    :  ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
-          {
-             unparse_label(out, $label.tree);
-             fprintf(out, "Program ");
-             unparse_token(out, $T_IDENT);
-             fprintf(out, "\n");
-          }
    ;
 
 
@@ -79,9 +126,30 @@ program_stmt
 //----------------------------------------------------------------------------------------
 end_program_stmt
    :  ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
+   ;
+
+
+//========================================================================================
+// R1234-F08 subroutine-stmt
+//----------------------------------------------------------------------------------------
+subroutine_stmt
+   :   ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
           {
-             unparse_label(out, $label.tree);
-             fprintf(out, "End Program ");
+             //unparse_label(out, $label.tree);
+             fprintf(out, "Subroutine ");
+             unparse_token(out, $T_IDENT);
+             fprintf(out, "\n");
+          }
+   ;
+
+//========================================================================================
+// R1236-F08 end-subroutine-stmt
+//----------------------------------------------------------------------------------------
+end_subroutine_stmt
+   :   ^(OFPEndStmt ^(OFPLabel label?) T_IDENT?)
+          {
+             //unparse_label(out, $label.tree);
+             fprintf(out, "End Subroutine ");
              unparse_token(out, $T_IDENT);
              fprintf(out, "\n");
           }
