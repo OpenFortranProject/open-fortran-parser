@@ -2578,7 +2578,9 @@ volatile_stmt
             {c_action_volatile_stmt(lbl,$T_VOLATILE,$end_of_stmt.start);}
    ;
 
-// R560-F08
+//========================================================================================
+// R560-F08 implicit-stmt
+//----------------------------------------------------------------------------------------
 implicit_stmt
 @after
 {
@@ -5344,7 +5346,7 @@ main_program
    -> ^(SgProgramHeaderStatement program_stmt? end_program_stmt
           ^(SgFunctionDefinition 
               ^(SgBasicBlock
-                                specification_part
+                  ^(OFPSpecificationPart       specification_part          )
                )
            )
        )
@@ -6107,15 +6109,25 @@ proc_language_binding_spec
 // C1240 (R1227) A prefix shall contain at most one of each prefix-spec
 // C1241 (R1227) A prefix shall not specify both ELEMENTAL AND RECURSIVE
 prefix
-@init{int specCount=1;}
-   :  prefix_spec ( prefix_spec {specCount++;} )*
-          {c_action_prefix(specCount);}
+@init
+{
+   int specCount = 1;
+}
+   :   ( prefix_spec {specCount++;} )+
+           {
+              c_action_prefix(specCount);
+           }
    ;
 
 t_prefix
-@init{int specCount=1;}
-   :  t_prefix_spec ( t_prefix_spec {specCount++;} )*
-           {c_action_t_prefix(specCount);}
+@init
+{
+   int specCount = 1;
+}
+   :   ( t_prefix_spec {specCount++;} )+
+           {
+              c_action_t_prefix(specCount);
+           }
    ;
 
 // R1226-F08
@@ -6191,7 +6203,9 @@ subroutine_subprogram
        )
    ;
 
-// R1232
+//========================================================================================
+// R1234-F08 subroutine-stmt
+//----------------------------------------------------------------------------------------
 subroutine_stmt
 @init
 {
@@ -6234,13 +6248,20 @@ options{greedy=false; memoize=false;}
    ;
 
 dummy_arg_list
-@init{ int count=0;}
-   :       {c_action_dummy_arg_list__begin();}
-        dummy_arg {count++;} ( T_COMMA dummy_arg {count++;} )*
-            {c_action_dummy_arg_list(count);}
+@init
+{
+   int count = 0;
+   c_action_dummy_arg_list__begin();
+}
+   :   dummy_arg {count++;} ( T_COMMA dummy_arg {count++;} )*
+          {
+             c_action_dummy_arg_list(count);
+          }
    ;
 
-// R1234
+//========================================================================================
+// R1236-F08 end-subroutine-stmt
+//----------------------------------------------------------------------------------------
 end_subroutine_stmt
 @after
 {
@@ -6473,6 +6494,8 @@ specification_part
            {
               c_action_specification_part(numUseStmts,numImportStmts,gCount1,gCount2);
            }
+
+   ->  use_stmt* import_stmt* implicit_part_recursion declaration_construct*
    ;
 
 ////////////
