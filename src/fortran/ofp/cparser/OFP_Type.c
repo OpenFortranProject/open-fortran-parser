@@ -30,7 +30,7 @@ ofpPushTypeTable(pOFP_TYPE_TABLE table)
 static void
 ofpPutIntrinsicType(struct OFP_TYPE_TABLE_struct * table, pANTLR3_BASE_TREE tree)
 {
-   printf("ofpPutIntrinsicType: type==%d\n", tree->getType(tree));
+   // printf("ofpPutIntrinsicType: type==%d\n", tree->getType(tree));
 }
 
 static void
