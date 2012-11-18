@@ -11,8 +11,12 @@ options {
 
 #include  "OFP_Type.h"
 
-static      pANTLR3_VECTOR      tlist;
-static      ANTLR3_MARKER       next_token;
+//static      pANTLR3_VECTOR      tlist;
+//static      ANTLR3_MARKER       next_token;
+
+      pANTLR3_VECTOR      tlist;
+      ANTLR3_MARKER       next_token;
+
 
 void FTreeWalker_set_tokens(pANTLR3_VECTOR lexer_tlist)
    {
@@ -87,7 +91,12 @@ unparse(pANTLR3_BASE_TREE btn, ANTLR3_MARKER next)
 // R204-F08 specification-part
 //----------------------------------------------------------------------------------------
 specification_part
-   :   use_stmt* import_stmt* implicit_part_recursion declaration_construct*
+   :  ^(OFPSpecificationPart
+          ^(OFPUseStmtList               use_stmt*                 )
+                                         import_stmt*
+                                         implicit_part_recursion
+          ^(OFPDeclarationConstructList  declaration_construct*    )
+       )
    ;
 
 ////////////
@@ -330,7 +339,9 @@ type_param_value
    |   T_COLON
    ;
 
-// R404
+//========================================================================================
+// R404-F08 intrinsic-type-spec
+//----------------------------------------------------------------------------------------
 intrinsic_type_spec
 @after
 {
@@ -789,9 +800,15 @@ scalar_int_variable
  */
 
 
-// R501
+//========================================================================================
+// R501-F08 type-declaration-stmt
+//----------------------------------------------------------------------------------------
 type_declaration_stmt
-   :   ^(SgVariableDeclaration declaration_type_spec entity_decl+ label?)
+   :   ^(SgVariableDeclaration ^(OFPLabel label?)
+          declaration_type_spec
+          ^(OFPAttrSpec attr_spec*  )
+          ^(OFPList entity_decl+)
+        )
    ;
 
 // R502
@@ -809,36 +826,18 @@ declaration_type_spec
 // R502-F08, R503-F03
 //
 attr_spec
-   :   access_spec
-   |   T_ALLOCATABLE
-   |   T_ASYNCHRONOUS
-   |   T_CODIMENSION T_LBRACKET coarray_spec T_RBRACKET  // NEW_TO_2008
-   |   T_CONTIGUOUS                                      // NEW_TO_2008
-   |   T_DIMENSION T_LPAREN array_spec T_RPAREN
-   |   T_EXTERNAL
-   |   T_INTENT T_LPAREN intent_spec T_RPAREN
-   |   T_INTRINSIC
-   |   language_binding_spec        
-   |   T_OPTIONAL
-   |   T_PARAMETER
-   |   T_POINTER
-   |   T_PROTECTED
-   |   T_SAVE
-   |   T_TARGET
-   |   T_VALUE
-   |   T_VOLATILE
-   |   T_KIND
-   |   T_LEN
-   |   attr_spec_extension
+   :   intent_spec
+   |   OFPOptional
+   |   OFPUnimplemented
    ;
     
 // language extension point
 attr_spec_extension : T_NO_LANGUAGE_EXTENSION ;
 
 
-////////////
-// R503-F08, R504-F03
-//
+//========================================================================================
+// R503-F08 entity-decl
+//----------------------------------------------------------------------------------------
 entity_decl
 //   :   T_IDENT ( T_LPAREN array_spec T_RPAREN  )?
 //               ( T_LBRACKET coarray_spec T_RBRACKET  )?
@@ -918,10 +917,9 @@ explicit_shape_spec_list
 
 // R517
 intent_spec
-   :   T_IN        
-   |   T_OUT       
-   |   T_IN T_OUT  
-   |   T_INOUT
+   :   OFPIntentIn
+   |   OFPIntentOut
+   |   OFPIntentInOut
    ;
 
 // R518
@@ -2605,6 +2603,7 @@ program
 
 program_unit
    :   main_program
+   |   module
    |   subroutine_subprogram
    |   ext_function_subprogram
    ;
@@ -2632,7 +2631,7 @@ ext_function_subprogram
 // R1102-F08 program-stmt
 //----------------------------------------------------------------------------------------
 program_stmt
-   :  ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
+   :  ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT ^(OFPCommentList OFPComment*))
    ;
 
 
@@ -2648,18 +2647,20 @@ end_program_stmt
 // R1104-F08 module
 //----------------------------------------------------------------------------------------
 module
-   :   module_stmt
-       specification_part
-       ( module_subprogram_part )?
-       end_module_stmt
+   :  ^(SgModuleStatement module_stmt end_module_stmt
+          ^(SgBasicBlock
+              specification_part
+          // TODO - ( module_subprogram_part )?
+           )
+       )
    ;
 
 //========================================================================================
 // R1105-F08 module-stmt
 //----------------------------------------------------------------------------------------
 module_stmt
-   :   label?
-       T_MODULE  ( T_IDENT  )?   end_of_stmt
+   :  ^(OFPBeginStmt  ^(OFPLabel label?)  T_IDENT )
+      ^(SgInitializedName                 T_IDENT )
    ;
 
 
@@ -2667,12 +2668,7 @@ module_stmt
 // R1106-F08 end-program-stmt
 //----------------------------------------------------------------------------------------
 end_module_stmt
-   :   label?
-       T_END  T_MODULE   (T_IDENT )?  end_of_stmt
-   |   label?
-       T_ENDMODULE       (T_IDENT )?  end_of_stmt
-   |   label?
-       T_END                          end_of_stmt
+   :   ^(OFPEndStmt ^(OFPLabel label?) T_IDENT? )
    ;
 
 
@@ -2697,15 +2693,13 @@ module_subprogram
 
 // R1109
 use_stmt
-   :    label? T_USE 
-            ( (T_COMMA module_nature )? 
-            T_COLON_COLON )? T_IDENT ( T_COMMA 
-            fortran_rename+ )? end_of_stmt
-   |    label? T_USE 
-            ( ( T_COMMA module_nature )? 
-            T_COLON_COLON )? T_IDENT T_COMMA T_ONLY T_COLON ( only+ )? 
-            end_of_stmt
+   : ^(OFPUseStmt ^(OFPLabel label?) ^(SgInitializedName T_IDENT)
+          ^(OFPModuleNature module_nature  ?)
+          ^(OFPRenameList   fortran_rename *)
+          ^(OFPOnlyList     only           *)
+      )
    ;
+   
 
 // R1110
 module_nature
@@ -2811,28 +2805,24 @@ interface_specification
    |   procedure_stmt
    ;
 
-// R1203
+//========================================================================================
+// R1203-F08 interface-stmt
+//----------------------------------------------------------------------------------------
 interface_stmt
-   :       
-        label? T_INTERFACE ( generic_spec 
-            )? end_of_stmt
-            
-   |   label? T_ABSTRACT T_INTERFACE end_of_stmt
-            
+   :   ^(OFPInterfaceStmt ^(OFPLabel label?) ^(OFPGenericSpec generic_spec?))
    ;
 
-// R1204
+//========================================================================================
+// R1204-F08 end-interface-stmt
+//----------------------------------------------------------------------------------------
 end_interface_stmt
-   : label? T_END T_INTERFACE ( generic_spec 
-            )? end_of_stmt
-   | label? T_ENDINTERFACE    ( generic_spec 
-            )? end_of_stmt
+   :   ^(OFPEndInterfaceStmt ^(OFPLabel label?) ^(OFPGenericSpec generic_spec?))
    ;
 
 // R1205
 interface_body
-   :   (prefix)? function_stmt specification_part end_function_stmt
-   |   subroutine_stmt specification_part end_subroutine_stmt
+   :   ^(SgFunctionDeclaration subroutine_stmt end_subroutine_stmt specification_part)
+   |     OFPUnimplemented
    ;
 
 // R1206
@@ -2841,12 +2831,12 @@ procedure_stmt
             T_PROCEDURE generic_name_list end_of_stmt
    ;
 
-// R1207
+//========================================================================================
+// R1207-F08 generic_spec
+//----------------------------------------------------------------------------------------
 generic_spec
-   :   T_IDENT
-   |   T_OPERATOR T_LPAREN defined_operator T_RPAREN
-   |   T_ASSIGNMENT T_LPAREN T_EQUALS T_RPAREN
-   |   defined_io_generic_spec
+   :   ^(SgInitializedName T_IDENT)
+   |     OFPUnimplemented
    ;
 
 // R1208
@@ -3026,7 +3016,11 @@ subroutine_subprogram
 // R1234-F08 subroutine-stmt
 //----------------------------------------------------------------------------------------
 subroutine_stmt
-   :   ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
+   :   ^(OFPBeginStmt  ^(OFPLabel label?)  T_IDENT                      )
+       ^(SgInitializedName                 T_IDENT                      )
+       ^(SgFunctionParameterList           dummy_arg *                  )
+       ^(OFPPrefixList                     t_prefix ?                   )
+       ^(OFPSuffix                         proc_language_binding_spec ? )
    ;
 
 // R1233
