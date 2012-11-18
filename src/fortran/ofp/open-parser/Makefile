@@ -16,13 +16,11 @@ LIBS = -L$(ANTLR_ROOT)/lib -lantlr3c -lATerm
 
 GEN_SRC_FILES = FortranTokenLexer.c  FortranTokenParser.c         \
                 FortranParser.c      FTreeWalker.c                \
-                ATermGen.c           ATermGen_FTreeWalker.c       \
-                traversal.c
+                ATermGen.c           ATermGen_FTreeWalker.c
 
 GEN_HDR_FILES = FortranTokenLexer.h  FortranTokenParser.h         \
                 FortranParser.h      FTreeWalker.h                \
-                ATermGen.h           ATermGen_FTreeWalker.h       \
-                traversal.h
+                ATermGen.h           ATermGen_FTreeWalker.h
 
 OBJS = OFPFrontEnd.o OFP_Type.o support.o ftoken-parser.o \
        FortranTokenLexer.o FortranTokenParser.o \
