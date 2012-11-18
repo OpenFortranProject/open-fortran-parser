@@ -7,6 +7,8 @@
 13 End Program TestParser
 
 subroutine foo
+!  interface
+!  end interface
 end subroutine
 
 subroutine bar() BIND(C)
