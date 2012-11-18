@@ -21,14 +21,30 @@ options {
 tokens {
    // Imaginary nodes for intermediate processing
    //
+   OFPAttrSpec;
    OFPBind;
-   OFPExecutionPart;
+   OFPComment;
+   OFPCommentList;
+   OFPDeclarationConstructList;
+   OFPGenericSpec;
+   OFPIntentIn;
+   OFPIntentInOut;
+   OFPIntentOut;
    OFPInternalSubProgramPart;
+   OFPInterfaceStmt;
+   OFPEndInterfaceStmt;
    OFPLabel;
    OFPList;
+   OFPModuleNature;
+   OFPOnlyList;
+   OFPOptional;
    OFPPrefixList;
+   OFPRenameList;
    OFPSpecificationPart;
    OFPSuffix;
+   OFPUnimplemented;
+   OFPUseStmt;
+   OFPUseStmtList;
 
    OFPBeginStmt;
    OFPEndStmt;
@@ -39,7 +55,7 @@ tokens {
 
 //   OFPFunctionSubprogram;
 //   OFPSubroutineSubprogram;
-   OFPModule;
+//   OFPModule;
    OFPSubmodule;
    OFPBlockData;
 
@@ -55,6 +71,7 @@ tokens {
 
    SgFunctionParameterList;
    SgFunctionDefinition;
+   SgFunctionDeclaration;
    SgInitializedName;
 
    SgImplicitStatement;
@@ -763,10 +780,13 @@ declaration_type_spec
 
 // inlined scalar_expr
 
-// R404-F08
+//========================================================================================
+// R404-F08 intrinsic-type-spec
+//
 // Nonstandard Extension: source BLAS
 //  |   T_DOUBLE T_COMPLEX
 //  |   T_DOUBLECOMPLEX
+//----------------------------------------------------------------------------------------
 intrinsic_type_spec
 @init{ANTLR3_BOOLEAN hasKindSelector = ANTLR3_FALSE;}
    :   T_INTEGER (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
@@ -1835,46 +1855,67 @@ scalar_int_variable
 attr_spec
    :   access_spec
            {c_action_attr_spec(NULL, IActionEnums_ AttrSpec_access);}
+   -> OFPUnimplemented
    |   T_ALLOCATABLE
            {c_action_attr_spec($T_ALLOCATABLE, IActionEnums_ AttrSpec_ALLOCATABLE);}
+   -> OFPUnimplemented
    |   T_ASYNCHRONOUS
            {c_action_attr_spec($T_ASYNCHRONOUS, IActionEnums_ AttrSpec_ASYNCHRONOUS);}
+   -> OFPUnimplemented
    |   T_CODIMENSION T_LBRACKET coarray_spec T_RBRACKET  // NEW_TO_2008
            {c_action_attr_spec($T_CODIMENSION, IActionEnums_ AttrSpec_CODIMENSION);}
+   -> OFPUnimplemented
    |   T_CONTIGUOUS                                      // NEW_TO_2008
            {c_action_attr_spec($T_CONTIGUOUS, IActionEnums_ AttrSpec_CONTIGUOUS);}
+   -> OFPUnimplemented
    |   T_DIMENSION T_LPAREN array_spec T_RPAREN
            {c_action_attr_spec($T_DIMENSION, IActionEnums_ AttrSpec_DIMENSION);}
+   -> OFPUnimplemented
    |   T_EXTERNAL
            {c_action_attr_spec($T_EXTERNAL, IActionEnums_ AttrSpec_EXTERNAL);}
+   -> OFPUnimplemented
    |   T_INTENT T_LPAREN intent_spec T_RPAREN
            {c_action_attr_spec($T_INTENT, IActionEnums_ AttrSpec_INTENT);}
+   -> intent_spec
    |   T_INTRINSIC
            {c_action_attr_spec($T_INTRINSIC, IActionEnums_ AttrSpec_INTRINSIC);}
+   -> OFPUnimplemented
    |   language_binding_spec        
            {c_action_attr_spec(NULL, IActionEnums_ AttrSpec_language_binding);}
+   -> OFPUnimplemented
    |   T_OPTIONAL
            {c_action_attr_spec($T_OPTIONAL, IActionEnums_ AttrSpec_OPTIONAL);}
+   -> OFPOptional
    |   T_PARAMETER
            {c_action_attr_spec($T_PARAMETER, IActionEnums_ AttrSpec_PARAMETER);}
+   -> OFPUnimplemented
    |   T_POINTER
            {c_action_attr_spec($T_POINTER, IActionEnums_ AttrSpec_POINTER);}
+   -> OFPUnimplemented
    |   T_PROTECTED
            {c_action_attr_spec($T_PROTECTED, IActionEnums_ AttrSpec_PROTECTED);}
+   -> OFPUnimplemented
    |   T_SAVE
            {c_action_attr_spec($T_SAVE, IActionEnums_ AttrSpec_SAVE);}
+   -> OFPUnimplemented
    |   T_TARGET
            {c_action_attr_spec($T_TARGET, IActionEnums_ AttrSpec_TARGET);}
+   -> OFPUnimplemented
    |   T_VALUE
            {c_action_attr_spec($T_VALUE, IActionEnums_ AttrSpec_VALUE);}
+   -> OFPUnimplemented
    |   T_VOLATILE
            {c_action_attr_spec($T_VOLATILE, IActionEnums_ AttrSpec_VOLATILE);}
 // TODO are T_KIND and T_LEN correct?
+   -> OFPUnimplemented
    |   T_KIND
            {c_action_attr_spec($T_KIND, IActionEnums_ AttrSpec_KIND);}
+   -> OFPUnimplemented
    |   T_LEN
            {c_action_attr_spec($T_LEN, IActionEnums_ AttrSpec_LEN);}
+   -> OFPUnimplemented
    |   attr_spec_extension
+   -> OFPUnimplemented
    ;
     
 // language extension point
@@ -2074,12 +2115,16 @@ explicit_shape_spec_list
 intent_spec
    :   T_IN        { c_action_intent_spec($T_IN, NULL, 
                 IActionEnums_ IntentSpec_IN); }
+   -> OFPIntentIn
    |   T_OUT       { c_action_intent_spec($T_OUT, NULL, 
                 IActionEnums_ IntentSpec_OUT); }
+   -> OFPIntentOut
    |   T_IN T_OUT  { c_action_intent_spec($T_IN, $T_OUT, 
                 IActionEnums_ IntentSpec_INOUT); }
+   -> OFPIntentInOut
    |   T_INOUT     { c_action_intent_spec($T_INOUT, NULL, 
                 IActionEnums_ IntentSpec_INOUT); }
+   -> OFPIntentInOut
    ;
 
 // R518
@@ -5335,7 +5380,7 @@ main_program
 {
    c_action_main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart);
 }
-   :   ( program_stmt {hasProgramStmt = ANTLR3_FALSE;} )?
+   :   ( program_stmt {hasProgramStmt = ANTLR3_TRUE} )?
 
        specification_part
        ( execution_part {hasExecutionPart = ANTLR3_TRUE;} )?
@@ -5346,7 +5391,7 @@ main_program
    -> ^(SgProgramHeaderStatement program_stmt? end_program_stmt
           ^(SgFunctionDefinition 
               ^(SgBasicBlock
-                  ^(OFPSpecificationPart       specification_part          )
+                  ^(OFPSpecificationPart  specification_part )
                )
            )
        )
@@ -5392,7 +5437,7 @@ program_stmt
              c_action_program_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_PROGRAM,$T_IDENT,$end_of_stmt.start);
           }
 
-   -> ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
+   -> ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT ^(OFPCommentList))
    ;
 
 
@@ -5458,6 +5503,13 @@ module
        specification_part
        ( module_subprogram_part )?
        end_module_stmt
+
+   -> ^(SgModuleStatement module_stmt end_module_stmt
+          ^(SgBasicBlock
+              specification_part
+          // TODO - ( module_subprogram_part )?
+           )
+       )
    ;
 
 //========================================================================================
@@ -5470,61 +5522,58 @@ module
 module_stmt
 @init
 {
-   pANTLR3_COMMON_TOKEN  lbl = NULL;
-   pANTLR3_COMMON_TOKEN  id  = NULL;
    c_action_module_stmt__begin();
 }
 @after
 {
    checkForInclude();
 }
-   :   (label {lbl=$label.start;})?
-       T_MODULE!  ( T_IDENT {id=$T_IDENT;} )?   end_of_stmt
+   :   lbl=label?  T_MODULE  id=T_IDENT  end_of_stmt
 
            {
-              c_action_module_stmt(lbl, $T_MODULE, id, $end_of_stmt.start);
+              c_action_module_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_MODULE,id,$end_of_stmt.start);
            }
 
+   -> ^(OFPBeginStmt  ^(OFPLabel label?)  T_IDENT )
+      ^(SgInitializedName                 T_IDENT )
    ;
 
 
 //========================================================================================
 //
-/* R1106-F08 end-program-stmt
+/* R1106-F08 end-module-stmt
  *   is  END [ MODULE [ module-name ] ]
  */
 //
 //----------------------------------------------------------------------------------------
 end_module_stmt
-@init
-{
-   pANTLR3_COMMON_TOKEN  lbl = NULL;
-   pANTLR3_COMMON_TOKEN  id  = NULL;
-}
 @after
 {
    checkForInclude();
 }
-   :   (label {lbl=$label.start;})?
-       T_END!  T_MODULE!  (T_IDENT {id=$T_IDENT;})?  end_of_stmt
+   :   lbl=label?  T_END  T_MODULE  id=T_IDENT?  end_of_stmt
 
            {
-              c_action_end_module_stmt(lbl, $T_END, $T_MODULE, id, $end_of_stmt.start);
+              c_action_end_module_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,$T_MODULE,id,$end_of_stmt.start);
            }
 
-   |   (label {lbl=$label.start;})?
-       T_ENDMODULE!       (T_IDENT {id=$T_IDENT;})?  end_of_stmt
+   -> ^(OFPEndStmt ^(OFPLabel label?) T_IDENT? )
+
+   |   lbl=label?  T_ENDMODULE      id=T_IDENT?  end_of_stmt
 
            {
-              c_action_end_module_stmt(lbl, $T_ENDMODULE, NULL, id, $end_of_stmt.start);
+              c_action_end_module_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_ENDMODULE,NULL,id,$end_of_stmt.start);
            }
 
-   |   (label {lbl=$label.start;})?
-       T_END                                         end_of_stmt
+   -> ^(OFPEndStmt ^(OFPLabel label?) T_IDENT? )
+
+   |   lbl=label?  T_END                         end_of_stmt
 
            {
-              c_action_end_module_stmt(lbl, $T_END, NULL, id, $end_of_stmt.start);
+              c_action_end_module_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_END,NULL,id,$end_of_stmt.start);
            }
+
+   -> ^(OFPEndStmt ^(OFPLabel label?) )
 
    ;
 
@@ -5569,24 +5618,43 @@ module_subprogram
 
 // R1109
 use_stmt
-@init {
-    pANTLR3_COMMON_TOKEN lbl=NULL; 
+@init
+{
     ANTLR3_BOOLEAN hasModuleNature=ANTLR3_FALSE; 
     ANTLR3_BOOLEAN hasRenameList=ANTLR3_FALSE;
 }
-@after{checkForInclude();}
-   :    (label {lbl=$label.start;})? T_USE 
-            ( (T_COMMA module_nature {hasModuleNature=ANTLR3_TRUE;})? 
-            T_COLON_COLON )? T_IDENT ( T_COMMA 
-            rename_list {hasRenameList=ANTLR3_TRUE;})? end_of_stmt
-            {c_action_use_stmt(lbl, $T_USE, $T_IDENT, NULL, $end_of_stmt.start, 
-                             hasModuleNature, hasRenameList, ANTLR3_FALSE);}
-   |    (label {lbl=$label.start;})? T_USE 
-            ( ( T_COMMA module_nature {hasModuleNature=ANTLR3_TRUE;})? 
-            T_COLON_COLON )? T_IDENT T_COMMA T_ONLY T_COLON ( only_list )? 
-            end_of_stmt
-            {c_action_use_stmt(lbl, $T_USE, $T_IDENT, $T_ONLY, $end_of_stmt.start, 
-                             hasModuleNature,hasRenameList,ANTLR3_TRUE);}
+@after
+{
+   checkForInclude();
+}
+   :   lbl=label?
+       T_USE   ( (T_COMMA module_nature {hasModuleNature=ANTLR3_TRUE;})? T_COLON_COLON )?
+       T_IDENT (  T_COMMA rename_list   {hasRenameList=ANTLR3_TRUE;})?   end_of_stmt
+
+            {
+               c_action_use_stmt(lbl,$T_USE,$T_IDENT,NULL,$end_of_stmt.start,hasModuleNature,hasRenameList,ANTLR3_FALSE);
+            }
+
+   -> ^(OFPUseStmt ^(OFPLabel label?) ^(SgInitializedName T_IDENT)
+           ^(OFPModuleNature module_nature?)
+           ^(OFPRenameList   rename_list  ?)
+             OFPOnlyList
+       )
+
+   |   lbl=label?
+       T_USE   ( ( T_COMMA module_nature {hasModuleNature=ANTLR3_TRUE;})? T_COLON_COLON )?
+       T_IDENT     T_COMMA T_ONLY T_COLON  only_list?                     end_of_stmt
+
+            {
+               c_action_use_stmt(lbl,$T_USE,$T_IDENT,$T_ONLY,$end_of_stmt.start,hasModuleNature,hasRenameList,ANTLR3_TRUE);
+            }
+
+   -> ^(OFPUseStmt ^(OFPLabel label?) ^(SgInitializedName T_IDENT)
+           ^(OFPModuleNature module_nature?)
+             OFPRenameList
+           ^(OFPOnlyList     only_list    ?)
+       )
+
    ;
 
 // R1110
@@ -5651,10 +5719,15 @@ only
    ;
 
 only_list
-@init{ int count=0;}
-   :       {c_action_only_list__begin();}
-        only {count++;} ( T_COMMA only {count++;} )*
+@init
+{
+   int count=0;
+   c_action_only_list__begin();
+}
+   :   only {count++;} ( T_COMMA only {count++;} )*
             {c_action_only_list(count);}
+
+   -> only+
    ;
 
 // R1113 only_use_name was use_name inlined as T_IDENT
@@ -5811,43 +5884,92 @@ interface_specification
    |   procedure_stmt
    ;
 
-// R1203 Note that the last argument to the action specifies whether this
-// is an abstract interface or not.
+//========================================================================================
+//
+/* R1203-F08 interface-stmt
+ *   is  INTERFACE [ generic-spec ]
+ */
+//
+//----------------------------------------------------------------------------------------
 interface_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasGenericSpec=ANTLR3_FALSE;}
-@after{checkForInclude();}
-   :       {c_action_interface_stmt__begin();}
-        (label {lbl=$label.start;})? T_INTERFACE ( generic_spec 
-            {hasGenericSpec=ANTLR3_TRUE;})? end_of_stmt
-            {c_action_interface_stmt(lbl, NULL, $T_INTERFACE, $end_of_stmt.start, 
-                                   hasGenericSpec);}
-   |   (label {lbl=$label.start;})? T_ABSTRACT T_INTERFACE end_of_stmt
-            {c_action_interface_stmt(lbl, $T_ABSTRACT, $T_INTERFACE, 
-                                   $end_of_stmt.start, hasGenericSpec);}
+@init
+{
+   c_action_interface_stmt__begin();
+   ANTLR3_BOOLEAN hasGenericSpec = ANTLR3_FALSE;
+}
+@after
+{
+   checkForInclude();
+}
+   :   lbl=label?
+       T_INTERFACE ( generic_spec {hasGenericSpec=ANTLR3_TRUE;} )?  end_of_stmt
+
+           {
+              c_action_interface_stmt(lbl,NULL,$T_INTERFACE,$end_of_stmt.start,hasGenericSpec);
+           }
+
+   -> ^(OFPInterfaceStmt ^(OFPLabel label?) ^(OFPGenericSpec generic_spec?))
+
+   |   lbl=label?
+       T_ABSTRACT T_INTERFACE                                       end_of_stmt
+           {
+              c_action_interface_stmt(lbl,$T_ABSTRACT,$T_INTERFACE,$end_of_stmt.start,hasGenericSpec);
+           }
+
+   -> ^(OFPInterfaceStmt ^(OFPLabel label?)   OFPGenericSpec )
+
    ;
 
-// R1204
+//========================================================================================
+//
+/* R1204-F08 end-interface-stmt
+ *   is  END INTERFACE [ generic-spec ]
+ */
+//
+//----------------------------------------------------------------------------------------
 end_interface_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL; ANTLR3_BOOLEAN hasGenericSpec=ANTLR3_FALSE;}
-@after{checkForInclude();}
-   : (label {lbl=$label.start;})? T_END T_INTERFACE ( generic_spec 
-            {hasGenericSpec=ANTLR3_TRUE;})? end_of_stmt
-            {c_action_end_interface_stmt(lbl, $T_END, $T_INTERFACE, 
-                $end_of_stmt.start, hasGenericSpec);}
-   | (label {lbl=$label.start;})? T_ENDINTERFACE    ( generic_spec 
-            {hasGenericSpec=ANTLR3_TRUE;})? end_of_stmt
-            {c_action_end_interface_stmt(lbl, $T_ENDINTERFACE, NULL, 
-                $end_of_stmt.start, hasGenericSpec);}
+@init
+{
+   ANTLR3_BOOLEAN hasGenericSpec=ANTLR3_FALSE;
+}
+@after
+{
+   checkForInclude();
+}
+   :   lbl=label?
+       T_END T_INTERFACE ( generic_spec {hasGenericSpec=ANTLR3_TRUE;} )?  end_of_stmt
+
+           {
+              c_action_end_interface_stmt(lbl,$T_END,$T_INTERFACE,$end_of_stmt.start,hasGenericSpec);
+           }
+
+   -> ^(OFPEndInterfaceStmt ^(OFPLabel label?) ^(OFPGenericSpec generic_spec?))
+
+   |   lbl=label?
+       T_ENDINTERFACE    ( generic_spec {hasGenericSpec=ANTLR3_TRUE;} )?  end_of_stmt
+
+           {
+              c_action_end_interface_stmt(lbl,$T_ENDINTERFACE,NULL,$end_of_stmt.start,hasGenericSpec);
+           }
+
+   -> ^(OFPEndInterfaceStmt ^(OFPLabel label?) ^(OFPGenericSpec generic_spec?))
+
    ;
 
 // R1205
 // specification_part made non-optional to remove END ambiguity (as can 
 // be empty)
 interface_body
-   :   (prefix)? function_stmt specification_part end_function_stmt
+   :   prefix? function_stmt specification_part end_function_stmt
             { c_action_interface_body(ANTLR3_TRUE); /* true for hasPrefix */ }
+
+   -> OFPUnimplemented
+
    |   subroutine_stmt specification_part end_subroutine_stmt
             { c_action_interface_body(ANTLR3_FALSE); /* false for hasPrefix */ }
+
+   -> ^(SgFunctionDeclaration subroutine_stmt end_subroutine_stmt specification_part)
+
    ;
 
 // R1206
@@ -5865,17 +5987,37 @@ procedure_stmt
 // T_IDENT inlined for generic_name
 generic_spec
    :   T_IDENT
-            {c_action_generic_spec(NULL, $T_IDENT, 
-                                 IActionEnums_ GenericSpec_generic_name);}
+
+           {
+              c_action_generic_spec(NULL,$T_IDENT,IActionEnums_ GenericSpec_generic_name);
+           }
+
+   -> ^(SgInitializedName T_IDENT)
+
    |   T_OPERATOR T_LPAREN defined_operator T_RPAREN
-            {c_action_generic_spec($T_OPERATOR, NULL, 
-                                 IActionEnums_ GenericSpec_OPERATOR);}
+
+           {
+              c_action_generic_spec($T_OPERATOR,NULL,IActionEnums_ GenericSpec_OPERATOR);
+           }
+
+   -> OFPUnimplemented
+
    |   T_ASSIGNMENT T_LPAREN T_EQUALS T_RPAREN
-            {c_action_generic_spec($T_ASSIGNMENT, NULL, 
-                                 IActionEnums_ GenericSpec_ASSIGNMENT);}
+
+           {
+              c_action_generic_spec($T_ASSIGNMENT,NULL,IActionEnums_ GenericSpec_ASSIGNMENT);
+           }
+
+   -> OFPUnimplemented
+
    |   defined_io_generic_spec
-            { c_action_generic_spec(NULL, NULL, 
-                IActionEnums_ GenericSpec_dtio_generic_spec); }
+
+           {
+              c_action_generic_spec(NULL,NULL,IActionEnums_ GenericSpec_dtio_generic_spec);
+           }
+
+   -> OFPUnimplemented
+
    ;
 
 // R1208
@@ -6235,8 +6377,11 @@ subroutine_stmt
                c_action_subroutine_stmt((lbl.tree==NULL)?NULL:lbl.start,$T_SUBROUTINE,$T_IDENT,$end_of_stmt.start,hasPrefix, hasDummyArgList,hasBindingSpec,hasArgSpecifier);
             }
 
-   -> ^(OFPBeginStmt ^(OFPLabel label?) T_IDENT)
-
+   -> ^(OFPBeginStmt  ^(OFPLabel label?)  T_IDENT                      )
+      ^(SgInitializedName                 T_IDENT                      )
+      ^(SgFunctionParameterList           dummy_arg_list *             )
+      ^(OFPPrefixList                     t_prefix ?                   )
+      ^(OFPSuffix                         proc_language_binding_spec ? )
    ;
 
 // R1233
@@ -6257,6 +6402,8 @@ dummy_arg_list
           {
              c_action_dummy_arg_list(count);
           }
+
+   -> dummy_arg +
    ;
 
 //========================================================================================
@@ -6487,6 +6634,10 @@ specification_part
    gCount1=0;
    gCount2=0;
 }
+@after
+{
+   printf("parser:specification_part=====\n");
+}
    :   ( use_stmt               {numUseStmts++;}    )*
        ( import_stmt            {numImportStmts++;} )*
        implicit_part_recursion             // making nonoptional with predicates fixes ambiguity
@@ -6495,7 +6646,12 @@ specification_part
               c_action_specification_part(numUseStmts,numImportStmts,gCount1,gCount2);
            }
 
-   ->  use_stmt* import_stmt* implicit_part_recursion declaration_construct*
+   ->  ^(OFPSpecificationPart
+           ^(OFPUseStmtList               use_stmt*                 )
+                                          import_stmt*
+                                          implicit_part_recursion
+           ^(OFPDeclarationConstructList  declaration_construct*    )
+        )
    ;
 
 ////////////
@@ -6673,11 +6829,9 @@ action_stmt
  */
 
 //========================================================================================
-//
-/* R501-F08 type-declaration-stmt
- *    is declaration-type-spec [[, attr-spec ]... :: ] entity-decl-list
- */
-//
+// R501-F08 type-declaration-stmt
+//-------------------------------
+//    is declaration-type-spec [[, attr-spec ]... :: ] entity-decl-list
 //----------------------------------------------------------------------------------------
 type_declaration_stmt
 @init
@@ -6697,7 +6851,11 @@ type_declaration_stmt
              c_action_type_declaration_stmt(lbl,numAttrSpecs,$end_of_stmt.start);
           }
 
-   -> ^(SgVariableDeclaration declaration_type_spec entity_decl_list label?)
+   -> ^(SgVariableDeclaration ^(OFPLabel label?)
+          declaration_type_spec
+          ^(OFPAttrSpec attr_spec*  )
+          ^(OFPList entity_decl_list)
+       )
 
    ;
 
