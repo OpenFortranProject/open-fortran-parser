@@ -1,4 +1,5 @@
 RULE=R102
+PRGM=module.f90
 
 # cc with Apple XCode uses clang which has unwelcome warning messages
 #
@@ -87,8 +88,8 @@ OFP_Type.o: OFP_Type.c OFP_Type.h
 support.o: support.c support.h
 
 check: unparse
-	@java fortran.ofp.FrontEnd test-parser.f90 --tokenfile test-parser.f90.tokens
-	@unparse test-parser.f90
+	@java fortran.ofp.FrontEnd $(PRGM) --tokenfile $(PRGM).tokens
+	@unparse $(PRGM)
 
 rulecheck: unparse
 	@echo "Testing rule $(RULE)"
