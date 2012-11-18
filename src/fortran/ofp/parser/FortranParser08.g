@@ -4989,14 +4989,23 @@ module
 
 // R1105
 module_stmt
-@init {Token lbl = null; Token id = null;}
-@after{checkForInclude();}
- 	:		{action.module_stmt__begin();}
- 		(label {lbl=$label.tk;})? T_MODULE ( T_IDENT {id=$T_IDENT;} )? 
-            end_of_stmt
- 			{action.module_stmt(lbl, $T_MODULE, id, $end_of_stmt.tk);}
-	;
-
+@init {
+   action.module_stmt__begin();
+}
+@after {
+   checkForInclude();
+}
+    :    lbl=label?
+         T_MODULE      id=T_IDENT
+       ( T_IDENT      mid=T_IDENT )?
+         end_of_stmt
+            {
+               if (mid != null) {
+                  System.out.println("module_stmt: meta_module is " + mid);
+               }
+               action.module_stmt(lbl, $T_MODULE, id, $end_of_stmt.tk);
+            }
+    ;
 
 // R1106
 end_module_stmt
