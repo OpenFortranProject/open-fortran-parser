@@ -90,10 +90,10 @@ unparse(pANTLR3_BASE_TREE btn, ANTLR3_MARKER next)
 //----------------------------------------------------------------------------------------
 specification_part
    :  ^(OFPSpecificationPart
-          ^(OFPUseStmtList               use_stmt*                 )
-                                         import_stmt*
-                                         implicit_part_recursion
-          ^(OFPDeclarationConstructList  declaration_construct*    )
+          ^(OFPUseStmtList               use_stmt*               )
+          ^(OFPImportStmtList            import_stmt*            )
+          ^(OFPImplicitPart              implicit_part_recursion )
+          ^(OFPDeclarationConstructList  declaration_construct*  )
        )
    ;
 
@@ -109,9 +109,9 @@ implicit_part_recursion
    |   // empty
    ;
 
-////////////
-// R207-F08
-//
+//========================================================================================
+// R207-F08 declaration-construct
+//----------------------------------------------------------------------------------------
 declaration_construct
    :   derived_type_def
    |   entry_stmt
@@ -123,7 +123,6 @@ declaration_construct
    |   other_specification_stmt
    |   type_declaration_stmt
    |   stmt_function_stmt
-
    ;
 
 // R208
@@ -341,6 +340,15 @@ type_param_value
    ;
 
 //========================================================================================
+// R403-F08 declaration-type-spec
+//----------------------------------------------------------------------------------------
+declaration_type_spec
+   :  ^(OFPDeclarationTypeSpec intrinsic_type_spec)
+   |  ^(OFPDeclarationTypeSpec derived_type_spec)
+   |  ^(OFPDeclarationTypeSpec T_ASTERISK)
+   ;
+
+//========================================================================================
 // R404-F08 intrinsic-type-spec
 //----------------------------------------------------------------------------------------
 intrinsic_type_spec
@@ -349,18 +357,24 @@ intrinsic_type_spec
    pOFP_TYPE_TABLE ttable = ofpGetTypeTable();
    ttable->putIntrinsic(ttable, retval.tree);
 }
-   :   ^( SgTypeInt       kind_selector? )
-   |   ^( SgTypeFloat     kind_selector? )
-   |      SgTypeDouble
-   |   ^( SgTypeComplex   kind_selector? )
-   |      SgTypeDComplex                      // TODO - what is the real SgType?
-   |   ^( SgTypeChar      char_selector? )
-   |   ^( SgTypeBool      kind_selector? )
+   :   ^( OFPIntrinsicTypeSpec OFPTypeLogical   opt_kind_selector )
+   |   ^( OFPIntrinsicTypeSpec OFPTypeInteger   opt_kind_selector )
+   |   ^( OFPIntrinsicTypeSpec OFPTypeReal      opt_kind_selector )
+   |   ^( OFPIntrinsicTypeSpec OFPTypeDouble    opt_kind_selector )
+   |   ^( OFPIntrinsicTypeSpec OFPTypeComplex   opt_kind_selector )
+   |   ^( OFPIntrinsicTypeSpec OFPTypeDComplex  opt_kind_selector )
+   |   ^( OFPIntrinsicTypeSpec OFPTypeChar      opt_char_selector )
    ;
 
-// R404
+//========================================================================================
+// R405-F08 kind-selector
+//----------------------------------------------------------------------------------------
 kind_selector
-   :   ^(OFPKindSelector expr)
+   :   expr
+   ;
+
+opt_kind_selector
+   :   ^(OFPKindSelector kind_selector?)
    ;
 
 // R405
@@ -416,9 +430,15 @@ imag_part
    |   T_IDENT                         
    ;
 
-// R420-F08
+//========================================================================================
+// R420-F08 char-selector
+//----------------------------------------------------------------------------------------
 char_selector
-   :   ^(OFPCharSelector ^(OFPKindSelector expr?) ^(OFPLengthSelector type_param_value?))
+   :   ^(OFPKindSelector expr?) ^(OFPLengthSelector type_param_value?)
+   ;
+
+opt_char_selector
+   :   ^(OFPCharSelector char_selector?)
    ;
 
 // R421-F08
@@ -465,7 +485,7 @@ derived_type_def
    ;
 
 type_param_or_comp_def_stmt_list
-   :   (kind_selector)? T_COMMA type_param_or_comp_def_stmt
+   :   opt_kind_selector T_COMMA type_param_or_comp_def_stmt
             type_param_or_comp_def_stmt_list
    |
    ;
@@ -805,22 +825,11 @@ scalar_int_variable
 // R501-F08 type-declaration-stmt
 //----------------------------------------------------------------------------------------
 type_declaration_stmt
-   :   ^(SgVariableDeclaration ^(OFPLabel label?)
+   :   ^(OFPTypeDeclarationStmt ^(OFPLabel label?)
           declaration_type_spec
           ^(OFPAttrSpec attr_spec*  )
-          ^(OFPList entity_decl+)
+          ^(OFPEntityDeclList entity_decl+)
         )
-   ;
-
-// R502
-declaration_type_spec
-   :   intrinsic_type_spec
-{
-//   printf("intrinsic_type_spec: create an intrinsic SgType here\n");
-}
-   |   T_TYPE T_LPAREN derived_type_spec T_RPAREN
-   |   T_CLASS T_LPAREN derived_type_spec T_RPAREN
-   |   T_CLASS T_LPAREN T_ASTERISK T_RPAREN
    ;
 
 ////////////
@@ -845,7 +854,7 @@ entity_decl
 //               ( T_ASTERISK char_length  )?
 //               ( initialization  )?
 
-   :  ^(SgInitializedName T_IDENT array_spec?)
+   :  ^(OFPObjectName ^(OFPName T_IDENT))
    ;
 
 
@@ -2615,7 +2624,7 @@ program_unit
 main_program
    :   ^(OFPMainProgram
            program_stmt
-              ^(OFPSpecificationPart       specification_part?       )
+              specification_part
               ^(OFPExecutionPart           execution_part?           )
               ^(OFPInternalSubprogramPart  internal_subprogram_part? )
            end_program_stmt
@@ -2632,7 +2641,9 @@ ext_function_subprogram
 // R1102-F08 program-stmt
 //----------------------------------------------------------------------------------------
 program_stmt
-   :  ^(OFPProgramStmt
+   :  OFPProgramStmt
+
+   |  ^(OFPProgramStmt
           ^(OFPLabel label?)
           ^(OFPProgramName T_IDENT)
        )
