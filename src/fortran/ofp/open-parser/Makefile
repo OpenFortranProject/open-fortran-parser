@@ -1,4 +1,4 @@
-RULE=R1101.f03
+RULE=R1101e.f90
 PRGM=module.f90
 
 ANTLR_ROOT = /usr/local
