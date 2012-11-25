@@ -16,7 +16,7 @@ options {
 import FTreeWalker;
 
 @header {
-#include <aterm1.h>
+#include <aterm2.h>
 #include "ofpbase.h"
 #include "traversal.h"
 }
@@ -200,6 +200,46 @@ unparse_entity_decl_list(FILE * fp, pANTLR3_BASE_TREE ofpList)
    }
 }
 
+ATerm
+match_OFPObjectName(pANTLR3_BASE_TREE obj_name)
+{
+   ATerm aterm = ATmake("OFPObjectName");
+   if (obj_name->getChildCount(obj_name) > 0) {
+      pANTLR3_BASE_TREE name = obj_name->getChild(obj_name, 0);
+      if (name->getChildCount(name) > 0) {
+         name = name->getChild(name, 0);
+         aterm = ATmake("<str>", name->getText(name)->chars);
+         aterm = ofp_annotate_start_stop(aterm, obj_name);
+         aterm = ATmake("object-name(name(<term>))", aterm);
+      }
+   }
+   return aterm;
+}
+
+ATerm
+match_entity_decl_list(pANTLR3_BASE_TREE ofpList)
+{
+// entity_decl
+//   :   object-name ( T_LPAREN array_spec T_RPAREN  )?
+//               ( T_LBRACKET coarray_spec T_RBRACKET  )?
+//               ( T_ASTERISK char_length  )?
+//               ( initialization  )?
+//
+//   :   ^(SgInitializedName T_IDENT array_spec?)
+
+   int i, count;
+
+   ATermList edlist = ATmakeList0();
+
+   count = ofplist_count(ofpList);
+   for (i = count-1; i >= 0; i--) {
+      pANTLR3_BASE_TREE obj_name = ofpList->getChild(ofpList, i);
+      ATerm term = match_OFPObjectName(obj_name);
+      edlist = ATinsert(edlist, term);
+   }
+   return ATmake("entity-decl-list(<term>)", edlist);
+}
+
 
 static void
 unparse_token(FILE * fp, pANTLR3_BASE_TREE tree)
@@ -283,6 +323,62 @@ opt_label returns [ATerm aterm]
               }
               retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPLabel);
            }
+;
+
+
+/*
+ * Section/Clause 1: Overview
+ */
+
+
+/*
+ * Section/Clause 2: Fortran concepts
+ */
+
+
+//========================================================================================
+// R204-F08 specification-part
+//----------------------------------------------------------------------------------------
+specification_part returns [ATerm aterm]
+@init
+{
+   ATermList dclist = ATmakeList0();
+}
+   :  ^(OFPSpecificationPart
+          ^(OFPUseStmtList               use_stmt*               )
+          ^(OFPImportStmtList            import_stmt*            )
+          ^(OFPImplicitPart              implicit_part_recursion )
+          ^(OFPDeclarationConstructList  
+              (dc=declaration_construct {dclist = ATappend(dclist, dc.aterm);})*
+           )
+       )
+
+       {
+          retval.aterm = ATmake("declaration-construct-list(<list>)", dclist);
+          retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPDeclarationConstructList);
+          retval.aterm = ATmake("specification-part(<term>)", retval.aterm);
+          retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPSpecificationPart);
+       }
+   ;
+
+//========================================================================================
+// R207-F08 declaration-construct
+//----------------------------------------------------------------------------------------
+declaration_construct returns [ATerm aterm]
+   //   t=derived_type_def
+   //   t=entry_stmt
+   //   t=enum_def
+   //   t=format_stmt
+   //   t=interface_block
+   //   t=parameter_stmt
+   //   t=procedure_declaration_stmt
+   //   t=other_specification_stmt
+   :   term=type_declaration_stmt
+          {
+             retval.aterm = ATmake("declaration-construct(<term>)", term.aterm);
+             retval.aterm = ofp_annotate_start_stop(retval.aterm, term.tree);
+          }
+   //   t=stmt_function_stmt
    ;
 
 
@@ -290,18 +386,64 @@ opt_label returns [ATerm aterm]
  * Section/Clause 4: Types
  */
 
+//========================================================================================
+// R403-F08 declaration-type-spec
+//----------------------------------------------------------------------------------------
+declaration_type_spec returns [ATerm aterm]
+   :  ^(OFPDeclarationTypeSpec intrinsic_type_spec)
+          {
+             retval.aterm = ATmake("declaration-type-spec(<term>)", $intrinsic_type_spec.aterm);
+             retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPDeclarationTypeSpec);
+          }
+   |  ^(OFPDeclarationTypeSpec derived_type_spec)
+   |  ^(OFPDeclarationTypeSpec T_ASTERISK)
+   
+;
 
 //========================================================================================
 // R404-F08 intrinsic-type-spec
 //----------------------------------------------------------------------------------------
-intrinsic_type_spec
-   :   ^( SgTypeInt    {fprintf(out,"Integer");}   kind_selector? )  {fprintf(out, " :: ");}
-   |   ^( SgTypeFloat  {fprintf(out,"Real"   );}   kind_selector? )  {fprintf(out, " :: ");}
-   |      SgTypeDouble
-   |   ^( SgTypeComplex   kind_selector? )
-   |      SgTypeDComplex                      // TODO - what is the real SgType?
-   |   ^( SgTypeChar      char_selector? )
-   |   ^( SgTypeBool      kind_selector? )
+intrinsic_type_spec returns [ATerm aterm]
+@init
+{
+   ATerm type, kind;
+}
+@after
+{
+   type = ofp_annotate_start_stop(type, t);
+   retval.aterm = ATmake("intrinsic-type-spec(<term>,<term>)", type, kind);
+   retval.aterm = ofp_annotate_start_stop(retval.aterm, r);
+}
+   :   ^( r=OFPIntrinsicTypeSpec
+             (    t=OFPTypeLogical   {type=ATmake("LOGICAL"  );}  k=opt_kind_selector {kind = k.aterm;}
+               |  t=OFPTypeInteger   {type=ATmake("INTEGER"  );}  k=opt_kind_selector {kind = k.aterm;}
+               |  t=OFPTypeReal      {type=ATmake("REAL"     );}  k=opt_kind_selector {kind = k.aterm;}
+               |  t=OFPTypeDouble    {type=ATmake("DOUBLE"   );}  k=opt_kind_selector {kind = k.aterm;}
+               |  t=OFPTypeComplex   {type=ATmake("COMPLEX"  );}  k=opt_kind_selector {kind = k.aterm;}
+               |  t=OFPTypeDComplex  {type=ATmake("DCOMPLEX" );}  k=opt_kind_selector {kind = k.aterm;}
+               |  t=OFPTypeCharacter {type=ATmake("CHARACTER");}  c=opt_char_selector {kind = c.aterm;}
+             )
+        )
+   ;
+
+//========================================================================================
+// R405-F08 kind-selector
+//----------------------------------------------------------------------------------------
+opt_kind_selector returns [ATerm aterm]
+   :   ^(OFPKindSelector kind_selector?)
+           {
+              retval.aterm = ATmake("kind-selector");
+           }
+   ;
+
+//========================================================================================
+// R420-F08 char-selector
+//----------------------------------------------------------------------------------------
+opt_char_selector returns [ATerm aterm]
+   :   ^(OFPCharSelector char_selector?)
+           {
+              retval.aterm = ATmake("char-selector");
+           }
    ;
 
 
@@ -313,16 +455,53 @@ intrinsic_type_spec
 //========================================================================================
 // R501-F08 type-declaration-stmt
 //----------------------------------------------------------------------------------------
-type_declaration_stmt
-   :   ^(SgVariableDeclaration ^(OFPLabel label?)
+type_declaration_stmt returns [ATerm aterm]
+   :   ^(OFPTypeDeclarationStmt opt_label
           declaration_type_spec
-          ^(OFPAttrSpec attr_spec*  )
-          ^(OFPList entity_decl+)
+          ^(OFPAttrSpec attr_spec*)
+          entity_decl_list
         )
            {
-              unparse_entity_decl_list(out, $OFPList);
-              fprintf(out, "\n");
+              retval.aterm = ATmake("type-declaration-stmt(<term>, <term>, <term>)",
+                                    $opt_label.aterm,
+                                    $declaration_type_spec.aterm,
+                                    $entity_decl_list.aterm
+                                   );
+              retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPTypeDeclarationStmt);
            }
+   ;
+
+//========================================================================================
+// R503-F08 entity-decl
+//----------------------------------------------------------------------------------------
+entity_decl returns [ATerm aterm]
+//   :   T_IDENT ( T_LPAREN array_spec T_RPAREN  )?
+//               ( T_LBRACKET coarray_spec T_RBRACKET  )?
+//               ( T_ASTERISK char_length  )?
+//               ( initialization  )?
+   :   ^(OFPObjectName ^(OFPName id=T_IDENT))
+           {
+              retval.aterm = ATmake("name(<str>)", id->getText(id)->chars);
+              retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPName);
+              retval.aterm = ATmake("object-name(<term>)", retval.aterm);
+           }
+   ;
+
+entity_decl_list returns [ATerm aterm]
+@init
+{
+   ATermList edlist = ATmakeList0();
+}
+@after
+{
+   retval.aterm = ATmake("entity-decl-list(<term>)", edlist);
+   retval.aterm = ofp_annotate_start_stop(retval.aterm, retval.tree);
+}
+   :   ^(OFPEntityDeclList
+           (
+              entity_decl  {edlist = ATappend(edlist, $entity_decl.aterm);}
+           )+
+        )
    ;
 
 //========================================================================================
@@ -343,28 +522,18 @@ implicit_stmt
 main_program returns [ATerm aterm]
    :   ^(OFPMainProgram
            program_stmt
-              ^(OFPSpecificationPart       specification_part?       )
+              specification_part
               ^(OFPExecutionPart           execution_part?           )
               ^(OFPInternalSubprogramPart  internal_subprogram_part? )
            end_program_stmt
         )
 
         {
-           ATerm at_program_stmt;
-           ATerm at_specification_part = ATmake("specification-part()");
-           ATerm at_exe_part           = ATmake("execution-part()");
-           ATerm at_int_sub_part       = ATmake("internal-subprogram-part()");
-           if ($program_stmt.tree->getChildCount($program_stmt.tree) > 0) {
-                  at_program_stmt = $program_stmt.aterm;
-           } else at_program_stmt = ATmake("program-stmt()");
-           //if ($OFPSpecificationPart->getChildCount($OFPSpecificationPart) > 0) {
-           //} else at_specification_part = ATmake("specification-part()");
-
            retval.aterm = ATmake("main-program(<term>,<term>,<term>,<term>,<term>)",
-                                  at_program_stmt,
-                                  at_specification_part,
-                                  at_exe_part,
-                                  at_int_sub_part,
+                                  $program_stmt.aterm,
+                                  $specification_part.aterm,
+                                  ATmake("execution-part"),
+                                  ATmake("internal-subprogram-part"),
                                   $end_program_stmt.aterm);
            retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPMainProgram);
            ATprintf("\%t\n\n", retval.aterm);
@@ -379,7 +548,12 @@ main_program returns [ATerm aterm]
 // R1102-F08 program-stmt
 //----------------------------------------------------------------------------------------
 program_stmt returns [ATerm aterm]
-   :  ^(OFPProgramStmt opt_label
+   :  OFPProgramStmt
+       {
+          retval.aterm = ATmake("program-stmt");
+       }
+
+   |  ^(OFPProgramStmt opt_label
           ^(OFPProgramName T_IDENT)
        )
 
