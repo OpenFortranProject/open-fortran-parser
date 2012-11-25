@@ -1,7 +1,7 @@
 //
 // TODO:
 //   1. Fix lexer so that the single quote "'" character can be in the text
-//   2. Fix to work without a program_stmt (just an end_program_stmt)
+//   2. Fix to work without a program_stmt (just an end_program_stmt). DONE.
 //   3. Implement CheckForIncludes
 //   4. Implememt error handling
 //
@@ -23,17 +23,25 @@ tokens {
    //
    OFPAttrSpec;
    OFPBind;
+   OFPCharSelector;
    OFPComment;
    OFPCommentList;
+   OFPDeclarationConstruct;
    OFPDeclarationConstructList;
+   OFPDeclarationTypeSpec;
+   OFPEntityDeclList;
    OFPExecutionPart;
    OFPGenericSpec;
+   OFPImplicitPart;
+   OFPImportStmtList;
    OFPIntentIn;
    OFPIntentInOut;
    OFPIntentOut;
    OFPInternalSubprogramPart;
    OFPInterfaceStmt;
    OFPEndInterfaceStmt;
+   OFPIntrinsicTypeSpec;
+   OFPKindSelector;
    OFPLabel;
    OFPList;
    OFPMainProgram;
@@ -42,6 +50,8 @@ tokens {
    OFPModuleNature;
    OFPModuleStmt;
    OFPEndModuleStmt;
+   OFPName;
+   OFPObjectName;
    OFPOnlyList;
    OFPOptional;
    OFPPrefixList;
@@ -51,6 +61,7 @@ tokens {
    OFPRenameList;
    OFPSpecificationPart;
    OFPSuffix;
+   OFPTypeDeclarationStmt;
    OFPUnimplemented;
    OFPUseStmt;
    OFPUseStmtList;
@@ -84,15 +95,14 @@ tokens {
    SgImplicitStatement;
 
    SgBasicBlock;
-   SgVariableDeclaration;
 
-   SgTypeInt;
-   SgTypeFloat;
-   SgTypeDouble;
-   SgTypeComplex;
-   SgTypeDComplex;     // TODO - what is the real SgType?
-   SgTypeChar;
-   SgTypeBool;
+   OFPTypeLogical;
+   OFPTypeInteger;
+   OFPTypeReal;
+   OFPTypeDouble;
+   OFPTypeComplex;
+   OFPTypeDComplex;     // TODO - what is the real OFPType?
+   OFPTypeCharacter;
 }
 
 /*
@@ -162,17 +172,50 @@ treeSetTokenBoundaries(pANTLR3_BASE_TREE     tree,
                       )
 {
    pANTLR3_BASE_TREE child;
-   pOFP_BASE_RTN ss = (pOFP_BASE_RTN) malloc(sizeof(OFP_BASE_RTN));
+   pOFP_BASE_RTN ss;
    if (childIndex < 0) {
       /* This is the root of a tree node, make sure it's not empty. */
-      if (tree->getChildCount(tree) < 1) return;
+      if (tree->getChildCount(tree) < 1) {
+         const char * text = tree->getText(tree)->chars;
+         printf("treeSetTokenBoundaries: root with no children: \%s\n", text);
+         return;
+      }
       child = tree;
    }
    else {
       child = tree->getChild(tree, childIndex);
    }
+   ss = (pOFP_BASE_RTN) malloc(sizeof(OFP_BASE_RTN));
    ss->start = start;  ss->stop = stop;
    child->u = ss;
+}
+
+/** Set the token boundaries for a list at childIndex of tree.
+ */
+static void
+treeSetListBoundaries(pANTLR3_BASE_TREE tree, int childIndex)
+{
+   int                count;
+   pANTLR3_BASE_TREE  child = tree->getChild(tree, childIndex);
+
+   if (child == NULL) {
+      printf("treeSetListBoundaries: child is NULL, tree==\%s\n", tree->getText(tree)->chars);
+      return;
+   }
+
+   count = child->getChildCount(child);
+   if (count > 0) {
+      pANTLR3_BASE_TREE  start = child->getChild(child, 0);
+      pANTLR3_BASE_TREE  stop  = child->getChild(child, count-1);
+      pOFP_BASE_RTN      ss    = (pOFP_BASE_RTN) malloc(sizeof(OFP_BASE_RTN));
+      if (start->u == NULL || stop->u == NULL) {
+         printf("treeSetListBoundaries: start/stop->u is NULL, child==\%s\n", child->getText(child)->chars);
+         return;
+      }
+      ss->start = (*(pOFP_BASE_RTN)start->u).start;
+      ss->stop  = (*(pOFP_BASE_RTN)start->u).stop;
+      child->u = ss;
+   }
 }
 
 /** Hand coded start rule
@@ -449,7 +492,10 @@ program_unit
  */
 //----------------------------------------------------------------------------------------
 declaration_construct
-@after {c_action_declaration_construct();}
+@after
+{
+   c_action_declaration_construct();
+}
    :   derived_type_def
    |   entry_stmt
    |   enum_def
@@ -804,24 +850,50 @@ type_spec
    |   derived_type_spec
    ;
 
-// R403-F08
+//========================================================================================
+// R403-F08 declaration-type-spec
+//
+//     is intrinsic-type-spec
+//     or TYPE ( intrinsic-type-spec )
+//     or TYPE ( derived-type-spec )
+//     or CLASS ( derived-type-spec )
+//     or CLASS ( * )
+//----------------------------------------------------------------------------------------
 declaration_type_spec
+@after
+{
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+}
    :   intrinsic_type_spec
            {
               c_action_declaration_type_spec(NULL,IActionEnums_ DeclarationTypeSpec_INTRINSIC);
            }
+   -> ^(OFPDeclarationTypeSpec intrinsic_type_spec)
+
+   |   T_TYPE T_LPAREN intrinsic_type_spec T_RPAREN
+           {
+              c_action_declaration_type_spec(NULL,IActionEnums_ DeclarationTypeSpec_INTRINSIC);
+           }
+   -> ^(OFPDeclarationTypeSpec intrinsic_type_spec)
+
    |   T_TYPE T_LPAREN derived_type_spec T_RPAREN
            {
               c_action_declaration_type_spec($T_TYPE,IActionEnums_ DeclarationTypeSpec_TYPE);
            }
+   -> ^(OFPDeclarationTypeSpec derived_type_spec)
+
    |   T_CLASS T_LPAREN derived_type_spec T_RPAREN
            {
               c_action_declaration_type_spec($T_CLASS,IActionEnums_ DeclarationTypeSpec_CLASS);
            }
+   -> ^(OFPDeclarationTypeSpec derived_type_spec)
+
    |   T_CLASS T_LPAREN T_ASTERISK T_RPAREN
            {
               c_action_declaration_type_spec($T_CLASS,IActionEnums_ DeclarationTypeSpec_unlimited);
            }
+   -> ^(OFPDeclarationTypeSpec T_ASTERISK)
+
    ;
 
 
@@ -837,78 +909,97 @@ declaration_type_spec
 //  |   T_DOUBLECOMPLEX
 //----------------------------------------------------------------------------------------
 intrinsic_type_spec
-@init{ANTLR3_BOOLEAN hasKindSelector = ANTLR3_FALSE;}
-   :   T_INTEGER (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
+@init
+{
+   ANTLR3_BOOLEAN hasKindSelector = ANTLR3_FALSE;
+   pANTLR3_COMMON_TOKEN start, stop;
+}
+@after
+{
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+   treeSetTokenBoundaries(retval.tree, start, stop, 0);
+}
+   :   T_LOGICAL kind=opt_kind_selector
            {
+              if (kind.tree->getChildCount(kind.tree) > 0) hasKindSelector = ANTLR3_TRUE;
+              c_action_intrinsic_type_spec($T_LOGICAL,NULL,IActionEnums_ IntrinsicTypeSpec_LOGICAL,hasKindSelector);
+           }
+
+    -> ^(OFPIntrinsicTypeSpec OFPTypeLogical opt_kind_selector)
+
+   |   T_INTEGER kind=opt_kind_selector
+           {
+              if (kind.tree->getChildCount(kind.tree) > 0) hasKindSelector = ANTLR3_TRUE;
               c_action_intrinsic_type_spec($T_INTEGER,NULL,IActionEnums_ IntrinsicTypeSpec_INTEGER,hasKindSelector);
            }
 
-    -> ^(SgTypeInt kind_selector?)
+    -> ^(OFPIntrinsicTypeSpec OFPTypeInteger opt_kind_selector)
 
-   |   T_REAL (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
+   |   T_REAL kind=opt_kind_selector
            {
+              start = stop = $T_REAL;
+              if (kind.tree->getChildCount(kind.tree) > 0) hasKindSelector = ANTLR3_TRUE;
               c_action_intrinsic_type_spec($T_REAL,NULL,IActionEnums_ IntrinsicTypeSpec_REAL,hasKindSelector);
            }
 
-    -> ^(SgTypeFloat kind_selector?)
+    -> ^(OFPIntrinsicTypeSpec OFPTypeReal opt_kind_selector)
 
    |   T_DOUBLE T_PRECISION
            {
               c_action_intrinsic_type_spec($T_DOUBLE,$T_PRECISION,IActionEnums_ IntrinsicTypeSpec_DOUBLEPRECISION,ANTLR3_FALSE);
            }
 
-    -> SgTypeDouble
+    -> ^(OFPIntrinsicTypeSpec OFPTypeDouble OFPKindSelector)
 
    |   T_DOUBLEPRECISION
            {
               c_action_intrinsic_type_spec($T_DOUBLEPRECISION,NULL,IActionEnums_ IntrinsicTypeSpec_DOUBLEPRECISION,ANTLR3_FALSE);
            }
 
-    -> SgTypeDouble
+    -> ^(OFPIntrinsicTypeSpec OFPTypeDouble OFPKindSelector)
 
-   |   T_COMPLEX (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
+   |   T_COMPLEX kind=opt_kind_selector
            {
+              if (kind.tree->getChildCount(kind.tree) > 0) hasKindSelector = ANTLR3_TRUE;
               c_action_intrinsic_type_spec($T_COMPLEX,NULL,IActionEnums_ IntrinsicTypeSpec_COMPLEX,hasKindSelector);
            }
 
-    -> SgTypeComplex kind_selector?
+    -> ^(OFPIntrinsicTypeSpec OFPTypeComplex opt_kind_selector)
 
    |   T_DOUBLE T_COMPLEX
            {
               c_action_intrinsic_type_spec($T_DOUBLE,$T_COMPLEX,IActionEnums_ IntrinsicTypeSpec_DOUBLECOMPLEX,ANTLR3_FALSE);
            }
 
-    -> SgTypeDComplex
+    -> ^(OFPIntrinsicTypeSpec OFPTypeDComplex OFPKindSelector)
 
    |   T_DOUBLECOMPLEX
            {
               c_action_intrinsic_type_spec($T_DOUBLECOMPLEX,NULL,IActionEnums_ IntrinsicTypeSpec_DOUBLECOMPLEX,ANTLR3_FALSE);
            }
 
-    -> SgTypeDComplex
+    -> ^(OFPIntrinsicTypeSpec OFPTypeDComplex OFPKindSelector)
 
-   |   T_CHARACTER (char_selector {hasKindSelector = ANTLR3_TRUE;})?
+   |   T_CHARACTER ckind=opt_char_selector
            {
+              if (ckind.tree->getChildCount(ckind.tree) > 0) hasKindSelector = ANTLR3_TRUE;
               c_action_intrinsic_type_spec($T_CHARACTER,NULL,IActionEnums_ IntrinsicTypeSpec_CHARACTER,hasKindSelector);
            }
 
-    -> SgTypeChar char_selector?
-
-   |   T_LOGICAL (kind_selector {hasKindSelector = ANTLR3_TRUE;})?
-           {
-              c_action_intrinsic_type_spec($T_LOGICAL,NULL,IActionEnums_ IntrinsicTypeSpec_LOGICAL,hasKindSelector);
-           }
-
-    -> SgTypeBool kind_selector?
+    -> ^(OFPIntrinsicTypeSpec OFPTypeCharacter opt_char_selector)
 
    ;
 
 
-// R405-F08
-// ERR_CHK 404 scalar_int_initialization_expr replaced by expr
+//========================================================================================
+// R405-F08 kind-selector
+//    is ( [ KIND = ] scalar-int-constant-expr )
+//
+// ERR_CHK 405 scalar_int_constant_expr replaced by expr
 // Nonstandard extension: source common practice
 //  | T_ASTERISK T_DIGIT_STRING  // e.g., COMPLEX*16    
 // TODO - check to see if second alternative is where it should go
+//----------------------------------------------------------------------------------------
 kind_selector
 @init
 {
@@ -920,17 +1011,19 @@ kind_selector
               c_action_kind_selector(tk1, tk2, ANTLR3_TRUE);
            }
 
-    -> ^(OFPKindSelector expr)
+    -> expr
 
    |   T_ASTERISK T_DIGIT_STRING
            {
               c_action_kind_selector($T_ASTERISK, $T_DIGIT_STRING, ANTLR3_FALSE);
            }
 
-    -> ^(OFPKindSelector T_DIGIT_STRING)
-
+    -> T_DIGIT_STRING
    ;
 
+opt_kind_selector
+   :   kind_selector?  ->  ^(OFPKindSelector kind_selector?)
+   ;
 
 // R405
 signed_int_literal_constant
@@ -1033,11 +1126,14 @@ imag_part
             { c_action_imag_part(ANTLR3_FALSE, ANTLR3_FALSE, $T_IDENT); }
    ;
 
-// R424
-// ERR_CHK 424a scalar_int_initialization_expr replaced by expr
-// ERR_CHK 424b T_KIND, if type_param_value, must be a 
+//========================================================================================
+// R420-F08 char-selector
+//
+// ERR_CHK 420a scalar_int_initialization_expr replaced by expr
+// ERR_CHK 420b T_KIND, if type_param_value, must be a 
 // scalar_int_initialization_expr
-// ERR_CHK 424c T_KIND and T_LEN cannot both be specified
+// ERR_CHK 420c T_KIND and T_LEN cannot both be specified
+//----------------------------------------------------------------------------------------
 char_selector
 @init {
     int kindOrLen1; kindOrLen1 = IActionEnums_ KindLenParam_none;
@@ -1081,6 +1177,10 @@ char_selector
             kindOrLen1 = IActionEnums_ KindLenParam_kind;
             c_action_char_selector($T_KIND, tk, kindOrLen1, kindOrLen2, hasAsterisk);
           }
+   ;
+
+opt_char_selector
+   :   char_selector?  ->  ^(OFPCharSelector char_selector?)
    ;
 
 // R421-F08
@@ -1992,15 +2092,19 @@ entity_decl
    ANTLR3_BOOLEAN hasCharLength=ANTLR3_FALSE;
    ANTLR3_BOOLEAN hasInitialization=ANTLR3_FALSE;
 }
-   :   T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=ANTLR3_TRUE;} )?
-               ( T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=ANTLR3_TRUE;} )?
-               ( T_ASTERISK char_length {hasCharLength=ANTLR3_TRUE;} )?
-               ( initialization {hasInitialization=ANTLR3_TRUE;} )?
+@after
+{
+   treeSetTokenBoundaries(retval.tree, id, id, 0);
+}
+   :   id=T_IDENT ( T_LPAREN array_spec T_RPAREN {hasArraySpec=ANTLR3_TRUE;} )?
+                  ( T_LBRACKET coarray_spec T_RBRACKET {hasCoarraySpec=ANTLR3_TRUE;} )?
+                  ( T_ASTERISK char_length {hasCharLength=ANTLR3_TRUE;} )?
+                  ( initialization {hasInitialization=ANTLR3_TRUE;} )?
           {
              c_action_entity_decl($T_IDENT, hasArraySpec,
                                 hasCoarraySpec, hasCharLength, hasInitialization);
           }
-   -> ^(SgInitializedName T_IDENT)
+   -> ^(OFPObjectName ^(OFPName T_IDENT))
    ;
 
 
@@ -2010,10 +2114,15 @@ entity_decl_list
    int count = 0;
    c_action_entity_decl_list__begin();
 }
-   :   entity_decl {count += 1;}  ( T_COMMA!  entity_decl  {count += 1;} )*
+@after
+{
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+}
+   :   entity_decl {count += 1;}  ( T_COMMA  entity_decl  {count += 1;} )*
           {
              c_action_entity_decl_list(count);
           }
+   -> ^(OFPEntityDeclList entity_decl+)
    ;
 
 
@@ -5440,7 +5549,7 @@ main_program
 
    -> ^(OFPMainProgram
            opt_program_stmt
-             ^(OFPSpecificationPart       specification_part?       )
+             specification_part
              ^(OFPExecutionPart           execution_part?           )
              ^(OFPInternalSubprogramPart  internal_subprogram_part? )
            end_program_stmt
@@ -5564,7 +5673,7 @@ module
 }
    :   module_stmt
        specification_part
-       ( module_subprogram_part )?
+       module_subprogram_part?
        end_module_stmt
 
    -> ^(OFPModule module_stmt
@@ -6697,6 +6806,13 @@ specification_part
    gCount1=0;
    gCount2=0;
 }
+@after
+{
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+   treeSetListBoundaries (retval.tree, 1);
+   treeSetListBoundaries (retval.tree, 2);
+   treeSetListBoundaries (retval.tree, 3);  // TODO - why not 4, what about implicit_part?
+}
    :   ( use_stmt               {numUseStmts++;}    )*
        ( import_stmt            {numImportStmts++;} )*
        implicit_part_recursion             // making nonoptional with predicates fixes ambiguity
@@ -6706,10 +6822,10 @@ specification_part
            }
 
    ->  ^(OFPSpecificationPart
-           ^(OFPUseStmtList               use_stmt*                 )
-                                          import_stmt*
-                                          implicit_part_recursion
-           ^(OFPDeclarationConstructList  declaration_construct*    )
+           ^(OFPUseStmtList               use_stmt*               )
+           ^(OFPImportStmtList            import_stmt*            )
+           ^(OFPImplicitPart              implicit_part_recursion )
+           ^(OFPDeclarationConstructList  declaration_construct*  )
         )
    ;
 
@@ -6895,25 +7011,25 @@ action_stmt
 type_declaration_stmt
 @init
 {
-   pANTLR3_COMMON_TOKEN lbl = NULL;
    int numAttrSpecs = 0;
 }
 @after
 {
    checkForInclude();
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
 }
-   :   (label {lbl=$label.start;})?
+   :   lbl=opt_label
        declaration_type_spec
        ( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
        entity_decl_list  end_of_stmt
           {
-             c_action_type_declaration_stmt(lbl,numAttrSpecs,$end_of_stmt.start);
+             c_action_type_declaration_stmt((lbl.tree==NULL)?NULL:lbl.start,numAttrSpecs,$end_of_stmt.start);
           }
 
-   -> ^(SgVariableDeclaration ^(OFPLabel label?)
+   -> ^(OFPTypeDeclarationStmt opt_label
           declaration_type_spec
           ^(OFPAttrSpec attr_spec*  )
-          ^(OFPList entity_decl_list)
+          entity_decl_list
        )
 
    ;
