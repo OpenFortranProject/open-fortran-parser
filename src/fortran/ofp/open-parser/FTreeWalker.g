@@ -125,13 +125,17 @@ declaration_construct
    |   stmt_function_stmt
    ;
 
-// R208
+//========================================================================================
+// R208-F08 execution-part
+//----------------------------------------------------------------------------------------
 execution_part
-   :   executable_construct
-       execution_part_construct *
+   :  OFPExecutionPart
+   |  ^(OFPExecutionPart ^(OFPExecutablePartConstructList execution_part_construct+))
    ;
 
-// R209
+//========================================================================================
+// R209-F08 execution-part-construct
+//----------------------------------------------------------------------------------------
 execution_part_construct
    :   executable_construct  
    |   format_stmt
@@ -183,13 +187,15 @@ other_specification_stmt
 // language extension point
 other_spec_stmt_extension : T_NO_LANGUAGE_EXTENSION ;
 
-////////////
-// R213-F03
-//
+//========================================================================================
+// R213-F08 executable-construct
+//----------------------------------------------------------------------------------------
 executable_construct
    :   action_stmt
    |   associate_construct
+   |   block_construct                 // NEW_TO_2008
    |   case_construct
+   |   critical_construct              // NEW_TO_2008
    |   do_construct
    |   forall_construct
    |   if_construct
@@ -197,10 +203,9 @@ executable_construct
    |   where_construct
    ;
 
-
-////////////
+//========================================================================================
 // R214-F08 action-stmt
-//
+//----------------------------------------------------------------------------------------
 action_stmt
    :   allocate_stmt
    |   assignment_stmt
@@ -210,13 +215,22 @@ action_stmt
    |   continue_stmt
    |   cycle_stmt
    |   deallocate_stmt
+//////////
+// These end functions are not needed because the initiating constructs are called
+// explicitly to avoid ambiguities.
+//   |   end_function_stmt
+//   |   end_mp_subprogram_stmt        // NEW_TO_2008
+//   |   end_program_stmt
+//   |   end_subroutine_stmt
    |   endfile_stmt
+   |   errorstop_stmt                // NEW_TO_2008
    |   exit_stmt
    |   flush_stmt
    |   forall_stmt
    |   goto_stmt
    |   if_stmt
    |   inquire_stmt  
+   |   lock_stmt                     // NEW_TO_2008
    |   nullify_stmt
    |   open_stmt
    |   pointer_assignment_stmt
@@ -225,14 +239,18 @@ action_stmt
    |   return_stmt
    |   rewind_stmt
    |   stop_stmt
+   |   sync_all_stmt                 // NEW_TO_2008
+   |   sync_images_stmt              // NEW_TO_2008
+   |   sync_memory_stmt              // NEW_TO_2008
+   |   unlock_stmt                   // NEW_TO_2008
    |   wait_stmt
    |   where_stmt
    |   write_stmt
    |   arithmetic_if_stmt
    |   computed_goto_stmt
-   |   assign_stmt 
-   |   assigned_goto_stmt
-   |   pause_stmt
+   |   assign_stmt                   // deleted feature
+   |   assigned_goto_stmt            // deleted feature
+   |   pause_stmt                    // deleted feature
    ;
 
 //========================================================================================
@@ -383,12 +401,16 @@ signed_int_literal_constant
         int_literal_constant
    ;
 
-// R406
+//========================================================================================
+// R407-F08 int-literal-constant
+//----------------------------------------------------------------------------------------
 int_literal_constant
-   :   T_DIGIT_STRING (T_UNDERSCORE kind_param )?
+   :  ^(OFPIntLiteralConstant T_DIGIT_STRING ^(OFPKindParam kind_param?))
    ;
 
-// R407
+//========================================================================================
+// R408-F08 kind-param
+//----------------------------------------------------------------------------------------
 kind_param
    :   T_DIGIT_STRING 
    |   T_IDENT 
@@ -1293,20 +1315,19 @@ common_block_object_list
    :   common_block_object ( T_COMMA common_block_object  )*
    ;
 
+
 /**
  * Section/Clause 6: Use of data objects
  */               
 
-
-// R601
-variable
-   :   designator 
-   ;
-
-// R603
+//========================================================================================
+// R601-F08 designator
+//----------------------------------------------------------------------------------------
 designator
-   :   data_ref (T_LPAREN substring_range  T_RPAREN)?
-   |   char_literal_constant T_LPAREN substring_range T_RPAREN
+   :  ^(OFPDesignator  data_ref               substring_range? )
+//TODO - add this option
+//   |  ^(OFPDesignator  char_literal_constant  substring_range  )
+//
    ;
 
 designator_or_func_ref
@@ -1329,6 +1350,13 @@ substr_range_or_arg_list_suffix returns [ANTLR3_BOOLEAN isSubstringRange]
    |
         ( T_COMMA actual_arg_spec  )*
               // actual_arg_spec_list
+   ;
+
+//========================================================================================
+// R602-F08 variable
+//----------------------------------------------------------------------------------------
+variable
+   :   ^(OFPVariable designator)
    ;
 
 // R604
@@ -1379,16 +1407,19 @@ substring_range
    :   (expr )? T_COLON  (expr )?
    ;
 
-// R612
+//========================================================================================
+// R611-F08 data-ref
+//----------------------------------------------------------------------------------------
 data_ref
-   :   part_ref  ( T_PERCENT part_ref )*
+   :  ^(OFPDataRef ^(OFPPartRefList part_ref+) )
    ;
 
-////////////
-// R612-F08, R613-F03
-//
+//========================================================================================
+// R612-F08 part-ref
+//----------------------------------------------------------------------------------------
 part_ref
-   :   T_IDENT
+   :  ^(OFPPartRef T_IDENT)
+      //TODO - add section-subscript-list and image-selector
    ;
 
 vector_subscript
@@ -1609,8 +1640,7 @@ equiv_operand
 
 // R717
 level_5_expr
-   : equiv_operand (defined_binary_op equiv_operand
-             )*
+   : equiv_operand ( defined_binary_op equiv_operand )*
    ;
 
 // R718
@@ -1634,9 +1664,11 @@ equiv_op
    |   T_NEQV     
    ;
 
-// R722
+//========================================================================================
+// R722-F08  expr
+//----------------------------------------------------------------------------------------
 expr
-   : level_5_expr
+   :  ^(OFPExpr int_literal_constant)    // TODO FIXME
    ;
 
 // R723
@@ -1644,10 +1676,11 @@ defined_binary_op
    :   T_DEFINED_OP   
    ;
 
-// R734
+//========================================================================================
+// R732-F08  assignment-stmt
+//----------------------------------------------------------------------------------------
 assignment_stmt
-   :   label? T_ASSIGNMENT_STMT variable
-        T_EQUALS expr end_of_stmt
+   :  ^(OFPAssignmentStmt opt_label variable expr)
    ;
 
 // R735
@@ -2625,7 +2658,7 @@ main_program
    :   ^(OFPMainProgram
            program_stmt
               specification_part
-              ^(OFPExecutionPart           execution_part?           )
+              execution_part
               ^(OFPInternalSubprogramPart  internal_subprogram_part? )
            end_program_stmt
         )
@@ -3109,6 +3142,13 @@ stmt_function_stmt
             T_EQUALS expr end_of_stmt
    ;
 
+
+//========================================================================================
+// This rule added to simplify optional labels.
+//----------------------------------------------------------------------------------------
+opt_label
+   :  ^(OFPLabel label?)
+   ;
 
 //========================================================================================
 // This rule added to allow matching of T_EOS or EOF combination.
