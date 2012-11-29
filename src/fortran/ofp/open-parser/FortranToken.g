@@ -54,9 +54,13 @@ ftoken
     ;
 
 ftoken_index
-   :   '@' NUMBER
+@init
+{
+   int sign = 1;  /* -1 for synthetic tokens */
+}
+   :   '@'  ('-' {sign=-1;})?  NUMBER
           {
-              int index = atoi($NUMBER.text->chars);
+              int index = sign * atoi($NUMBER.text->chars);
               token->setTokenIndex(token, (ANTLR3_MARKER)index);
           }
    ;             
@@ -102,9 +106,13 @@ line
    ;
 
 column
-   :   NUMBER
+@init
+{
+   int sign = 1;  /* -1 for synthetic tokens */
+}
+   :   ('-' {sign=-1;})?  NUMBER
           {
-             int pos = atoi($NUMBER.text->chars);
+             int pos = sign * atoi($NUMBER.text->chars);
              token->setCharPositionInLine(token, (ANTLR3_UINT32)pos);
           }
    ;
