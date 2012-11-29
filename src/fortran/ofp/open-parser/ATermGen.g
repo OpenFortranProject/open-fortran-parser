@@ -381,6 +381,108 @@ declaration_construct returns [ATerm aterm]
    //   t=stmt_function_stmt
    ;
 
+//========================================================================================
+// R208-F08 execution-part
+//----------------------------------------------------------------------------------------
+execution_part returns [ATerm aterm]
+@init
+{
+   ATermList list = ATmakeList0();
+}
+   :  OFPExecutionPart
+          {
+             retval.aterm = ATmake("executable-part");
+             retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPExecutionPart);
+          }
+
+   |  ^(OFPExecutionPart
+         ^(OFPExecutablePartConstructList
+             ( execution_part_construct {list = ATappend(list, $execution_part_construct.aterm);} )+
+          )
+       )
+          {
+             retval.aterm = ATmake("executable-part-construct-list(<list>)", list);
+             retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPExecutablePartConstructList);
+             retval.aterm = ATmake("executable-part(<term>)", retval.aterm);
+             retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPExecutionPart);
+          }
+   ;
+
+//========================================================================================
+// R209-F08 execution-part-construct
+//----------------------------------------------------------------------------------------
+execution_part_construct returns [ATerm aterm]
+   :   executable_construct           {retval.aterm = $executable_construct.aterm;}
+//TODO PUTBACK   |   format_stmt
+//TODO PUTBACK   |   entry_stmt
+//TODO PUTBACK   |   data_stmt
+   ;
+
+//========================================================================================
+// R213-F08 executable-construct
+//----------------------------------------------------------------------------------------
+executable_construct returns [ATerm aterm]
+   :   action_stmt           {retval.aterm = $action_stmt.aterm;}
+//TODO PUTBACK   |   associate_construct
+//TODO PUTBACK   |   block_construct                 // NEW_TO_2008
+//TODO PUTBACK   |   case_construct
+//TODO PUTBACK   |   critical_construct              // NEW_TO_2008
+//TODO PUTBACK   |   do_construct
+//TODO PUTBACK   |   forall_construct
+//TODO PUTBACK   |   if_construct
+//TODO PUTBACK   |   select_type_construct
+//TODO PUTBACK   |   where_construct
+   ;
+
+//========================================================================================
+// R214-F08 action-stmt
+//----------------------------------------------------------------------------------------
+action_stmt returns [ATerm aterm]
+//TODO PUTBACK   :   allocate_stmt
+   :   assignment_stmt           {retval.aterm = $assignment_stmt.aterm;}
+//TODO PUTBACK   |   backspace_stmt
+//TODO PUTBACK   |   call_stmt
+//TODO PUTBACK   |   close_stmt
+//TODO PUTBACK   |   continue_stmt
+//TODO PUTBACK   |   cycle_stmt
+//TODO PUTBACK   |   deallocate_stmt
+//////////
+// These end functions are not needed because the initiating constructs are called
+// explicitly to avoid ambiguities.
+//   |   end_function_stmt
+//   |   end_mp_subprogram_stmt        // NEW_TO_2008
+//   |   end_program_stmt
+//   |   end_subroutine_stmt
+//TODO PUTBACK   |   endfile_stmt
+//TODO PUTBACK   |   errorstop_stmt                // NEW_TO_2008
+//TODO PUTBACK   |   exit_stmt
+//TODO PUTBACK   |   flush_stmt
+//TODO PUTBACK   |   forall_stmt
+//TODO PUTBACK   |   goto_stmt
+//TODO PUTBACK   |   if_stmt
+//TODO PUTBACK   |   inquire_stmt  
+//TODO PUTBACK   |   lock_stmt                     // NEW_TO_2008
+//TODO PUTBACK   |   nullify_stmt
+//TODO PUTBACK   |   open_stmt
+//TODO PUTBACK   |   pointer_assignment_stmt
+//TODO PUTBACK   |   print_stmt
+//TODO PUTBACK   |   read_stmt
+//TODO PUTBACK   |   return_stmt
+//TODO PUTBACK   |   rewind_stmt
+//TODO PUTBACK   |   stop_stmt
+//TODO PUTBACK   |   sync_all_stmt                 // NEW_TO_2008
+//TODO PUTBACK   |   sync_images_stmt              // NEW_TO_2008
+//TODO PUTBACK   |   sync_memory_stmt              // NEW_TO_2008
+//TODO PUTBACK   |   unlock_stmt                   // NEW_TO_2008
+//TODO PUTBACK   |   wait_stmt
+//TODO PUTBACK   |   where_stmt
+//TODO PUTBACK   |   write_stmt
+//TODO PUTBACK   |   arithmetic_if_stmt
+//TODO PUTBACK   |   computed_goto_stmt
+//TODO PUTBACK   |   assign_stmt                   // deleted feature
+//TODO PUTBACK   |   assigned_goto_stmt            // deleted feature
+//TODO PUTBACK   |   pause_stmt                    // deleted feature
+   ;
 
 /**
  * Section/Clause 4: Types
@@ -437,6 +539,27 @@ opt_kind_selector returns [ATerm aterm]
    ;
 
 //========================================================================================
+// R407-F08 int-literal-constant
+//----------------------------------------------------------------------------------------
+int_literal_constant returns [ATerm aterm]
+@after
+{
+  if (kp.tree)
+       retval.aterm = ATmake("int-literal-constant(<int>,<term>)",atoi(ds->getText(ds)->chars),kp);
+  else retval.aterm = ATmake("int-literal-constant(<int>)",       atoi(ds->getText(ds)->chars));
+}
+   :  ^(OFPIntLiteralConstant ds=T_DIGIT_STRING ^(OFPKindParam kp=kind_param?))
+   ;
+
+//========================================================================================
+// R408-F08 kind-param
+//----------------------------------------------------------------------------------------
+kind_param returns [ATerm aterm]
+   :   ds=T_DIGIT_STRING  {retval.aterm = ATmake("kind-param(<int>)", atoi(ds->getText(ds)->chars));}
+   |   id=T_IDENT         {retval.aterm = ATmake("kind-param(<str>)", id->getText(id)->chars);}
+   ;
+
+//========================================================================================
 // R420-F08 char-selector
 //----------------------------------------------------------------------------------------
 opt_char_selector returns [ATerm aterm]
@@ -462,7 +585,7 @@ type_declaration_stmt returns [ATerm aterm]
           entity_decl_list
         )
            {
-              retval.aterm = ATmake("type-declaration-stmt(<term>, <term>, <term>)",
+              retval.aterm = ATmake("type-declaration-stmt(<term>,<term>,<term>)",
                                     $opt_label.aterm,
                                     $declaration_type_spec.aterm,
                                     $entity_decl_list.aterm
@@ -490,16 +613,16 @@ entity_decl returns [ATerm aterm]
 entity_decl_list returns [ATerm aterm]
 @init
 {
-   ATermList edlist = ATmakeList0();
+   ATermList list = ATmakeList0();
 }
 @after
 {
-   retval.aterm = ATmake("entity-decl-list(<term>)", edlist);
+   retval.aterm = ATmake("entity-decl-list(<term>)", list);
    retval.aterm = ofp_annotate_start_stop(retval.aterm, retval.tree);
 }
    :   ^(OFPEntityDeclList
            (
-              entity_decl  {edlist = ATappend(edlist, $entity_decl.aterm);}
+              entity_decl  {list = ATappend(list, $entity_decl.aterm);}
            )+
         )
    ;
@@ -516,6 +639,108 @@ implicit_stmt
            }
    ;
 
+
+/**
+ * Section/Clause 6: Use of data objects
+ */               
+
+//========================================================================================
+// R601-F08 designator
+//----------------------------------------------------------------------------------------
+designator returns [ATerm aterm]
+@after
+{
+   retval.aterm = ofp_annotate_start_stop(retval.aterm, retval.tree);
+}
+   :  ^(OFPDesignator  data_ref               substring_range? )
+          {
+            //TODO - add substring range
+            retval.aterm = ATmake("designator(<term>)", $data_ref.aterm);
+          }
+
+//TODO - add this option
+//   |  ^(OFPDesignator  char_literal_constant  substring_range  )
+//          {
+//            retval.aterm = ATmake("designator(<term>)", $char_literal_constant);
+//          }
+   ;
+
+//========================================================================================
+// R602-F08 variable
+//----------------------------------------------------------------------------------------
+variable returns [ATerm aterm]
+@after
+{
+   retval.aterm = ATmake("variable(<term>)", d.aterm);
+   retval.aterm = ofp_annotate_start_stop(retval.aterm, retval.tree);
+}
+   :   ^(OFPVariable d=designator)
+   ;
+
+//========================================================================================
+// R611-F08 data-ref
+//----------------------------------------------------------------------------------------
+data_ref returns [ATerm aterm]
+@init
+{
+   ATermList list = ATmakeList0();
+}
+@after
+{
+   retval.aterm = ATmake("data-ref(<term>)", list);
+   retval.aterm = ofp_annotate_start_stop(retval.aterm, retval.tree);
+}
+   :  ^(OFPDataRef ^(OFPPartRefList (part_ref {list=ATappend(list, $part_ref.aterm);})+ ))
+   ;
+
+//========================================================================================
+// R612-F08 part-ref
+//----------------------------------------------------------------------------------------
+part_ref returns [ATerm aterm]
+@after
+{
+   retval.aterm = ATmake("part-ref(<str>)", id->getText(id)->chars);
+   retval.aterm = ofp_annotate_start_stop(retval.aterm, retval.tree);
+}
+   :  ^(OFPPartRef id=T_IDENT)
+      //TODO - add section-subscript-list and image-selector
+   ;
+
+/**
+ * Section/Clause 7: Expressions and assignment
+ */
+
+//========================================================================================
+// R722-F08  expr
+//----------------------------------------------------------------------------------------
+expr returns [ATerm aterm]
+   :  ^(OFPExpr int_literal_constant)    // TODO FIXME
+          {
+             retval.aterm = ATmake("expr(<term>)", $int_literal_constant.aterm);
+//TODO - PUTBACK             retval.aterm = ofp_annotate_start_stop(retval.aterm, retval.tree);
+          }
+   ;
+
+//========================================================================================
+// R732-F08  assignment-stmt
+//----------------------------------------------------------------------------------------
+assignment_stmt returns [ATerm aterm]
+   :  ^(OFPAssignmentStmt opt_label variable expr)
+
+       {
+          retval.aterm = ATmake("assignment-stmt(<term>,<term>,<term>)",
+                                $opt_label.aterm,
+                                $variable.aterm,
+                                $expr.aterm);
+          retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPAssignmentStmt);
+       }
+   ;
+
+
+/**
+ * Section/Clause 11: Program units
+ */
+
 //========================================================================================
 // R1101-F08 main-program
 //----------------------------------------------------------------------------------------
@@ -523,7 +748,7 @@ main_program returns [ATerm aterm]
    :   ^(OFPMainProgram
            program_stmt
               specification_part
-              ^(OFPExecutionPart           execution_part?           )
+              execution_part
               ^(OFPInternalSubprogramPart  internal_subprogram_part? )
            end_program_stmt
         )
@@ -532,7 +757,7 @@ main_program returns [ATerm aterm]
            retval.aterm = ATmake("main-program(<term>,<term>,<term>,<term>,<term>)",
                                   $program_stmt.aterm,
                                   $specification_part.aterm,
-                                  ATmake("execution-part"),
+                                  $execution_part.aterm,
                                   ATmake("internal-subprogram-part"),
                                   $end_program_stmt.aterm);
            retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPMainProgram);
@@ -559,7 +784,7 @@ program_stmt returns [ATerm aterm]
 
        {
           ATerm name = aterm_opt_str($OFPProgramName, "program-name");
-          retval.aterm = ATmake("program-stmt(<term>, <term>)", $opt_label.aterm, name);
+          retval.aterm = ATmake("program-stmt(<term>,<term>)", $opt_label.aterm, name);
           retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPProgramStmt);
        }
    ;
@@ -575,7 +800,7 @@ end_program_stmt returns [ATerm aterm]
 
        {
           ATerm name = aterm_opt_str($OFPProgramName, "program-name");
-          retval.aterm = ATmake("end-program-stmt(<term>, <term>)", $opt_label.aterm, name);
+          retval.aterm = ATmake("end-program-stmt(<term>,<term>)", $opt_label.aterm, name);
           retval.aterm = ofp_annotate_start_stop(retval.aterm, $OFPEndProgramStmt);
        }
    ;
