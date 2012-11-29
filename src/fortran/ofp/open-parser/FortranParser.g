@@ -21,16 +21,21 @@ options {
 tokens {
    // Imaginary nodes for intermediate processing
    //
+   OFPAssignmentStmt;
    OFPAttrSpec;
    OFPBind;
    OFPCharSelector;
    OFPComment;
    OFPCommentList;
+   OFPDataRef;
    OFPDeclarationConstruct;
    OFPDeclarationConstructList;
    OFPDeclarationTypeSpec;
+   OFPDesignator;
    OFPEntityDeclList;
    OFPExecutionPart;
+   OFPExecutablePartConstructList;
+   OFPExpr;
    OFPGenericSpec;
    OFPImplicitPart;
    OFPImportStmtList;
@@ -40,7 +45,9 @@ tokens {
    OFPInternalSubprogramPart;
    OFPInterfaceStmt;
    OFPEndInterfaceStmt;
+   OFPIntLiteralConstant;
    OFPIntrinsicTypeSpec;
+   OFPKindParam;
    OFPKindSelector;
    OFPLabel;
    OFPList;
@@ -54,6 +61,8 @@ tokens {
    OFPObjectName;
    OFPOnlyList;
    OFPOptional;
+   OFPPartRef;
+   OFPPartRefList;
    OFPPrefixList;
    OFPProgramName;
    OFPProgramStmt;
@@ -65,7 +74,9 @@ tokens {
    OFPUnimplemented;
    OFPUseStmt;
    OFPUseStmtList;
+   OFPVariable;
 
+// TODO - make go away
    OFPBeginStmt;
    OFPEndStmt;
 
@@ -509,19 +520,38 @@ declaration_construct
    ;
 
 
-// R208
+//========================================================================================
+/*
+ * R208-F08   execution-part      is executable-construct
+ *                                    [ execution-part-construct ] ...
+ */
+//----------------------------------------------------------------------------------------
 execution_part
-@after {
-    c_action_execution_part();
+@after
+{
+   c_action_execution_part();
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+   treeSetListBoundaries (retval.tree, 1);
 }
    :   executable_construct
        execution_part_construct *
+
+   ->  ^(OFPExecutablePartConstructList executable_construct execution_part_construct*)
    ;
 
-// R209
+//========================================================================================
+/*
+ * R209-F08   execution-part-construct      is executable-construct
+ *                                          or format-stmt
+ *                                          or entry-stmt
+ *                                          or data-stmt
+ */
+//----------------------------------------------------------------------------------------
 execution_part_construct
-@after {
-    c_action_execution_part_construct();
+@after
+{
+   c_action_execution_part_construct();
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
 }
    :   executable_construct  
    |   format_stmt
@@ -1033,15 +1063,30 @@ signed_int_literal_constant
             { c_action_signed_int_literal_constant(sign); }
    ;
 
-// R406
+//========================================================================================
+/* R407-F08 int-literal-constant
+ *    is digit-string [ _ kind-param ]
+ */
+//----------------------------------------------------------------------------------------
 int_literal_constant
-@init{pANTLR3_COMMON_TOKEN kind = NULL;} 
+@init
+{
+   pANTLR3_COMMON_TOKEN kind = NULL;
+} 
    :   T_DIGIT_STRING (T_UNDERSCORE kind_param {kind = $kind_param.start;})?
             {c_action_int_literal_constant($T_DIGIT_STRING, kind);}
+
+   -> ^(OFPIntLiteralConstant T_DIGIT_STRING ^(OFPKindParam kind_param?))
    ;
 
 // R407
+//========================================================================================
+/* R408-F08 kind-param
+ *   is  digit-string
+ *   of  scalar-int-constant-name
+ */
 // T_IDENT inlined for scalar_int_constant_name
+//----------------------------------------------------------------------------------------
 kind_param
    :   T_DIGIT_STRING 
            { c_action_kind_param($T_DIGIT_STRING); }
@@ -2967,15 +3012,17 @@ common_block_object_list
  * Section/Clause 6: Use of data objects
  */               
 
-
-// R601
-variable
-   :   designator {c_action_variable();}
-   ;
-
-// R602 variable_name was name inlined as T_IDENT
-
-// R603
+//========================================================================================
+/* R601-F08 designator
+ *    is object-name
+ *    or array-element
+ *    or array-section
+ *    or coindexed-named-object
+ *    or complex-part-designator
+ *    or structure-component
+ *    or substring
+ */
+//
 //  :   object-name             // T_IDENT (data-ref isa T_IDENT)
 //  |   array-element           // R616 is data-ref
 //  |   array-section           // R617 is data-ref [ (substring-range) ] 
@@ -2983,13 +3030,27 @@ variable
 //  |   substring
 // (substring-range) may be matched in data-ref
 // this rule is now identical to substring
+//----------------------------------------------------------------------------------------
 designator
-@init{ANTLR3_BOOLEAN hasSubstringRange = ANTLR3_FALSE;}
-   :   data_ref (T_LPAREN substring_range {hasSubstringRange=ANTLR3_TRUE;} T_RPAREN)?
-            { c_action_designator(hasSubstringRange); }
-   |   char_literal_constant T_LPAREN substring_range T_RPAREN
-            { hasSubstringRange=ANTLR3_TRUE; c_action_substring(hasSubstringRange); }
+@init
+{
+   ANTLR3_BOOLEAN hasSubstringRange = ANTLR3_FALSE;
+}
+@after
+{
+   c_action_designator(hasSubstringRange);
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+}
+   :   data_ref ( T_LPAREN substring_range T_RPAREN {hasSubstringRange=ANTLR3_TRUE;} )?
+
+   ->  ^(OFPDesignator data_ref substring_range?)
+
+   |   char_literal_constant T_LPAREN substring_range T_RPAREN {hasSubstringRange=ANTLR3_TRUE;}
+
+   ->  ^(OFPDesignator char_literal_constant substring_range)
    ;
+
+// R603 variable_name was name inlined as T_IDENT
 
 //
 // a function_reference is ambiguous with designator, ie, foo(b) could be an 
@@ -3120,6 +3181,22 @@ substr_range_or_arg_list_suffix returns [ANTLR3_BOOLEAN isSubstringRange]
             }  // actual_arg_spec_list
    ;
 
+
+//========================================================================================
+/* R602-F08 variable
+ *    is  designator
+ *    or  expr
+ */
+//----------------------------------------------------------------------------------------
+variable
+@after
+{
+   c_action_variable();
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+}
+   :   designator  ->  ^(OFPVariable designator)
+   ;
+
 // R604
 logical_variable
    :   variable
@@ -3191,11 +3268,23 @@ substring_range
             { c_action_substring_range(hasLowerBound, hasUpperBound); }
    ;
 
-// R612
+//========================================================================================
+// R611-F08 data-ref
+//----------------------------------------------------------------------------------------
 data_ref
-@init{int numPartRefs = 0;}
-   :   part_ref {numPartRefs += 1;} ( T_PERCENT part_ref {numPartRefs += 1;})*
-            {c_action_data_ref(numPartRefs);}
+@init
+{
+   int numPartRefs = 1;
+}
+@after
+{
+   c_action_data_ref(numPartRefs);
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+   treeSetListBoundaries (retval.tree, 1);
+}
+   :   part_ref ( T_PERCENT part_ref {numPartRefs += 1;})*
+
+   ->  ^(OFPDataRef ^(OFPPartRefList part_ref+) )
    ;
 
 /**
@@ -3687,13 +3776,18 @@ equiv_op
    |   T_NEQV     { c_action_equiv_op($T_NEQV); }
    ;
 
-// R722
+//========================================================================================
+/* R722-F08  expr
+ *   is [ expr defined-binary-op ] level-5-expr
+ */
 // moved leading optional to level_5_expr
+//----------------------------------------------------------------------------------------
 expr
-//    : ( expr defined_binary_op )? level_5_expr
-//    : ( level_5_expr defined_binary_op )* level_5_expr
-   : level_5_expr
-        {c_action_expr();}
+@after
+{
+   c_action_expr();
+}
+   : level_5_expr  ->  ^(OFPExpr level_5_expr)
    ;
 
 // R723
@@ -3729,13 +3823,19 @@ defined_binary_op
 
 // inlined scalar_logical_initialization_expr was logical_expr
 
-// R734
+//========================================================================================
+// R732-F08  assignment-stmt  is  variable = expr
+//----------------------------------------------------------------------------------------
 assignment_stmt
-@init {pANTLR3_COMMON_TOKEN lbl = NULL;}
-@after{checkForInclude();}
-   :   (label {lbl=$label.start;})? T_ASSIGNMENT_STMT variable
-        T_EQUALS expr end_of_stmt
-            {c_action_assignment_stmt(lbl, $end_of_stmt.start);}
+@after
+{
+   checkForInclude();
+   c_action_assignment_stmt((lbl.tree==NULL)?NULL:lbl.start,eos.start);
+   treeSetTokenBoundaries(retval.tree, retval.start, retval.stop, -1);
+}
+   :   lbl=opt_label T_ASSIGNMENT_STMT variable T_EQUALS expr eos=end_of_stmt
+
+   -> ^(OFPAssignmentStmt opt_label variable expr)
    ;
 
 // R735
@@ -6812,10 +6912,11 @@ specification_part
    treeSetListBoundaries (retval.tree, 1);
    treeSetListBoundaries (retval.tree, 2);
    treeSetListBoundaries (retval.tree, 3);  // TODO - why not 4, what about implicit_part?
+                                            // maybe because implicit_part_recursion can be empty
 }
    :   ( use_stmt               {numUseStmts++;}    )*
        ( import_stmt            {numImportStmts++;} )*
-       implicit_part_recursion             // making nonoptional with predicates fixes ambiguity
+         implicit_part_recursion             // making nonoptional with predicates fixes ambiguity
        ( declaration_construct  {gCount2++;}        )*
            {
               c_action_specification_part(numUseStmts,numImportStmts,gCount1,gCount2);
@@ -6824,7 +6925,7 @@ specification_part
    ->  ^(OFPSpecificationPart
            ^(OFPUseStmtList               use_stmt*               )
            ^(OFPImportStmtList            import_stmt*            )
-           ^(OFPImplicitPart              implicit_part_recursion )
+           ^(OFPImplicitPart              )//TODO PUTBACK implicit_part_recursion )
            ^(OFPDeclarationConstructList  declaration_construct*  )
         )
    ;
@@ -6840,7 +6941,6 @@ implicit_part_recursion
    |   ((label)? T_ENTRY)     => entry_stmt     {gCount2++;} implicit_part_recursion
    |   // empty
    ;
-
 
 //========================================================================================
 //
@@ -6865,15 +6965,16 @@ executable_construct
    c_action_executable_construct();
 }
    :   action_stmt
-   |   associate_construct
-   |   block_construct                 // NEW_TO_2008
-   |   case_construct
-   |   critical_construct              // NEW_TO_2008
-   |   do_construct
-   |   forall_construct
-   |   if_construct
-   |   select_type_construct
-   |   where_construct
+//TODO PUTBACK
+//   |   associate_construct
+//   |   block_construct                 // NEW_TO_2008
+//   |   case_construct
+//   |   critical_construct              // NEW_TO_2008
+//   |   do_construct
+//   |   forall_construct
+//   |   if_construct
+//   |   select_type_construct
+//   |   where_construct
    ;
 
 
@@ -6942,14 +7043,16 @@ action_stmt
 // also.  However, need to see if there is a way to define tokens w/o defining
 // them in the lexer so that the lexer doesn't have to add them to it's parsing.
 //  02.05.07
-   :   allocate_stmt
-   |   assignment_stmt
-   |   backspace_stmt
-   |   call_stmt
-   |   close_stmt
-   |   continue_stmt
-   |   cycle_stmt
-   |   deallocate_stmt
+//TODO PUTBACK
+//   :   allocate_stmt
+   :   assignment_stmt
+//TODO PUTBACK
+//   |   backspace_stmt
+//   |   call_stmt
+//   |   close_stmt
+//   |   continue_stmt
+//   |   cycle_stmt
+//   |   deallocate_stmt
 //////////
 // These end functions are not needed because the initiating constructs are called
 // explicitly to avoid ambiguities.
@@ -6957,35 +7060,36 @@ action_stmt
 //   |   end_mp_subprogram_stmt        // NEW_TO_2008
 //   |   end_program_stmt
 //   |   end_subroutine_stmt
-   |   endfile_stmt
-   |   errorstop_stmt                // NEW_TO_2008
-   |   exit_stmt
-   |   flush_stmt
-   |   forall_stmt
-   |   goto_stmt
-   |   if_stmt
-   |   inquire_stmt  
-   |   lock_stmt                     // NEW_TO_2008
-   |   nullify_stmt
-   |   open_stmt
-   |   pointer_assignment_stmt
-   |   print_stmt
-   |   read_stmt
-   |   return_stmt
-   |   rewind_stmt
-   |   stop_stmt
-   |   sync_all_stmt                 // NEW_TO_2008
-   |   sync_images_stmt              // NEW_TO_2008
-   |   sync_memory_stmt              // NEW_TO_2008
-   |   unlock_stmt                   // NEW_TO_2008
-   |   wait_stmt
-   |   where_stmt
-   |   write_stmt
-   |   arithmetic_if_stmt
-   |   computed_goto_stmt
-   |   assign_stmt                   // ADDED?
-   |   assigned_goto_stmt            // ADDED?
-   |   pause_stmt                    // ADDED?
+//TODO PUTBACK
+//   |   endfile_stmt
+//   |   errorstop_stmt                // NEW_TO_2008
+//   |   exit_stmt
+//   |   flush_stmt
+//   |   forall_stmt
+//   |   goto_stmt
+//   |   if_stmt
+//   |   inquire_stmt  
+//   |   lock_stmt                     // NEW_TO_2008
+//   |   nullify_stmt
+//   |   open_stmt
+//   |   pointer_assignment_stmt
+//   |   print_stmt
+//   |   read_stmt
+//   |   return_stmt
+//   |   rewind_stmt
+//   |   stop_stmt
+//   |   sync_all_stmt                 // NEW_TO_2008
+//   |   sync_images_stmt              // NEW_TO_2008
+//   |   sync_memory_stmt              // NEW_TO_2008
+//   |   unlock_stmt                   // NEW_TO_2008
+//   |   wait_stmt
+//   |   where_stmt
+//   |   write_stmt
+//   |   arithmetic_if_stmt
+//   |   computed_goto_stmt
+//   |   assign_stmt                   // deleted feature
+//   |   assigned_goto_stmt            // deleted feature
+//   |   pause_stmt                    // deleted feature
    ;
 
 
@@ -7064,7 +7168,6 @@ type_declaration_stmt
 
 
 //========================================================================================
-//
 /*
  * R612-F08 part-ref
  *    is part-name [ ( section-subscript-list ) ] [ image-selector]
@@ -7084,23 +7187,22 @@ options {k=2;}
    ANTLR3_BOOLEAN hasSSL = ANTLR3_FALSE;
    ANTLR3_BOOLEAN hasImageSelector = ANTLR3_FALSE;
 }
-   :   (T_IDENT T_LPAREN) => T_IDENT T_LPAREN section_subscript_list T_RPAREN
-                             (image_selector {hasImageSelector=ANTLR3_TRUE;})?
-           {
-              hasSSL=ANTLR3_TRUE;
-              c_action_part_ref($T_IDENT, hasSSL, hasImageSelector);
-           }
+@after
+{
+   c_action_part_ref(id, hasSSL, hasImageSelector);
+}
+   :   (T_IDENT T_LPAREN)   => id=T_IDENT T_LPAREN section_subscript_list T_RPAREN {hasSSL=ANTLR3_TRUE;}
+                                  (image_selector {hasImageSelector=ANTLR3_TRUE;})?
 
-   |   (T_IDENT T_LBRACKET) => T_IDENT image_selector
-           {
-              hasImageSelector=ANTLR3_TRUE;
-              c_action_part_ref($T_IDENT, hasSSL, hasImageSelector);
-           }
+   ->  ^(OFPPartRef T_IDENT section_subscript_list image_selector?)
 
-   |   T_IDENT
-           {
-              c_action_part_ref($T_IDENT, hasSSL, hasImageSelector);
-           }
+   |   (T_IDENT T_LBRACKET) => id=T_IDENT image_selector {hasImageSelector=ANTLR3_TRUE;}
+
+   ->  ^(OFPPartRef T_IDENT image_selector)
+
+   |   id=T_IDENT
+
+   ->  ^(OFPPartRef T_IDENT)
    ;
 
 
