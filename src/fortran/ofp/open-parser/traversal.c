@@ -1,6 +1,6 @@
 #include "traversal.h"
 
-ATbool ofp_tranverse_label(ATerm term)
+ATbool ofp_traverse_label(ATerm term)
 {
    int    label;
    ATbool matched = ATfalse;
@@ -12,7 +12,7 @@ ATbool ofp_tranverse_label(ATerm term)
    return matched;
 }
 
-ATbool ofp_tranverse_program_name(ATerm term)
+ATbool ofp_traverse_program_name(ATerm term)
 {
    char * name;
    ATbool matched = ATfalse;
@@ -64,15 +64,84 @@ ATbool ofp_traverse_declaration_construct_list(ATerm term)
    ATerm     head;
    ATermList tail;
 
-   if ( ATmatch(term, "declaration-construct-list(<list>)", &tail) != ATtrue ) return ATfalse;
+   if (! ATmatch(term, "declaration-construct-list(<list>)", &tail)) return ATfalse;
 
-   while (!ATisEmpty(tail)) {
+   while (! ATisEmpty(tail)) {
       head = ATgetFirst (tail);
       tail = ATgetNext  (tail);
       if ( ofp_traverse_declaration_construct(head) != ATtrue) return ATfalse;
    }
 
    return ATtrue;
+}
+
+//========================================================================================
+// R208-F08 execution-part
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_execution_part(ATerm term)
+{
+   ATerm ep;
+
+   if (ATmatch(term, "executable-part", &ep))  return ATtrue;
+
+   if (ATmatch(term, "executable-part(<term>)", &ep)) {
+      if (! ofp_traverse_executable_part_construct_list(ep)) return ATfalse;
+      return ATtrue;
+   }
+
+   return ATfalse;
+}
+
+//========================================================================================
+// R209-F08 execution-part-construct
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_execution_part_construct(ATerm term)
+{
+   //TODO PUTBACK   if ( ofp_traverse_format_stmt          (term) ) return ATtrue;
+   //TODO PUTBACK   if ( ofp_traverse_entry_stmt           (term) ) return ATtrue;
+   //TODO PUTBACK   if ( ofp_traverse_data_stmt            (term) ) return ATtrue;
+
+   if ( ofp_traverse_executable_construct (term) ) return ATtrue;
+
+   return ATfalse;
+}
+
+ATbool ofp_traverse_executable_part_construct_list(ATerm term)
+{
+   ATerm     head;
+   ATermList tail;
+
+   if (! ATmatch(term, "executable-part-construct-list(<list>)", &tail)) return ATfalse;
+
+   while (! ATisEmpty(tail)) {
+      head = ATgetFirst (tail);
+      tail = ATgetNext  (tail);
+      if ( ofp_traverse_executable_construct(head) != ATtrue) return ATfalse;
+   }
+
+   return ATtrue;
+}
+
+//========================================================================================
+// R213-F08 executable-construct
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_executable_construct(ATerm term)
+{
+   if ( ofp_traverse_action_stmt (term) ) return ATtrue;
+   //TODO PUTBACK other branches
+
+   return ATfalse;
+}
+
+//========================================================================================
+// R214-F08 action-stmt
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_action_stmt(ATerm term)
+{
+   if ( ofp_traverse_assignment_stmt (term) ) return ATtrue;
+   //TODO PUTBACK other branches
+
+   return ATfalse;
 }
 
 /**
@@ -113,6 +182,19 @@ ATbool ofp_traverse_intrinsic_type_spec(ATerm term)
    return matched;
 }
 
+//========================================================================================
+// R407-F08  int-literal-constant
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_int_literal_constant(ATerm term)
+{
+   int i;
+
+   if (! ATmatch(term, "int-literal-constant(<int>)", &i)) return ATfalse;
+   printf("%d", i);
+
+   return ATtrue;
+}
+
 /**
  * Section/Clause 5: Attribute declarations and specifications
  */
@@ -133,7 +215,7 @@ ATbool ofp_traverse_type_declaration_stmt(ATerm term)
                      &entity_decl_list);
    if (!matched) return ATfalse;
 
-   ofp_tranverse_label(label);   /* optional */
+   ofp_traverse_label(label);   /* optional */
 
    if ( ofp_traverse_declaration_type_spec (decl_type_spec) != ATtrue ) return ATfalse;
    printf(" :: ");
@@ -175,6 +257,95 @@ ATbool ofp_traverse_entity_decl_list(ATerm term)
    return ATtrue;
 }
 
+//========================================================================================
+// R601-F08 designator
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_designator(ATerm term)
+{
+   ATerm data_ref;
+
+   if (! ATmatch(term, "designator(<term>)", &data_ref)) return ATfalse;
+   if (! ofp_traverse_data_ref(data_ref))                return ATfalse;
+
+   return ATtrue;
+}
+
+//========================================================================================
+// R602-F08 variable
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_variable(ATerm term)
+{
+   ATerm designator;
+
+   if (! ATmatch(term, "variable(<term>)", &designator)) return ATfalse;
+   if (! ofp_traverse_designator(designator))            return ATfalse;
+
+   return ATtrue;
+}
+
+//========================================================================================
+// R611-F08 data-ref
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_data_ref(ATerm term)
+{
+   ATerm list;
+
+   if (! ATmatch(term, "data-ref(<term>)", &list)) return ATfalse;
+   if (! ofp_traverse_part_ref(list))              return ATfalse;
+
+   return ATtrue;
+}
+
+//========================================================================================
+// R612-F08 part-ref
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_part_ref(ATerm tail)
+{
+   ATerm  head;
+   char * id, * percent = "";
+
+   while (! ATisEmpty(tail)) {
+      head = ATgetFirst (tail);
+      tail = ATgetNext  (tail);
+      if (! ATmatch(head, "part-ref(<str>)", &id)) return ATfalse;
+      printf("%s%s", id, percent);      percent = "%";
+   }
+
+   return ATtrue;
+}
+
+
+//========================================================================================
+// R722-F08  expr
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_expr(ATerm term)
+{
+   ATerm int_literal_constant;
+
+   if (! ATmatch(term, "expr(<term>)", &int_literal_constant))    return ATfalse;
+   if (! ofp_traverse_int_literal_constant(int_literal_constant)) return ATfalse;
+
+   return ATtrue;
+}
+
+//========================================================================================
+// R732-F08 assignment-stmt
+//----------------------------------------------------------------------------------------
+ATbool ofp_traverse_assignment_stmt(ATerm term)
+{
+   ATerm label, var, expr;
+
+   if (! ATmatch(term,"assignment-stmt(<term>,<term>,<term>)",&label,&var,&expr)) return ATfalse;
+
+   ofp_traverse_label(label);         /* optional */
+
+   if (! ofp_traverse_variable(var)) return ATfalse;
+   printf(" = ");
+   if (! ofp_traverse_expr(expr)   ) return ATfalse;
+   printf("\n");
+
+   return ATtrue;
+}
 
 //========================================================================================
 // R1101-F08 main-program
@@ -194,6 +365,7 @@ ATbool ofp_traverse_main_program(ATerm term)
  
    if (!(matched = ofp_traverse_program_stmt         (prgm_stmt)     )) return ATfalse;
    if (!(matched = ofp_traverse_specification_part   (spec_part)     )) return ATfalse;
+   if (!(matched = ofp_traverse_execution_part       (exe_part)      )) return ATfalse;
    if (!(matched = ofp_traverse_end_program_stmt     (end_prgm_stmt) )) return ATfalse;
 
    return matched;
@@ -213,10 +385,10 @@ ATbool ofp_traverse_program_stmt(ATerm term)
    matched = ATmatch(term, "program-stmt(<term>, <term>)", &label, &name);
    if (!matched) return ATfalse;
 
-   ofp_tranverse_label(label);   /* optional */
+   ofp_traverse_label(label);   /* optional */
    printf("PROGRAM");
 
-   matched = ofp_tranverse_program_name(name);
+   matched = ofp_traverse_program_name(name);
    printf("\n");
 
    return matched;
@@ -227,17 +399,15 @@ ATbool ofp_traverse_program_stmt(ATerm term)
 //----------------------------------------------------------------------------------------
 ATbool ofp_traverse_end_program_stmt(ATerm term)
 {
-   ATbool matched;
    ATerm  label, name;
 
-   matched = ATmatch(term, "end-program-stmt(<term>, <term>)", &label, &name);
-   if (!matched) return ATfalse;
+   if (! ATmatch(term, "end-program-stmt(<term>,<term>)", &label, &name)) return ATfalse;
 
-   ofp_tranverse_label(label);         /* optional */
+   ofp_traverse_label(label);         /* optional */
    printf("END PROGRAM");
 
-   ofp_tranverse_program_name(name);   /* optional */
+   ofp_traverse_program_name(name);   /* optional */
    printf("\n");
 
-   return matched;
+   return ATtrue;
 }
