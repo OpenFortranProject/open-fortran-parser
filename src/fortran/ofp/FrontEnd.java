@@ -226,6 +226,7 @@ public class FrontEnd implements Callable<Boolean> {
       Boolean verbose = false;
       Boolean silent = true;
       Boolean dumpTokens = false;
+      Boolean dumpAllTokens = false;
       String tokenFile = null;
       ArrayList<String> newArgs = new ArrayList<String>(0);
       String type = "fortran.ofp.parser.java.FortranParserActionNull";
@@ -260,19 +261,23 @@ public class FrontEnd implements Callable<Boolean> {
             nArgs += 1;
             continue;
          } else if (args[i].startsWith("--silent")) {
-             type = "fortran.ofp.parser.java.FortranParserActionPrint";
-             silent = true;
-             nArgs += 1;
-             continue;
+            type = "fortran.ofp.parser.java.FortranParserActionPrint";
+            silent = true;
+            nArgs += 1;
+            continue;
          } else if (args[i].startsWith("--tokenfile")) {
-             tokenFile = args[i+1];
-             dumpTokens = true;
-             nArgs += 1;
-             continue;
+            i += 1;
+            tokenFile = args[i];
+            nArgs += 2;
+            continue;
+         } else if (args[i].startsWith("--alltokens")) {
+            dumpAllTokens = true;
+            nArgs += 1;
+            continue;
          } else if (args[i].startsWith("--tokens")) {
-             dumpTokens = true;
-             nArgs += 1;
-             continue;
+            dumpTokens = true;
+            nArgs += 1;
+            continue;
          } else if (args[i].startsWith("--class")) {
             i += 1;
             type = args[i];
@@ -303,7 +308,8 @@ public class FrontEnd implements Callable<Boolean> {
          //
          if (args[i].startsWith("--RiceCAF") | args[i].startsWith("--LOPExt") | 
              args[i].startsWith("--dump")    | args[i].startsWith("--silent") |
-             args[i].startsWith("--verbose") | args[i].startsWith("--tokens")) {
+             args[i].startsWith("--verbose") | args[i].startsWith("--tokens") |
+                                               args[i].startsWith("--alltokens")) {
             continue;
          } else if (args[i].startsWith("-I")) {
             /* Skip the include dir stuff; it's handled by the lexer. */
@@ -334,14 +340,16 @@ public class FrontEnd implements Callable<Boolean> {
             }
 
             if (dumpTokens) {
-                if (tokenFile != null) {
-                	ofp.tokens.outputTokenList(tokenFile);
-                } else {
-            		ofp.tokens.outputTokenList(ofp.parser.getAction());
-                }
+               ofp.tokens.outputTokenList(ofp.parser.getAction());
+            }
+            else if (tokenFile != null && !dumpAllTokens) {
+               ofp.tokens.outputTokenList(tokenFile);
             }
             else {
                error |= ofp.call();
+               if (dumpAllTokens && tokenFile != null) {
+                  ofp.tokens.outputTokenList(tokenFile);
+               }
             }
          }
 
