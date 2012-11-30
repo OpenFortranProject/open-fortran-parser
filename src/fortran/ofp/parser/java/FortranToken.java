@@ -26,7 +26,7 @@ public class FortranToken extends CommonToken {
 	protected String whiteText = "";
 
 	public FortranToken(CharStream input, int type, int channel,
-							  int start, int stop) {
+                                              int start, int stop) {
 		super(input, type, channel, start, stop);
 	}
 
