@@ -24,7 +24,7 @@ module Fortran
 
 imports FortranLex
 %%TODO imports R400DataTypes
-%%TODO imports R500DataDeclarations
+imports R500DataDeclarations
 %%TODO imports R600UseDataObjects
 %%TODO imports R700Expressions
 %%TODO imports R800ExecutionControl
@@ -36,16 +36,19 @@ imports R1100ProgramUnits
 exports
 
 sorts
-%%TODO   ActionStmt ArrayName Body
+  ActionStmt ArrayName Body
 %%TODO   BodyConstruct CommonBlockName ComponentName DeclarationConstruct DefinedOperator
 %%TODO   DummyArgName EndName EntryName ExecutableConstruct ExecutableProgram
-%%TODO   ExecutionPartConstruct ExternalName FunctionName GenericName ImpliedDoVariable
+  ExecutionPartConstruct %%TODO ExternalName FunctionName GenericName ImpliedDoVariable
 %%TODO   InternalSubProgPart InternalSubprogram IntrinsicProcedureName  MainProgram
 %%TODO   MainRange  ModuleSubprogram ModuleSubprogramPartConstruct Name
 %%TODO   NamelistGroupName ObjectName ProgramName ProgramUnit SFDummyArgName
 %%TODO   SpecificationPartConstruct SpecificationStmt SubroutineName SubroutineNameUse TypeName
 %%TODO   VariableName   
   
+%%TODO - replace with above
+  DefinedOperator
+  ExecutableConstruct
 
 context-free start-symbols 
   ExecutableProgram
@@ -58,7 +61,7 @@ context-free syntax
 
 %%R202
 %%R203
-  MainProgram                           -> ProgramUnit
+%%TODO   MainProgram                           -> ProgramUnit
 %%TODO   FunctionSubprogram                    -> ProgramUnit
 %%TODO   SubroutineSubprogram                  -> ProgramUnit
 %%TODO   Module                                -> ProgramUnit
@@ -66,14 +69,14 @@ context-free syntax
 
 
 %%R1101
-  ProgramStmt? MainRange                -> MainProgram
+%%TODO   ProgramStmt? MainRange                -> MainProgram
 %%TODO   BodyConstruct+ EndProgramStmt         -> MainRange
 %%TODO   InternalSubProgPart EndProgramStmt    -> MainRange
-  EndProgramStmt                        -> MainRange
+%%TODO   EndProgramStmt                        -> MainRange
 
 %%TODO   SpecificationPartConstruct            -> BodyConstruct
 %%TODO   ExecutableConstruct                   -> BodyConstruct
-%%TODO   BodyConstruct+                        -> Body
+  BodyConstruct+                        -> Body
 
 %%R204
 %%TODO   ImplicitStmt                          -> SpecificationPartConstruct
@@ -84,13 +87,13 @@ context-free syntax
 %%TODO   UseStmt                               -> SpecificationPartConstruct
 
 %%R207
-%%TODO   TypeDeclarationStmt                   -> DeclarationConstruct
+  TypeDeclarationStmt                   -> DeclarationConstruct
 %%TODO   SpecificationStmt                     -> DeclarationConstruct
 %%TODO   DerivedTypeDef                        -> DeclarationConstruct
 %%TODO   InterfaceBlock                        -> DeclarationConstruct
 
 %%R209
-%%TODO   ExecutableConstruct                   -> ExecutionPartConstruct
+  ExecutableConstruct                   -> ExecutionPartConstruct
 %%TODO   FormatStmt                            -> ExecutionPartConstruct
 %%TODO   DataStmt                              -> ExecutionPartConstruct
 %%TODO   EntryStmt                             -> ExecutionPartConstruct
@@ -129,7 +132,7 @@ context-free syntax
 %%TODO   SubroutineSubprogram          -> ModuleSubprogram
 
 %%R215
-%%TODO   ActionStmt                    -> ExecutableConstruct
+  ActionStmt                    -> ExecutableConstruct
 %%TODO   DoConstruct                   -> ExecutableConstruct
 %%TODO   IfConstruct                   -> ExecutableConstruct
 %%TODO   CaseConstruct                 -> ExecutableConstruct
@@ -145,7 +148,7 @@ context-free syntax
 %%TODO   PointerAssignmentStmt         -> ActionStmt
 %%TODO   WhereStmt                     -> ActionStmt
 %%TODO   ArithmeticIfStmt              -> ActionStmt
-%%TODO   AssignmentStmt                -> ActionStmt
+  AssignmentStmt                -> ActionStmt
 %%TODO   AssignStmt                    -> ActionStmt
 %%TODO   BackspaceStmt                 -> ActionStmt
 %%TODO   CallStmt                      -> ActionStmt
@@ -172,7 +175,7 @@ context-free syntax
 %%TODO   Dop                   -> DefinedOperator
 %%TODO   PowerOp               -> DefinedOperator
 %%TODO   MultOp                -> DefinedOperator
-%%TODO   AddOp                 -> DefinedOperator
+  AddOp                 -> DefinedOperator
 %%TODO   ConcatOp              -> DefinedOperator
 %%TODO   RelOp                 -> DefinedOperator
 %%TODO   NotOp                 -> DefinedOperator
