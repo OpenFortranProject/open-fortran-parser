@@ -1,0 +1,124 @@
+      
+%%%%%%%%%%
+%% Fortran ISO/IEC 1539:1991 4xx DataTypes
+%%%%%%%%%%
+
+%%module languages/fortran/syntax/R400DataTypes
+module R400DataTypes
+
+imports
+%%  languages/fortran/syntax/FortranLex
+%%  languages/fortran/syntax/R500DataDeclarations
+  FortranLex
+  R500DataDeclarations
+
+exports
+
+sorts
+
+%%TODO   AcImpliedDo AcValue AcValueList  ArrayConstructor
+%%TODO   BozLiteralConstant ComponentArraySpec ComponentAttrSpec ComponentAttrSpecList ComponentDecl
+%%TODO   ComponentDeclList ComponentDefStmt Constant DerivedTypeBody DerivedTypeDef
+%%TODO   DerivedTypeStmt EndTypeStmt KindParam LogicalConstant PrivateSequenceStmt
+%%TODO   StructureConstructor UnsignedArithmeticConstant   
+
+%%TODO - Add these back above
+  KindParam
+  Constant
+  BozLiteralConstant
+
+context-free syntax
+%%-R401 lex: signed-digit-string is [sign] digit-string
+%%-R402 lex: digit-string is digit [digit]...
+
+%%R404
+  Icon '_' KindParam                    -> UnsignedArithmeticConstant
+
+%%R405
+  Icon                                  -> KindParam
+  NamedConstantUse                      -> KindParam
+
+%%R406
+  NamedConstantUse                      -> Constant
+  UnsignedArithmeticConstant            -> Constant
+  '+' UnsignedArithmeticConstant        -> Constant
+  '-' UnsignedArithmeticConstant        -> Constant
+  Scon                                  -> Constant
+%%  Hcon                                  -> Constant
+  LogicalConstant                       -> Constant
+
+%%R420 char-literal-constant
+  Icon '_' Scon                         -> Constant
+  NamedConstantUse '_' Scon             -> Constant
+
+%%R407
+  BinaryConstant                        -> BozLiteralConstant
+  OctalConstant                         -> BozLiteralConstant
+  HexConstant                           -> BozLiteralConstant
+
+%%R413
+  Rcon '_' KindParam                    -> UnsignedArithmeticConstant
+
+%%R421
+  '.true.' '_' KindParam                -> LogicalConstant
+  '.false.' '_' KindParam               -> LogicalConstant
+
+%%R422
+%% TODO: iso defines order: privateseq, componentdef.
+%%TODO   DerivedTypeStmt DerivedTypeBody+ EndTypeStmt          -> DerivedTypeDef
+%%TODO   PrivateSequenceStmt                                   -> DerivedTypeBody
+%%TODO   ComponentDefStmt                                      -> DerivedTypeBody
+
+%%R423
+%%TODO   LblDef 'private' EOS                                  -> PrivateSequenceStmt
+%%TODO   LblDef 'sequence' EOS                                 -> PrivateSequenceStmt
+
+%%R424
+%%TODO   LblDef 'type' TypeName EOS                            -> DerivedTypeStmt
+%%TODO   LblDef 'type' ':' ':' TypeName EOS                    -> DerivedTypeStmt
+%%TODO   LblDef 'type' ',' AccessSpec ':' ':' TypeName EOS     -> DerivedTypeStmt
+
+%%R425
+%%TODO   LblDef 'end' 'type' TypeName? EOS                     -> EndTypeStmt
+
+%%R426
+%%TODO   LblDef TypeSpec ( ',' ComponentAttrSpecList )? ':' ':' ComponentDeclList EOS          -> ComponentDefStmt
+%%TODO   LblDef TypeSpec ComponentDeclList EOS                                                 -> ComponentDefStmt
+
+%%R427
+%%TODO   {ComponentAttrSpec ","}+                              -> ComponentAttrSpecList
+%%TODO   'pointer'                                             -> ComponentAttrSpec
+%%TODO   'dimension' '(' ComponentArraySpec ')'                -> ComponentAttrSpec
+
+%%R428
+%%TODO   ExplicitShapeSpecList                                 -> ComponentArraySpec
+%%TODO   DeferredShapeSpecList                                 -> ComponentArraySpec
+
+%%R429
+%% TODO check with iso def
+%%TODO   ComponentName ('(' ComponentArraySpec ')')? ('*' CharLength)?         -> ComponentDecl
+%%TODO   {ComponentDecl ","}+                                                  -> ComponentDeclList
+
+%%R430
+%%TODO  TypeName '(' {Expr ","}+ ')'                   -> StructureConstructor
+
+%%R431
+%%TODO   '(/' AcValueList '/)'                         -> ArrayConstructor
+
+%%R432
+%%  Expr                                        -> AcValueList
+%%  AcValueList1                                -> AcValueList
+%%  Expr ',' Expr                               -> AcValueList1
+%%  Expr ',' AcImpliedDo                        -> AcValueList1
+%%  AcImpliedDo                                 -> AcValueList1
+%%  AcValueList1 ',' Expr                       -> AcValueList1
+%%  AcValueList1 ',' AcImpliedDo                -> AcValueList1
+%%TODO   Expr                                          -> AcValue
+%%TODO   AcImpliedDo                                   -> AcValue
+%%TODO   {AcValue ","}+                                -> AcValueList
+   
+%%R433
+%%TODO   '(' Expr ',' ImpliedDoVariable '=' Expr ',' Expr ')'                  -> AcImpliedDo
+%%TODO   '(' Expr ',' ImpliedDoVariable '=' Expr ',' Expr ',' Expr ')'         -> AcImpliedDo
+%%TODO   '(' AcImpliedDo ',' ImpliedDoVariable '=' Expr ',' Expr ')'           -> AcImpliedDo
+%%TODO   '(' AcImpliedDo ',' ImpliedDoVariable '=' Expr ',' Expr ',' Expr ')'  -> AcImpliedDo
