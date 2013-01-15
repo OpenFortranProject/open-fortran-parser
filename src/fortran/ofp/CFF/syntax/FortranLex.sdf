@@ -24,7 +24,7 @@ sorts
   Letter OctalConstant
   Rcon ScalarIntLiteralConstant  Scon
   SconDouble SconSingle 
-%% Ident Aliasses:
+%% Ident Aliases:
   Name ArrayName ComponentName GenericName NamelistGroupName TypeName EndName CommonBlockName DummyArgName
   EntryName ExternalName FunctionName ImpliedDoVariable IntrinsicProcedureName ObjectName ProgramName
   SFDummyArgName SubroutineName SubroutineNameUse VariableName
