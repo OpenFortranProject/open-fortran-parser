@@ -37,6 +37,7 @@ sorts
 
 %%TODO - replace with above
   TypeDeclarationStmt
+  AttrSpec
   TypeSpec
   EntityDecl
   KindSelector
@@ -49,12 +50,12 @@ context-free syntax
   Ident                         -> NamedConstantUse
 
 %%R501
-%%TODO   LblDef TypeSpec (',' AttrSpec)* ':' ':' {EntityDecl ","}+ EOS         -> TypeDeclarationStmt
-  LblDef TypeSpec {EntityDecl ","}+ EOS                                 -> TypeDeclarationStmt
+  LblDef TypeSpec (',' AttrSpec)* '::' {EntityDecl ","}+ EOS         -> TypeDeclarationStmt
+  LblDef TypeSpec                      {EntityDecl ","}+ EOS         -> TypeDeclarationStmt
 
 %%R502
-  'INTEGER'   KindSelector      -> TypeSpec
-  'REAL'      KindSelector      -> TypeSpec
+  'INTEGER'   KindSelector?      -> TypeSpec
+  'REAL'      KindSelector?      -> TypeSpec
 %%TODO   'double' 'precision'          -> TypeSpec
 %%TODO   'complex'   KindSelector      -> TypeSpec
 %%TODO   'character' CharSelector      -> TypeSpec
@@ -69,7 +70,7 @@ context-free syntax
 %%TODO   'character' LengthSelector    -> TypeSpec
 
 %%R503
-%%TODO   'parameter'                   -> AttrSpec
+  'PARAMETER'                   -> AttrSpec
 %%TODO    AccessSpec                   -> AttrSpec
 %%TODO   'allocatable'                 -> AttrSpec
 %%TODO   'dimension' '(' ArraySpec ')' -> AttrSpec
