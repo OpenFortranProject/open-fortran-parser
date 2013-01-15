@@ -24,10 +24,10 @@ module R1100ProgramUnits
 
 imports FortranLex
 %%TODO imports R400DataTypes
-%%TODO imports R500DataDeclarations
+imports R500DataDeclarations
 %%TODO imports R600UseDataObjects
 %%TODO imports R700Expressions
-%%TODO imports R800ExecutionControl
+imports R800ExecutionControl
 %%TODO imports R900IOStatements
 %%TODO imports R1000_IOEditing
 imports R1100ProgramUnits
@@ -36,15 +36,19 @@ imports R1100ProgramUnits
 exports
 
 sorts
-%%TODO   ActionStmt ArrayName Body
-%%TODO   BodyConstruct CommonBlockName ComponentName DeclarationConstruct DefinedOperator
+  ActionStmt ArrayName Body
+  BodyConstruct CommonBlockName ComponentName DeclarationConstruct %%TODO DefinedOperator
 %%TODO   DummyArgName EndName EntryName ExecutableConstruct ExecutableProgram
-%%TODO   ExecutionPartConstruct ExternalName FunctionName GenericName ImpliedDoVariable
+  ExecutionPartConstruct %%TODO ExternalName FunctionName GenericName ImpliedDoVariable
 %%TODO   InternalSubProgPart InternalSubprogram IntrinsicProcedureName  MainProgram
   MainRange %%TODO ModuleSubprogram ModuleSubprogramPartConstruct Name
 %%TODO   NamelistGroupName ObjectName ProgramName ProgramUnit SFDummyArgName
-%%TODO   SpecificationPartConstruct SpecificationStmt SubroutineName SubroutineNameUse TypeName
+  SpecificationPartConstruct %%TODO SpecificationStmt SubroutineName SubroutineNameUse TypeName
 %%TODO   VariableName   
+
+%%TODO - replace with above
+  DefinedOperator
+  ExecutableConstruct
   
   ExecutableProgram                   %%R201   (program in R2008)
   ProgramUnit                         %%R202
@@ -60,10 +64,10 @@ context-free syntax
 
 %%R201 JD: the optional startcommentblock is needed to parse comment lines in 1st lines of a file.
 %% original: ExecutableProgram ProgramUnit -> ExecutableProgram
-  StartCommentBlock? ProgramUnit+       -> ExecutableProgram
+  StartCommentBlock? ProgramUnit+              -> ExecutableProgram
 
 %%R202
-  MainProgram                           -> ProgramUnit
+  MainProgram                                  -> ProgramUnit
 %%TODO   FunctionSubprogram                    -> ProgramUnit
 %%TODO   SubroutineSubprogram                  -> ProgramUnit
 %%TODO   Module                                -> ProgramUnit
@@ -71,14 +75,14 @@ context-free syntax
 
 
 %%R1101
-  ProgramStmt? MainRange                -> MainProgram
-%%TODO   BodyConstruct+ EndProgramStmt         -> MainRange
+  ProgramStmt? MainRange                       -> MainProgram
+  BodyConstruct+ EndProgramStmt                -> MainRange
 %%TODO   InternalSubProgPart EndProgramStmt    -> MainRange
-  EndProgramStmt                        -> MainRange
+  EndProgramStmt                               -> MainRange
 
-%%TODO   SpecificationPartConstruct            -> BodyConstruct
+  SpecificationPartConstruct                   -> BodyConstruct
 %%TODO   ExecutableConstruct                   -> BodyConstruct
-%%TODO   BodyConstruct+                        -> Body
+  BodyConstruct+                        -> Body
 
 %%R1102
   Label? "PROGRAM"       ProgramName       EOS -> ProgramStmt      {cons("program-stmt")}
@@ -91,17 +95,17 @@ context-free syntax
 %%TODO   ParameterStmt                         -> SpecificationPartConstruct
 %%TODO   FormatStmt                            -> SpecificationPartConstruct
 %%TODO   EntryStmt                             -> SpecificationPartConstruct
-%%TODO   DeclarationConstruct                  -> SpecificationPartConstruct
+  DeclarationConstruct                         -> SpecificationPartConstruct
 %%TODO   UseStmt                               -> SpecificationPartConstruct
 
 %%R207
-%%TODO   TypeDeclarationStmt                   -> DeclarationConstruct
+  TypeDeclarationStmt                          -> DeclarationConstruct
 %%TODO   SpecificationStmt                     -> DeclarationConstruct
 %%TODO   DerivedTypeDef                        -> DeclarationConstruct
 %%TODO   InterfaceBlock                        -> DeclarationConstruct
 
 %%R209
-%%TODO   ExecutableConstruct                   -> ExecutionPartConstruct
+  ExecutableConstruct                   -> ExecutionPartConstruct
 %%TODO   FormatStmt                            -> ExecutionPartConstruct
 %%TODO   DataStmt                              -> ExecutionPartConstruct
 %%TODO   EntryStmt                             -> ExecutionPartConstruct
@@ -140,7 +144,7 @@ context-free syntax
 %%TODO   SubroutineSubprogram          -> ModuleSubprogram
 
 %%R215
-%%TODO   ActionStmt                    -> ExecutableConstruct
+  ActionStmt                    -> ExecutableConstruct
 %%TODO   DoConstruct                   -> ExecutableConstruct
 %%TODO   IfConstruct                   -> ExecutableConstruct
 %%TODO   CaseConstruct                 -> ExecutableConstruct
@@ -156,7 +160,7 @@ context-free syntax
 %%TODO   PointerAssignmentStmt         -> ActionStmt
 %%TODO   WhereStmt                     -> ActionStmt
 %%TODO   ArithmeticIfStmt              -> ActionStmt
-%%TODO   AssignmentStmt                -> ActionStmt
+  AssignmentStmt                -> ActionStmt
 %%TODO   AssignStmt                    -> ActionStmt
 %%TODO   BackspaceStmt                 -> ActionStmt
 %%TODO   CallStmt                      -> ActionStmt
@@ -183,7 +187,7 @@ context-free syntax
 %%TODO   Dop                   -> DefinedOperator
 %%TODO   PowerOp               -> DefinedOperator
 %%TODO   MultOp                -> DefinedOperator
-%%TODO   AddOp                 -> DefinedOperator
+  AddOp                 -> DefinedOperator
 %%TODO   ConcatOp              -> DefinedOperator
 %%TODO   RelOp                 -> DefinedOperator
 %%TODO   NotOp                 -> DefinedOperator
