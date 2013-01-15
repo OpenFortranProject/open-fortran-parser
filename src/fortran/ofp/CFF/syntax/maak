@@ -1,0 +1,7 @@
+#! /bin/sh -e
+
+# collect modules 
+pack-sdf -i Fortran.sdf -o Fortran.def
+
+# generate parse table
+sdf2table -i Fortran.def -o Fortran.tbl -m Fortran

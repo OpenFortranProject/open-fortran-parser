@@ -1,0 +1,7 @@
+#! /bin/sh -e
+
+# parse the program file
+sglri -p Fortran.tbl -i main.f90 -o main.ast
+
+# pretty-print the ATerms
+pp-aterm -i main.ast -o main.acff
