@@ -18,22 +18,29 @@ imports
 exports
 
 sorts
-  AccessId AccessIdList AccessSpec AccessStmt AllocatableStmt
-  ArrayAllocation ArrayAllocationList ArrayDeclarator ArrayDeclaratorList ArraySpec
-  AssumedShapeSpec AssumedShapeSpecList AssumedSizeSpec AttrSpec CharLength
-  CharSelector Comblock CommonBlockObject CommonBlockObjectList
-  CommonStmt Constant DataIDoObject DataIDoObjectList DataImpliedDo
-  Datalist DataStmt DataStmtObject DataStmtObjectList DataStmtSet
-  DataStmtValue DataStmtValueList DeferredShapeSpec DeferredShapeSpecList DimensionStmt
-  EntityDecl EquivalenceObject EquivalenceSet EquivalenceSetList EquivalenceStmt
-  ExplicitShapeSpec ExplicitShapeSpecList ImplicitSpec ImplicitStmt IntentPar
-  IntentParList IntentSpec IntentStmt KindSelector LengthSelector
-  LetterSpec LowerBound NamedConstant NamedConstantDef NamedConstantDefList
-  NamedConstantUse NamelistGroup NamelistGroupObject NamelistStmt
-  OptionalPar OptionalParList OptionalStmt ParameterStmt PointerStmt
-  PointerStmtObject PointerStmtObjectList SavedEntity SavedEntityList SaveStmt
-  TargetObject TargetObjectList TargetStmt TypeDeclarationStmt TypeParamValue
-  TypeSpec UpperBound   
+%%TODO   AccessId AccessIdList AccessSpec AccessStmt AllocatableStmt
+%%TODO   ArrayAllocation ArrayAllocationList ArrayDeclarator ArrayDeclaratorList ArraySpec
+%%TODO   AssumedShapeSpec AssumedShapeSpecList AssumedSizeSpec AttrSpec CharLength
+%%TODO   CharSelector Comblock CommonBlockObject CommonBlockObjectList
+%%TODO   CommonStmt Constant DataIDoObject DataIDoObjectList DataImpliedDo
+%%TODO   Datalist DataStmt DataStmtObject DataStmtObjectList DataStmtSet
+%%TODO   DataStmtValue DataStmtValueList DeferredShapeSpec DeferredShapeSpecList DimensionStmt
+%%TODO   EntityDecl EquivalenceObject EquivalenceSet EquivalenceSetList EquivalenceStmt
+%%TODO   ExplicitShapeSpec ExplicitShapeSpecList ImplicitSpec ImplicitStmt IntentPar
+%%TODO   IntentParList IntentSpec IntentStmt KindSelector LengthSelector
+%%TODO   LetterSpec LowerBound NamedConstant NamedConstantDef NamedConstantDefList
+%%TODO   NamedConstantUse NamelistGroup NamelistGroupObject NamelistStmt
+%%TODO   OptionalPar OptionalParList OptionalStmt ParameterStmt PointerStmt
+%%TODO   PointerStmtObject PointerStmtObjectList SavedEntity SavedEntityList SaveStmt
+%%TODO   TargetObject TargetObjectList TargetStmt TypeDeclarationStmt TypeParamValue
+%%TODO   TypeSpec UpperBound   
+
+%%TODO - replace with above
+  TypeDeclarationStmt
+  TypeSpec
+  EntityDecl
+  KindSelector
+  NamedConstant NamedConstantUse
 
 context-free syntax
 
@@ -42,217 +49,217 @@ context-free syntax
   Ident                         -> NamedConstantUse
 
 %%R501
-  LblDef TypeSpec (',' AttrSpec)* ':' ':' {EntityDecl ","}+ EOS         -> TypeDeclarationStmt
+%%TODO   LblDef TypeSpec (',' AttrSpec)* ':' ':' {EntityDecl ","}+ EOS         -> TypeDeclarationStmt
   LblDef TypeSpec {EntityDecl ","}+ EOS                                 -> TypeDeclarationStmt
 
 %%R502
-  'integer'   KindSelector      -> TypeSpec
-  'real'      KindSelector      -> TypeSpec
-  'double' 'precision'          -> TypeSpec
-  'complex'   KindSelector      -> TypeSpec
-  'character' CharSelector      -> TypeSpec
-  'logical'   KindSelector      -> TypeSpec
-  'type' '(' TypeName ')'       -> TypeSpec
+  'INTEGER'   KindSelector      -> TypeSpec
+  'REAL'      KindSelector      -> TypeSpec
+%%TODO   'double' 'precision'          -> TypeSpec
+%%TODO   'complex'   KindSelector      -> TypeSpec
+%%TODO   'character' CharSelector      -> TypeSpec
+%%TODO   'logical'   KindSelector      -> TypeSpec
+%%TODO   'type' '(' TypeName ')'       -> TypeSpec
 %%old F77 rules:
-  'integer'                     -> TypeSpec
-  'real'                        -> TypeSpec
-  'complex'                     -> TypeSpec
-  'logical'                     -> TypeSpec
-  'character'                   -> TypeSpec
-  'character' LengthSelector    -> TypeSpec
+%%TODO   'integer'                     -> TypeSpec
+%%TODO   'real'                        -> TypeSpec
+%%TODO   'complex'                     -> TypeSpec
+%%TODO   'logical'                     -> TypeSpec
+%%TODO   'character'                   -> TypeSpec
+%%TODO   'character' LengthSelector    -> TypeSpec
 
 %%R503
-  'parameter'                   -> AttrSpec
-   AccessSpec                   -> AttrSpec
-  'allocatable'                 -> AttrSpec
-  'dimension' '(' ArraySpec ')' -> AttrSpec
-  'external'                    -> AttrSpec
-  'intent' '(' IntentSpec ')'   -> AttrSpec
-  'intrinsic'                   -> AttrSpec
-  'optional'                    -> AttrSpec
-  'pointer'                     -> AttrSpec
-  'save'                        -> AttrSpec
-  'target'                      -> AttrSpec
+%%TODO   'parameter'                   -> AttrSpec
+%%TODO    AccessSpec                   -> AttrSpec
+%%TODO   'allocatable'                 -> AttrSpec
+%%TODO   'dimension' '(' ArraySpec ')' -> AttrSpec
+%%TODO   'external'                    -> AttrSpec
+%%TODO   'intent' '(' IntentSpec ')'   -> AttrSpec
+%%TODO   'intrinsic'                   -> AttrSpec
+%%TODO   'optional'                    -> AttrSpec
+%%TODO   'pointer'                     -> AttrSpec
+%%TODO   'save'                        -> AttrSpec
+%%TODO   'target'                      -> AttrSpec
 
 %%R504
-  ObjectName '=' Expr                                   -> EntityDecl
-  ObjectName '(' ArraySpec ')' '=' Expr                 -> EntityDecl
-  ObjectName '*' CharLength '=' Expr                    -> EntityDecl
-  ObjectName '*' CharLength '(' ArraySpec ')' '=' Expr  -> EntityDecl
+%%TODO   ObjectName '=' Expr                                   -> EntityDecl
+%%TODO   ObjectName '(' ArraySpec ')' '=' Expr                 -> EntityDecl
+%%TODO   ObjectName '*' CharLength '=' Expr                    -> EntityDecl
+%%TODO   ObjectName '*' CharLength '(' ArraySpec ')' '=' Expr  -> EntityDecl
 %%F77
   ObjectName                                            -> EntityDecl
-  ObjectName '*' CharLength                             -> EntityDecl
-  ObjectName '(' ArraySpec ')'                          -> EntityDecl
-  ObjectName '(' ArraySpec ')' '*' CharLength           -> EntityDecl
+%%TODO   ObjectName '*' CharLength                             -> EntityDecl
+%%TODO   ObjectName '(' ArraySpec ')'                          -> EntityDecl
+%%TODO   ObjectName '(' ArraySpec ')' '*' CharLength           -> EntityDecl
 
 
 %%R505
 %% expr used as scalar-int-initialization-expr 
-  '(' ('kind' '=')? Expr ')'                            -> KindSelector
+  '(' ('KIND' '=')? Expr ')'                            -> KindSelector
 %%TODO: remove this often used in complex declarations like Integer*8 Complex*8 Complex*16 (IBM standard, not ISO!?)
-  '*' Icon                                              -> KindSelector
+%%TODO   '*' Icon                                              -> KindSelector
 
 %%R506
-  '(' 'len' '=' TypeParamValue ',' 'kind' '=' Expr ')'  -> CharSelector
-  '(' 'len' '=' TypeParamValue ',' Expr ')'             -> CharSelector
-  '(' 'len' '=' TypeParamValue ')'                      -> CharSelector
-  '(' ('kind' '=')? Expr ')'                            -> CharSelector
+%%TODO   '(' 'len' '=' TypeParamValue ',' 'kind' '=' Expr ')'  -> CharSelector
+%%TODO   '(' 'len' '=' TypeParamValue ',' Expr ')'             -> CharSelector
+%%TODO   '(' 'len' '=' TypeParamValue ')'                      -> CharSelector
+%%TODO   '(' ('kind' '=')? Expr ')'                            -> CharSelector
 
 %%R507
-  '(' TypeParamValue ')'        -> LengthSelector
+%%TODO   '(' TypeParamValue ')'        -> LengthSelector
 %%F77
-  '*' CharLength                -> LengthSelector
+%%TODO   '*' CharLength                -> LengthSelector
 
 %%R508
-  '(' TypeParamValue ')'        -> CharLength
-  ScalarIntLiteralConstant      -> CharLength
+%%TODO   '(' TypeParamValue ')'        -> CharLength
+%%TODO   ScalarIntLiteralConstant      -> CharLength
 
 %%R509
-  SpecificationExpr | '*'       -> TypeParamValue
+%%TODO   SpecificationExpr | '*'       -> TypeParamValue
 
 %%R510
-  'public'      -> AccessSpec
-  'private'     -> AccessSpec
+%%TODO   'public'      -> AccessSpec
+%%TODO   'private'     -> AccessSpec
 
 %%R511
-  'in'          -> IntentSpec
-  'out'         -> IntentSpec
-  'in' 'out'    -> IntentSpec
+%%TODO   'in'          -> IntentSpec
+%%TODO   'out'         -> IntentSpec
+%%TODO   'in' 'out'    -> IntentSpec
 
 %%R512
-  AssumedShapeSpecList                          -> ArraySpec
-  DeferredShapeSpecList                         -> ArraySpec
-  ExplicitShapeSpecList                         -> ArraySpec
-  AssumedSizeSpec                               -> ArraySpec
+%%TODO   AssumedShapeSpecList                          -> ArraySpec
+%%TODO   DeferredShapeSpecList                         -> ArraySpec
+%%TODO   ExplicitShapeSpecList                         -> ArraySpec
+%%TODO   AssumedSizeSpec                               -> ArraySpec
 
 %%R513
-  {ExplicitShapeSpec ","}+                      -> ExplicitShapeSpecList
-  (LowerBound ':')? UpperBound                  -> ExplicitShapeSpec
+%%TODO   {ExplicitShapeSpec ","}+                      -> ExplicitShapeSpecList
+%%TODO   (LowerBound ':')? UpperBound                  -> ExplicitShapeSpec
 
 %%R514 
-  SpecificationExpr                             -> LowerBound
+%%TODO   SpecificationExpr                             -> LowerBound
 
 %%R515
-  SpecificationExpr                             -> UpperBound
+%%TODO   SpecificationExpr                             -> UpperBound
 
 %%R516
-  LowerBound? ':'                               -> AssumedShapeSpec
-  LowerBound ':'                                -> AssumedShapeSpecList
-  DeferredShapeSpecList ',' LowerBound ':'      -> AssumedShapeSpecList
-  AssumedShapeSpecList ',' AssumedShapeSpec     -> AssumedShapeSpecList
+%%TODO   LowerBound? ':'                               -> AssumedShapeSpec
+%%TODO   LowerBound ':'                                -> AssumedShapeSpecList
+%%TODO   DeferredShapeSpecList ',' LowerBound ':'      -> AssumedShapeSpecList
+%%TODO   AssumedShapeSpecList ',' AssumedShapeSpec     -> AssumedShapeSpecList
 
 %%R517
-  {DeferredShapeSpec ","}+                      -> DeferredShapeSpecList
-  ':'                                           -> DeferredShapeSpec
+%%TODO   {DeferredShapeSpec ","}+                      -> DeferredShapeSpecList
+%%TODO   ':'                                           -> DeferredShapeSpec
 
 %%R518
-  (LowerBound ':')? '*'                                 -> AssumedSizeSpec
-  ExplicitShapeSpecList ',' '*'                         -> AssumedSizeSpec
-  ExplicitShapeSpecList ',' LowerBound ':' '*'          -> AssumedSizeSpec
+%%TODO   (LowerBound ':')? '*'                                 -> AssumedSizeSpec
+%%TODO   ExplicitShapeSpecList ',' '*'                         -> AssumedSizeSpec
+%%TODO   ExplicitShapeSpecList ',' LowerBound ':' '*'          -> AssumedSizeSpec
 
 %%R519
-  LblDef 'intent' '(' IntentSpec ')' ':' ':' IntentParList EOS  -> IntentStmt
-  LblDef 'intent' '(' IntentSpec ')' IntentParList EOS          -> IntentStmt
-  {IntentPar ","}+                                              -> IntentParList
-  DummyArgName                                                  -> IntentPar
+%%TODO   LblDef 'intent' '(' IntentSpec ')' ':' ':' IntentParList EOS  -> IntentStmt
+%%TODO   LblDef 'intent' '(' IntentSpec ')' IntentParList EOS          -> IntentStmt
+%%TODO   {IntentPar ","}+                                              -> IntentParList
+%%TODO   DummyArgName                                                  -> IntentPar
 
 %%R520
-  LblDef 'optional' ':' ':' OptionalParList EOS         -> OptionalStmt
-  LblDef 'optional' OptionalParList EOS                 -> OptionalStmt
-  {OptionalPar ","}+                                    -> OptionalParList
-  DummyArgName                                          -> OptionalPar
+%%TODO   LblDef 'optional' ':' ':' OptionalParList EOS         -> OptionalStmt
+%%TODO   LblDef 'optional' OptionalParList EOS                 -> OptionalStmt
+%%TODO   {OptionalPar ","}+                                    -> OptionalParList
+%%TODO   DummyArgName                                          -> OptionalPar
 
 %%R521
-  LblDef AccessSpec ':' ':' AccessIdList EOS            -> AccessStmt
-  LblDef AccessSpec AccessIdList? EOS                   -> AccessStmt
+%%TODO   LblDef AccessSpec ':' ':' AccessIdList EOS            -> AccessStmt
+%%TODO   LblDef AccessSpec AccessIdList? EOS                   -> AccessStmt
 
 %%R522
-  {AccessId ","}+               -> AccessIdList
-  GenericName                   -> AccessId
-  GenericSpec                   -> AccessId
+%%TODO   {AccessId ","}+               -> AccessIdList
+%%TODO   GenericName                   -> AccessId
+%%TODO   GenericSpec                   -> AccessId
 
 %%R523 see 26
-  LblDef 'save' ':' ':' SavedEntityList EOS             -> SaveStmt
-  LblDef 'save' SavedEntityList? EOS                    -> SaveStmt
+%%TODO   LblDef 'save' ':' ':' SavedEntityList EOS             -> SaveStmt
+%%TODO   LblDef 'save' SavedEntityList? EOS                    -> SaveStmt
 
 %%R524
-  {SavedEntity ","}+            -> SavedEntityList
-  VariableName                  -> SavedEntity
-  '/' CommonBlockName '/'       -> SavedEntity
+%%TODO   {SavedEntity ","}+            -> SavedEntityList
+%%TODO   VariableName                  -> SavedEntity
+%%TODO   '/' CommonBlockName '/'       -> SavedEntity
 
 %%R525
-  LblDef 'dimension' ':' ':' ArrayDeclaratorList EOS    -> DimensionStmt
-  LblDef 'dimension' ArrayDeclaratorList EOS            -> DimensionStmt
+%%TODO   LblDef 'dimension' ':' ':' ArrayDeclaratorList EOS    -> DimensionStmt
+%%TODO   LblDef 'dimension' ArrayDeclaratorList EOS            -> DimensionStmt
 
-  {ArrayDeclarator ","}+                                -> ArrayDeclaratorList
-  VariableName '(' ArraySpec ')'                        -> ArrayDeclarator
+%%TODO   {ArrayDeclarator ","}+                                -> ArrayDeclaratorList
+%%TODO   VariableName '(' ArraySpec ')'                        -> ArrayDeclarator
 
 %%R526
-  LblDef 'allocatable' ':' ':' ArrayAllocationList EOS  -> AllocatableStmt
-  LblDef 'allocatable' ArrayAllocationList EOS          -> AllocatableStmt
-  {ArrayAllocation ","}+                                -> ArrayAllocationList
-  ArrayName ( '(' DeferredShapeSpecList ')' )?          -> ArrayAllocation
+%%TODO   LblDef 'allocatable' ':' ':' ArrayAllocationList EOS  -> AllocatableStmt
+%%TODO   LblDef 'allocatable' ArrayAllocationList EOS          -> AllocatableStmt
+%%TODO   {ArrayAllocation ","}+                                -> ArrayAllocationList
+%%TODO   ArrayName ( '(' DeferredShapeSpecList ')' )?          -> ArrayAllocation
 
 %%R527
-  LblDef 'pointer' ':' ':' PointerStmtObjectList EOS    -> PointerStmt
-  LblDef 'pointer' PointerStmtObjectList EOS            -> PointerStmt
-  {PointerStmtObject ","}+                              -> PointerStmtObjectList
-  ObjectName                                            -> PointerStmtObject
-  ObjectName '(' DeferredShapeSpecList ')'              -> PointerStmtObject
+%%TODO   LblDef 'pointer' ':' ':' PointerStmtObjectList EOS    -> PointerStmt
+%%TODO   LblDef 'pointer' PointerStmtObjectList EOS            -> PointerStmt
+%%TODO   {PointerStmtObject ","}+                              -> PointerStmtObjectList
+%%TODO   ObjectName                                            -> PointerStmtObject
+%%TODO   ObjectName '(' DeferredShapeSpecList ')'              -> PointerStmtObject
 
 %%R528
-  LblDef 'target' ':' ':' TargetObjectList EOS          -> TargetStmt
-  LblDef 'target' TargetObjectList EOS                  -> TargetStmt
-  {TargetObject ","}+                                   -> TargetObjectList
-  ObjectName                                            -> TargetObject
-  ObjectName '(' ArraySpec ')'                          -> TargetObject
+%%TODO   LblDef 'target' ':' ':' TargetObjectList EOS          -> TargetStmt
+%%TODO   LblDef 'target' TargetObjectList EOS                  -> TargetStmt
+%%TODO   {TargetObject ","}+                                   -> TargetObjectList
+%%TODO   ObjectName                                            -> TargetObject
+%%TODO   ObjectName '(' ArraySpec ')'                          -> TargetObject
 
 %%R529
-  LblDef 'data' Datalist EOS                            -> DataStmt
-  {DataStmtSet ","}+                                    -> Datalist
+%%TODO   LblDef 'data' Datalist EOS                            -> DataStmt
+%%TODO   {DataStmtSet ","}+                                    -> Datalist
 
 %%R530
-  DataStmtObjectList '/' DataStmtValueList '/'          -> DataStmtSet
+%%TODO   DataStmtObjectList '/' DataStmtValueList '/'          -> DataStmtSet
 
 %%R531
-  {DataStmtObject ","}+                                 -> DataStmtObjectList
-  Variable                                              -> DataStmtObject
-  DataImpliedDo                                         -> DataStmtObject
+%%TODO   {DataStmtObject ","}+                                 -> DataStmtObjectList
+%%TODO   Variable                                              -> DataStmtObject
+%%TODO   DataImpliedDo                                         -> DataStmtObject
 
 %%R532
-  {DataStmtValue ","}+                                          -> DataStmtValueList
-  Constant                                                      -> DataStmtValue
+%%TODO   {DataStmtValue ","}+                                          -> DataStmtValueList
+%%TODO   Constant                                                      -> DataStmtValue
 %%TODO  @<Scalar Integer Literal Constant@> '*' Constant        -> DataStmtValue
-  NamedConstantUse '*' Constant                                 -> DataStmtValue
+%%TODO   NamedConstantUse '*' Constant                                 -> DataStmtValue
 
 %%R533 see 100
-  StructureConstructor                  -> Constant
-  BozLiteralConstant                    -> Constant
+%%TODO   StructureConstructor                  -> Constant
+%%TODO   BozLiteralConstant                    -> Constant
 
 %%R535
-  '(' DataIDoObjectList ',' ImpliedDoVariable '=' Expr ',' Expr (',' Expr)? ')' -> DataImpliedDo
+%%TODO   '(' DataIDoObjectList ',' ImpliedDoVariable '=' Expr ',' Expr (',' Expr)? ')' -> DataImpliedDo
 
 %%R536
-  {DataIDoObject ","}+                  -> DataIDoObjectList
-  ArrayElement                          -> DataIDoObject
-  DataImpliedDo                         -> DataIDoObject
-  StructureComponent                    -> DataIDoObject
+%%TODO   {DataIDoObject ","}+                  -> DataIDoObjectList
+%%TODO   ArrayElement                          -> DataIDoObject
+%%TODO   DataImpliedDo                         -> DataIDoObject
+%%TODO   StructureComponent                    -> DataIDoObject
 
 %%R538
-  LblDef 'parameter' '(' NamedConstantDefList ')' EOS  -> ParameterStmt
+%%TODO   LblDef 'parameter' '(' NamedConstantDefList ')' EOS  -> ParameterStmt
 
 %%R539
 %% original iso: named-constant-def is named-constant = initialization-expr
-  {NamedConstantDef ","}+                       -> NamedConstantDefList
-  NamedConstant '=' Expr                        -> NamedConstantDef
+%%TODO   {NamedConstantDef ","}+                       -> NamedConstantDefList
+%%TODO   NamedConstant '=' Expr                        -> NamedConstantDef
 
 %%R540
-  LblDef 'implicit' 'none' EOS                  -> ImplicitStmt
-  LblDef 'implicit' {ImplicitSpec ","}+ EOS     -> ImplicitStmt
+%%TODO   LblDef 'implicit' 'none' EOS                  -> ImplicitStmt
+%%TODO   LblDef 'implicit' {ImplicitSpec ","}+ EOS     -> ImplicitStmt
 
 %%541
-  TypeSpec "(" {LetterSpec ","}+ ")"            -> ImplicitSpec
-  Letter ( "-" Letter )?                        -> LetterSpec
+%%TODO   TypeSpec "(" {LetterSpec ","}+ ")"            -> ImplicitSpec
+%%TODO   Letter ( "-" Letter )?                        -> LetterSpec
 
 %%R543
 %% todo: Use SDF notation.
@@ -260,22 +267,22 @@ context-free syntax
 %%                      '/' NamelistGroupName '/' NamelistGroupObject   -> NamelistGroups
 %%  NamelistGroups ','? '/' NamelistGroupName '/' NamelistGroupObject   -> NamelistGroups
 %%  NamelistGroups ',' NamelistGroupObject                              -> NamelistGroups
-  LblDef 'namelist' NamelistGroup ( ','? NamelistGroup)*  EOS           -> NamelistStmt
-  '/' NamelistGroupName '/' {NamelistGroupObject ","}+                  -> NamelistGroup
+%%TODO   LblDef 'namelist' NamelistGroup ( ','? NamelistGroup)*  EOS           -> NamelistStmt
+%%TODO   '/' NamelistGroupName '/' {NamelistGroupObject ","}+                  -> NamelistGroup
 
 %%R544
-  VariableName                                                  -> NamelistGroupObject
+%%TODO   VariableName                                                  -> NamelistGroupObject
 
 %%R545
-  LblDef 'equivalence' EquivalenceSetList EOS                   -> EquivalenceStmt
+%%TODO   LblDef 'equivalence' EquivalenceSetList EOS                   -> EquivalenceStmt
 
 %%R546
-  {EquivalenceSet ","}+                                         -> EquivalenceSetList
-  '(' EquivalenceObject "," {EquivalenceObject ","}+ ')'        -> EquivalenceSet
+%%TODO   {EquivalenceSet ","}+                                         -> EquivalenceSetList
+%%TODO   '(' EquivalenceObject "," {EquivalenceObject ","}+ ')'        -> EquivalenceSet
 
 %%R547 Note: Variable includes Substring variables %% TODO: check EqObject def substring,arrayname?
-  ArrayName                                     -> EquivalenceObject
-  Variable                                      -> EquivalenceObject
+%%TODO   ArrayName                                     -> EquivalenceObject
+%%TODO   Variable                                      -> EquivalenceObject
 
 %%R548
 %%  LblDef 'common' Comlist EOS                 -> CommonStmt
@@ -286,12 +293,12 @@ context-free syntax
 %%  Comlist ',' Comblock CommonBlockObject      -> Comlist
 %%  '/' '/'                                     -> Comblock
 %%  '/' CommonBlockName '/'                     -> Comblock
-  LblDef 'common' Comblock? CommonBlockObjectList (','? Comblock CommonBlockObjectList)* EOS    -> CommonStmt
-  '/' CommonBlockName? '/'                                                                      -> Comblock
+%%TODO   LblDef 'common' Comblock? CommonBlockObjectList (','? Comblock CommonBlockObjectList)* EOS    -> CommonStmt
+%%TODO   '/' CommonBlockName? '/'                                                                      -> Comblock
 
 %%R549
 %%todo: check if this can be reverted to 
 %%      original iso def: CommonBlockObject is VariableName [(ExplicitShapeSpecList)]
-  VariableName                                  -> CommonBlockObject
-  ArrayDeclarator                               -> CommonBlockObject
-  {CommonBlockObject ","}+                      -> CommonBlockObjectList
+%%TODO   VariableName                                  -> CommonBlockObject
+%%TODO   ArrayDeclarator                               -> CommonBlockObject
+%%TODO   {CommonBlockObject ","}+                      -> CommonBlockObjectList
