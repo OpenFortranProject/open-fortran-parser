@@ -24,7 +24,15 @@ sorts
 %%TODO   ProcedureName ProcedureNameList ReturnStmt SFDummyArgNameList 
   %% StmtFunctionStmt obsolescant/deleted
 %%TODO   SubprogramInterfaceBody SubroutineInterfaceRange SubroutinePar SubroutineParList SubroutineRange
-%%TODO   SubroutineStmt SubroutineSubprogram   
+%%TODO   SubroutineStmt SubroutineSubprogram
+
+%%TODO - putback in above
+  ContainsStmt
+  SubroutineSubprogram
+  SubroutineRange
+  SubroutineParList
+  EndSubroutineStmt
+  SubroutinePar
 
 context-free syntax
 
@@ -117,16 +125,16 @@ context-free syntax
 
 %%R1219
 %%R1220
-%%TODO   LblDef 'recursive'? 'subroutine' SubroutineName SubroutineRange       -> SubroutineSubprogram
-%%TODO   SubroutineParList? EOS Body? EndSubroutineStmt                        -> SubroutineRange
+  LblDef 'RECURSIVE'? 'SUBROUTINE' SubroutineName SubroutineRange       -> SubroutineSubprogram
+  SubroutineParList? EOS Body? EndSubroutineStmt                        -> SubroutineRange
 %%TODO   SubroutineParList  EOS InternalSubProgPart EndSubroutineStmt          -> SubroutineRange
 %% split subroutineStmt/subroutineSubprogram needed? (ELI legacy)
-%%TODO   LblDef 'subroutine' Name SubroutineParList? EOS                       -> SubroutineStmt
-%%TODO    '(' {SubroutinePar ","}* ')'                                         -> SubroutineParList
+%%TODO   LblDef 'SUBROUTINE' Name SubroutineParList? EOS                       -> SubroutineStmt
+   '(' {SubroutinePar ","}* ')'                                         -> SubroutineParList
 
 %%R1221
-%%TODO    DummyArgName         -> SubroutinePar
-%%TODO    '*'                  -> SubroutinePar
+   DummyArgName         -> SubroutinePar
+   '*'                  -> SubroutinePar
 
 %%/* Must be split on semantic grounds, due to the different scopes for the
 %%TODO    LblDef FunctionPrefix Name FunctionParList? EOS      -> FunctionStmt
@@ -136,8 +144,8 @@ context-free syntax
 %%TODO    DummyArgName                                         -> FunctionPar
 
 %%R1222
-%%TODO   LblDef 'end' 'subroutine' EndName? EOS        -> EndSubroutineStmt
-%%TODO   LblDef 'end' EOS                              -> EndSubroutineStmt
+  LblDef 'END' 'SUBROUTINE' EndName? EOS        -> EndSubroutineStmt
+  LblDef 'END' EOS                              -> EndSubroutineStmt
 
 %%R1223
 %%TODO   LblDef 'entry' EntryName SubroutineParList EOS                        -> EntryStmt
@@ -147,7 +155,7 @@ context-free syntax
 %%TODO   LblDef 'return' Expr? EOS             -> ReturnStmt
 
 %%R1225
-%%TODO   LblDef 'contains' EOS                 -> ContainsStmt
+  LblDef 'CONTAINS' EOS                        -> ContainsStmt
 
 %%-R1226 
 %% statement-functions are obsolete in fortran 95. 
