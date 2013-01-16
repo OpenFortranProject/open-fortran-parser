@@ -50,7 +50,7 @@ sorts
   DefinedOperator
   ExecutableConstruct
   
-  ExecutableProgram                   %%R201   (program in R2008)
+  Program                             %%R201   (originally ExecutableProgram F90)
   ProgramUnit                         %%R202
 
   MainProgram                         %%R1101
@@ -58,13 +58,15 @@ sorts
   EndProgramStmt                      %%R1103
 
 context-free start-symbols 
-  ExecutableProgram
+  Program
 
 context-free syntax
 
 %%R201 JD: the optional startcommentblock is needed to parse comment lines in 1st lines of a file.
 %% original: ExecutableProgram ProgramUnit -> ExecutableProgram
-  StartCommentBlock? ProgramUnit+              -> ExecutableProgram
+%%TODO  StartCommentBlock? ProgramUnit+              -> ExecutableProgram
+
+ ProgramUnit+                                  -> Program
 
 %%R202
   MainProgram                                  -> ProgramUnit
@@ -81,14 +83,15 @@ context-free syntax
   EndProgramStmt                               -> MainRange
 
   SpecificationPartConstruct                   -> BodyConstruct
-%%TODO   ExecutableConstruct                   -> BodyConstruct
-  BodyConstruct+                        -> Body
+  ExecutableConstruct                          -> BodyConstruct
+  BodyConstruct+                               -> Body
 
 %%R1102
-  Label? "PROGRAM"       ProgramName       EOS -> ProgramStmt      {cons("program-stmt")}
+  LblDef "PROGRAM"       ProgramName       EOS -> ProgramStmt      {cons("program-stmt")}
 
 %%R1103
-  Label? "END" "PROGRAM" ProgramName       EOS -> EndProgramStmt   {cons("end-program-stmt")}
+  LblDef "END"                             EOS -> EndProgramStmt   {cons("end-program-stmt")}
+  LblDef "END" "PROGRAM" ProgramName?      EOS -> EndProgramStmt   {cons("end-program-stmt")}
 
 %%R204
 %%TODO   ImplicitStmt                          -> SpecificationPartConstruct
