@@ -157,15 +157,15 @@ context-free syntax
 
 %%R735 
 %% todo: check. Original ISO: assignmentStatement is variable '=' expression
-  LblDef Name '%' Name '=' Expr EOS                                      -> AssignmentStmt
-  LblDef Name '%' DataRef '=' Expr EOS                                   -> AssignmentStmt
-  LblDef Name '(' SFExprList ')' '%' Name '=' Expr EOS                   -> AssignmentStmt
-  LblDef Name '(' SFExprList ')' '%' DataRef '=' Expr EOS                -> AssignmentStmt
+%%TODO   LblDef Name '%' Name '=' Expr EOS                                      -> AssignmentStmt
+%%TODO   LblDef Name '%' DataRef '=' Expr EOS                                   -> AssignmentStmt
+%%TODO   LblDef Name '(' SFExprList ')' '%' Name '=' Expr EOS                   -> AssignmentStmt
+%%TODO   LblDef Name '(' SFExprList ')' '%' DataRef '=' Expr EOS                -> AssignmentStmt
 %%TODO   LblDef Name '(' SFDummyArgNameList ')' '%' Name '=' Expr EOS           -> AssignmentStmt
 %%TODO   LblDef Name '(' SFDummyArgNameList ')' '%' DataRef '=' Expr EOS        -> AssignmentStmt
   LblDef Name '=' Expr EOS                                               -> AssignmentStmt
-  LblDef Name '(' SFExprList ')' '=' Expr EOS                            -> AssignmentStmt
-  LblDef Name '(' SFExprList ')' SubstringRange '=' Expr EOS             -> AssignmentStmt
+%%TODO   LblDef Name '(' SFExprList ')' '=' Expr EOS                            -> AssignmentStmt
+%%TODO   LblDef Name '(' SFExprList ')' SubstringRange '=' Expr EOS             -> AssignmentStmt
 
   SFExpr ':' Expr ':' Expr                      -> SFExprList
   SFExpr ':' ':' Expr                           -> SFExprList
