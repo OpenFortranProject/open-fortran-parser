@@ -130,7 +130,7 @@ context-free syntax
 %%TODO   TargetStmt                            -> SpecificationStmt
 
 %%R210
-%%TODO   Body ContainsStmt   InternalSubprogram        -> InternalSubProgPart
+  Body ContainsStmt   InternalSubprogram       -> InternalSubProgPart
   ContainsStmt        InternalSubprogram       -> InternalSubProgPart
 %%TODO   InternalSubProgPart InternalSubprogram        -> InternalSubProgPart
 
