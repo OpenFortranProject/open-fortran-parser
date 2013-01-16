@@ -40,7 +40,7 @@ sorts
   BodyConstruct CommonBlockName ComponentName DeclarationConstruct %%TODO DefinedOperator
 %%TODO   DummyArgName EndName EntryName ExecutableConstruct ExecutableProgram
   ExecutionPartConstruct %%TODO ExternalName FunctionName GenericName ImpliedDoVariable
-%%TODO   InternalSubProgPart InternalSubprogram IntrinsicProcedureName  MainProgram
+  InternalSubProgPart InternalSubprogram %%TODO IntrinsicProcedureName  MainProgram
   MainRange %%TODO ModuleSubprogram ModuleSubprogramPartConstruct Name
 %%TODO   NamelistGroupName ObjectName ProgramName ProgramUnit SFDummyArgName
   SpecificationPartConstruct %%TODO SpecificationStmt SubroutineName SubroutineNameUse TypeName
@@ -78,8 +78,8 @@ context-free syntax
 
 %%R1101
   ProgramStmt? MainRange                       -> MainProgram
-  BodyConstruct+ EndProgramStmt                -> MainRange
-%%TODO   InternalSubProgPart EndProgramStmt    -> MainRange
+  BodyConstruct+       EndProgramStmt          -> MainRange
+  InternalSubProgPart  EndProgramStmt          -> MainRange
   EndProgramStmt                               -> MainRange
 
   SpecificationPartConstruct                   -> BodyConstruct
@@ -108,7 +108,7 @@ context-free syntax
 %%TODO   InterfaceBlock                        -> DeclarationConstruct
 
 %%R209
-  ExecutableConstruct                   -> ExecutionPartConstruct
+  ExecutableConstruct                          -> ExecutionPartConstruct
 %%TODO   FormatStmt                            -> ExecutionPartConstruct
 %%TODO   DataStmt                              -> ExecutionPartConstruct
 %%TODO   EntryStmt                             -> ExecutionPartConstruct
@@ -131,12 +131,12 @@ context-free syntax
 
 %%R210
 %%TODO   Body ContainsStmt   InternalSubprogram        -> InternalSubProgPart
-%%TODO   ContainsStmt        InternalSubprogram        -> InternalSubProgPart
+  ContainsStmt        InternalSubprogram       -> InternalSubProgPart
 %%TODO   InternalSubProgPart InternalSubprogram        -> InternalSubProgPart
 
 %%R211
-%%TODO   FunctionSubprogram            -> InternalSubprogram
-%%TODO   SubroutineSubprogram          -> InternalSubprogram
+%%TODO   FunctionSubprogram                    -> InternalSubprogram
+  SubroutineSubprogram                         -> InternalSubprogram
 
 %%R212
 %%TODO   ContainsStmt                  -> ModuleSubprogramPartConstruct
