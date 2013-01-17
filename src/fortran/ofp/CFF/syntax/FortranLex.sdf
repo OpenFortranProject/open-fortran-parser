@@ -125,7 +125,7 @@ context-free restrictions
    LblDef -/- [\!]
 
 context-free syntax
-   Label?                               -> LblDef
+  Label? -> LblDef                       {cons("label")}
 
 %% Ident Aliasses. TODO: put them in the right modules.
   Ident  -> Name
@@ -139,12 +139,12 @@ context-free syntax
   Ident  -> DummyArgName
   Ident  -> EntryName
   Ident  -> ExternalName
-  Ident  -> FunctionName
+  Ident  -> FunctionName                  {cons("function-name")}
   Ident  -> ImpliedDoVariable
   Ident  -> IntrinsicProcedureName
-  Ident  -> ModuleName
-  Ident  -> ObjectName
-  Ident  -> ProgramName
+  Ident  -> ModuleName                    {cons("module-name")}
+  Ident  -> ObjectName                    {cons("object-name")}
+  Ident  -> ProgramName                   {cons("program-name")}
   Ident  -> SFDummyArgName
   Ident  -> SubroutineName
   Ident  -> SubroutineNameUse
