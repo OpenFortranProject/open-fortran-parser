@@ -127,7 +127,7 @@ context-free syntax
 %%R1220
   LblDef 'RECURSIVE'? 'SUBROUTINE' SubroutineName SubroutineRange       -> SubroutineSubprogram
   SubroutineParList? EOS Body? EndSubroutineStmt                        -> SubroutineRange
-  SubroutineParList  EOS InternalSubProgPart EndSubroutineStmt          -> SubroutineRange
+%%TODO   SubroutineParList  EOS InternalSubProgPart EndSubroutineStmt          -> SubroutineRange
 %% split subroutineStmt/subroutineSubprogram needed? (ELI legacy)
 %%TODO   LblDef 'SUBROUTINE' Name SubroutineParList? EOS                       -> SubroutineStmt
    '(' {SubroutinePar ","}* ')'                                         -> SubroutineParList
