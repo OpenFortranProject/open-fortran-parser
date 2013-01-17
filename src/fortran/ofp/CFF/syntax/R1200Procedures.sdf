@@ -33,6 +33,8 @@ sorts
   SubroutineParList
   EndSubroutineStmt
   SubroutinePar
+  FunctionStmt
+  FunctionPar EndFunctionStmt FunctionParList FunctionSubprogram FunctionRange
 
 context-free syntax
 
@@ -102,9 +104,14 @@ context-free syntax
 %%R1214 alt-return-spec is '*' label
 %% see 1213
 
-%%R1215
-%%TODO   LblDef FunctionPrefix FunctionName FunctionRange      -> FunctionSubprogram
-%%TODO   FunctionParList EOS Body? EndFunctionStmt             -> FunctionRange
+%%R1227
+%%TODO   LblDef FunctionPrefix FunctionName FunctionRange     -> FunctionSubprogram  {cons("function-subprogram")}
+  FunctionStmt EndFunctionStmt                         -> FunctionSubprogram  {cons("function-subprogram")}
+  FunctionParList EOS Body? EndFunctionStmt            -> FunctionRange
+
+%%R1228
+%%TODO - add prefix, dummy-arg-name-list, suffix
+  LblDef 'FUNCTION' FunctionName '(' ')'           EOS -> FunctionStmt        {cons("function-stmt")}
 
 %%R1215
 %%TODO   FunctionParList 'result' '(' Name ')' EOS InternalSubProgPart EndFunctionStmt         -> FunctionRange
@@ -118,10 +125,10 @@ context-free syntax
 %%TODO   'recursive' TypeSpec 'function'       -> FunctionPrefix
 %%TODO   TypeSpec 'recursive' 'function'       -> FunctionPrefix
 
-%%R1218
+%%R1232
 %% endfunction (without spaces) is allowed
-%%TODO   LblDef 'end' EOS                              -> EndFunctionStmt
-%%TODO   LblDef 'end' 'function' EndName? EOS          -> EndFunctionStmt
+  LblDef 'END'                              EOS -> EndFunctionStmt      {cons("end-function-stmt")}
+  LblDef 'END' 'FUNCTION' FunctionName?     EOS -> EndFunctionStmt      {cons("end-function-stmt")}
 
 %%R1219
 %%R1220
@@ -140,22 +147,22 @@ context-free syntax
 %%TODO    LblDef FunctionPrefix Name FunctionParList? EOS      -> FunctionStmt
 %%TODO    TypeSpec? 'function'                                 -> FunctionPrefix
 
-%%TODO    '(' {FunctionPar ","}* ')'                           -> FunctionParList
-%%TODO    DummyArgName                                         -> FunctionPar
+   '(' {FunctionPar ","}* ')'                                  -> FunctionParList
+   DummyArgName                                                -> FunctionPar
 
-%%R1222
-  LblDef 'END' 'SUBROUTINE' EndName? EOS        -> EndSubroutineStmt
-  LblDef 'END' EOS                              -> EndSubroutineStmt
+%%R1236
+  LblDef 'END' 'SUBROUTINE' SubroutineName? EOS -> EndSubroutineStmt   {cons("end-subroutine-stmt")}
+  LblDef 'END'                              EOS -> EndSubroutineStmt   {cons("end-subroutine-stmt")}
 
 %%R1223
 %%TODO   LblDef 'entry' EntryName SubroutineParList EOS                        -> EntryStmt
 %%TODO   LblDef 'entry' EntryName SubroutineParList 'result' '(' Name ')' EOS  -> EntryStmt
 
 %%R1224
-%%TODO   LblDef 'return' Expr? EOS             -> ReturnStmt
+%%TODO   LblDef 'return' Expr? EOS              -> ReturnStmt
 
-%%R1225
-  LblDef 'CONTAINS' EOS                        -> ContainsStmt
+%%R1242
+  LblDef 'CONTAINS'                         EOS -> ContainsStmt        {cons("contains-stmt")}
 
 %%-R1226 
 %% statement-functions are obsolete in fortran 95. 

@@ -70,7 +70,7 @@ context-free syntax
 %%R201 JD: the optional startcommentblock is needed to parse comment lines in 1st lines of a file.
 %% original: ExecutableProgram ProgramUnit -> ExecutableProgram
 
- StartCommentBlock? ProgramUnit+               -> Program
+ StartCommentBlock? ProgramUnit+               -> Program          {cons("program")}
 
 %%R202
   MainProgram                                  -> ProgramUnit
@@ -81,7 +81,7 @@ context-free syntax
 
 
 %%R1101
-  ProgramStmt? MainRange                       -> MainProgram
+  ProgramStmt? MainRange                       -> MainProgram      {cons("main-program")}
   BodyConstruct+       EndProgramStmt          -> MainRange
   InternalSubProgPart  EndProgramStmt          -> MainRange
   EndProgramStmt                               -> MainRange
@@ -98,15 +98,15 @@ context-free syntax
   LblDef "END" "PROGRAM" ProgramName?      EOS -> EndProgramStmt   {cons("end-program-stmt")}
 
 %%R1104
-  ModuleStmt ModuleBody EndModuleStmt          -> Module
-  ModuleStmt            EndModuleStmt          -> Module
+  ModuleStmt ModuleBody EndModuleStmt          -> Module           {cons("module")}
+  ModuleStmt            EndModuleStmt          -> Module           {cons("module")}
 
 %%R1105
-  LblDef "MODULE" ModuleName               EOS -> ModuleStmt
+  LblDef "MODULE" ModuleName               EOS -> ModuleStmt        {cons("module-stmt")}
 
 %%R1106
-  LblDef "END"                             EOS -> EndModuleStmt
-  LblDef "END" "MODULE" EndName?           EOS -> EndModuleStmt
+  LblDef "END"                             EOS -> EndModuleStmt     {cons("end-module-stmt")}
+  LblDef "END" "MODULE" ModuleName?        EOS -> EndModuleStmt     {cons("end-module-stmt")}
 
   SpecificationPartConstruct                   -> ModuleBody
   ModuleSubprogramPartConstruct                -> ModuleBody
@@ -118,7 +118,7 @@ context-free syntax
   ModuleSubprogram                             -> ModuleSubprogramPartConstruct
 
 %%R1108
-%%TODO   FunctionSubprogram                    -> ModuleSubprogram
+  FunctionSubprogram                           -> ModuleSubprogram
   SubroutineSubprogram                         -> ModuleSubprogram
 
 %%R204
@@ -163,16 +163,16 @@ context-free syntax
 %%TODO   InternalSubProgPart InternalSubprogram        -> InternalSubProgPart
 
 %%R211
-%%TODO   FunctionSubprogram                    -> InternalSubprogram
-  SubroutineSubprogram                         -> InternalSubprogram
+  FunctionSubprogram                   -> InternalSubprogram
+  SubroutineSubprogram                 -> InternalSubprogram
 
 %%R212
-%%TODO   ContainsStmt                  -> ModuleSubprogramPartConstruct
-%%TODO   ModuleSubprogram              -> ModuleSubprogramPartConstruct
+  ContainsStmt                         -> ModuleSubprogramPartConstruct
+  ModuleSubprogram                     -> ModuleSubprogramPartConstruct
 
 %%R213
-%%TODO   FunctionSubprogram            -> ModuleSubprogram
-%%TODO   SubroutineSubprogram          -> ModuleSubprogram
+  FunctionSubprogram                   -> ModuleSubprogram
+  SubroutineSubprogram                 -> ModuleSubprogram
 
 %%R215
   ActionStmt                    -> ExecutableConstruct
