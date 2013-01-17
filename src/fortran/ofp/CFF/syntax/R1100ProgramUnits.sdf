@@ -41,7 +41,7 @@ sorts
 %%TODO   DummyArgName EndName EntryName ExecutableConstruct ExecutableProgram
   ExecutionPartConstruct %%TODO ExternalName FunctionName GenericName ImpliedDoVariable
   InternalSubProgPart InternalSubprogram %%TODO IntrinsicProcedureName  MainProgram
-  MainRange %%TODO ModuleSubprogram ModuleSubprogramPartConstruct Name
+  MainRange ModuleSubprogram ModuleSubprogramPartConstruct %%TODO Name
 %%TODO   NamelistGroupName ObjectName ProgramName ProgramUnit SFDummyArgName
   SpecificationPartConstruct %%TODO SpecificationStmt SubroutineName SubroutineNameUse TypeName
 %%TODO   VariableName   
@@ -57,6 +57,11 @@ sorts
   ProgramStmt                         %%R1102
   EndProgramStmt                      %%R1103
 
+  Module                              %%R1104
+  ModuleStmt                          %%R1105
+  EndModuleStmt                       %%R1105
+  ModuleBody
+
 context-free start-symbols 
   Program
 
@@ -64,15 +69,14 @@ context-free syntax
 
 %%R201 JD: the optional startcommentblock is needed to parse comment lines in 1st lines of a file.
 %% original: ExecutableProgram ProgramUnit -> ExecutableProgram
-%%TODO  StartCommentBlock? ProgramUnit+              -> ExecutableProgram
 
- ProgramUnit+                                  -> Program
+ StartCommentBlock? ProgramUnit+               -> Program
 
 %%R202
   MainProgram                                  -> ProgramUnit
 %%TODO   FunctionSubprogram                    -> ProgramUnit
 %%TODO   SubroutineSubprogram                  -> ProgramUnit
-%%TODO   Module                                -> ProgramUnit
+  Module                                       -> ProgramUnit
 %%TODO   BlockDataSubprogram                   -> ProgramUnit
 
 
@@ -92,6 +96,30 @@ context-free syntax
 %%R1103
   LblDef "END"                             EOS -> EndProgramStmt   {cons("end-program-stmt")}
   LblDef "END" "PROGRAM" ProgramName?      EOS -> EndProgramStmt   {cons("end-program-stmt")}
+
+%%R1104
+  ModuleStmt ModuleBody EndModuleStmt          -> Module
+  ModuleStmt            EndModuleStmt          -> Module
+
+%%R1105
+  LblDef "MODULE" ModuleName               EOS -> ModuleStmt
+
+%%R1106
+  LblDef "END"                             EOS -> EndModuleStmt
+  LblDef "END" "MODULE" EndName?           EOS -> EndModuleStmt
+
+  SpecificationPartConstruct                   -> ModuleBody
+  ModuleSubprogramPartConstruct                -> ModuleBody
+  ModuleBody SpecificationPartConstruct        -> ModuleBody
+  ModuleBody ModuleSubprogramPartConstruct     -> ModuleBody
+
+%%R1108
+  ContainsStmt                                 -> ModuleSubprogramPartConstruct
+  ModuleSubprogram                             -> ModuleSubprogramPartConstruct
+
+%%R1108
+%%TODO   FunctionSubprogram                    -> ModuleSubprogram
+  SubroutineSubprogram                         -> ModuleSubprogram
 
 %%R204
 %%TODO   ImplicitStmt                          -> SpecificationPartConstruct
