@@ -57,8 +57,7 @@ context-free syntax
 
 %%R201 JD: the optional startcommentblock is needed to parse comment lines in 1st lines of a file.
 %% original: ExecutableProgram ProgramUnit -> ExecutableProgram
-%%TODO   StartCommentBlock? ProgramUnit+       -> ExecutableProgram
+
+  StartCommentBlock? ProgramUnit+              -> Program
 
 %%TODO - Figure out what Fortran.sdf really does
-
-  ProgramUnit+                                 -> Program
