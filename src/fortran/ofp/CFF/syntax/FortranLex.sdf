@@ -26,8 +26,8 @@ sorts
   SconDouble SconSingle 
 %% Ident Aliases:
   Name ArrayName ComponentName GenericName NamelistGroupName TypeName EndName CommonBlockName DummyArgName
-  EntryName ExternalName FunctionName ImpliedDoVariable IntrinsicProcedureName ObjectName ProgramName
-  SFDummyArgName SubroutineName SubroutineNameUse VariableName
+  EntryName ExternalName FunctionName ImpliedDoVariable IntrinsicProcedureName ModuleName ObjectName
+  ProgramName SFDummyArgName SubroutineName SubroutineNameUse VariableName
 
 lexical syntax
 
@@ -142,6 +142,7 @@ context-free syntax
   Ident  -> FunctionName
   Ident  -> ImpliedDoVariable
   Ident  -> IntrinsicProcedureName
+  Ident  -> ModuleName
   Ident  -> ObjectName
   Ident  -> ProgramName
   Ident  -> SFDummyArgName
