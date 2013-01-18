@@ -9,6 +9,16 @@
 !
 ! Not tested here: specification-part and block-data-name.
 
-! Include none of the optional parts.
-BLOCK DATA 
-END
+! Include just the optional "BLOCK DATA" part of end-block-data-stmt
+BLOCK DATA
+END BLOCK DATA
+
+! Include the optional block-data-name
+BLOCK DATA foo
+END BLOCK DATA foo
+
+! Include the optional specification-part
+BLOCK DATA bar
+   INTEGER i
+   common /mycom/i
+END BLOCK DATA bar
