@@ -34,8 +34,7 @@ sorts
   SubroutineParList
   EndSubroutineStmt
   SubroutinePar
-  FunctionStmt
-  FunctionPar EndFunctionStmt FunctionParList FunctionSubprogram FunctionRange
+  FunctionStmt FunctionPar EndFunctionStmt FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
 
 context-free syntax
 
@@ -106,25 +105,25 @@ context-free syntax
 %% see 1213
 
 %%R1227
-%%TODO   LblDef FunctionPrefix FunctionName FunctionRange     -> FunctionSubprogram  {cons("function-subprogram")}
+  LblDef FunctionPrefix FunctionName FunctionRange     -> FunctionSubprogram  {cons("function-subprogram")}
   FunctionStmt EndFunctionStmt                         -> FunctionSubprogram  {cons("function-subprogram")}
   FunctionParList EOS Body? EndFunctionStmt            -> FunctionRange
 
 %%R1228
-%%TODO - add prefix, dummy-arg-name-list, suffix
+%%TODO-F08 - add prefix, dummy-arg-name-list, suffix
   LblDef 'FUNCTION' FunctionName '(' ')'           EOS -> FunctionStmt        {cons("function-stmt")}
 
 %%R1215
-%%TODO   FunctionParList 'result' '(' Name ')' EOS InternalSubProgPart EndFunctionStmt         -> FunctionRange
-%%TODO   FunctionParList 'result' '(' Name ')' EOS Body EndFunctionStmt                        -> FunctionRange
-%%TODO   FunctionParList 'result' '(' Name ')' EOS EndFunctionStmt                             -> FunctionRange
-%%TODO   FunctionParList EOS InternalSubProgPart EndFunctionStmt                               -> FunctionRange
+  FunctionParList 'result' '(' Name ')' EOS InternalSubProgPart EndFunctionStmt         -> FunctionRange
+  FunctionParList 'result' '(' Name ')' EOS Body EndFunctionStmt                        -> FunctionRange
+  FunctionParList 'result' '(' Name ')' EOS EndFunctionStmt                             -> FunctionRange
+  FunctionParList EOS InternalSubProgPart EndFunctionStmt                               -> FunctionRange
 
 %%R1216
 %%R1217
-%%TODO   'recursive' 'function'                -> FunctionPrefix
-%%TODO   'recursive' TypeSpec 'function'       -> FunctionPrefix
-%%TODO   TypeSpec 'recursive' 'function'       -> FunctionPrefix
+  'RECURSIVE' 'FUNCTION'                       -> FunctionPrefix
+  'recursive' TypeSpec 'function'              -> FunctionPrefix
+  TypeSpec 'recursive' 'function'              -> FunctionPrefix
 
 %%R1232
 %% endfunction (without spaces) is allowed
@@ -145,11 +144,11 @@ context-free syntax
    '*'                  -> SubroutinePar
 
 %%/* Must be split on semantic grounds, due to the different scopes for the
-%%TODO    LblDef FunctionPrefix Name FunctionParList? EOS      -> FunctionStmt
-%%TODO    TypeSpec? 'function'                                 -> FunctionPrefix
+   LblDef FunctionPrefix Name FunctionParList? EOS      -> FunctionStmt
+   TypeSpec? 'function'                                 -> FunctionPrefix
 
-   '(' {FunctionPar ","}* ')'                                  -> FunctionParList
-   DummyArgName                                                -> FunctionPar
+   '(' {FunctionPar ","}* ')'                           -> FunctionParList {cons("function-par-list")}
+   DummyArgName                                         -> FunctionPar
 
 %%R1236
   LblDef 'END' 'SUBROUTINE' SubroutineName? EOS -> EndSubroutineStmt   {cons("end-subroutine-stmt")}

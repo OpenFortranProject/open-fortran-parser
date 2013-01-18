@@ -76,7 +76,7 @@ context-free syntax
 
 %%R202
   MainProgram                                  -> ProgramUnit
-%%TODO   FunctionSubprogram                    -> ProgramUnit
+  FunctionSubprogram                           -> ProgramUnit
 %%TODO   SubroutineSubprogram                  -> ProgramUnit
   Module                                       -> ProgramUnit
   BlockDataSubprogram                          -> ProgramUnit
@@ -201,7 +201,7 @@ context-free syntax
 %%R210
   Body ContainsStmt   InternalSubprogram       -> InternalSubProgPart
   ContainsStmt        InternalSubprogram       -> InternalSubProgPart
-%%TODO   InternalSubProgPart InternalSubprogram        -> InternalSubProgPart
+  InternalSubProgPart InternalSubprogram       -> InternalSubProgPart
 
 %%R211
   FunctionSubprogram                   -> InternalSubprogram
