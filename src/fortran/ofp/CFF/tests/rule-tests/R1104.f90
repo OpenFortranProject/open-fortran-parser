@@ -41,6 +41,7 @@ CONTAINS
   subroutine sub()
   END subroutine sub
   Function foo()
+    foo = 13
   END FUNCTION foo
 END MODULE e
 
@@ -51,5 +52,6 @@ contains
   subroutine sub()
   END subroutine sub
   FUNCTION foo()
+    foo = 13
   END FUNCTION foo
 END MODULE f
