@@ -19,38 +19,39 @@
 ! subroutine-subprogram.
 
 ! None of the optional parts included
-module a
-end
+MODULE a
+END
 
 ! Include the optional MODULE in end-module-stmt
-module a
-end module
+MODULE b
+END MODULE
 
 ! Include optional MODULE and module-name in end-module-stmt.
-module a
-end module a
+MODULE c
+END MODULE c
 
 ! Include an optional specification-part
-module a
-  integer i
-end module a
+MODULE d
+  Integer i
+END MODULE d
 
 ! Include an optional module-subprogram-part
-module a
-contains
+MODULE e
+CONTAINS
   subroutine sub()
-  end subroutine sub
-  function foo()
-  end function foo
-end module a
+  END subroutine sub
+  Function foo()
+    foo = 13
+  END FUNCTION foo
+END MODULE e
 
 ! Include all optional parts
-module a
+MODULE f
   integer i
 contains
   subroutine sub()
-  end subroutine sub
-  function foo()
-  end function foo
-end module a
-
+  END subroutine sub
+  FUNCTION foo()
+    foo = 13
+  END FUNCTION foo
+END MODULE f
