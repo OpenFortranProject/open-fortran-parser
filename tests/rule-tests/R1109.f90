@@ -28,20 +28,31 @@
 ! Note: defined-binary-op and defined-unary-op are ambiguous to the grammar 
 ! and are both matched as T_DEFINED_OP in the lexer.
 
+!! moduls for preceeding tests
+!
+MODULE A
+  INTEGER :: b, c
+END MODULE
+MODULE AA
+  INTEGER :: b, c
+END MODULE
+MODULE AAA
+  INTEGER :: m, n
+END MODULE
+
 ! Test with none of the optional parts
-use a
+USE a
 
 ! Include optional module nature
-use, intrinsic :: iso_c_binding
-use, non_intrinsic :: my_mod
+USE, INTRINSIC :: iso_c_binding
+USE, NON_INTRINSIC :: my_mod
 
 ! Include optional rename-list
-use a, b=>c, d=>e
-use a, operator(.myop.)=>operator(.yourop.), integer => real, &
-     b => c, operator(.myotherop.) =>operator(.yourotherop.)
+USE aa, d=>b, e=>c
+USE a, OPERATOR(.myop.)=>OPERATOR(.yourop.), integer => real, &
+8      b => c, OPERATOR(.myotherop.) =>OPERATOR(.yourotherop.)
 
 ! Include optional only clause
-use a, only: b, c=>d
+USE aaa, ONLY: m, f=>n
 
-end
-
+END
