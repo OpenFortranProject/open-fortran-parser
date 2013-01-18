@@ -30,8 +30,8 @@ imports R500DataDeclarations
 imports R800ExecutionControl
 %%TODO imports R900IOStatements
 %%TODO imports R1000_IOEditing
-imports R1100ProgramUnits
-%%TODO imports R1200Procedures
+%%TODO imports R1100ProgramUnits
+imports R1200Procedures
 
 exports
 
@@ -49,6 +49,8 @@ sorts
 %%TODO - replace with above
   DefinedOperator
   ExecutableConstruct
+  UseStmt UseName Only OnlyList Rename RenameList
+  BlockDataSubprogram BlockDataStmt EndBlockDataStmt BlockDataBodyConstruct BlockDataName BlockDataBody
   
   Program                             %%R201   (originally ExecutableProgram F90)
   ProgramUnit                         %%R202
@@ -77,7 +79,7 @@ context-free syntax
 %%TODO   FunctionSubprogram                    -> ProgramUnit
 %%TODO   SubroutineSubprogram                  -> ProgramUnit
   Module                                       -> ProgramUnit
-%%TODO   BlockDataSubprogram                   -> ProgramUnit
+  BlockDataSubprogram                          -> ProgramUnit
 
 
 %%R1101
@@ -121,13 +123,52 @@ context-free syntax
   FunctionSubprogram                           -> ModuleSubprogram
   SubroutineSubprogram                         -> ModuleSubprogram
 
+%%R1109
+%%TODO-F08 - add module-nature
+  LblDef "USE" Name ("," RenameList)?      EOS -> UseStmt           {cons("use-stmt")}
+  LblDef "USE" Name "," "ONLY"
+                    ":"  OnlyList?         EOS -> UseStmt           {cons("use-stmt")}
+
+%%1111
+%%TODO-F08 - add OPERATORs
+  Ident "=>" UseName                           -> Rename
+  Rename ("," Rename)*                         -> RenameList
+
+  Ident                                        -> UseName
+
+%%R1112
+%%TODO-F08 - add rename and only-use-name
+  GenericSpec                                  -> Only
+  (Ident "=>")? UseName                        -> Only
+
+  Only ("," Only)*                             -> OnlyList
+
+
+%%R1120
+  BlockDataStmt BlockDataBody EndBlockDataStmt   -> BlockDataSubprogram
+  BlockDataStmt EndBlockDataStmt                 -> BlockDataSubprogram
+
+%%R1121
+  LblDef "BLOCK" "DATA" BlockDataName?       EOS -> BlockDataStmt     {cons("block-data-stmt")}
+
+%%R1122
+  LblDef "END" "BLOCK" "DATA" BlockDataName? EOS -> EndBlockDataStmt  {cons("end-block-data-stmt")}
+  LblDef "END"                               EOS -> EndBlockDataStmt  {cons("end-block-data-stmt")}
+
+  Ident -> BlockDataName
+
+  BlockDataBodyConstruct+ -> BlockDataBody
+
+  SpecificationPartConstruct -> BlockDataBodyConstruct
+
+
 %%R204
 %%TODO   ImplicitStmt                          -> SpecificationPartConstruct
 %%TODO   ParameterStmt                         -> SpecificationPartConstruct
 %%TODO   FormatStmt                            -> SpecificationPartConstruct
 %%TODO   EntryStmt                             -> SpecificationPartConstruct
   DeclarationConstruct                         -> SpecificationPartConstruct
-%%TODO   UseStmt                               -> SpecificationPartConstruct
+  UseStmt                                      -> SpecificationPartConstruct
 
 %%R207
   TypeDeclarationStmt                          -> DeclarationConstruct
