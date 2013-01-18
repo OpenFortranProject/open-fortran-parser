@@ -14,3 +14,4 @@ check :
 
 clean :
 	rm -f *.ast *.acff
+	rm -f *.o *.mod
