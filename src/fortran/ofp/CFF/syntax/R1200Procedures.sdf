@@ -28,6 +28,7 @@ sorts
 
 %%TODO - putback in above
   ContainsStmt
+  GenericSpec
   SubroutineSubprogram
   SubroutineRange
   SubroutineParList
@@ -72,7 +73,7 @@ context-free syntax
 
 %%R1206
 %%TODO   'operator' '(' DefinedOperator ')'            -> GenericSpec
-%%TODO   'assignment' '(' '=' ')'                      -> GenericSpec
+  'assignment' '(' '=' ')'                      -> GenericSpec
 
 %%R1207
 %%TODO   LblDef 'external' {ExternalName ","}+ EOS     -> ExternalStmt
