@@ -37,6 +37,7 @@ sorts
   FunctionStmt FunctionPar EndFunctionStmt FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
   SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBody InterfaceBlock
   InterfaceStmt EndInterfaceStmt InterfaceBlockPart
+  ProcedureName ProcedureNameList ModuleProcedureStmt
 
 context-free syntax
 
@@ -45,7 +46,7 @@ context-free syntax
   InterfaceStmt InterfaceBlockPart+ EndInterfaceStmt   -> InterfaceBlock
 
   InterfaceBody                                        -> InterfaceBlockPart
-%%TODO   ModuleProcedureStmt                           -> InterfaceBlockPart
+  ModuleProcedureStmt                                  -> InterfaceBlockPart
 
 %%R1203
 %%TODO-F08 abstract
@@ -54,29 +55,30 @@ context-free syntax
   LblDef 'INTERFACE'                               EOS -> InterfaceStmt       {cons("interface-stmt")}
 
 %%R1204
+%%TODO-F08 generic-spec replaces generic-name ENDINTERFACE
   LblDef 'END' 'INTERFACE' GenericName?            EOS -> EndInterfaceStmt    {cons("end-interface-stmt")}
 
 %%R1205
   LblDef FunctionPrefix FunctionName FunctionInterfaceRange     -> InterfaceBody
   LblDef 'SUBROUTINE' SubroutineName SubroutineInterfaceRange   -> InterfaceBody
 
-  FunctionParList   EOS SubprogramInterfaceBody EndFunctionStmt         -> FunctionInterfaceRange
-  FunctionParList   EOS EndFunctionStmt                                 -> FunctionInterfaceRange
+  FunctionParList   EOS SubprogramInterfaceBody EndFunctionStmt    -> FunctionInterfaceRange
+  FunctionParList   EOS EndFunctionStmt                            -> FunctionInterfaceRange
 
-  SubroutineParList EOS SubprogramInterfaceBody EndSubroutineStmt       -> SubroutineInterfaceRange
-  SubroutineParList EOS EndSubroutineStmt                               -> SubroutineInterfaceRange
+  SubroutineParList EOS SubprogramInterfaceBody EndSubroutineStmt  -> SubroutineInterfaceRange
+  SubroutineParList EOS EndSubroutineStmt                          -> SubroutineInterfaceRange
 
   SpecificationPartConstruct                            -> SubprogramInterfaceBody
   SubprogramInterfaceBody SpecificationPartConstruct    -> SubprogramInterfaceBody
 
 %%R1205
-%%TODO   LblDef 'module' 'procedure' ProcedureNameList EOS     -> ModuleProcedureStmt
-%%TODO   {ProcedureName ","}+                                  -> ProcedureNameList
-%%TODO   Ident                                                 -> ProcedureName
+  LblDef 'MODULE' 'PROCEDURE' ProcedureNameList     EOS -> ModuleProcedureStmt  {cons("module-procedure-stmt")}
+  {ProcedureName ","}+                                  -> ProcedureNameList
+  Ident                                                 -> ProcedureName
 
 %%R1206
 %%TODO   'operator' '(' DefinedOperator ')'            -> GenericSpec
-  'ASSIGNMENT' '(' '=' ')'                      -> GenericSpec
+  'ASSIGNMENT' '(' '=' ')'                             -> GenericSpec
 
 %%R1207
 %%TODO   LblDef 'external' {ExternalName ","}+ EOS     -> ExternalStmt
