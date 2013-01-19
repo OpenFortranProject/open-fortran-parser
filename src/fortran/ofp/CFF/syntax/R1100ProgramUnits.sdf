@@ -174,7 +174,7 @@ context-free syntax
   TypeDeclarationStmt                          -> DeclarationConstruct
 %%TODO   SpecificationStmt                     -> DeclarationConstruct
 %%TODO   DerivedTypeDef                        -> DeclarationConstruct
-%%TODO   InterfaceBlock                        -> DeclarationConstruct
+  InterfaceBlock                               -> DeclarationConstruct
 
 %%R209
   ExecutableConstruct                          -> ExecutionPartConstruct
