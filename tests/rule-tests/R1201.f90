@@ -14,30 +14,30 @@
 ! Not tested here: interface-body, procedure-stmt, and generic-spec.
 
 ! Include none of the optional parts.
-interface
-end interface
+INTERFACE
+END INTERFACE
 
 ! Include a generic-spec in the interface-stmt and end-interface-stmt
-interface foo
-end interface foo
+INTERFACE foo
+END INTERFACE foo
 
 ! Try an abstract interface
-abstract interface
-end interface
+ABSTRACT INTERFACE
+END INTERFACE
 
 ! Include an optional interface-specification
-interface
-   subroutine sub()
-   end subroutine sub
-end interface
+INTERFACE
+   SUBROUTINE sub()
+   END SUBROUTINE sub
+END INTERFACE
 
 ! Include multiple optional interface-specification
-interface
-   subroutine sub()
-   end subroutine sub
-   function foo()
-   end function foo
-end interface
+INTERFACE
+   SUBROUTINE bub()
+   END SUBROUTINE bub
+   FUNCTION foo()
+   END FUNCTION foo
+END INTERFACE
 
-end
+END
 
