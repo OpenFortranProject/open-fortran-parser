@@ -172,7 +172,7 @@ context-free syntax
 
 %%R207
   TypeDeclarationStmt                          -> DeclarationConstruct
-%%TODO   SpecificationStmt                     -> DeclarationConstruct
+  SpecificationStmt                            -> DeclarationConstruct
 %%TODO   DerivedTypeDef                        -> DeclarationConstruct
   InterfaceBlock                               -> DeclarationConstruct
 
@@ -185,7 +185,7 @@ context-free syntax
 %%R214                     
 %%TODO   AccessStmt                            -> SpecificationStmt
 %%TODO   AllocatableStmt                       -> SpecificationStmt
-%%TODO   CommonStmt                            -> SpecificationStmt
+  CommonStmt                                   -> SpecificationStmt
 %%TODO   DataStmt                              -> SpecificationStmt
 %%TODO   DimensionStmt                         -> SpecificationStmt
 %%TODO   EquivalenceStmt                       -> SpecificationStmt

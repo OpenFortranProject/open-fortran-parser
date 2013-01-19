@@ -22,7 +22,7 @@ sorts
 %%TODO   ArrayAllocation ArrayAllocationList ArrayDeclarator ArrayDeclaratorList ArraySpec
 %%TODO   AssumedShapeSpec AssumedShapeSpecList AssumedSizeSpec AttrSpec CharLength
 %%TODO   CharSelector Comblock CommonBlockObject CommonBlockObjectList
-%%TODO   CommonStmt Constant DataIDoObject DataIDoObjectList DataImpliedDo
+  CommonStmt %%TODO Constant DataIDoObject DataIDoObjectList DataImpliedDo
 %%TODO   Datalist DataStmt DataStmtObject DataStmtObjectList DataStmtSet
 %%TODO   DataStmtValue DataStmtValueList DeferredShapeSpec DeferredShapeSpecList DimensionStmt
 %%TODO   EntityDecl EquivalenceObject EquivalenceSet EquivalenceSetList EquivalenceStmt
@@ -42,6 +42,7 @@ sorts
   EntityDecl
   KindSelector
   NamedConstant NamedConstantUse
+  CommonBlockObjectList  Comblock CommonBlockObject Comlist SpecificationStmt
 
 context-free syntax
 
@@ -285,21 +286,21 @@ context-free syntax
 %%TODO   ArrayName                                     -> EquivalenceObject
 %%TODO   Variable                                      -> EquivalenceObject
 
-%%R548
-%%  LblDef 'common' Comlist EOS                 -> CommonStmt
-%%  CommonBlockObject                           -> Comlist
-%%  Comblock CommonBlockObject                  -> Comlist
-%%  Comlist ',' CommonBlockObject               -> Comlist
-%%  Comlist Comblock CommonBlockObject          -> Comlist
-%%  Comlist ',' Comblock CommonBlockObject      -> Comlist
-%%  '/' '/'                                     -> Comblock
-%%  '/' CommonBlockName '/'                     -> Comblock
-%%TODO   LblDef 'common' Comblock? CommonBlockObjectList (','? Comblock CommonBlockObjectList)* EOS    -> CommonStmt
-%%TODO   '/' CommonBlockName? '/'                                                                      -> Comblock
+%%R567
+  LblDef 'COMMON' Comlist                    EOS -> CommonStmt     {cons("common-stmt")}
+  CommonBlockObject                              -> Comlist
+  Comblock CommonBlockObject                     -> Comlist
+  Comlist ',' CommonBlockObject                  -> Comlist
+  Comlist Comblock CommonBlockObject             -> Comlist
+  Comlist ',' Comblock CommonBlockObject         -> Comlist
+  '/' '/'                                        -> Comblock
+  '/' CommonBlockName '/'                        -> Comblock
+  LblDef 'common' Comblock? CommonBlockObjectList (','? Comblock CommonBlockObjectList)* EOS    -> CommonStmt
+   '/' CommonBlockName? '/'                      -> Comblock
 
-%%R549
+%%R568
 %%todo: check if this can be reverted to 
 %%      original iso def: CommonBlockObject is VariableName [(ExplicitShapeSpecList)]
-%%TODO   VariableName                                  -> CommonBlockObject
-%%TODO   ArrayDeclarator                               -> CommonBlockObject
-%%TODO   {CommonBlockObject ","}+                      -> CommonBlockObjectList
+  VariableName                                  -> CommonBlockObject
+%%TODO   ArrayDeclarator                        -> CommonBlockObject
+  {CommonBlockObject ","}+                      -> CommonBlockObjectList
