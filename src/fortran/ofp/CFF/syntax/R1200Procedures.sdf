@@ -57,6 +57,7 @@ context-free syntax
 %%R1204
 %%TODO-F08 generic-spec replaces generic-name ENDINTERFACE
   LblDef 'END' 'INTERFACE' GenericName?            EOS -> EndInterfaceStmt    {cons("end-interface-stmt")}
+  LblDef 'END' 'INTERFACE' GenericSpec?            EOS -> EndInterfaceStmt    {cons("end-interface-stmt")}
 
 %%R1205
   LblDef FunctionPrefix FunctionName FunctionInterfaceRange     -> InterfaceBody
@@ -76,9 +77,9 @@ context-free syntax
   {ProcedureName ","}+                                  -> ProcedureNameList
   Ident                                                 -> ProcedureName
 
-%%R1206
-%%TODO   'operator' '(' DefinedOperator ')'            -> GenericSpec
-  'ASSIGNMENT' '(' '=' ')'                             -> GenericSpec
+%%R1207
+  'OPERATOR'   '(' DefinedOperator ')'                   -> GenericSpec
+  'ASSIGNMENT' '(' '='             ')'                   -> GenericSpec
 
 %%R1207
 %%TODO   LblDef 'external' {ExternalName ","}+ EOS     -> ExternalStmt
