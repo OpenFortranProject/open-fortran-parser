@@ -125,9 +125,9 @@ context-free syntax
 
 %%R1109
 %%TODO-F08 - add module-nature
-  LblDef "USE" Name ("," RenameList)?      EOS -> UseStmt           {cons("use-stmt")}
-  LblDef "USE" Name "," "ONLY"
-                    ":"  OnlyList?         EOS -> UseStmt           {cons("use-stmt")}
+  LblDef "USE" "::"? Name ("," RenameList)? EOS -> UseStmt           {cons("use-stmt")}
+  LblDef "USE" "::"? Name "," "ONLY"
+                    ":"  OnlyList?          EOS -> UseStmt           {cons("use-stmt")}
 
 %%1111
 %%TODO-F08 - add OPERATORs
