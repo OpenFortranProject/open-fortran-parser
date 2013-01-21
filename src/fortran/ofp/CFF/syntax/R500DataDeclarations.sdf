@@ -36,6 +36,7 @@ sorts
 %%TODO   TypeSpec UpperBound   
 
 %%TODO - replace with above
+  ArraySpec
   TypeDeclarationStmt
   AttrSpec IntentSpec
   TypeSpec
@@ -44,6 +45,7 @@ sorts
   NamedConstant NamedConstantUse
   CommonBlockObjectList  Comblock CommonBlockObject Comlist SpecificationStmt
   ImplicitStmt ImplicitSpec
+  LanguageBindingSpec
 
 context-free syntax
 
@@ -55,14 +57,20 @@ context-free syntax
   LblDef TypeSpec (',' AttrSpec)* '::' {EntityDecl ","}+  EOS -> TypeDeclarationStmt  {cons("type-declaration-stmt")}
   LblDef TypeSpec                      {EntityDecl ","}+  EOS -> TypeDeclarationStmt  {cons("type-declaration-stmt")}
 
-%%R502
+%%R402
+%%TODO-F08 move to R400
   'INTEGER'   KindSelector?      -> TypeSpec
   'REAL'      KindSelector?      -> TypeSpec
 %%TODO   'double' 'precision'          -> TypeSpec
 %%TODO   'complex'   KindSelector      -> TypeSpec
 %%TODO   'character' CharSelector      -> TypeSpec
 %%TODO   'logical'   KindSelector      -> TypeSpec
+
+%%R403
+%%TODO-F08 declaration-type-spec
   'TYPE' '(' TypeName ')'        -> TypeSpec
+  'TYPE' '(' '*' ')'             -> TypeSpec
+
 %%old F77 rules:
 %%TODO   'integer'                     -> TypeSpec
 %%TODO   'real'                        -> TypeSpec
@@ -75,7 +83,7 @@ context-free syntax
   'PARAMETER'                    -> AttrSpec
 %%TODO    AccessSpec                   -> AttrSpec
 %%TODO   'allocatable'                 -> AttrSpec
-%%TODO   'dimension' '(' ArraySpec ')' -> AttrSpec
+  'DIMENSION' '(' ArraySpec ')' -> AttrSpec
 %%TODO   'external'                    -> AttrSpec
   'INTENT' '(' IntentSpec ')'          -> AttrSpec
 %%TODO   'intrinsic'                   -> AttrSpec
@@ -84,7 +92,7 @@ context-free syntax
 %%TODO   'save'                        -> AttrSpec
 %%TODO   'target'                      -> AttrSpec
 
-%%R504
+%%R503
 %%TODO   ObjectName '=' Expr                                   -> EntityDecl
 %%TODO   ObjectName '(' ArraySpec ')' '=' Expr                 -> EntityDecl
 %%TODO   ObjectName '*' CharLength '=' Expr                    -> EntityDecl
@@ -114,26 +122,34 @@ context-free syntax
 %%TODO   '*' CharLength                -> LengthSelector
 
 %%R508
+  'BIND' '(' 'C' (',' 'NAME' '=' Scon)? ')'  -> LanguageBindingSpec
+
+%%R508
 %%TODO   '(' TypeParamValue ')'        -> CharLength
 %%TODO   ScalarIntLiteralConstant      -> CharLength
 
 %%R509
 %%TODO   SpecificationExpr | '*'       -> TypeParamValue
 
-%%R510
+%%R507
 %%TODO   'public'      -> AccessSpec
 %%TODO   'private'     -> AccessSpec
+
+%%R510
+%%TODO-F08 - fix assumed-rank-spec
+  '..'                                                 -> ArraySpec
+%%TODO   AssumedShapeSpecList                          -> ArraySpec
+%%TODO   DeferredShapeSpecList                         -> ArraySpec
+%%TODO   ExplicitShapeSpecList                         -> ArraySpec
+%%TODO   AssumedSizeSpec                               -> ArraySpec
+
+%%R511
+%%TODO-F08 co-array-spec
 
 %%R523
   'IN'                 -> IntentSpec
   'OUT'                -> IntentSpec
   'INOUT'              -> IntentSpec
-
-%%R512
-%%TODO   AssumedShapeSpecList                          -> ArraySpec
-%%TODO   DeferredShapeSpecList                         -> ArraySpec
-%%TODO   ExplicitShapeSpecList                         -> ArraySpec
-%%TODO   AssumedSizeSpec                               -> ArraySpec
 
 %%R513
 %%TODO   {ExplicitShapeSpec ","}+                      -> ExplicitShapeSpecList

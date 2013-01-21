@@ -39,6 +39,7 @@ sorts
   SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBody InterfaceBlock
   InterfaceStmt EndInterfaceStmt InterfaceBlockPart
   ProcedureName ProcedureNameList ModuleProcedureStmt
+  ProcLanguageBindingSpec
 
 context-free syntax
 
@@ -96,7 +97,7 @@ context-free syntax
 
 %%R1210 
 %%TODO   LblDef 'call' SubroutineNameUse EOS                           -> CallStmt
-%%TODO   LblDef 'call' SubroutineNameUse '(' {ActualArg ","}* ')' EOS  -> CallStmt
+%%TODO   LblDef 'call' SubroutineNamUese '(' {ActualArg ","}* ')' EOS  -> CallStmt
 
 %%R1213 
 %%TODO   (Name '=')? Expr                      -> ActualArg
@@ -136,19 +137,27 @@ context-free syntax
   'recursive' TypeSpec 'function'              -> FunctionPrefix
   TypeSpec 'recursive' 'function'              -> FunctionPrefix
 
+%%R1229
+  LanguageBindingSpec                          -> ProcLanguageBindingSpec
+
 %%R1232
 %% endfunction (without spaces) is allowed
   LblDef 'END'                              EOS -> EndFunctionStmt      {cons("end-function-stmt")}
   LblDef 'END' 'FUNCTION' FunctionName?     EOS -> EndFunctionStmt      {cons("end-function-stmt")}
 
-%%R1219
-%%R1220
-  LblDef 'RECURSIVE'? 'SUBROUTINE' SubroutineName SubroutineRange       -> SubroutineSubprogram
-  SubroutineParList? EOS Body? EndSubroutineStmt                        -> SubroutineRange
-%%TODO   SubroutineParList  EOS InternalSubProgPart EndSubroutineStmt          -> SubroutineRange
+%%R1233
+%%TODO-F08 add prefix
+  LblDef 'RECURSIVE'? 'SUBROUTINE' SubroutineName SubroutineRange        -> SubroutineSubprogram
+  SubroutineParList? EOS Body? EndSubroutineStmt                         -> SubroutineRange
+%%TODO   SubroutineParList  EOS InternalSubProgPart EndSubroutineStmt    -> SubroutineRange
 %% split subroutineStmt/subroutineSubprogram needed? (ELI legacy)
-%%TODO   LblDef 'SUBROUTINE' Name SubroutineParList? EOS                       -> SubroutineStmt
-   '(' {SubroutinePar ","}* ')'                                         -> SubroutineParList
+
+%%1234
+%%TODO   LblDef 'SUBROUTINE' Name SubroutineParList? EOS                 -> SubroutineStmt
+
+%%R1230
+%%TODO-F08 dummy-arg-name-list and move proc-language-binding-spec
+   '(' {SubroutinePar ","}* ')' ProcLanguageBindingSpec?                 -> SubroutineParList
 
 %%R1221
    DummyArgName         -> SubroutinePar
