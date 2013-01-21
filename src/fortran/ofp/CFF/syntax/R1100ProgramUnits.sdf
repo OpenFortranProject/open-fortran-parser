@@ -163,7 +163,7 @@ context-free syntax
 
 
 %%R204
-%%TODO   ImplicitStmt                          -> SpecificationPartConstruct
+  ImplicitStmt                                 -> SpecificationPartConstruct
 %%TODO   ParameterStmt                         -> SpecificationPartConstruct
 %%TODO   FormatStmt                            -> SpecificationPartConstruct
 %%TODO   EntryStmt                             -> SpecificationPartConstruct
