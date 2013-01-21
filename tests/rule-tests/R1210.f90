@@ -2,10 +2,10 @@
 !      external-stmt  is  EXTERNAL [ :: ] external-name-list
 !
 ! Not tested here: external-name-list
-external a
-external a, b
-external :: a
-external :: a, b
+EXTERNAL a
+EXTERNAL a, b
+EXTERNAL :: a
+EXTERNAL :: a, b
 
-end
+END
 
