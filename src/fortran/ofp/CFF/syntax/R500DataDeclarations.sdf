@@ -28,7 +28,7 @@ sorts
 %%TODO   EntityDecl EquivalenceObject EquivalenceSet EquivalenceSetList EquivalenceStmt
 %%TODO   ExplicitShapeSpec ExplicitShapeSpecList ImplicitSpec ImplicitStmt IntentPar
 %%TODO   IntentParList IntentSpec IntentStmt KindSelector LengthSelector
-%%TODO   LetterSpec LowerBound NamedConstant NamedConstantDef NamedConstantDefList
+  LetterSpec %%TODO LowerBound NamedConstant NamedConstantDef NamedConstantDefList
 %%TODO   NamedConstantUse NamelistGroup NamelistGroupObject NamelistStmt
 %%TODO   OptionalPar OptionalParList OptionalStmt ParameterStmt PointerStmt
 %%TODO   PointerStmtObject PointerStmtObjectList SavedEntity SavedEntityList SaveStmt
@@ -43,6 +43,7 @@ sorts
   KindSelector
   NamedConstant NamedConstantUse
   CommonBlockObjectList  Comblock CommonBlockObject Comlist SpecificationStmt
+  ImplicitStmt ImplicitSpec
 
 context-free syntax
 
@@ -255,13 +256,15 @@ context-free syntax
 %%TODO   {NamedConstantDef ","}+                       -> NamedConstantDefList
 %%TODO   NamedConstant '=' Expr                        -> NamedConstantDef
 
-%%R540
-%%TODO   LblDef 'implicit' 'none' EOS                  -> ImplicitStmt
-%%TODO   LblDef 'implicit' {ImplicitSpec ","}+ EOS     -> ImplicitStmt
+%%R559
+  LblDef 'IMPLICIT' 'NONE'                         EOS -> ImplicitStmt    {cons("implicit-stmt")}
+  LblDef 'IMPLICIT' {ImplicitSpec ","}+            EOS -> ImplicitStmt    {cons("implicit-stmt")}
 
-%%541
-%%TODO   TypeSpec "(" {LetterSpec ","}+ ")"            -> ImplicitSpec
-%%TODO   Letter ( "-" Letter )?                        -> LetterSpec
+%%560
+  TypeSpec "(" {LetterSpec ","}+ ")"                   -> ImplicitSpec
+
+%%561
+  Letter ( "-" Letter )?                               -> LetterSpec
 
 %%R543
 %% todo: Use SDF notation.
