@@ -256,13 +256,13 @@ context-free syntax
 
 
 %%R311
-%%TODO   Dop                   -> DefinedOperator
-%%TODO   PowerOp               -> DefinedOperator
-%%TODO   MultOp                -> DefinedOperator
+  Dop                   -> DefinedOperator
+  PowerOp               -> DefinedOperator
+  MultOp                -> DefinedOperator
   AddOp                 -> DefinedOperator
-%%TODO   ConcatOp              -> DefinedOperator
-%%TODO   RelOp                 -> DefinedOperator
-%%TODO   NotOp                 -> DefinedOperator
-%%TODO   AndOp                 -> DefinedOperator
-%%TODO   OrOp                  -> DefinedOperator
-%%TODO   EquivOp               -> DefinedOperator
+  ConcatOp              -> DefinedOperator
+  RelOp                 -> DefinedOperator
+  NotOp                 -> DefinedOperator
+  AndOp                 -> DefinedOperator
+  OrOp                  -> DefinedOperator
+  EquivOp               -> DefinedOperator
