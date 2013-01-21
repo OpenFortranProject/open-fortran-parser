@@ -37,7 +37,7 @@ sorts
 
 %%TODO - replace with above
   TypeDeclarationStmt
-  AttrSpec
+  AttrSpec IntentSpec
   TypeSpec
   EntityDecl
   KindSelector
@@ -52,8 +52,8 @@ context-free syntax
   Ident                         -> NamedConstantUse
 
 %%R501
-  LblDef TypeSpec (',' AttrSpec)* '::' {EntityDecl ","}+ EOS         -> TypeDeclarationStmt
-  LblDef TypeSpec                      {EntityDecl ","}+ EOS         -> TypeDeclarationStmt
+  LblDef TypeSpec (',' AttrSpec)* '::' {EntityDecl ","}+  EOS -> TypeDeclarationStmt  {cons("type-declaration-stmt")}
+  LblDef TypeSpec                      {EntityDecl ","}+  EOS -> TypeDeclarationStmt  {cons("type-declaration-stmt")}
 
 %%R502
   'INTEGER'   KindSelector?      -> TypeSpec
@@ -62,7 +62,7 @@ context-free syntax
 %%TODO   'complex'   KindSelector      -> TypeSpec
 %%TODO   'character' CharSelector      -> TypeSpec
 %%TODO   'logical'   KindSelector      -> TypeSpec
-%%TODO   'type' '(' TypeName ')'       -> TypeSpec
+  'TYPE' '(' TypeName ')'        -> TypeSpec
 %%old F77 rules:
 %%TODO   'integer'                     -> TypeSpec
 %%TODO   'real'                        -> TypeSpec
@@ -77,7 +77,7 @@ context-free syntax
 %%TODO   'allocatable'                 -> AttrSpec
 %%TODO   'dimension' '(' ArraySpec ')' -> AttrSpec
 %%TODO   'external'                    -> AttrSpec
-%%TODO   'intent' '(' IntentSpec ')'   -> AttrSpec
+  'INTENT' '(' IntentSpec ')'          -> AttrSpec
 %%TODO   'intrinsic'                   -> AttrSpec
 %%TODO   'optional'                    -> AttrSpec
 %%TODO   'pointer'                     -> AttrSpec
@@ -124,10 +124,10 @@ context-free syntax
 %%TODO   'public'      -> AccessSpec
 %%TODO   'private'     -> AccessSpec
 
-%%R511
-%%TODO   'in'          -> IntentSpec
-%%TODO   'out'         -> IntentSpec
-%%TODO   'in' 'out'    -> IntentSpec
+%%R523
+  'IN'                 -> IntentSpec
+  'OUT'                -> IntentSpec
+  'INOUT'              -> IntentSpec
 
 %%R512
 %%TODO   AssumedShapeSpecList                          -> ArraySpec
