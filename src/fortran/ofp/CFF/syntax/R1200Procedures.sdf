@@ -28,6 +28,7 @@ sorts
 
 %%TODO - putback in above
   ContainsStmt
+  ExternalStmt
   GenericSpec
   SubroutineSubprogram
   SubroutineRange
@@ -81,11 +82,14 @@ context-free syntax
   'OPERATOR'   '(' DefinedOperator ')'                   -> GenericSpec
   'ASSIGNMENT' '(' '='             ')'                   -> GenericSpec
 
-%%R1207
-%%TODO   LblDef 'external' {ExternalName ","}+ EOS     -> ExternalStmt
-
 %%R1208
 %%TODO   LblDef 'intrinsic' {IntrinsicProcedureName ","}+ EOS  -> IntrinsicStmt
+
+%%R1209
+%%TODO-F08 import-stmt
+
+%%R1210
+  LblDef 'EXTERNAL' '::'? {ExternalName ","}+       EOS -> ExternalStmt         {cons("external-stmt")}
 
 %%R1209
 %%TODO   Name '(' FunctionArgList? ')'                         -> FunctionReference
