@@ -1,5 +1,5 @@
-! Test procedure-declaration-stmt
-!      procedure-declaration-stmt  is  PROCEDURE ( [ proc-interface ] ) 
+! R1211 procedure-declaration-stmt
+!                      is  PROCEDURE ( [ proc-interface ] ) 
 !                                        [ [ , proc-attr-spec ] ... :: ] 
 !                                        proc-decl-list
 !
@@ -22,22 +22,21 @@
 ! null-init.
 
 ! Test with no optional parts.
-procedure() a
-procedure() a, b
+!TODO-F08 PROCEDURE() a1
+!TODO-F08 PROCEDURE() a2, b2
 
 ! Test with optional proc-interface.
-procedure(c) a
-procedure(c) a, b
-procedure(integer(4)) a
+!TODO-F08 PROCEDURE(c) a3
+!TODO-F08 PROCEDURE(c) a4, b4
+!TODO-F08 PROCEDURE(INTEGER(4)) a5
 
 ! Test with optional ::
-procedure(c) :: a
+!TODO-F08 PROCEDURE(c) :: a6
 
 ! Test with optional proc-attr-spec
-procedure(c), bind(c), public, pointer :: a, b
+!TODO-F08 PROCEDURE(c), BIND(C), PUBLIC, POINTER :: a7, b7
 
 ! Test with optional null-init
-procedure(c), pointer :: func_ptr=>null(), b
+!TODO-F08 PROCEDURE(c), POINTER :: func_ptr=>NULL(), b8
 
-end
-
+END
