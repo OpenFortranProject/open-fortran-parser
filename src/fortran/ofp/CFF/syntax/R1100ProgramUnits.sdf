@@ -235,7 +235,7 @@ context-free syntax
   AssignmentStmt                -> ActionStmt
 %%TODO   AssignStmt                    -> ActionStmt
 %%TODO   BackspaceStmt                 -> ActionStmt
-%%TODO   CallStmt                      -> ActionStmt
+  CallStmt                      -> ActionStmt
 %%TODO   CloseStmt                     -> ActionStmt
 %%TODO   ContinueStmt                  -> ActionStmt
 %%TODO   EndfileStmt                   -> ActionStmt
