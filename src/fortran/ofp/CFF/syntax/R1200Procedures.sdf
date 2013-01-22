@@ -100,7 +100,7 @@ context-free syntax
 
 %%R1219
 %%TODO-F08 - this is also ambiguous with array reference so perhaps FunctionArgList is not complete
-  Name '(' FunctionArgList? ')'                        -> FunctionReference
+  Name '(' FunctionArgList? ')'                        -> FunctionReference   {cons("function-reference")}
 
 %%R1220
   LblDef 'CALL' SubroutineNameUse                           EOS -> CallStmt   {cons("call-stmt")}
@@ -114,7 +114,7 @@ context-free syntax
 %% [ keyword = ] actual-arg
   FunctionArg                                          -> FunctionArgList
   FunctionArgList ',' FunctionArg                      -> FunctionArgList
-%%TODO   SectionSubscriptList ',' FunctionArg          -> FunctionArgList
+%%TODO  SectionSubscriptList ',' FunctionArg           -> FunctionArgList
 
 %%R1223
 %%TODO-F08
