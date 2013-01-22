@@ -44,7 +44,7 @@ context-free syntax
   Icon                          -> UFPrimary
   Scon                          -> UFPrimary
   Name                          -> UFPrimary
-%%TODO   FunctionReference             -> UFPrimary
+  FunctionReference             -> UFPrimary
   DataRef                       -> UFPrimary
   '(' UFExpr ')'                -> UFPrimary
 
@@ -55,7 +55,7 @@ context-free syntax
   Scon                          -> COperand
   Name                          -> COperand
   DataRef                       -> COperand
-%%TODO   FunctionReference             -> COperand
+  FunctionReference             -> COperand
 
 %%101
   Icon                          -> UnsignedArithmeticConstant
@@ -74,7 +74,7 @@ context-free syntax
   UnsignedArithmeticConstant    -> Primary
   Name                          -> Primary
   DataRef                       -> Primary
-%%TODO   FunctionReference             -> Primary
+  FunctionReference             -> Primary
   '(' Expr ')'                  -> Primary
   Scon                          -> Primary
 
@@ -195,7 +195,7 @@ context-free syntax
   Icon                                          -> SFPrimary
   Name                                          -> SFPrimary
   DataRef                                       -> SFPrimary
-%%TODO   FunctionReference                             -> SFPrimary
+  FunctionReference                             -> SFPrimary
   '(' Expr ')'                                  -> SFPrimary
 
 %%R736
