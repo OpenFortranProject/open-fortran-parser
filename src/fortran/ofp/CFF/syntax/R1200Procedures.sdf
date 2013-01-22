@@ -16,7 +16,7 @@ exports
 
 sorts
 
-%%TODO   ActualArg CallStmt ContainsStmt EndFunctionStmt EndInterfaceStmt
+  ActualArg CallStmt ContainsStmt EndFunctionStmt EndInterfaceStmt
 %%TODO   EndSubroutineStmt EntryStmt ExternalStmt FunctionArg FunctionArgList
 %%TODO   FunctionInterfaceRange FunctionPar FunctionParList FunctionPrefix FunctionRange
 %%TODO   FunctionReference FunctionStmt FunctionSubprogram GenericSpec InterfaceBlock
@@ -27,7 +27,7 @@ sorts
 %%TODO   SubroutineStmt SubroutineSubprogram
 
 %%TODO - putback in above
-  ContainsStmt
+  FunctionArg FunctionReference FunctionArgList
   ExternalStmt
   GenericSpec
   SubroutineSubprogram
@@ -35,9 +35,9 @@ sorts
   SubroutineParList
   EndSubroutineStmt
   SubroutinePar
-  FunctionStmt FunctionPar EndFunctionStmt FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
+  FunctionStmt FunctionPar FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
   SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBody InterfaceBlock
-  InterfaceStmt EndInterfaceStmt InterfaceBlockPart
+  InterfaceStmt InterfaceBlockPart
   ProcedureName ProcedureNameList ModuleProcedureStmt
   ProcLanguageBindingSpec
 
@@ -92,29 +92,39 @@ context-free syntax
 %%R1210
   LblDef 'EXTERNAL' '::'? {ExternalName ","}+       EOS -> ExternalStmt         {cons("external-stmt")}
 
-%%R1209
-%%TODO   Name '(' FunctionArgList? ')'                         -> FunctionReference
-
-%%R1210 
-%%TODO   LblDef 'call' SubroutineNameUse EOS                           -> CallStmt
-%%TODO   LblDef 'call' SubroutineNamUese '(' {ActualArg ","}* ')' EOS  -> CallStmt
-
-%%R1213 
-%%TODO   (Name '=')? Expr                      -> ActualArg
-%%TODO   (Name '=')? '*' LblRef                -> ActualArg
-
-%%R1211 [ keyword = ] actual-arg
-%%TODO   FunctionArg                                   -> FunctionArgList
-%%TODO   FunctionArgList ',' FunctionArg               -> FunctionArgList
-%%TODO   SectionSubscriptList ',' FunctionArg          -> FunctionArgList
-
-%%TODO   Name '=' Expr                                 -> FunctionArg
-
 %%R1212 keyword is dummy-arg-name
 %% see 1211
 
 %%R1214 alt-return-spec is '*' label
 %% see 1213
+
+%%R1219
+%%TODO-F08 - this is also ambiguous with array reference so perhaps FunctionArgList is not complete
+  Name '(' FunctionArgList? ')'                        -> FunctionReference
+
+%%R1220
+  LblDef 'CALL' SubroutineNameUse                           EOS -> CallStmt   {cons("call-stmt")}
+  LblDef 'CALL' SubroutineNameUse '(' {ActualArg ","}* ')'  EOS -> CallStmt   {cons("call-stmt")}
+
+%%1221
+%%TODO-F08 - procedure-designator
+
+%%1222
+%%TODO-F08 - actual-arg-spec
+%% [ keyword = ] actual-arg
+  FunctionArg                                          -> FunctionArgList
+  FunctionArgList ',' FunctionArg                      -> FunctionArgList
+%%TODO   SectionSubscriptList ',' FunctionArg          -> FunctionArgList
+
+%%R1223
+%%TODO-F08
+  (Name '=')? Expr                                     -> ActualArg
+  (Name '=')? '*' LblRef                               -> ActualArg
+
+  Name '=' Expr                                        -> FunctionArg
+
+%%1224
+%%TODO-F08 - alt-return-spec
 
 %%R1227
   LblDef FunctionPrefix FunctionName FunctionRange     -> FunctionSubprogram  {cons("function-subprogram")}
