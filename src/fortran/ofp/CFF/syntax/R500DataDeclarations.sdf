@@ -36,7 +36,7 @@ sorts
   TypeSpec UpperBound   
 
 %%TODO - replace with above
-  ArraySpec
+  ArraySpec AssumedSizeSpec 
   TypeDeclarationStmt
   AttrSpec IntentSpec
   EntityDecl
@@ -140,7 +140,7 @@ context-free syntax
 %%TODO   AssumedShapeSpecList                          -> ArraySpec
 %%TODO   DeferredShapeSpecList                         -> ArraySpec
   ExplicitShapeSpecList                                -> ArraySpec
-%%TODO   AssumedSizeSpec                               -> ArraySpec
+  AssumedSizeSpec                                      -> ArraySpec
 
 %%R511
 %%TODO-F08 co-array-spec
@@ -171,7 +171,7 @@ context-free syntax
 %%TODO   ':'                                           -> DeferredShapeSpec
 
 %%R518
-%%TODO   (LowerBound ':')? '*'                                 -> AssumedSizeSpec
+  (LowerBound ':')? '*'                                -> AssumedSizeSpec
 %%TODO   ExplicitShapeSpecList ',' '*'                         -> AssumedSizeSpec
 %%TODO   ExplicitShapeSpecList ',' LowerBound ':' '*'          -> AssumedSizeSpec
 
