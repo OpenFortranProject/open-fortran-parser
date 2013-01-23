@@ -173,7 +173,7 @@ context-free syntax
 
 %%R518
   (LowerBound ':')? '*'                                -> AssumedSizeSpec
-%%TODO   ExplicitShapeSpecList ',' '*'                         -> AssumedSizeSpec
+  ExplicitShapeSpecList ',' '*'                        -> AssumedSizeSpec
 %%TODO   ExplicitShapeSpecList ',' LowerBound ':' '*'          -> AssumedSizeSpec
 
 %%R519
