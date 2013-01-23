@@ -26,25 +26,23 @@ sorts
 %%TODO   Datalist DataStmt DataStmtObject DataStmtObjectList DataStmtSet
 %%TODO   DataStmtValue DataStmtValueList DeferredShapeSpec DeferredShapeSpecList DimensionStmt
 %%TODO   EntityDecl EquivalenceObject EquivalenceSet EquivalenceSetList EquivalenceStmt
-%%TODO   ExplicitShapeSpec ExplicitShapeSpecList ImplicitSpec ImplicitStmt IntentPar
+  ExplicitShapeSpec ExplicitShapeSpecList ImplicitSpec ImplicitStmt %%TODO IntentPar
 %%TODO   IntentParList IntentSpec IntentStmt KindSelector LengthSelector
-  LetterSpec %%TODO LowerBound NamedConstant NamedConstantDef NamedConstantDefList
+  LetterSpec LowerBound NamedConstant %%TODO NamedConstantDef NamedConstantDefList
 %%TODO   NamedConstantUse NamelistGroup NamelistGroupObject NamelistStmt
 %%TODO   OptionalPar OptionalParList OptionalStmt ParameterStmt PointerStmt
 %%TODO   PointerStmtObject PointerStmtObjectList SavedEntity SavedEntityList SaveStmt
 %%TODO   TargetObject TargetObjectList TargetStmt TypeDeclarationStmt TypeParamValue
-%%TODO   TypeSpec UpperBound   
+  TypeSpec UpperBound   
 
 %%TODO - replace with above
   ArraySpec
   TypeDeclarationStmt
   AttrSpec IntentSpec
-  TypeSpec
   EntityDecl
   KindSelector
-  NamedConstant NamedConstantUse
+  NamedConstantUse
   CommonBlockObjectList  Comblock CommonBlockObject Comlist SpecificationStmt
-  ImplicitStmt ImplicitSpec
   LanguageBindingSpec
 
 context-free syntax
@@ -101,7 +99,7 @@ context-free syntax
 %%F77
   ObjectName                                            -> EntityDecl
 %%TODO   ObjectName '*' CharLength                             -> EntityDecl
-%%TODO   ObjectName '(' ArraySpec ')'                          -> EntityDecl
+  ObjectName '(' ArraySpec ')'                          -> EntityDecl
 %%TODO   ObjectName '(' ArraySpec ')' '*' CharLength           -> EntityDecl
 
 
@@ -141,7 +139,7 @@ context-free syntax
   '..'                                                 -> ArraySpec
 %%TODO   AssumedShapeSpecList                          -> ArraySpec
 %%TODO   DeferredShapeSpecList                         -> ArraySpec
-%%TODO   ExplicitShapeSpecList                         -> ArraySpec
+  ExplicitShapeSpecList                                -> ArraySpec
 %%TODO   AssumedSizeSpec                               -> ArraySpec
 
 %%R511
@@ -152,19 +150,19 @@ context-free syntax
   'OUT'                -> IntentSpec
   'INOUT'              -> IntentSpec
 
+%%R512
+  {ExplicitShapeSpec ","}+                             -> ExplicitShapeSpecList
+  (LowerBound ':')? UpperBound                         -> ExplicitShapeSpec
+
 %%R513
-%%TODO   {ExplicitShapeSpec ","}+                      -> ExplicitShapeSpecList
-%%TODO   (LowerBound ':')? UpperBound                  -> ExplicitShapeSpec
+  SpecificationExpr                             -> LowerBound
 
-%%R514 
-%%TODO   SpecificationExpr                             -> LowerBound
-
-%%R515
-%%TODO   SpecificationExpr                             -> UpperBound
+%%R514
+  SpecificationExpr                             -> UpperBound
 
 %%R516
-%%TODO   LowerBound? ':'                               -> AssumedShapeSpec
-%%TODO   LowerBound ':'                                -> AssumedShapeSpecList
+%%TODO   LowerBound? ':'                                      -> AssumedShapeSpec
+%%TODO   LowerBound ':'                                       -> AssumedShapeSpecList
 %%TODO   DeferredShapeSpecList ',' LowerBound ':'      -> AssumedShapeSpecList
 %%TODO   AssumedShapeSpecList ',' AssumedShapeSpec     -> AssumedShapeSpecList
 
