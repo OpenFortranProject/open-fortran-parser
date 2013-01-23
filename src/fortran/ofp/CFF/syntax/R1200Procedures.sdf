@@ -18,24 +18,18 @@ sorts
 
   ActualArg CallStmt ContainsStmt EndFunctionStmt EndInterfaceStmt
   EndSubroutineStmt EntryStmt ExternalStmt FunctionArg FunctionArgList
-%%TODO   FunctionInterfaceRange FunctionPar FunctionParList FunctionPrefix FunctionRange
-  FunctionReference %%TODO FunctionStmt FunctionSubprogram GenericSpec InterfaceBlock
+  FunctionInterfaceRange FunctionPar FunctionParList FunctionPrefix FunctionRange
+  FunctionReference FunctionStmt FunctionSubprogram GenericSpec InterfaceBlock
   InterfaceBlockPart InterfaceBody InterfaceStmt IntrinsicStmt ProcedureStmt
   ProcedureName ProcedureNameList ReturnStmt %%TODO SFDummyArgNameList 
-  %% StmtFunctionStmt obsolescant/deleted
-%%TODO   SubprogramInterfaceBody SubroutineInterfaceRange DummyArg SubroutineParList SubroutineRange
-%%TODO   SubroutineStmt SubroutineSubprogram
+  SubprogramInterfaceBody SubroutineInterfaceRange DummyArg SubroutineParList SubroutineRange
+  SubroutineStmt SubroutineSubprogram
 
-%%TODO - putback in above
-  GenericSpec
-  SubroutineSubprogram
-  SubroutineRange
-  SubroutineParList
-  SubroutineStmt  %% NOT USED
-  DummyArg
-  FunctionStmt FunctionPar FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
-  SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBlock
+%%F2008
   ProcLanguageBindingSpec
+
+%%TODO SubroutineStmt not used?
+%%TODO StmtFunctionStmt ambiguous obsolescant/deleted
 
 context-free syntax
 
@@ -96,6 +90,7 @@ context-free syntax
   LblDef 'INTRINSIC' '::'? {IntrinsicProcedureName ","}+   EOS -> IntrinsicStmt  {cons("intrinsic-stmt")}
 
 %%R1219
+%%TODO-F08 - procedure-designator
 %%TODO-F08 - this is also ambiguous with array reference so perhaps FunctionArgList is not complete
   Name '(' FunctionArgList? ')'                        -> FunctionReference   {cons("function-reference")}
 
