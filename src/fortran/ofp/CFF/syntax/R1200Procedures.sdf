@@ -20,7 +20,7 @@ sorts
   EndSubroutineStmt EntryStmt ExternalStmt FunctionArg FunctionArgList
 %%TODO   FunctionInterfaceRange FunctionPar FunctionParList FunctionPrefix FunctionRange
   FunctionReference %%TODO FunctionStmt FunctionSubprogram GenericSpec InterfaceBlock
-  InterfaceBlockPart InterfaceBody InterfaceStmt %%TODO IntrinsicStmt ProcedureStmt
+  InterfaceBlockPart InterfaceBody InterfaceStmt IntrinsicStmt ProcedureStmt
   ProcedureName ProcedureNameList ReturnStmt %%TODO SFDummyArgNameList 
   %% StmtFunctionStmt obsolescant/deleted
 %%TODO   SubprogramInterfaceBody SubroutineInterfaceRange DummyArg SubroutineParList SubroutineRange
@@ -35,7 +35,6 @@ sorts
   DummyArg
   FunctionStmt FunctionPar FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
   SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBlock
-  ProcedureStmt
   ProcLanguageBindingSpec
 
 context-free syntax
@@ -81,14 +80,11 @@ context-free syntax
   'OPERATOR'   '(' DefinedOperator ')'                      -> GenericSpec
   'ASSIGNMENT' '(' '='             ')'                      -> GenericSpec
 
-%%R1208
-%%TODO   LblDef 'intrinsic' {IntrinsicProcedureName ","}+ EOS  -> IntrinsicStmt
-
 %%R1209
 %%TODO-F08 import-stmt
 
 %%R1210
-  LblDef 'EXTERNAL' '::'? {ExternalName ","}+       EOS -> ExternalStmt         {cons("external-stmt")}
+  LblDef 'EXTERNAL' '::'? {ExternalName ","}+              EOS -> ExternalStmt   {cons("external-stmt")}
 
 %%R1212 keyword is dummy-arg-name
 %% see 1211
@@ -96,13 +92,16 @@ context-free syntax
 %%R1214 alt-return-spec is '*' label
 %% see 1213
 
+%%R1218
+  LblDef 'INTRINSIC' '::'? {IntrinsicProcedureName ","}+   EOS -> IntrinsicStmt  {cons("intrinsic-stmt")}
+
 %%R1219
 %%TODO-F08 - this is also ambiguous with array reference so perhaps FunctionArgList is not complete
   Name '(' FunctionArgList? ')'                        -> FunctionReference   {cons("function-reference")}
 
 %%R1220
-  LblDef 'CALL' SubroutineNameUse                           EOS -> CallStmt   {cons("call-stmt")}
-  LblDef 'CALL' SubroutineNameUse '(' {ActualArg ","}* ')'  EOS -> CallStmt   {cons("call-stmt")}
+  LblDef 'CALL' SubroutineNameUse                          EOS -> CallStmt   {cons("call-stmt")}
+  LblDef 'CALL' SubroutineNameUse '(' {ActualArg ","}* ')' EOS -> CallStmt   {cons("call-stmt")}
 
 %%1221
 %%TODO-F08 - procedure-designator

@@ -190,7 +190,7 @@ context-free syntax
 %%TODO   DimensionStmt                         -> SpecificationStmt
 %%TODO   EquivalenceStmt                       -> SpecificationStmt
    ExternalStmt                                -> SpecificationStmt
-%%TODO   IntrinsicStmt                         -> SpecificationStmt
+   IntrinsicStmt                               -> SpecificationStmt
 %%TODO   SaveStmt                              -> SpecificationStmt
 %%TODO   IntentStmt                            -> SpecificationStmt
 %%TODO   NamelistStmt                          -> SpecificationStmt
