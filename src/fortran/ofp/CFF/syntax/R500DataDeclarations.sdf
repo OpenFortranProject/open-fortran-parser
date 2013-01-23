@@ -21,7 +21,7 @@ sorts
 %%TODO   AccessId AccessIdList AccessSpec AccessStmt AllocatableStmt
 %%TODO   ArrayAllocation ArrayAllocationList ArrayDeclarator ArrayDeclaratorList ArraySpec
 %%TODO   AssumedShapeSpec AssumedShapeSpecList AssumedSizeSpec AttrSpec CharLength
-%%TODO   CharSelector Comblock CommonBlockObject CommonBlockObjectList
+  CharSelector %%TODO Comblock CommonBlockObject CommonBlockObjectList
   CommonStmt %%TODO Constant DataIDoObject DataIDoObjectList DataImpliedDo
 %%TODO   Datalist DataStmt DataStmtObject DataStmtObjectList DataStmtSet
 %%TODO   DataStmtValue DataStmtValueList DeferredShapeSpec DeferredShapeSpecList DimensionStmt
@@ -37,7 +37,7 @@ sorts
 
 %%TODO - replace with above
   ArraySpec AssumedSizeSpec 
-  TypeDeclarationStmt
+  TypeDeclarationStmt TypeParamValue
   AttrSpec IntentSpec
   EntityDecl
   KindSelector
@@ -61,7 +61,7 @@ context-free syntax
   'REAL'      KindSelector?      -> TypeSpec
 %%TODO   'double' 'precision'          -> TypeSpec
 %%TODO   'complex'   KindSelector      -> TypeSpec
-%%TODO   'character' CharSelector      -> TypeSpec
+  'CHARACTER' CharSelector      -> TypeSpec
   'LOGICAL'   KindSelector?      -> TypeSpec
 
 %%R403
@@ -109,10 +109,11 @@ context-free syntax
 %%TODO: remove this often used in complex declarations like Integer*8 Complex*8 Complex*16 (IBM standard, not ISO!?)
 %%TODO   '*' Icon                                              -> KindSelector
 
-%%R506
+%%R425
+%%TODO - move to R400...
 %%TODO   '(' 'len' '=' TypeParamValue ',' 'kind' '=' Expr ')'  -> CharSelector
 %%TODO   '(' 'len' '=' TypeParamValue ',' Expr ')'             -> CharSelector
-%%TODO   '(' 'len' '=' TypeParamValue ')'                      -> CharSelector
+  '(' 'LEN' '=' TypeParamValue ')'                             -> CharSelector
 %%TODO   '(' ('kind' '=')? Expr ')'                            -> CharSelector
 
 %%R507
@@ -128,7 +129,7 @@ context-free syntax
 %%TODO   ScalarIntLiteralConstant      -> CharLength
 
 %%R509
-%%TODO   SpecificationExpr | '*'       -> TypeParamValue
+  SpecificationExpr | '*'       -> TypeParamValue
 
 %%R507
 %%TODO   'public'      -> AccessSpec
