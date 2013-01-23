@@ -27,6 +27,7 @@ sorts
 
 %%F2008
   ProcLanguageBindingSpec
+  ProcedureEntityName InterfaceName ProcedureDeclarationStmt ProcDeclList ProcInterface
 
 %%TODO SubroutineStmt not used?
 %%TODO StmtFunctionStmt ambiguous obsolescant/deleted
@@ -80,11 +81,22 @@ context-free syntax
 %%R1210
   LblDef 'EXTERNAL' '::'? {ExternalName ","}+              EOS -> ExternalStmt   {cons("external-stmt")}
 
-%%R1212 keyword is dummy-arg-name
-%% see 1211
+%%R1211
+%%TODO-F08 - add proc-attr-spec
+  LblDef 'PROCEDURE' '(' ProcInterface ')' '::'? ProcDeclList  EOS
+             -> ProcedureDeclarationStmt  {cons("procedure-declaration-stmt")}
 
-%%R1214 alt-return-spec is '*' label
-%% see 1213
+%%R1212
+%%TODO-F08 - add declaration-type-spec
+  InterfaceName                                             -> ProcInterface
+
+%%R1214
+%%TODO-f08 - add proc-pointer-init
+  {ProcedureEntityName ","}+                                -> ProcDeclList
+  Ident                                                     -> ProcedureEntityName
+
+%%R1215
+  Ident                                                     -> InterfaceName
 
 %%R1218
   LblDef 'INTRINSIC' '::'? {IntrinsicProcedureName ","}+   EOS -> IntrinsicStmt  {cons("intrinsic-stmt")}
@@ -170,7 +182,7 @@ context-free syntax
    LblDef FunctionPrefix Name FunctionParList? EOS      -> FunctionStmt
    TypeSpec? 'function'                                 -> FunctionPrefix
 
-   '(' {FunctionPar ","}* ')'                           -> FunctionParList {cons("function-par-list")}
+   '(' {FunctionPar ","}* ')' ProcLanguageBindingSpec?  -> FunctionParList {cons("function-par-list")}
    DummyArgName                                         -> FunctionPar
 
 %%R1236
