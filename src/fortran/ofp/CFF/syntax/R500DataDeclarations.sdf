@@ -58,13 +58,13 @@ context-free syntax
   LblDef TypeSpec                      {EntityDecl ","}+  EOS -> TypeDeclarationStmt  {cons("type-declaration-stmt")}
 
 %%R402
-%%TODO-F08 move to R400
+%%TODO-F08 move to R400 and add intrinsic-type-spec
   'INTEGER'   KindSelector?      -> TypeSpec
   'REAL'      KindSelector?      -> TypeSpec
 %%TODO   'double' 'precision'          -> TypeSpec
 %%TODO   'complex'   KindSelector      -> TypeSpec
 %%TODO   'character' CharSelector      -> TypeSpec
-%%TODO   'logical'   KindSelector      -> TypeSpec
+  'LOGICAL'   KindSelector?      -> TypeSpec
 
 %%R403
 %%TODO-F08 declaration-type-spec
