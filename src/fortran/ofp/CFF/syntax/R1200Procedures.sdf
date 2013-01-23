@@ -23,7 +23,7 @@ sorts
 %%TODO   InterfaceBlockPart InterfaceBody InterfaceStmt IntrinsicStmt ModuleProcedureStmt
 %%TODO   ProcedureName ProcedureNameList ReturnStmt SFDummyArgNameList 
   %% StmtFunctionStmt obsolescant/deleted
-%%TODO   SubprogramInterfaceBody SubroutineInterfaceRange SubroutinePar SubroutineParList SubroutineRange
+%%TODO   SubprogramInterfaceBody SubroutineInterfaceRange DummyArg SubroutineParList SubroutineRange
 %%TODO   SubroutineStmt SubroutineSubprogram
 
 %%TODO - putback in above
@@ -33,8 +33,9 @@ sorts
   SubroutineSubprogram
   SubroutineRange
   SubroutineParList
+  SubroutineStmt  %% NOT USED
   EndSubroutineStmt
-  SubroutinePar
+  DummyArg
   FunctionStmt FunctionPar FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
   SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBody InterfaceBlock
   InterfaceStmt InterfaceBlockPart
@@ -52,24 +53,24 @@ context-free syntax
 
 %%R1203
 %%TODO-F08 abstract
-  LblDef 'INTERFACE' GenericName                   EOS -> InterfaceStmt       {cons("interface-stmt")}
-  LblDef 'INTERFACE' GenericSpec                   EOS -> InterfaceStmt       {cons("interface-stmt")}
-  LblDef 'INTERFACE'                               EOS -> InterfaceStmt       {cons("interface-stmt")}
+%%REMOVE-F90   LblDef 'INTERFACE' GenericName                   EOS -> InterfaceStmt       {cons("interface-stmt")}
+  LblDef 'INTERFACE' GenericSpec?                   EOS -> InterfaceStmt       {cons("interface-stmt")}
+%%REMOVE-F90   LblDef 'INTERFACE'                               EOS -> InterfaceStmt       {cons("interface-stmt")}
 
 %%R1204
 %%TODO-F08 generic-spec replaces generic-name ENDINTERFACE
-  LblDef 'END' 'INTERFACE' GenericName?            EOS -> EndInterfaceStmt    {cons("end-interface-stmt")}
+%%REMOVE-F90  LblDef 'END' 'INTERFACE' GenericName?            EOS -> EndInterfaceStmt    {cons("end-interface-stmt")}
   LblDef 'END' 'INTERFACE' GenericSpec?            EOS -> EndInterfaceStmt    {cons("end-interface-stmt")}
 
 %%R1205
-  LblDef FunctionPrefix FunctionName FunctionInterfaceRange     -> InterfaceBody
-  LblDef 'SUBROUTINE' SubroutineName SubroutineInterfaceRange   -> InterfaceBody
+  LblDef FunctionPrefix FunctionName FunctionInterfaceRange         -> InterfaceBody
+  LblDef 'SUBROUTINE' SubroutineName SubroutineInterfaceRange       -> InterfaceBody
 
-  FunctionParList   EOS SubprogramInterfaceBody EndFunctionStmt    -> FunctionInterfaceRange
-  FunctionParList   EOS EndFunctionStmt                            -> FunctionInterfaceRange
+  FunctionParList    EOS  SubprogramInterfaceBody EndFunctionStmt   -> FunctionInterfaceRange
+  FunctionParList    EOS  EndFunctionStmt                           -> FunctionInterfaceRange
 
-  SubroutineParList EOS SubprogramInterfaceBody EndSubroutineStmt  -> SubroutineInterfaceRange
-  SubroutineParList EOS EndSubroutineStmt                          -> SubroutineInterfaceRange
+  SubroutineParList? EOS  SubprogramInterfaceBody EndSubroutineStmt -> SubroutineInterfaceRange
+  SubroutineParList? EOS  EndSubroutineStmt                         -> SubroutineInterfaceRange
 
   SpecificationPartConstruct                            -> SubprogramInterfaceBody
   SubprogramInterfaceBody SpecificationPartConstruct    -> SubprogramInterfaceBody
@@ -80,6 +81,7 @@ context-free syntax
   Ident                                                 -> ProcedureName
 
 %%R1207
+  GenericName                                            -> GenericSpec
   'OPERATOR'   '(' DefinedOperator ')'                   -> GenericSpec
   'ASSIGNMENT' '(' '='             ')'                   -> GenericSpec
 
@@ -157,21 +159,21 @@ context-free syntax
 
 %%R1233
 %%TODO-F08 add prefix
-  LblDef 'RECURSIVE'? 'SUBROUTINE' SubroutineName SubroutineRange        -> SubroutineSubprogram
-  SubroutineParList? EOS Body? EndSubroutineStmt                         -> SubroutineRange
-%%TODO   SubroutineParList  EOS InternalSubProgPart EndSubroutineStmt    -> SubroutineRange
+  LblDef 'RECURSIVE'? 'SUBROUTINE' SubroutineName SubroutineRange   -> SubroutineSubprogram
+  SubroutineParList? EOS Body? EndSubroutineStmt                    -> SubroutineRange
+  SubroutineParList? EOS InternalSubProgPart EndSubroutineStmt      -> SubroutineRange
 %% split subroutineStmt/subroutineSubprogram needed? (ELI legacy)
 
 %%1234
-%%TODO   LblDef 'SUBROUTINE' Name SubroutineParList? EOS                 -> SubroutineStmt
+  LblDef 'SUBROUTINE' Name SubroutineParList?  EOS -> SubroutineStmt {cons("subroutine-stmt")}
 
 %%R1230
 %%TODO-F08 dummy-arg-name-list and move proc-language-binding-spec
-   '(' {SubroutinePar ","}* ')' ProcLanguageBindingSpec?                 -> SubroutineParList
+   '(' {DummyArg ","}* ')' ProcLanguageBindingSpec?                 -> SubroutineParList
 
 %%R1221
-   DummyArgName         -> SubroutinePar
-   '*'                  -> SubroutinePar
+   DummyArgName         -> DummyArg
+   '*'                  -> DummyArg
 
 %%/* Must be split on semantic grounds, due to the different scopes for the
    LblDef FunctionPrefix Name FunctionParList? EOS      -> FunctionStmt
@@ -185,8 +187,9 @@ context-free syntax
   LblDef 'END'                              EOS -> EndSubroutineStmt   {cons("end-subroutine-stmt")}
 
 %%R1223
+%%TODO - check for optional SubroutineParList
 %%TODO   LblDef 'entry' EntryName SubroutineParList EOS                        -> EntryStmt
-%%TODO   LblDef 'entry' EntryName SubroutineParList 'result' '(' Name ')' EOS  -> EntryStmt
+%%TODO   LblDef 'entry' EntryName SubroutineParList 'result' '(' Name ')'  EOS -> EntryStmt
 
 %%R1224
 %%TODO   LblDef 'return' Expr? EOS              -> ReturnStmt
