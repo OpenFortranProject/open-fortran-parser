@@ -80,14 +80,15 @@ context-free syntax
 %%TODO   'character' LengthSelector    -> TypeSpec
 
 %%R502
-  'PARAMETER'                    -> AttrSpec
 %%TODO    AccessSpec                   -> AttrSpec
 %%TODO   'allocatable'                 -> AttrSpec
-  'DIMENSION' '(' ArraySpec ')' -> AttrSpec
+  'ASYNCHRONOUS'                 -> AttrSpec
+  'DIMENSION' '(' ArraySpec ')'  -> AttrSpec
 %%TODO   'external'                    -> AttrSpec
   'INTENT' '(' IntentSpec ')'          -> AttrSpec
 %%TODO   'intrinsic'                   -> AttrSpec
   'OPTIONAL'                     -> AttrSpec
+  'PARAMETER'                    -> AttrSpec
 %%TODO   'pointer'                     -> AttrSpec
 %%TODO   'save'                        -> AttrSpec
 %%TODO   'target'                      -> AttrSpec
