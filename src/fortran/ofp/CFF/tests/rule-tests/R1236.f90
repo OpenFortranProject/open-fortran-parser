@@ -1,0 +1,11 @@
+!! R1236 end-subroutine-stmt
+!     is END [ SUBROUTINE [ subroutine-name ] ]
+
+SUBROUTINE foo1()
+END SUBROUTINE
+SUBROUTINE foo2()
+ENDSUBROUTINE foo2
+SUBROUTINE foo3()
+END SUBROUTINE foo3
+SUBROUTINE foo4()
+END
