@@ -59,9 +59,9 @@ context-free syntax
 %%TODO-F08 move to R400 and add intrinsic-type-spec
   'INTEGER'   KindSelector?      -> TypeSpec
   'REAL'      KindSelector?      -> TypeSpec
-%%TODO   'double' 'precision'          -> TypeSpec
+  'DOUBLE' 'PRECISION'           -> TypeSpec
 %%TODO   'complex'   KindSelector      -> TypeSpec
-  'CHARACTER' CharSelector      -> TypeSpec
+  'CHARACTER' CharSelector?      -> TypeSpec
   'LOGICAL'   KindSelector?      -> TypeSpec
 
 %%R403
