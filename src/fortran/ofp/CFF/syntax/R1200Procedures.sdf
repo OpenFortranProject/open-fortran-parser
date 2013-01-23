@@ -20,8 +20,8 @@ sorts
   EndSubroutineStmt EntryStmt ExternalStmt FunctionArg FunctionArgList
 %%TODO   FunctionInterfaceRange FunctionPar FunctionParList FunctionPrefix FunctionRange
   FunctionReference %%TODO FunctionStmt FunctionSubprogram GenericSpec InterfaceBlock
-%%TODO   InterfaceBlockPart InterfaceBody InterfaceStmt IntrinsicStmt ModuleProcedureStmt
-%%TODO   ProcedureName ProcedureNameList ReturnStmt SFDummyArgNameList 
+  InterfaceBlockPart InterfaceBody InterfaceStmt %%TODO IntrinsicStmt ModuleProcedureStmt
+  ProcedureName ProcedureNameList ReturnStmt %%TODO SFDummyArgNameList 
   %% StmtFunctionStmt obsolescant/deleted
 %%TODO   SubprogramInterfaceBody SubroutineInterfaceRange DummyArg SubroutineParList SubroutineRange
 %%TODO   SubroutineStmt SubroutineSubprogram
@@ -34,9 +34,8 @@ sorts
   SubroutineStmt  %% NOT USED
   DummyArg
   FunctionStmt FunctionPar FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
-  SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBody InterfaceBlock
-  InterfaceStmt InterfaceBlockPart
-  ProcedureName ProcedureNameList ModuleProcedureStmt
+  SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBlock
+  ModuleProcedureStmt
   ProcLanguageBindingSpec
 
 context-free syntax
@@ -188,8 +187,8 @@ context-free syntax
   LblDef 'ENTRY' EntryName SubroutineParList?                       EOS -> EntryStmt  {cons("entry-stmt")}
   LblDef 'ENTRY' EntryName SubroutineParList? 'RESULT' '(' Name ')' EOS -> EntryStmt  {cons("entry-stmt")}
 
-%%R1224
-%%TODO   LblDef 'return' Expr? EOS              -> ReturnStmt
+%%R1241
+  LblDef 'RETURN' Expr?                     EOS -> ReturnStmt          {cons("return-stmt")}
 
 %%R1242
   LblDef 'CONTAINS'                         EOS -> ContainsStmt        {cons("contains-stmt")}

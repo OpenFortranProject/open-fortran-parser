@@ -248,7 +248,7 @@ context-free syntax
 %%TODO   PauseStmt                     -> ActionStmt
 %%TODO   PrintStmt                     -> ActionStmt
 %%TODO   ReadStmt                      -> ActionStmt
-%%TODO   ReturnStmt                    -> ActionStmt
+  ReturnStmt                    -> ActionStmt
 %%TODO   RewindStmt                    -> ActionStmt
 %%  StmtFunctionStmt            -> ActionStmt see R1226 comment
 %%TODO   StopStmt                      -> ActionStmt
