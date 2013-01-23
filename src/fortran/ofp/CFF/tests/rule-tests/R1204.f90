@@ -1,4 +1,7 @@
-! Testing end-interface-stmt, R1204
+!! R1204 end-interface-stmt
+!     is END INTERFACE [ generic-spec ]
+!
+
 INTERFACE
 10 END INTERFACE
 !TODO-F08 INTERFACE
