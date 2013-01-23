@@ -17,9 +17,9 @@ exports
 sorts
 
   ActualArg CallStmt ContainsStmt EndFunctionStmt EndInterfaceStmt
-%%TODO   EndSubroutineStmt EntryStmt ExternalStmt FunctionArg FunctionArgList
+  EndSubroutineStmt EntryStmt ExternalStmt FunctionArg FunctionArgList
 %%TODO   FunctionInterfaceRange FunctionPar FunctionParList FunctionPrefix FunctionRange
-%%TODO   FunctionReference FunctionStmt FunctionSubprogram GenericSpec InterfaceBlock
+  FunctionReference %%TODO FunctionStmt FunctionSubprogram GenericSpec InterfaceBlock
 %%TODO   InterfaceBlockPart InterfaceBody InterfaceStmt IntrinsicStmt ModuleProcedureStmt
 %%TODO   ProcedureName ProcedureNameList ReturnStmt SFDummyArgNameList 
   %% StmtFunctionStmt obsolescant/deleted
@@ -27,14 +27,11 @@ sorts
 %%TODO   SubroutineStmt SubroutineSubprogram
 
 %%TODO - putback in above
-  FunctionArg FunctionReference FunctionArgList
-  ExternalStmt
   GenericSpec
   SubroutineSubprogram
   SubroutineRange
   SubroutineParList
   SubroutineStmt  %% NOT USED
-  EndSubroutineStmt
   DummyArg
   FunctionStmt FunctionPar FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
   SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBody InterfaceBlock
@@ -186,10 +183,10 @@ context-free syntax
   LblDef 'END' 'SUBROUTINE' SubroutineName? EOS -> EndSubroutineStmt   {cons("end-subroutine-stmt")}
   LblDef 'END'                              EOS -> EndSubroutineStmt   {cons("end-subroutine-stmt")}
 
-%%R1223
-%%TODO - check for optional SubroutineParList
-%%TODO   LblDef 'entry' EntryName SubroutineParList EOS                        -> EntryStmt
-%%TODO   LblDef 'entry' EntryName SubroutineParList 'result' '(' Name ')'  EOS -> EntryStmt
+%%R1240
+%%TODO-F08 add suffix
+  LblDef 'ENTRY' EntryName SubroutineParList?                       EOS -> EntryStmt  {cons("entry-stmt")}
+  LblDef 'ENTRY' EntryName SubroutineParList? 'RESULT' '(' Name ')' EOS -> EntryStmt  {cons("entry-stmt")}
 
 %%R1224
 %%TODO   LblDef 'return' Expr? EOS              -> ReturnStmt
