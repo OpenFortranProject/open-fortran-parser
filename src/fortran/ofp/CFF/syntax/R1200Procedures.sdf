@@ -20,7 +20,7 @@ sorts
   EndSubroutineStmt EntryStmt ExternalStmt FunctionArg FunctionArgList
 %%TODO   FunctionInterfaceRange FunctionPar FunctionParList FunctionPrefix FunctionRange
   FunctionReference %%TODO FunctionStmt FunctionSubprogram GenericSpec InterfaceBlock
-  InterfaceBlockPart InterfaceBody InterfaceStmt %%TODO IntrinsicStmt ModuleProcedureStmt
+  InterfaceBlockPart InterfaceBody InterfaceStmt %%TODO IntrinsicStmt ProcedureStmt
   ProcedureName ProcedureNameList ReturnStmt %%TODO SFDummyArgNameList 
   %% StmtFunctionStmt obsolescant/deleted
 %%TODO   SubprogramInterfaceBody SubroutineInterfaceRange DummyArg SubroutineParList SubroutineRange
@@ -35,7 +35,7 @@ sorts
   DummyArg
   FunctionStmt FunctionPar FunctionParList FunctionSubprogram FunctionRange FunctionPrefix
   SubprogramInterfaceBody SubroutineInterfaceRange FunctionInterfaceRange InterfaceBlock
-  ModuleProcedureStmt
+  ProcedureStmt
   ProcLanguageBindingSpec
 
 context-free syntax
@@ -45,7 +45,7 @@ context-free syntax
   InterfaceStmt InterfaceBlockPart+ EndInterfaceStmt   -> InterfaceBlock
 
   InterfaceBody                                        -> InterfaceBlockPart
-  ModuleProcedureStmt                                  -> InterfaceBlockPart
+  ProcedureStmt                                        -> InterfaceBlockPart
 
 %%R1203
 %%TODO-F08 abstract
@@ -68,18 +68,18 @@ context-free syntax
   SubroutineParList? EOS  SubprogramInterfaceBody EndSubroutineStmt -> SubroutineInterfaceRange
   SubroutineParList? EOS  EndSubroutineStmt                         -> SubroutineInterfaceRange
 
-  SpecificationPartConstruct                            -> SubprogramInterfaceBody
-  SubprogramInterfaceBody SpecificationPartConstruct    -> SubprogramInterfaceBody
+  SpecificationPartConstruct                                -> SubprogramInterfaceBody
+  SubprogramInterfaceBody SpecificationPartConstruct        -> SubprogramInterfaceBody
 
-%%R1205
-  LblDef 'MODULE' 'PROCEDURE' ProcedureNameList     EOS -> ModuleProcedureStmt  {cons("module-procedure-stmt")}
-  {ProcedureName ","}+                                  -> ProcedureNameList
-  Ident                                                 -> ProcedureName
+%%R1206
+  LblDef 'MODULE'? 'PROCEDURE' '::'? ProcedureNameList  EOS -> ProcedureStmt  {cons("procedure-stmt")}
+  {ProcedureName ","}+                                      -> ProcedureNameList
+  Ident                                                     -> ProcedureName
 
 %%R1207
-  GenericName                                            -> GenericSpec
-  'OPERATOR'   '(' DefinedOperator ')'                   -> GenericSpec
-  'ASSIGNMENT' '(' '='             ')'                   -> GenericSpec
+  GenericName                                               -> GenericSpec
+  'OPERATOR'   '(' DefinedOperator ')'                      -> GenericSpec
+  'ASSIGNMENT' '(' '='             ')'                      -> GenericSpec
 
 %%R1208
 %%TODO   LblDef 'intrinsic' {IntrinsicProcedureName ","}+ EOS  -> IntrinsicStmt
@@ -161,13 +161,14 @@ context-free syntax
 %% split subroutineStmt/subroutineSubprogram needed? (ELI legacy)
 
 %%1234
+%%TODO-F08 - add prefix and proc-language-binding-spec
   LblDef 'SUBROUTINE' Name SubroutineParList?  EOS -> SubroutineStmt {cons("subroutine-stmt")}
 
 %%R1230
 %%TODO-F08 dummy-arg-name-list and move proc-language-binding-spec
    '(' {DummyArg ","}* ')' ProcLanguageBindingSpec?                 -> SubroutineParList
 
-%%R1221
+%%R1235
    DummyArgName         -> DummyArg
    '*'                  -> DummyArg
 
