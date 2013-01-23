@@ -172,6 +172,7 @@ context-free syntax
 
 %%R207
   TypeDeclarationStmt                          -> DeclarationConstruct
+  ProcedureDeclarationStmt                     -> DeclarationConstruct
   SpecificationStmt                            -> DeclarationConstruct
 %%TODO   DerivedTypeDef                        -> DeclarationConstruct
   InterfaceBlock                               -> DeclarationConstruct
