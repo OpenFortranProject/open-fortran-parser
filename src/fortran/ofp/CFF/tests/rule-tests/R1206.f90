@@ -1,29 +1,31 @@
-! Test procedure-stmt
-!      procedure-stmt  is  [ MODULE ] PROCEDURE procedure-name-list
-!
-! Not tested here: procedure-name-list.
-!
-! procedure-stmt tested as part of an interface-specification.
-MODULE aMod
-INTERFACE generic_name
+!! R1206 procedure-stmt
+!     is [ MODULE ] PROCEDURE [ :: ] procedure-name-list
+
+MODULE PSM
+
+INTERFACE PSI
    ! First without the optional MODULE
-!TODO-F08?   PROCEDURE a
-!TODO-F08?   PROCEDURE a, b
+   PROCEDURE a
+   PROCEDURE :: b, c
    
    ! Now with the MODULE
-   MODULE PROCEDURE c
-   MODULE PROCEDURE d, e
+   MODULE PROCEDURE :: d
+   MODULE PROCEDURE e, f
 END INTERFACE
 
 CONTAINS
-
-SUBROUTINE c
-END SUBROUTINE
-SUBROUTINE d(i)
-END SUBROUTINE
-SUBROUTINE e(x)
-END SUBROUTINE
-
+  SUBROUTINE a
+  END SUBROUTINE
+  SUBROUTINE b(i)
+  END SUBROUTINE
+  SUBROUTINE c(i,j)
+  END SUBROUTINE
+  SUBROUTINE d(x)
+  END SUBROUTINE
+  SUBROUTINE e(x,y)
+  END SUBROUTINE
+  SUBROUTINE f(x,y,z)
+  END SUBROUTINE
 END MODULE
 
 
