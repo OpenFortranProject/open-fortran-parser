@@ -77,7 +77,7 @@ context-free syntax
 %%R202
   MainProgram                                  -> ProgramUnit
   FunctionSubprogram                           -> ProgramUnit
-%%TODO   SubroutineSubprogram                  -> ProgramUnit
+  SubroutineSubprogram                         -> ProgramUnit
   Module                                       -> ProgramUnit
   BlockDataSubprogram                          -> ProgramUnit
 
