@@ -166,7 +166,7 @@ context-free syntax
   ImplicitStmt                                 -> SpecificationPartConstruct
 %%TODO   ParameterStmt                         -> SpecificationPartConstruct
 %%TODO   FormatStmt                            -> SpecificationPartConstruct
-%%TODO   EntryStmt                             -> SpecificationPartConstruct
+  EntryStmt                                    -> SpecificationPartConstruct
   DeclarationConstruct                         -> SpecificationPartConstruct
   UseStmt                                      -> SpecificationPartConstruct
 
