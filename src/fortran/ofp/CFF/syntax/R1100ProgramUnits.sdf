@@ -41,7 +41,7 @@ sorts
 %%TODO   DummyArgName EndName EntryName ExecutableConstruct ExecutableProgram
   ExecutionPartConstruct %%TODO ExternalName FunctionName GenericName ImpliedDoVariable
   InternalSubProgPart InternalSubprogram %%TODO IntrinsicProcedureName  MainProgram
-  MainRange ModuleSubprogram ModuleSubprogramPartConstruct %%TODO Name
+  MainRange ModuleNature ModuleSubprogram ModuleSubprogramPartConstruct %%TODO Name
 %%TODO   NamelistGroupName ObjectName ProgramName ProgramUnit SFDummyArgName
   SpecificationPartConstruct %%TODO SpecificationStmt SubroutineName SubroutineNameUse TypeName
 %%TODO   VariableName   
@@ -124,10 +124,12 @@ context-free syntax
   SubroutineSubprogram                         -> ModuleSubprogram
 
 %%R1109
-%%TODO-F08 - add module-nature
-  LblDef "USE" "::"? Name ("," RenameList)? EOS -> UseStmt           {cons("use-stmt")}
-  LblDef "USE" "::"? Name "," "ONLY"
-                    ":"  OnlyList?          EOS -> UseStmt           {cons("use-stmt")}
+  LblDef 'USE' ((',' ModuleNature)? '::')? ModuleName (',' RenameList)?        EOS -> UseStmt    {cons("use-stmt")}
+  LblDef 'USE' ((',' ModuleNature)? '::')? ModuleName ',' 'ONLY' ':' OnlyList? EOS -> UseStmt    {cons("use-stmt")}
+
+%%R1110
+  'INTRINSIC'                                  -> ModuleNature
+  'NON_INTRINSIC'                              -> ModuleNature
 
 %%1111
 %%TODO-F08 - add OPERATORs
