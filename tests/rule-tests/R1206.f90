@@ -1,0 +1,31 @@
+!! R1206 procedure-stmt
+!     is [ MODULE ] PROCEDURE [ :: ] procedure-name-list
+
+MODULE PSM
+
+INTERFACE PSI
+   ! First without the optional MODULE
+   PROCEDURE a
+   PROCEDURE :: b, c
+   
+   ! Now with the MODULE
+   MODULE PROCEDURE :: d
+   MODULE PROCEDURE e, f
+END INTERFACE
+
+CONTAINS
+  SUBROUTINE a
+  END SUBROUTINE
+  SUBROUTINE b(i)
+  END SUBROUTINE
+  SUBROUTINE c(i,j)
+  END SUBROUTINE
+  SUBROUTINE d(x)
+  END SUBROUTINE
+  SUBROUTINE e(x,y)
+  END SUBROUTINE
+  SUBROUTINE f(x,y,z)
+  END SUBROUTINE
+END MODULE
+
+
