@@ -37,12 +37,14 @@ sorts
 
 %%TODO - replace with above
   ArraySpec AssumedSizeSpec 
-  TypeDeclarationStmt TypeParamValue
   AttrSpec IntentSpec
+  CharLength
+  CommonBlockObjectList  Comblock CommonBlockObject Comlist SpecificationStmt
   EntityDecl
   KindSelector
+  LengthSelector
   NamedConstantUse
-  CommonBlockObjectList  Comblock CommonBlockObject Comlist SpecificationStmt
+  TypeDeclarationStmt TypeParamValue
   LanguageBindingSpec
 
 context-free syntax
@@ -105,15 +107,21 @@ context-free syntax
 
 %%R425
 %%TODO - move to R400...
-%%TODO   '(' 'len' '=' TypeParamValue ',' 'kind' '=' Expr ')'  -> CharSelector
-%%TODO   '(' 'len' '=' TypeParamValue ',' Expr ')'             -> CharSelector
-  '(' 'LEN' '=' TypeParamValue ')'                             -> CharSelector
-%%TODO   '(' ('kind' '=')? Expr ')'                            -> CharSelector
+  LengthSelector                                        -> CharSelector
+  '(' 'LEN' '=' TypeParamValue ',' 'KIND' '=' Expr ')'  -> CharSelector
+  '('           TypeParamValue ',' 'KIND' '=' Expr ')'  -> CharSelector
+  '('           TypeParamValue ','            Expr ')'  -> CharSelector
 
-%%R507
-%%TODO   '(' TypeParamValue ')'        -> LengthSelector
-%%F77
-%%TODO   '*' CharLength                -> LengthSelector
+  '(' 'KIND' '=' Expr ',' 'LEN' '=' TypeParamValue ')'  -> CharSelector
+  '(' 'KIND' '=' Expr                              ')'  -> CharSelector
+
+%%R426
+  '(' ('LEN' '=')? TypeParamValue ')'                   -> LengthSelector
+  '*' CharLength ','?                                   -> LengthSelector
+
+%%R427
+  '(' TypeParamValue ')'                                -> CharLength
+  Icon                                                  -> CharLength
 
 %%R508
   'BIND' '(' 'C' (',' 'NAME' '=' Scon)? ')'  -> LanguageBindingSpec
@@ -122,8 +130,10 @@ context-free syntax
 %%TODO   '(' TypeParamValue ')'        -> CharLength
 %%TODO   ScalarIntLiteralConstant      -> CharLength
 
-%%R509
-  SpecificationExpr | '*'       -> TypeParamValue
+%%R401
+  SpecificationExpr                    -> TypeParamValue
+  '*'                                  -> TypeParamValue
+  ':'                                  -> TypeParamValue
 
 %%R507
 %%TODO   'public'      -> AccessSpec
