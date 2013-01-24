@@ -66,25 +66,25 @@ context-free syntax
   SubprogramInterfaceBody SpecificationPartConstruct        -> SubprogramInterfaceBody
 
 %%R1206
-  LblDef 'MODULE'? 'PROCEDURE' '::'? ProcedureNameList  EOS -> ProcedureStmt  {cons("procedure-stmt")}
+  LblDef 'MODULE'? 'PROCEDURE' "::"? ProcedureNameList  EOS -> ProcedureStmt  {cons("procedure-stmt")}
   {ProcedureName ","}+                                      -> ProcedureNameList
   Ident                                                     -> ProcedureName
 
 %%R1207
   GenericName                                               -> GenericSpec
-  'OPERATOR'   '(' DefinedOperator ')'                      -> GenericSpec
-  'ASSIGNMENT' '(' '='             ')'                      -> GenericSpec
+  'OPERATOR'   "(" DefinedOperator ")"                      -> GenericSpec
+  'ASSIGNMENT' "(" '='             ")"                      -> GenericSpec
 
 %%R1209
 %%TODO-F08 import-stmt
 
 %%R1210
-  LblDef 'EXTERNAL' '::'? {ExternalName ","}+              EOS -> ExternalStmt   {cons("external-stmt")}
+  LblDef 'EXTERNAL' "::"? {ExternalName ","}+              EOS -> ExternalStmt   {cons("external-stmt")}
 
 %%R1211
 %%TODO-F08 - add proc-attr-spec
-  LblDef 'PROCEDURE' '(' ProcInterface ')' '::'? ProcDeclList  EOS
-             -> ProcedureDeclarationStmt  {cons("procedure-declaration-stmt")}
+  LblDef 'PROCEDURE' "(" ProcInterface ")" "::"? ProcDeclList  EOS -> ProcedureDeclarationStmt
+                                                                        {cons("procedure-declaration-stmt")}
 
 %%R1212
 %%TODO-F08 - add declaration-type-spec
@@ -99,16 +99,16 @@ context-free syntax
   Ident                                                     -> InterfaceName
 
 %%R1218
-  LblDef 'INTRINSIC' '::'? {IntrinsicProcedureName ","}+   EOS -> IntrinsicStmt  {cons("intrinsic-stmt")}
+  LblDef 'INTRINSIC' "::"? {IntrinsicProcedureName ","}+   EOS -> IntrinsicStmt  {cons("intrinsic-stmt")}
 
 %%R1219
 %%TODO-F08 - procedure-designator
 %%TODO-F08 - this is also ambiguous with array reference so perhaps FunctionArgList is not complete
-  Name '(' FunctionArgList? ')'                        -> FunctionReference   {cons("function-reference")}
+  Name "(" FunctionArgList? ")"                        -> FunctionReference   {cons("function-reference")}
 
 %%R1220
   LblDef 'CALL' SubroutineNameUse                          EOS -> CallStmt   {cons("call-stmt")}
-  LblDef 'CALL' SubroutineNameUse '(' {ActualArg ","}* ')' EOS -> CallStmt   {cons("call-stmt")}
+  LblDef 'CALL' SubroutineNameUse "(" {ActualArg ","}* ")" EOS -> CallStmt   {cons("call-stmt")}
 
 %%1221
 %%TODO-F08 - procedure-designator
@@ -117,8 +117,8 @@ context-free syntax
 %%TODO-F08 - actual-arg-spec
 %% [ keyword = ] actual-arg
   FunctionArg                                          -> FunctionArgList
-  FunctionArgList ',' FunctionArg                      -> FunctionArgList
-%%TODO  SectionSubscriptList ',' FunctionArg           -> FunctionArgList
+  FunctionArgList "," FunctionArg                      -> FunctionArgList
+%%TODO  SectionSubscriptList "," FunctionArg           -> FunctionArgList
 
 %%R1223
 %%TODO-F08
@@ -137,12 +137,12 @@ context-free syntax
 
 %%R1228
 %%TODO-F08 - add prefix, dummy-arg-name-list, suffix
-  LblDef 'FUNCTION' FunctionName '(' ')'           EOS -> FunctionStmt        {cons("function-stmt")}
+  LblDef 'FUNCTION' FunctionName "(" ")"           EOS -> FunctionStmt        {cons("function-stmt")}
 
 %%R1215
-  FunctionParList 'result' '(' Name ')' EOS InternalSubProgPart EndFunctionStmt         -> FunctionRange
-  FunctionParList 'result' '(' Name ')' EOS Body EndFunctionStmt                        -> FunctionRange
-  FunctionParList 'result' '(' Name ')' EOS EndFunctionStmt                             -> FunctionRange
+  FunctionParList 'result' "(" Name ")" EOS InternalSubProgPart EndFunctionStmt         -> FunctionRange
+  FunctionParList 'result' "(" Name ")" EOS Body EndFunctionStmt                        -> FunctionRange
+  FunctionParList 'result' "(" Name ")" EOS EndFunctionStmt                             -> FunctionRange
   FunctionParList EOS InternalSubProgPart EndFunctionStmt                               -> FunctionRange
 
 %%R1216
@@ -156,14 +156,15 @@ context-free syntax
 
 %%R1232
 %% endfunction (without spaces) is allowed
-  LblDef 'END'                              EOS -> EndFunctionStmt      {cons("end-function-stmt")}
-  LblDef 'END' 'FUNCTION' FunctionName?     EOS -> EndFunctionStmt      {cons("end-function-stmt")}
+  LblDef 'END'                              EOS -> EndFunctionStmt       {cons("end-function-stmt")}
+  LblDef 'END' 'FUNCTION' FunctionName?     EOS -> EndFunctionStmt       {cons("end-function-stmt")}
 
 %%R1233
 %%TODO-F08 add prefix
-  LblDef 'RECURSIVE'? 'SUBROUTINE' SubroutineName SubroutineRange   -> SubroutineSubprogram
-  SubroutineParList? EOS Body? EndSubroutineStmt                    -> SubroutineRange
-  SubroutineParList? EOS InternalSubProgPart EndSubroutineStmt      -> SubroutineRange
+  LblDef 'RECURSIVE'? 'SUBROUTINE' SubroutineName SubroutineRange  -> SubroutineSubprogram
+                                                                         {cons("subroutine-subprogram")}
+  SubroutineParList? EOS Body? EndSubroutineStmt                   -> SubroutineRange
+  SubroutineParList? EOS InternalSubProgPart EndSubroutineStmt     -> SubroutineRange
 %% split subroutineStmt/subroutineSubprogram needed? (ELI legacy)
 
 %%1234
@@ -172,7 +173,7 @@ context-free syntax
 
 %%R1230
 %%TODO-F08 dummy-arg-name-list and move proc-language-binding-spec
-   '(' {DummyArg ","}* ')' ProcLanguageBindingSpec?                 -> SubroutineParList
+   "(" {DummyArg ","}* ")" ProcLanguageBindingSpec?                 -> SubroutineParList
 
 %%R1235
    DummyArgName         -> DummyArg
@@ -182,7 +183,7 @@ context-free syntax
    LblDef FunctionPrefix Name FunctionParList? EOS      -> FunctionStmt
    TypeSpec? 'function'                                 -> FunctionPrefix
 
-   '(' {FunctionPar ","}* ')' ProcLanguageBindingSpec?  -> FunctionParList {cons("function-par-list")}
+   "(" {FunctionPar ","}* ")" ProcLanguageBindingSpec?  -> FunctionParList {cons("function-par-list")}
    DummyArgName                                         -> FunctionPar
 
 %%R1236
@@ -192,7 +193,7 @@ context-free syntax
 %%R1240
 %%TODO-F08 add suffix
   LblDef 'ENTRY' EntryName SubroutineParList?                       EOS -> EntryStmt  {cons("entry-stmt")}
-  LblDef 'ENTRY' EntryName SubroutineParList? 'RESULT' '(' Name ')' EOS -> EntryStmt  {cons("entry-stmt")}
+  LblDef 'ENTRY' EntryName SubroutineParList? 'RESULT' "(" Name ")" EOS -> EntryStmt  {cons("entry-stmt")}
 
 %%R1241
   LblDef 'RETURN' Expr?                     EOS -> ReturnStmt          {cons("return-stmt")}
@@ -205,6 +206,6 @@ context-free syntax
 %% The following rule causes ambiguity with assignment statements like
 %% FOO(NOARG) = IN2-IN3
 %% If you're ok with ambig rules then uncomment the next line.
-%% LblDef  Name '(' SFDummyArgNameList? ')' '=' Expr EOS        -> StmtFunctionStmt
+%% LblDef  Name "(" SFDummyArgNameList? ")" "=" Expr EOS        -> StmtFunctionStmt
 
 %%TODO   {SFDummyArgName ","}+                 -> SFDummyArgNameList
