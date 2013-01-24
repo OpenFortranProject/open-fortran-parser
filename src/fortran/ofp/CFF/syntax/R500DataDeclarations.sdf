@@ -94,7 +94,7 @@ context-free syntax
 %%TODO   'target'                      -> AttrSpec
 
 %%R503
-%%TODO   ObjectName '=' Expr                                   -> EntityDecl
+  ObjectName '=' Expr                                   -> EntityDecl
 %%TODO   ObjectName '(' ArraySpec ')' '=' Expr                 -> EntityDecl
 %%TODO   ObjectName '*' CharLength '=' Expr                    -> EntityDecl
 %%TODO   ObjectName '*' CharLength '(' ArraySpec ')' '=' Expr  -> EntityDecl
@@ -109,7 +109,7 @@ context-free syntax
 %% expr used as scalar-int-initialization-expr 
   '(' ('KIND' '=')? Expr ')'                            -> KindSelector
 %%TODO: remove this often used in complex declarations like Integer*8 Complex*8 Complex*16 (IBM standard, not ISO!?)
-%%TODO   '*' Icon                                              -> KindSelector
+  '*' Icon                                              -> KindSelector
 
 %%R425
 %%TODO - move to R400...
