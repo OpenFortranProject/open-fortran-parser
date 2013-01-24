@@ -71,14 +71,6 @@ context-free syntax
   'TYPE' '(' TypeName ')'        -> TypeSpec
   'TYPE' '(' '*' ')'             -> TypeSpec
 
-%%old F77 rules:
-%%TODO   'integer'                     -> TypeSpec
-%%TODO   'real'                        -> TypeSpec
-%%TODO   'complex'                     -> TypeSpec
-%%TODO   'logical'                     -> TypeSpec
-%%TODO   'character'                   -> TypeSpec
-%%TODO   'character' LengthSelector    -> TypeSpec
-
 %%R502
 %%TODO    AccessSpec                   -> AttrSpec
 %%TODO   'allocatable'                 -> AttrSpec
