@@ -32,8 +32,8 @@ sorts
 lexical syntax
 
 %% Everything following a ! is comment. With the \n it is an End of Statement
-  "!" ~[\n]*                -> Comment
-  (Comment? "\n" [\ \t]* )+    -> EOS
+  "!" ~[\n]*                    -> Comment
+  (Comment? "\n" [\ \t]* )+     -> EOS
 %% ; at end of line is allowed
   (";" [\ \t]*)+ Comment? "\n" [\ \t]*  -> EOS
 
@@ -41,13 +41,13 @@ lexical syntax
   ("\n" [Cc\*] ~[\n]*)+         -> FixedComment
    FixedComment "\n" [\ \t]*    -> EOS
 
-%% commentlines at the start of a file/program are handled seperately in Fortran90.sdf
+%% commentlines at the start of a file/program are handled separately in Fortran90.sdf
   EOS  -> StartCommentBlock
 
-%% Statement seperator is also EOS (used seldomly)
-  ([\ \t]* ";" [\ \t]*)+            -> EOS 
+%% Statement separator is also EOS (used seldomly)
+  ([\ \t]* ";" [\ \t]*)+        -> EOS
 %%
-%% Continuation can optionally be seperated by comment. The & on the next line is also optional.
+%% Continuation can optionally be separated by comment. The & on the next line is also optional.
    "&" [\ \t]* ("!" ~[\n]*)? "\n" ( [\ \t]+ "&" )?  -> Continuation
    Continuation -> LAYOUT    
 
@@ -69,7 +69,7 @@ lexical syntax
   [0-9]+                        -> Icon
 
 %%R420 Character constants allow '' and "" as escaped ' and " in string literals like 'don''t' (="don't")
-%% seperate names needed for lexical restrictions later 
+%% separate names needed for lexical restrictions later 
 %% NOTE: continuated strings like 'hello&\n   &world' will be parsed as one string with & embedded.
   [\'] (~[\'] | "''")*  [\']    -> SconSingle
   [\"] (~[\"] | '""')*  [\"]    -> SconDouble
