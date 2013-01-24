@@ -72,7 +72,8 @@ context-free syntax
 %%R201 JD: the optional startcommentblock is needed to parse comment lines in 1st lines of a file.
 %% original: ExecutableProgram ProgramUnit -> ExecutableProgram
 
- StartCommentBlock? ProgramUnit+               -> Program          {cons("program")}
+%%R201
+  StartCommentBlock? ProgramUnit+              -> Program          {cons("program")}
 
 %%R202
   MainProgram                                  -> ProgramUnit
@@ -93,22 +94,22 @@ context-free syntax
   BodyConstruct+                               -> Body
 
 %%R1102
-  LblDef "PROGRAM"       ProgramName       EOS -> ProgramStmt      {cons("program-stmt")}
+  LblDef 'PROGRAM'       ProgramName       EOS -> ProgramStmt      {cons("program-stmt")}
 
 %%R1103
-  LblDef "END"                             EOS -> EndProgramStmt   {cons("end-program-stmt")}
-  LblDef "END" "PROGRAM" ProgramName?      EOS -> EndProgramStmt   {cons("end-program-stmt")}
+  LblDef 'END'                             EOS -> EndProgramStmt   {cons("end-program-stmt")}
+  LblDef 'END' 'PROGRAM' ProgramName?      EOS -> EndProgramStmt   {cons("end-program-stmt")}
 
 %%R1104
   ModuleStmt ModuleBody EndModuleStmt          -> Module           {cons("module")}
   ModuleStmt            EndModuleStmt          -> Module           {cons("module")}
 
 %%R1105
-  LblDef "MODULE" ModuleName               EOS -> ModuleStmt        {cons("module-stmt")}
+  LblDef 'MODULE' ModuleName               EOS -> ModuleStmt       {cons("module-stmt")}
 
 %%R1106
-  LblDef "END"                             EOS -> EndModuleStmt     {cons("end-module-stmt")}
-  LblDef "END" "MODULE" ModuleName?        EOS -> EndModuleStmt     {cons("end-module-stmt")}
+  LblDef 'END'                             EOS -> EndModuleStmt    {cons("end-module-stmt")}
+  LblDef 'END' 'MODULE' ModuleName?        EOS -> EndModuleStmt    {cons("end-module-stmt")}
 
   SpecificationPartConstruct                   -> ModuleBody
   ModuleSubprogramPartConstruct                -> ModuleBody
@@ -124,8 +125,10 @@ context-free syntax
   SubroutineSubprogram                         -> ModuleSubprogram
 
 %%R1109
-  LblDef 'USE' ((',' ModuleNature)? '::')? ModuleName (',' RenameList)?        EOS -> UseStmt    {cons("use-stmt")}
-  LblDef 'USE' ((',' ModuleNature)? '::')? ModuleName ',' 'ONLY' ':' OnlyList? EOS -> UseStmt    {cons("use-stmt")}
+  LblDef 'USE' (("," ModuleNature)? "::")? ModuleName ("," RenameList)?        EOS -> UseStmt
+                                                                                        {cons("use-stmt")}
+  LblDef 'USE' (("," ModuleNature)? "::")? ModuleName "," 'ONLY' ":" OnlyList? EOS -> UseStmt
+                                                                                        {cons("use-stmt")}
 
 %%R1110
   'INTRINSIC'                                  -> ModuleNature
@@ -151,11 +154,11 @@ context-free syntax
   BlockDataStmt EndBlockDataStmt                 -> BlockDataSubprogram
 
 %%R1121
-  LblDef "BLOCK" "DATA" BlockDataName?       EOS -> BlockDataStmt     {cons("block-data-stmt")}
+  LblDef 'BLOCK' 'DATA' BlockDataName?       EOS -> BlockDataStmt     {cons("block-data-stmt")}
 
 %%R1122
-  LblDef "END" "BLOCK" "DATA" BlockDataName? EOS -> EndBlockDataStmt  {cons("end-block-data-stmt")}
-  LblDef "END"                               EOS -> EndBlockDataStmt  {cons("end-block-data-stmt")}
+  LblDef 'END' 'BLOCK' 'DATA' BlockDataName? EOS -> EndBlockDataStmt  {cons("end-block-data-stmt")}
+  LblDef 'END'                               EOS -> EndBlockDataStmt  {cons("end-block-data-stmt")}
 
   Ident -> BlockDataName
 
