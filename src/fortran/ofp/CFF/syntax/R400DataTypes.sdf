@@ -20,7 +20,7 @@ sorts
   BozLiteralConstant ComponentArraySpec ComponentAttrSpec ComponentAttrSpecList ComponentDecl
   ComponentDeclList ComponentDefStmt %%TODO Constant DerivedTypeBody DerivedTypeDef
   DerivedTypeStmt EndTypeStmt %%TODO KindParam LogicalConstant PrivateSequenceStmt
-%%TODO   StructureConstructor UnsignedArithmeticConstant   
+  StructureConstructor UnsignedArithmeticConstant   
 
 %%TODO - Add these back above
   AcValue AcValueList
@@ -112,17 +112,24 @@ context-free syntax
   'CONTIGUOUS'                                          -> ComponentAttrSpec
   'POINTER'                                             -> ComponentAttrSpec
 
-%%R444
-  ExplicitShapeSpecList                                 -> ComponentArraySpec
-  DeferredShapeSpecList                                 -> ComponentArraySpec
-
 %%R443
 %%TODO-F08 co-array-spec, component-initialization
   ComponentName ('(' ComponentArraySpec ')')? ('*' CharLength)?      -> ComponentDecl
   {ComponentDecl ","}+                                               -> ComponentDeclList
 
-%%R430
-%%TODO  TypeName '(' {Expr ","}+ ')'                   -> StructureConstructor
+%%R444
+  ExplicitShapeSpecList                                 -> ComponentArraySpec
+  DeferredShapeSpecList                                 -> ComponentArraySpec
+
+%%R445
+%%TODO-F08 proc-component-def-stmt
+
+%%R446
+%%TODO-F08 proc-component-attr-spec
+
+%%R459
+%%TODO - component-spec-list
+  TypeName '(' {Expr ","}+ ')'                  -> StructureConstructor
 
 %%R467
   '(/' AcValueList '/)'                         -> ArrayConstructor
