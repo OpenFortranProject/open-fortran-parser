@@ -99,18 +99,22 @@ context-free syntax
 %%R434
   LblDef 'END' 'TYPE' TypeName?                            EOS -> EndTypeStmt   {cons("end-type-stmt")}
 
-%%R426
+%%R440
   LblDef TypeSpec ( ',' ComponentAttrSpecList )? ':' ':' ComponentDeclList EOS   -> ComponentDefStmt
   LblDef TypeSpec ComponentDeclList EOS                                          -> ComponentDefStmt
 
-%%R427
+%%R442
+%%TODO-F08 - add co-array-spec to dimension
   {ComponentAttrSpec ","}+                              -> ComponentAttrSpecList
-  'POINTER'                                             -> ComponentAttrSpec
+  AccessSpec                                            -> ComponentAttrSpec
+  'ALLOCATABLE'                                         -> ComponentAttrSpec
   'DIMENSION' '(' ComponentArraySpec ')'                -> ComponentAttrSpec
+  'CONTIGUOUS'                                          -> ComponentAttrSpec
+  'POINTER'                                             -> ComponentAttrSpec
 
-%%R428
-  ExplicitShapeSpecList                                        -> ComponentArraySpec
-%%TODO   DeferredShapeSpecList                                 -> ComponentArraySpec
+%%R444
+  ExplicitShapeSpecList                                 -> ComponentArraySpec
+  DeferredShapeSpecList                                 -> ComponentArraySpec
 
 %%R429
 %% TODO check with iso def
