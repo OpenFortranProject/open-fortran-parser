@@ -127,8 +127,14 @@ context-free syntax
 %%R446
 %%TODO-F08 proc-component-attr-spec
 
+%%R454
+%%TODO-F08 type-bound-generic-stmt
+
+%%R455
+%%TODO-F08 binding-attr
+
 %%R459
-%%TODO - component-spec-list
+%%TODO-F08 component-spec-list
   TypeName '(' {Expr ","}+ ')'                  -> StructureConstructor
 
 %%R467
