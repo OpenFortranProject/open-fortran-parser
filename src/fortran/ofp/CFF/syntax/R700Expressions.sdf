@@ -69,8 +69,8 @@ context-free syntax
   '.true.' | '.false.'          -> LogicalConstant
 
 %%R701
-%%TODO   ArrayConstructor              -> Primary
-%%TODO   ArrayConstructor              -> SFPrimary
+  ArrayConstructor              -> Primary
+  ArrayConstructor              -> SFPrimary
   UnsignedArithmeticConstant    -> Primary
   Name                          -> Primary
   DataRef                       -> Primary
