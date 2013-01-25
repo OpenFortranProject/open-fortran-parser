@@ -36,7 +36,7 @@ sorts
   TypeSpec UpperBound   
 
 %%TODO - replace with above
-  ArraySpec AssumedSizeSpec 
+  AccessSpec ArraySpec AssumedSizeSpec 
   AttrSpec IntentSpec
   CharLength
   CommonBlockObjectList  Comblock CommonBlockObject Comlist SpecificationStmt
@@ -74,18 +74,24 @@ context-free syntax
   'TYPE' '(' '*' ')'             -> TypeSpec
 
 %%R502
-%%TODO    AccessSpec                   -> AttrSpec
-%%TODO   'allocatable'                 -> AttrSpec
+   AccessSpec                    -> AttrSpec
+  'ALLOCATABLE'                  -> AttrSpec
   'ASYNCHRONOUS'                 -> AttrSpec
+  'CONTIGUOUS'                   -> AttrSpec
+%%TODO-F08  DimensionSpec                  -> AttrSpec
   'DIMENSION' '(' ArraySpec ')'  -> AttrSpec
-%%TODO   'external'                    -> AttrSpec
-  'INTENT' '(' IntentSpec ')'          -> AttrSpec
-%%TODO   'intrinsic'                   -> AttrSpec
+  'EXTERNAL'                     -> AttrSpec
+  'INTENT' '(' IntentSpec ')'    -> AttrSpec
+  'INTRINSIC'                    -> AttrSpec
+   LanguageBindingSpec           -> AttrSpec
   'OPTIONAL'                     -> AttrSpec
   'PARAMETER'                    -> AttrSpec
-%%TODO   'pointer'                     -> AttrSpec
-%%TODO   'save'                        -> AttrSpec
-%%TODO   'target'                      -> AttrSpec
+  'POINTER'                      -> AttrSpec
+  'PROTECTED'                    -> AttrSpec
+  'SAVE'                         -> AttrSpec
+  'TARGET'                       -> AttrSpec
+  'VALUE'                        -> AttrSpec
+  'VOLATILE'                     -> AttrSpec
 
 %%R503
   ObjectName '=' Expr                                   -> EntityDecl
@@ -136,8 +142,8 @@ context-free syntax
   ':'                                  -> TypeParamValue
 
 %%R507
-%%TODO   'public'      -> AccessSpec
-%%TODO   'private'     -> AccessSpec
+  'PUBLIC'                             -> AccessSpec
+  'PRIVATE'                            -> AccessSpec
 
 %%R510
 %%TODO-F08 - fix assumed-rank-spec
