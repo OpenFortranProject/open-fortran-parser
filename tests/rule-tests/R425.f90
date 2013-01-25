@@ -1,4 +1,9 @@
-! Test char_selector (R424)
+!! R425 char-selector
+!    is length-selector
+!    or ( LEN = type-param-value , KIND = scalar-int-initialization-expr )
+!    or ( type-param-value , [ KIND = ] scalar-int-initialization-expr )
+!    or ( KIND = scalar-int-initialization-expr [ , LEN =type-param-value ] )
+
 ! char_selector alt1, char_length alt2, no optional comma
 character*5 :: a
 ! char_selector alt1, char_length alt1, no optional comma
