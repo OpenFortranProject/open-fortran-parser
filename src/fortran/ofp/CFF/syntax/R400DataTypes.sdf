@@ -116,8 +116,8 @@ context-free syntax
   ExplicitShapeSpecList                                 -> ComponentArraySpec
   DeferredShapeSpecList                                 -> ComponentArraySpec
 
-%%R429
-%% TODO check with iso def
+%%R443
+%%TODO-F08 co-array-spec, component-initialization
   ComponentName ('(' ComponentArraySpec ')')? ('*' CharLength)?      -> ComponentDecl
   {ComponentDecl ","}+                                               -> ComponentDeclList
 
