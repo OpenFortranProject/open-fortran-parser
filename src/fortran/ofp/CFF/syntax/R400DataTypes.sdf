@@ -23,6 +23,8 @@ sorts
 %%TODO   StructureConstructor UnsignedArithmeticConstant   
 
 %%TODO - Add these back above
+  AcValue AcValueList
+  ArrayConstructor
   DerivedTypeDef DerivedTypeBody PrivateSequenceStmt
   KindParam
   Constant
@@ -118,8 +120,8 @@ context-free syntax
 %%R430
 %%TODO  TypeName '(' {Expr ","}+ ')'                   -> StructureConstructor
 
-%%R431
-%%TODO   '(/' AcValueList '/)'                         -> ArrayConstructor
+%%R467
+  '(/' AcValueList '/)'                         -> ArrayConstructor
 
 %%R432
 %%  Expr                                        -> AcValueList
@@ -129,9 +131,9 @@ context-free syntax
 %%  AcImpliedDo                                 -> AcValueList1
 %%  AcValueList1 ',' Expr                       -> AcValueList1
 %%  AcValueList1 ',' AcImpliedDo                -> AcValueList1
-%%TODO   Expr                                          -> AcValue
+  Expr                                          -> AcValue
 %%TODO   AcImpliedDo                                   -> AcValue
-%%TODO   {AcValue ","}+                                -> AcValueList
+  {AcValue ","}+                                -> AcValueList
    
 %%R433
 %%TODO   '(' Expr ',' ImpliedDoVariable '=' Expr ',' Expr ')'                  -> AcImpliedDo
