@@ -73,7 +73,7 @@ context-free syntax
 %% original: ExecutableProgram ProgramUnit -> ExecutableProgram
 
 %%R201
-  StartCommentBlock? ProgramUnit+              -> Program          {cons("program")}
+  StartCommentBlock?  ProgramUnit+              -> Program          {cons("program")}
 
 %%R202
   MainProgram                                  -> ProgramUnit
@@ -179,7 +179,7 @@ context-free syntax
   TypeDeclarationStmt                          -> DeclarationConstruct
   ProcedureDeclarationStmt                     -> DeclarationConstruct
   SpecificationStmt                            -> DeclarationConstruct
-%%TODO   DerivedTypeDef                        -> DeclarationConstruct
+  DerivedTypeDef                               -> DeclarationConstruct
   InterfaceBlock                               -> DeclarationConstruct
 
 %%R209
