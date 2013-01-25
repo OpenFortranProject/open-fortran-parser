@@ -1,5 +1,9 @@
+!! R432 type-attr-spec
+!    is ABSTRACT
+!    or access-spec
+!    or BIND (C)
+!    or EXTENDS ( parent-type-name )
 
-! Testing type attribute spec list
 type, abstract, extends(truth) :: beauty
 end type beauty
 type, abstract :: ugly
