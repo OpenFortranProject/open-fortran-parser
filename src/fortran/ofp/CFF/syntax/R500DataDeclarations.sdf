@@ -20,7 +20,7 @@ exports
 sorts
 %%TODO   AccessId AccessIdList AccessSpec AccessStmt AllocatableStmt
 %%TODO   ArrayAllocation ArrayAllocationList ArrayDeclarator ArrayDeclaratorList ArraySpec
-%%TODO   AssumedShapeSpec AssumedShapeSpecList AssumedSizeSpec AttrSpec CharLength
+  AssumedShapeSpec AssumedShapeSpecList AssumedSizeSpec AttrSpec CharLength
   CharSelector %%TODO Comblock CommonBlockObject CommonBlockObjectList
   CommonStmt %%TODO Constant DataIDoObject DataIDoObjectList DataImpliedDo
 %%TODO   Datalist DataStmt DataStmtObject DataStmtObjectList DataStmtSet
@@ -36,10 +36,10 @@ sorts
   TypeSpec UpperBound   
 
 %%TODO - replace with above
-  AccessSpec ArraySpec AssumedSizeSpec 
-  AttrSpec IntentSpec
-  CharLength
+  IntentSpec
+  AccessSpec ArraySpec
   CommonBlockObjectList  Comblock CommonBlockObject Comlist SpecificationStmt
+  DeferredShapeSpec DeferredShapeSpecList
   EntityDecl
   KindSelector
   LengthSelector
@@ -147,11 +147,11 @@ context-free syntax
 
 %%R510
 %%TODO-F08 - fix assumed-rank-spec
-  '..'                                                 -> ArraySpec
-%%TODO   AssumedShapeSpecList                          -> ArraySpec
-%%TODO   DeferredShapeSpecList                         -> ArraySpec
-  ExplicitShapeSpecList                                -> ArraySpec
-  AssumedSizeSpec                                      -> ArraySpec
+  '..'                                 -> ArraySpec
+  AssumedShapeSpecList                 -> ArraySpec
+  DeferredShapeSpecList                -> ArraySpec
+  ExplicitShapeSpecList                -> ArraySpec
+  AssumedSizeSpec                      -> ArraySpec
 
 %%R511
 %%TODO-F08 co-array-spec
@@ -162,8 +162,8 @@ context-free syntax
   'INOUT'              -> IntentSpec
 
 %%R512
-  {ExplicitShapeSpec ","}+                             -> ExplicitShapeSpecList
-  (LowerBound ':')? UpperBound                         -> ExplicitShapeSpec
+  {ExplicitShapeSpec ","}+                      -> ExplicitShapeSpecList
+  (LowerBound ':')? UpperBound                  -> ExplicitShapeSpec
 
 %%R513
   SpecificationExpr                             -> LowerBound
@@ -172,19 +172,19 @@ context-free syntax
   SpecificationExpr                             -> UpperBound
 
 %%R516
-%%TODO   LowerBound? ':'                                      -> AssumedShapeSpec
-%%TODO   LowerBound ':'                                       -> AssumedShapeSpecList
-%%TODO   DeferredShapeSpecList ',' LowerBound ':'      -> AssumedShapeSpecList
-%%TODO   AssumedShapeSpecList ',' AssumedShapeSpec     -> AssumedShapeSpecList
+  LowerBound? ':'                               -> AssumedShapeSpec
+  LowerBound ':'                                -> AssumedShapeSpecList
+  DeferredShapeSpecList ',' LowerBound ':'      -> AssumedShapeSpecList
+  AssumedShapeSpecList ',' AssumedShapeSpec     -> AssumedShapeSpecList
 
 %%R517
-%%TODO   {DeferredShapeSpec ","}+                      -> DeferredShapeSpecList
-%%TODO   ':'                                           -> DeferredShapeSpec
+  {DeferredShapeSpec ","}+                      -> DeferredShapeSpecList
+  ':'                                           -> DeferredShapeSpec
 
 %%R518
-  (LowerBound ':')? '*'                                -> AssumedSizeSpec
-  ExplicitShapeSpecList ',' '*'                        -> AssumedSizeSpec
-%%TODO   ExplicitShapeSpecList ',' LowerBound ':' '*'          -> AssumedSizeSpec
+  (LowerBound ':')? '*'                         -> AssumedSizeSpec
+  ExplicitShapeSpecList ',' '*'                 -> AssumedSizeSpec
+  ExplicitShapeSpecList ',' LowerBound ':' '*'  -> AssumedSizeSpec
 
 %%R519
 %%TODO   LblDef 'intent' '(' IntentSpec ')' ':' ':' IntentParList EOS  -> IntentStmt
