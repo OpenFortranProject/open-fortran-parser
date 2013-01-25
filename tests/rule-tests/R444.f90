@@ -1,5 +1,7 @@
-
-! Testing explicit-shape-spec-list and deferred-.
+!! R444 component-array-spec
+!    is explicit-shape-spec -list
+!    or deferred-shape-spec -list
+!
 type ugly
 	real truth(:)
 	real beauty(:,:,:,:,:)
