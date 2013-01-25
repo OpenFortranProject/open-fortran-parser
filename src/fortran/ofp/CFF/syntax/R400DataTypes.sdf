@@ -139,6 +139,7 @@ context-free syntax
 
 %%R467
   '(/' AcValueList '/)'                         -> ArrayConstructor
+  '['  AcValueList  ']'                         -> ArrayConstructor
 
 %%R432
 %%  Expr                                        -> AcValueList
