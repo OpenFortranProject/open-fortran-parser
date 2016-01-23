@@ -69,10 +69,6 @@ The C action interfaces are currently provided by JNI.
 
 [build]
   - Build directory.
-  
-[lib]
-  - A pre-built OpenFortranParser-0.8.4.jar file if
-    an OFP distribution is downloaded.
 
 [tests]
   - Fortran test files for the parser.
@@ -93,7 +89,6 @@ The C action interfaces are currently provided by JNI.
 [INSTALL]: ./INSTALL
 [src]: ./src
 [build]: ./build
-[lib]: ./lib
 [tests]: ./tests
 [Issues]: https://github.com/openfortranproject/open-fortran-parser/issues
 [OFP]: https://github.com/openfortranproject/open-fortran-parser/
@@ -106,6 +101,6 @@ The C action interfaces are currently provided by JNI.
 [AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
 [Rose]: http://www.rosecompiler.org/
 [ANTLR]: http://www.antlr.org
-[Java file]: (./src/fortran/ofp/parser/java/IFortranParserAction.java)
+[Java file]: ./src/fortran/ofp/parser/java/IFortranParserAction.java
 [CLASSPATH]: https://en.wikipedia.org/wiki/Classpath_(Java)
 
