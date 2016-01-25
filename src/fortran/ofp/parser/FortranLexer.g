@@ -78,11 +78,169 @@ import fortran.ofp.parser.java.FortranToken;
     } // end isKeyword()
 
     public boolean isKeyword(int tokenType) {
-        if (tokenType > T_BEGIN_KEYWORDS && tokenType < T_END_KEYWORDS) {
-            return true;
-        } else {
-            return false;
-        }
+      return (
+      tokenType == T_INTEGER ||
+      tokenType == T_REAL ||
+      tokenType == T_COMPLEX ||
+      tokenType == T_CHARACTER ||
+      tokenType == T_LOGICAL ||
+      tokenType == T_ABSTRACT ||
+      tokenType == T_ACQUIRED_LOCK ||
+      tokenType == T_ALL ||
+      tokenType == T_ALLOCATABLE ||
+      tokenType == T_ALLOCATE ||
+      tokenType == T_ASSIGNMENT ||
+      tokenType == T_ASSIGN ||
+      tokenType == T_ASSOCIATE ||
+      tokenType == T_ASYNCHRONOUS ||
+      tokenType == T_BACKSPACE ||
+      tokenType == T_BLOCK ||
+      tokenType == T_BLOCKDATA ||
+      tokenType == T_CALL ||
+      tokenType == T_CASE ||
+      tokenType == T_CLASS ||
+      tokenType == T_CLOSE ||
+      tokenType == T_CODIMENSION ||
+      tokenType == T_COMMON ||
+      tokenType == T_CONCURRENT ||
+      tokenType == T_CONTAINS ||
+      tokenType == T_CONTIGUOUS ||
+      tokenType == T_CONTINUE ||
+      tokenType == T_CRITICAL ||
+      tokenType == T_CYCLE ||
+      tokenType == T_DATA ||
+      tokenType == T_DEFAULT ||
+      tokenType == T_DEALLOCATE ||
+      tokenType == T_DEFERRED ||
+      tokenType == T_DO ||
+      tokenType == T_DOUBLE ||
+      tokenType == T_DOUBLEPRECISION ||
+      tokenType == T_DOUBLECOMPLEX ||
+      tokenType == T_ELEMENTAL ||
+      tokenType == T_ELSE ||
+      tokenType == T_ELSEIF ||
+      tokenType == T_ELSEWHERE ||
+      tokenType == T_ENTRY ||
+      tokenType == T_ENUM ||
+      tokenType == T_ENUMERATOR ||
+      tokenType == T_ERROR ||
+      tokenType == T_EQUIVALENCE ||
+      tokenType == T_EXIT ||
+      tokenType == T_EXTENDS ||
+      tokenType == T_EXTERNAL ||
+      tokenType == T_FILE ||
+      tokenType == T_FINAL ||
+      tokenType == T_FLUSH ||
+      tokenType == T_FORALL ||
+      tokenType == T_FORMAT ||
+      tokenType == T_FORMATTED ||
+      tokenType == T_FUNCTION ||
+      tokenType == T_GENERIC ||
+      tokenType == T_GO ||
+      tokenType == T_GOTO ||
+      tokenType == T_IF ||
+      tokenType == T_IMAGES ||
+      tokenType == T_IMPLICIT ||
+      tokenType == T_IMPORT ||
+      tokenType == T_IMPURE ||
+      tokenType == T_IN ||
+      tokenType == T_INOUT ||
+      tokenType == T_INTENT ||
+      tokenType == T_INTERFACE ||
+      tokenType == T_INTRINSIC ||
+      tokenType == T_INQUIRE ||
+      tokenType == T_LOCK ||
+      tokenType == T_MEMORY ||
+      tokenType == T_MODULE ||
+      tokenType == T_NAMELIST ||
+      tokenType == T_NONE ||
+      tokenType == T_NON_INTRINSIC ||
+      tokenType == T_NON_OVERRIDABLE ||
+      tokenType == T_NOPASS ||
+      tokenType == T_NULLIFY ||
+      tokenType == T_ONLY ||
+      tokenType == T_OPEN ||
+      tokenType == T_OPERATOR ||
+      tokenType == T_OPTIONAL ||
+      tokenType == T_OUT ||
+      tokenType == T_PARAMETER ||
+      tokenType == T_PASS ||
+      tokenType == T_PAUSE ||
+      tokenType == T_POINTER ||
+      tokenType == T_PRINT ||
+      tokenType == T_PRECISION ||
+      tokenType == T_PRIVATE ||
+      tokenType == T_PROCEDURE ||
+      tokenType == T_PROGRAM ||
+      tokenType == T_PROTECTED ||
+      tokenType == T_PUBLIC ||
+      tokenType == T_PURE ||
+      tokenType == T_READ ||
+      tokenType == T_RECURSIVE ||
+      tokenType == T_RESULT ||
+      tokenType == T_RETURN ||
+      tokenType == T_REWIND ||
+      tokenType == T_SAVE ||
+      tokenType == T_SELECT ||
+      tokenType == T_SELECTCASE ||
+      tokenType == T_SELECTTYPE ||
+      tokenType == T_SEQUENCE ||
+      tokenType == T_STOP ||
+      tokenType == T_SUBMODULE ||
+      tokenType == T_SUBROUTINE ||
+      tokenType == T_SYNC ||
+      tokenType == T_TARGET ||
+      tokenType == T_THEN ||
+      tokenType == T_TO ||
+      tokenType == T_TYPE ||
+      tokenType == T_UNFORMATTED ||
+      tokenType == T_UNLOCK ||
+      tokenType == T_USE ||
+      tokenType == T_VALUE ||
+      tokenType == T_VOLATILE ||
+      tokenType == T_WAIT ||
+      tokenType == T_WHERE ||
+      tokenType == T_WHILE ||
+      tokenType == T_WRITE ||
+      tokenType == T_WITHTEAM ||
+      tokenType == T_WITH ||
+      tokenType == T_TEAM ||
+      tokenType == T_TOPOLOGY ||
+      tokenType == T_EVENT ||
+      tokenType == T_LOCKSET ||
+      tokenType == T_FINISH ||
+      tokenType == T_SPAWN ||
+      tokenType == T_COPOINTER ||
+      tokenType == T_COTARGET ||
+      tokenType == T_HALO ||
+      tokenType == T_COPY_FN ||
+      tokenType == T_BOUNDARY ||
+      tokenType == T_CYCLIC ||
+      tokenType == T_EXCHANGE_HALO ||
+      tokenType == T_ENDASSOCIATE ||
+      tokenType == T_ENDBLOCK ||
+      tokenType == T_ENDBLOCKDATA ||
+      tokenType == T_ENDCRITICAL ||
+      tokenType == T_ENDDO ||
+      tokenType == T_ENDENUM ||
+      tokenType == T_ENDFILE ||
+      tokenType == T_ENDFORALL ||
+      tokenType == T_ENDFUNCTION ||
+      tokenType == T_ENDIF ||
+      tokenType == T_ENDMODULE ||
+      tokenType == T_ENDINTERFACE ||
+      tokenType == T_ENDPROCEDURE ||
+      tokenType == T_ENDPROGRAM ||
+      tokenType == T_ENDSELECT ||
+      tokenType == T_ENDSUBMODULE ||
+      tokenType == T_ENDSUBROUTINE ||
+      tokenType == T_ENDTYPE ||
+      tokenType == T_ENDWHERE ||
+      tokenType == T_END ||
+      tokenType == T_DIMENSION ||
+      tokenType == T_KIND ||
+      tokenType == T_LEN ||
+      tokenType == T_BIND);
     } // end isKeyword()
 
 
@@ -473,10 +631,7 @@ T_PERIOD_EXPONENT
 
 T_PERIOD        : '.' ;
 
-// begin keyword section (all keywords must appear between
-// T_BEGIN_KEYWORDS and T_END_KEYWORDS)
-// 
-T_BEGIN_KEYWORDS: '__BEGIN_KEYWORDS__';
+// begin keyword section
 
 T_INTEGER       :       'INTEGER'       ;
 T_REAL          :       'REAL'          ;
@@ -658,10 +813,7 @@ T_LEN  : 'LEN' ;
 
 T_BIND : 'BIND' ;
 
-// End keyword section (all keywords must appear between
-// T_BEGIN_KEYWORDS and T_END_KEYWORDS)
-// 
-T_END_KEYWORDS : '__END_KEYWORDS__';
+// End keyword section
 
 //
 // Note: Hollerith constants were deleted in F77; Hollerith edit descriptors
