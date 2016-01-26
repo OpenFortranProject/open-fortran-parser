@@ -9,6 +9,7 @@
 * [Help]
 * [Required packages]
 * [Before you start to compile OFP]
+* [UNIX configure/compile instructions]
 * [Running OFP]
 
 ## <a name="help">Help</a> ##
@@ -17,7 +18,7 @@
 
 ## <a name="required-packages">Required packages</a> ##
 
-The Open Fortran Parser (OFP) tools require [ANTLR]( http://antlr.org/) 3.3.
+The Open Fortran Parser (OFP) tools require [ANTLR] 3.3.
 You can obtain ANTLR from.  OFP also requires a Java installation.
 
 ## <a name="before-you-start">Before you start to compile OFP</a> ##
@@ -25,9 +26,9 @@ You can obtain ANTLR from.  OFP also requires a Java installation.
 Assuming that you have downloaded the [OFP distribution](http://sourceforge.net/projects/fortran-parser),
 unpacked, and untarred it, there should be, at least, the following files and directories:
 
-	[configure](./configure) ..................... used for Unix builds
-	[test](./test) ......................... test files
-	[src](./src/) .......................... the OFP source code
+* [configure] ................ used for Unix builds
+* [test] ......................... test files
+* [src] .......................... the OFP source code
 
 ## <a name="unix-configure">UNIX configure/compile instructions</a> ##
 
@@ -36,15 +37,15 @@ same.  First, cd to the OFP top level directory and do the following:
 
 1. Configure for your environment.  A convenient way to see the possible
    options is to type
-
-	./configure --help
-
+```bash
+    ./configure --help
+```
    The primary options are --enable-c-actions and --enable-c-main.  These
    are only needed if you wish build the action interfaces in C and are enabled
    by default.  Normally
-
-        ./configure
-
+```bash
+    ./configure
+```
    is sufficient for most users.  The --prefix option may be used to change
    the location of the install directory.
 
@@ -64,5 +65,21 @@ same.  First, cd to the OFP top level directory and do the following:
 ```java
     java fortran.ofp.FrontEnd [--verbose] filename
 ``` 
-   Your Java [CLASSPATH](https://en.wikipedia.org/wiki/Classpath_(Java)) must include the OpenFortranParser-0.8.4.jar
-   and the antlr-3.3-complete.jar files (see the [README.md](./README.md) file).
+   Your Java [CLASSPATH] must include the OpenFortranParser-0.8.4.jar
+   and the antlr-3.3-complete.jar files (see the [README.md] file).
+  
+[Contents]:# 
+[Help]: #help
+[Required packages]: #required-packages
+[Before you start to compile OFP]: #before-you-start
+[UNIX configure/compile instructions]: #unix-configure
+[Running OFP]: #running-ofp
+
+[Body]:#
+[OFP distribution]: http://sourceforge.net/projects/fortran-parser
+[ANTLR]:  http://antlr.org/
+[configure]: ./configure
+[test]: ./test
+[src]: ./src
+[CLASSPATH]: https://en.wikipedia.org/wiki/Classpath_(Java)
+[README.md]: ./README.md
