@@ -1,37 +1,35 @@
-/*******************************************************************
- *                                                                 *
- *              OFP installation and build instructions            *
- *                        Version 0.8.4                            *
- *                                                                 *
- *******************************************************************
- *    For help, please send e-mail to:                             *
- *          fortran-parser-devel@lists.sourceforge.net             *
- *******************************************************************/
+[This document is formatted with GitHub-Flavored Markdown.                       ]:#
+[For better viewing, including hyperlinks, read it online at                     ]:#
+[https://github.com/openfortranproject/open-fortran-parser/blob/master/INSTALL.md]:#
 
+#             OFP installation and build instructions           #
+####                 version 0.8.4                           ####
+ 
+## Contents                                                               
+* [Help]
+* [Required packages]
+* [Before you start to compile OFP]
+* [Running OFP]
 
-                       REQUIRED PACKAGES:
-                       ------------------
+## <a name="help">Help</a> ##
 
-The Open Fortran Parser (OFP) tools require ANTLR 3.3.
-You can obtain ANTLR from http://antlr.org/.  OFP also
-requires a Java installation.
+   - For help, please  e-mail fortran-parser-devel@lists.sourceforge.net            
 
+## <a name="required-packages">Required packages</a> ##
 
-               BEFORE YOU START TO COMPILE OFP:
-               ----------------------------------
+The Open Fortran Parser (OFP) tools require [ANTLR]( http://antlr.org/) 3.3.
+You can obtain ANTLR from.  OFP also requires a Java installation.
 
-Assuming that you have downloaded the OFP distribution (from
-http://sourceforge.net/projects/fortran-parser) and unpacked and untarred
-it, there should be, at least, the following files and directories:
+## <a name="before-you-start">Before you start to compile OFP</a> ##
 
-	configure ..................... used for Unix builds
-	lib ........................... a pre-built OpenFortranParser-0.8.4.jar file
-	test/ ......................... test files
-	src/ .......................... the OFP source code
+Assuming that you have downloaded the [OFP distribution](http://sourceforge.net/projects/fortran-parser),
+unpacked, and untarred it, there should be, at least, the following files and directories:
 
+	[configure](./configure) ..................... used for Unix builds
+	[test](./test) ......................... test files
+	[src](./src/) .......................... the OFP source code
 
-              UNIX CONFIGURE/COMPILE INSTRUCTIONS:
-              ------------------------------------
+## <a name="unix-configure">UNIX configure/compile instructions</a> ##
 
 The instructions for building OFP on all Unix platforms are the
 same.  First, cd to the OFP top level directory and do the following:
@@ -60,13 +58,11 @@ same.  First, cd to the OFP top level directory and do the following:
    specified with the prefix configure option.  Note that you must have
    the necessary privileges to write to the install directory.
 
-
-                          RUNNING OFP:
-                          --------------
+## <a name="running-ofp">Running OFP</a> ##
 
   - Run the parser with the command
-
-         java fortran.ofp.FrontEnd [--verbose] filename
-
-    Note that your Java CLASSPATH must include the OpenFortranParser-0.8.4.jar
-    and the antlr-3.3-complete.jar files (see the README file).
+```java
+    java fortran.ofp.FrontEnd [--verbose] filename
+``` 
+   Your Java [CLASSPATH](https://en.wikipedia.org/wiki/Classpath_(Java)) must include the OpenFortranParser-0.8.4.jar
+   and the antlr-3.3-complete.jar files (see the [README.md](./README.md) file).
