@@ -33,7 +33,7 @@ The C action interfaces are currently provided by JNI.
 
 ### <a name="installation-instructions">Installation instructions</a>  ###
 
-  - See the [INSTALL] file.
+  - See the [INSTALL.md] file.
 
 ### <a name="documentation">Documentation</a>   ###
 
@@ -86,7 +86,7 @@ The C action interfaces are currently provided by JNI.
 
 
 [Internal links]:#
-[INSTALL]: ./INSTALL
+[INSTALL.md]: ./INSTALL.md
 [src]: ./src
 [build]: ./build
 [tests]: ./tests
