@@ -3,7 +3,7 @@
 [https://github.com/openfortranproject/open-fortran-parser/blob/master/INSTALL.md]:#
 
 #             OFP installation and build instructions           #
-####                 version 0.8.4                           ####
+####                 version 0.8.4-1                         ####
  
 ## Contents                                                               
 * [Help]

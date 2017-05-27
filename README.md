@@ -3,7 +3,7 @@
 [https://github.com/openfortranproject/open-fortran-parser/blob/master/README.md]:#
 
 #                Open Fortran Parser (OFP)                   #
-####                 version 0.8.4                           ####
+####                 version 0.8.4-1                         ####
  
 ## Contents                                                               
 * [Description]
