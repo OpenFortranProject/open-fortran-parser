@@ -55,6 +55,9 @@ same.  First, cd to the OFP top level directory and do the following:
    reports an error a couple of times during the build process but continues
    to finish.  This is expected behavior.
 
+   2ND NOTE: First 'make' might randomly completely fail. In such case, just
+   run 'make' again and it should succeed.
+
 4. Run 'make install' to install the OFP files under the location
    specified with the prefix configure option.  Note that you must have
    the necessary privileges to write to the install directory.
