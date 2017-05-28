@@ -4,7 +4,10 @@
 
 #                Open Fortran Parser (OFP)                   #
 ####                 version 0.8.4-1                         ####
- 
+
+Build status of the fork https://github.com/mbdevpl/open-fortran-parser is:
+[![build status from Travis CI](https://travis-ci.org/mbdevpl/open-fortran-parser.svg?branch=master)](https://travis-ci.org/mbdevpl/open-fortran-parser)
+
 ## Contents                                                               
 * [Description]
 * [Resources]
