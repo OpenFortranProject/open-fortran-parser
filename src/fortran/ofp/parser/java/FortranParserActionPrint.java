@@ -24,22 +24,22 @@ import org.antlr.runtime.Token;
 import fortran.ofp.parser.java.IActionEnums;
 
 public class FortranParserActionPrint implements IFortranParserAction {
-   private boolean verbose = true;
-   private boolean printKeywords = false;
-   private int deletedFeature = -1;
-   private int generatedRule = -2;
-   private int unknownRule = -3;
-   private int f08Rule = -4;
+   protected boolean verbose = true;
+   protected boolean printKeywords = false;
+   protected int deletedFeature = -1;
+   protected int generatedRule = -2;
+   protected int unknownRule = -3;
+   protected int f08Rule = -4;
 	
    FortranParserActionPrint(String[] args, IFortranParser parser, String filename) {
       super();
    }
 	
-   private void printRuleHeader(int rule, String name) {
+   protected void printRuleHeader(int rule, String name) {
       printRuleHeader(rule, name, "");
    }
 	
-   private void printRuleHeader(int rule, String name, String addendum) {
+   protected void printRuleHeader(int rule, String name, String addendum) {
       boolean printYear = false;
       if (verbose) {
          System.out.print("R");
@@ -59,17 +59,17 @@ public class FortranParserActionPrint implements IFortranParserAction {
       }
    }
 	
-   private void printRuleTrailer() {
+   protected void printRuleTrailer() {
       System.out.println();
    }
 	
-   private void printParameter(Object param, String name) {
+   protected void printParameter(Object param, String name) {
       System.out.print(" ");
       if (verbose) System.out.print(name + "=");
       System.out.print(param);				
    }
 	
-   private void printParameter(Token param, String name) {
+   protected void printParameter(Token param, String name) {
       System.out.print(" ");
       if (verbose) {
          System.out.print(name + "=");
