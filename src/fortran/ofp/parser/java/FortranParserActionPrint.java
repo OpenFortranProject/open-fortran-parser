@@ -30,9 +30,15 @@ public class FortranParserActionPrint implements IFortranParserAction {
    protected int generatedRule = -2;
    protected int unknownRule = -3;
    protected int f08Rule = -4;
+   protected String[] args;
+   protected IFortranParser parser;
+   protected String filename;
 	
-   FortranParserActionPrint(String[] args, IFortranParser parser, String filename) {
+   public FortranParserActionPrint(String[] args, IFortranParser parser, String filename) {
       super();
+      this.args = args;
+      this.parser = parser;
+      this.filename = filename;
    }
 	
    protected void printRuleHeader(int rule, String name) {
