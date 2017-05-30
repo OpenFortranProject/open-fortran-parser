@@ -11,17 +11,16 @@ jdk:
 
 install:
   - wget "http://www.antlr3.org/download/antlr-3.3-complete.jar" -P "libs"
-  - wget "http://www.jdom.org/dist/binary/archive/jdom-1.1.3.zip" -P "libs"
-  - unzip -j "libs/jdom-1.1.3.zip" "jdom/build/jdom-1.1.3.jar" -d "libs"
+#  - wget "http://www.jdom.org/dist/binary/archive/jdom-1.1.3.zip" -P "libs"
+#  - unzip -j "libs/jdom-1.1.3.zip" "jdom/build/jdom-1.1.3.jar" -d "libs"
   - export CLASSPATH="${CLASSPATH}:$(pwd)/libs/*"
 
 script:
   - ./configure --prefix=$HOME/.local
-  - time make all || time make all
+  - time (make all || make all)
+  - make check
 
 after_success:
-  - make check
   - export CLASSPATH="${CLASSPATH}:$(pwd)/build/*"
   - java fortran.ofp.FrontEnd tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --verbose tests/f08-tests/R818-F08.f08
-  - java fortran.ofp.FrontEnd --xml tests/f08-tests/R818-F08.f08
