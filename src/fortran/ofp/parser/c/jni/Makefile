@@ -85,7 +85,7 @@ c_actions_jni.c: ../../java/IFortranParserAction.java
 	cp c_actions_jni.c $(INSTALLDIR)/.
 
 c_main_ex: c_main_ex.o
-	$(CC) -o $@ -fPIC $(LDFLAGS) $(OFP_LDFLAGS) $<
+	$(CC) -o $@ $< -fPIC $(LDFLAGS) $(OFP_LDFLAGS)
 
 # this should not be called (nor should allclean) if neither the 
 # c actions nor c main were enabled.
