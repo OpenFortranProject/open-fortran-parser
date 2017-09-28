@@ -4,6 +4,7 @@ make.inc
 FortranParser08_FortranParser03.java
 build/*.jar
 lib/
+/bin
 *.cache/
 .classpath
 .project
