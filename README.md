@@ -3,10 +3,8 @@
 [https://github.com/openfortranproject/open-fortran-parser/blob/master/README.md]:#
 
 #                Open Fortran Parser (OFP)                   #
-####                 version 0.8.4-1                         ####
 
-Build status of the fork https://github.com/mbdevpl/open-fortran-parser is:
-[![build status from Travis CI](https://travis-ci.org/mbdevpl/open-fortran-parser.svg?branch=master)](https://travis-ci.org/mbdevpl/open-fortran-parser)
+[![latest GitHub release](https://img.shields.io/github/release/mbdevpl/open-fortran-parser.svg)](https://github.com/mbdevpl/open-fortran-parser/releases) [![build status from Travis CI](https://travis-ci.org/mbdevpl/open-fortran-parser.svg?branch=master)](https://travis-ci.org/mbdevpl/open-fortran-parser)
 
 ## Contents                                                               
 * [Description]
@@ -45,10 +43,10 @@ The C action interfaces are currently provided by JNI.
 ### <a name="running-the-parser">Running the parser</a> ###
 
   - Set your java [CLASSPATH] to include the ANTLR jar files and 
-    OpenFortranParser-0.8.4.jar.  If you use the bash shell, you can set the
+    OpenFortranParser-<version>.jar.  If you use the bash shell, you can set the
     CLASSPATH with something like (assuming files are installed in /usr/local):
 ```bash
-  export CLASSPATH=/usr/local/antlr/lib/antlr-3.3-complete.jar:/usr/local/ofp/lib/OpenFortranParser-0.8.4.jar
+  export CLASSPATH=/usr/local/antlr/lib/antlr-3.3-complete.jar:/usr/local/ofp/lib/OpenFortranParser-<version>.jar
 ```
   - Run the parser with the command
 ```bash
