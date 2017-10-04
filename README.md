@@ -4,7 +4,7 @@
 
 #                Open Fortran Parser (OFP)                   #
 
-[![latest GitHub release](https://img.shields.io/github/release/mbdevpl/open-fortran-parser.svg)](https://github.com/mbdevpl/open-fortran-parser/releases) [![build status from Travis CI](https://travis-ci.org/mbdevpl/open-fortran-parser.svg?branch=master)](https://travis-ci.org/mbdevpl/open-fortran-parser)
+[![latest GitHub release](https://img.shields.io/github/release/mbdevpl/open-fortran-parser.svg)](https://github.com/mbdevpl/open-fortran-parser/releases) [![latest Bintray version](https://img.shields.io/bintray/v/mbdevpl/pkgs/open-fortran-parser.svg)](https://bintray.com/mbdevpl/pkgs/open-fortran-parser) [![build status from Travis CI](https://travis-ci.org/mbdevpl/open-fortran-parser.svg?branch=master)](https://travis-ci.org/mbdevpl/open-fortran-parser)
 
 ## Contents                                                               
 * [Description]
