@@ -21,3 +21,7 @@ lib/
 *.lai
 *.la
 *.a
+
+# Bintray deployment
+/travis_bintray_descriptor_gen.py
+/.bintray.json

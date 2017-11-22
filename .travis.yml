@@ -1,6 +1,10 @@
 sudo: false
 language: java
 os: linux
+addons:
+  apt:
+    packages:
+      - python3-pip
 jdk:
   - openjdk7
   - openjdk8
@@ -12,7 +16,7 @@ install:
   - export CLASSPATH="${CLASSPATH}:$(pwd)/libs/*"
 
 script:
-  - ./autoconf.sh
+  #- ./autoconf.sh  # skip this on Travis
   - ./configure --prefix=$HOME/.local
   - time (make all || make all)
   - make check
@@ -23,9 +27,9 @@ after_success:
   - java fortran.ofp.FrontEnd --verbose tests/f08-tests/R818-F08.f08
 
 before_deploy:
-  - export OFP_VERSION="$(cat make.inc | grep 'OFP_VERSION=' | sed 's/OFP_VERSION=//')"
+  - pip3 install --user version_query
   - wget https://gist.githubusercontent.com/mbdevpl/cdbc3dab3ae1941870dcaa5bb1b358bc/raw/travis_bintray_descriptor_gen.py
-  - python3 travis_bintray_descriptor_gen.py "$OFP_VERSION" "$TRAVIS_OS_NAME-$TRAVIS_JDK_VERSION" "build/*.jar"
+  - python3 travis_bintray_descriptor_gen.py "$(python3 -m version_query -p .)" "$TRAVIS_OS_NAME-$TRAVIS_JDK_VERSION" "build/*.jar"
   - cat ".bintray.json"
 
 deploy:
