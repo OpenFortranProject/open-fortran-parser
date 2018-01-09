@@ -4,7 +4,12 @@
 
 #                Open Fortran Parser (OFP)                   #
 
-[![latest GitHub release](https://img.shields.io/github/release/mbdevpl/open-fortran-parser.svg)](https://github.com/mbdevpl/open-fortran-parser/releases) [![latest Bintray version](https://img.shields.io/bintray/v/mbdevpl/pkgs/open-fortran-parser.svg)](https://bintray.com/mbdevpl/pkgs/open-fortran-parser) [![build status from Travis CI](https://travis-ci.org/mbdevpl/open-fortran-parser.svg?branch=master)](https://travis-ci.org/mbdevpl/open-fortran-parser)
+[![latest GitHub release](https://img.shields.io/github/release/mbdevpl/open-fortran-parser.svg)](https://github.com/mbdevpl/open-fortran-parser/releases) [![latest Bintray version](https://img.shields.io/bintray/v/mbdevpl/pkgs/open-fortran-parser.svg)](https://bintray.com/mbdevpl/pkgs/open-fortran-parser) [![build status from Travis CI](https://travis-ci.org/mbdevpl/open-fortran-parser.svg?branch=master)](https://travis-ci.org/mbdevpl/open-fortran-parser) [![test coverage from Codecov](https://codecov.io/gh/mbdevpl/open-fortran-parser/branch/master/graph/badge.svg)](https://codecov.io/gh/mbdevpl/open-fortran-parser)
+
+This is a fork of [Open Fortran Parser from Open Fortran Project](https://github.com/OpenFortranProject/open-fortran-parser). Changes from the source are described on [releases page](https://github.com/mbdevpl/open-fortran-parser/releases). This fork of OFP was mainly created to enable creation of XML Fortran AST through [Open Fortran Parser XML (OFP XML)](https://github.com/mbdevpl/open-fortran-parser-xml).
+
+
+Original README follows.
 
 ## Contents                                                               
 * [Description]
@@ -42,7 +47,7 @@ The C action interfaces are currently provided by JNI.
 
 ### <a name="running-the-parser">Running the parser</a> ###
 
-  - Set your java [CLASSPATH] to include the ANTLR jar files and 
+  - Set your java [CLASSPATH] to include the ANTLR jar files and
     OpenFortranParser-<version>.jar.  If you use the bash shell, you can set the
     CLASSPATH with something like (assuming files are installed in /usr/local):
 ```bash
@@ -104,4 +109,3 @@ The C action interfaces are currently provided by JNI.
 [ANTLR]: http://www.antlr.org
 [Java file]: ./src/fortran/ofp/parser/java/IFortranParserAction.java
 [CLASSPATH]: https://en.wikipedia.org/wiki/Classpath_(Java)
-
