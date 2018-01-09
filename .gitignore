@@ -22,6 +22,11 @@ lib/
 *.la
 *.a
 
+# Java coverage
+/jacoco
+/jacoco.exec
+/jacoco.xml
+
 # Bintray deployment
 /travis_bintray_descriptor_gen.py
 /.bintray.json
