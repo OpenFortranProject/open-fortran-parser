@@ -43,7 +43,10 @@ after_success:
   - java fortran.ofp.FrontEnd --silent tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --verbose tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --class fortran.ofp.parser.java.FortranParserActionPrint tests/f08-tests/R818-F08.f08
-  - java fortran.ofp.FrontEnd --verbose --class fortran.ofp.parser.java.FortranParserActionPrint tests/f08-tests/R818-F08.f08
+  - java fortran.ofp.FrontEnd --tokens --class fortran.ofp.parser.java.FortranParserActionPrint tests/f08-tests/R818-F08.f08
+  - java fortran.ofp.FrontEnd --tokenfile /dev/null tests/f08-tests/R818-F08.f08
+  - java fortran.ofp.FrontEnd --LOPExt --verbose tests/LOPe/halo-stmt.f90
+  - java fortran.ofp.FrontEnd --RiceCAF --verbose tests/caf_2.0/lockset.caf
   - unset JAVA_TOOL_OPTIONS
   - java -jar "lib/org.jacoco.cli-0.7.10-20170927.171630-24-nodeps.jar" report "jacoco.exec" --classfiles "build/" --sourcefiles "src/" --xml jacoco.xml
   - pip3 install --user codecov
