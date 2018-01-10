@@ -34,9 +34,16 @@ after_success:
   - ls tests/bug-reports/*.f{,90,03} | xargs java fortran.ofp.FrontEnd
   - ls tests/LOPe/*.f90 | xargs java fortran.ofp.FrontEnd --LOPExt
   - ls tests/caf_2.0/*.caf | xargs java fortran.ofp.FrontEnd --RiceCAF
+  - ls tests/rule-tests/*.f{90,03} | xargs java fortran.ofp.FrontEnd --verbose >/dev/null
+  - ls tests/rule-f08-tests/*.f{,90} | xargs java fortran.ofp.FrontEnd --verbose >/dev/null
+  - ls tests/f08-tests/*.f08 | xargs java fortran.ofp.FrontEnd --verbose >/dev/null
+  - ls tests/bug-reports/*.f{,90,03} | xargs java fortran.ofp.FrontEnd --verbose >/dev/null
+  - ls tests/LOPe/*.f90 | xargs java fortran.ofp.FrontEnd --LOPExt --verbose >/dev/null
+  - ls tests/caf_2.0/*.caf | xargs java fortran.ofp.FrontEnd --RiceCAF --verbose >/dev/null
   - java fortran.ofp.FrontEnd --silent tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --verbose tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --class fortran.ofp.parser.java.FortranParserActionPrint tests/f08-tests/R818-F08.f08
+  - java fortran.ofp.FrontEnd --verbose --class fortran.ofp.parser.java.FortranParserActionPrint tests/f08-tests/R818-F08.f08
   - unset JAVA_TOOL_OPTIONS
   - java -jar "lib/org.jacoco.cli-0.7.10-20170927.171630-24-nodeps.jar" report "jacoco.exec" --classfiles "build/" --sourcefiles "src/" --xml jacoco.xml
   - pip3 install --user codecov
