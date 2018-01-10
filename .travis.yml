@@ -28,6 +28,7 @@ script:
 after_success:
   - export CLASSPATH="${CLASSPATH}:$(pwd)/build/*"
   - export JAVA_TOOL_OPTIONS="-javaagent:$(pwd)/lib/org.jacoco.agent-0.7.9-runtime.jar=excludes=fortran.ofp.parser.java.FortranParserExtras_FortranParser08:fortran.ofp.parser.java.FortranParserRiceCAF_FortranParser08:fortran/ofp/parser/java/FortranParserLOPe_FortranParser08"
+  - java fortran.ofp.FrontEnd
   - ls tests/rule-tests/*.f{90,03} | xargs java fortran.ofp.FrontEnd
   - ls tests/rule-f08-tests/*.f{,90} | xargs java fortran.ofp.FrontEnd
   - ls tests/f08-tests/*.f08 | xargs java fortran.ofp.FrontEnd

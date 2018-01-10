@@ -297,10 +297,42 @@ public class FrontEnd implements Callable<Boolean> {
       }
 
       if (args.length <= nArgs) {
-         System.out.println("Usage: java fortran.ofp.FrontEnd "
-               + "[--verbose] [--tokens] [--silent] [--class className] ");
-         System.out.println("                                    "
-               + "[--user_option user_arg] file1 [file2..fileN]");
+         System.out.println("Usage: java fortran.ofp.FrontEnd [--verbose] [--silent] [--dump]");
+         System.out.println("    [--LOPExt] [ --RiceCAF] [--tokens] [ --alltokens] [--tokenfile file]");
+         System.out.println("    [--class className] [--option1 arg1 [--option2 arg2 ...]] file1 [file2 ...]");
+         System.out.println();
+         System.out.println("    --verbose: be verbose");
+         System.out.println("    --silent: be silent");
+         System.out.println("    --dump: don't be silent");
+         System.out.println("    --LOPExt: use OFP's LOPe research extensions");
+         System.out.println("    --RiceCAF: use Rice University's CAF extensions");
+         System.out.println("    --tokens, --alltokens, --tokenfile: used for printing tokens");
+         System.out.println("    --class:");
+         System.out.println("        use given qualified Java class name as provider of parser actions,");
+         System.out.println("        e.g. fortran.ofp.parser.java.FortranParserActionNull,");
+         System.out.println("        or fortran.ofp.parser.java.FortranParserActionPrint,");
+         System.out.println("        or your own implementation of IFortranParserAction");
+         System.out.println("    --option1 --option2 ...:");
+         System.out.println("        sequence of options passed to parser action provider given throug --class");
+         System.out.println("    file1 file2 ...:");
+         System.out.println("        sequence of paths to Fortran input files to be processed by OFP");
+         System.out.println();
+         System.out.println("Remarks:");
+         System.out.println();
+         System.out.println("    order of options matters, as later options sometimes override some effects of previous ones");
+         System.out.println("    --verbose and/or --dump override --silent");
+         System.out.println("    --silent doesn't override --verbose");
+         System.out.println("    any of --verbose, --silent or --dump imply '--class fortran.ofp.parser.java.FortranParserActionPrint'");
+         System.out.println("    --tokens hands tokens to provider of parser actions and input files are not parsed (only tokenized)");
+         System.out.println("    --alltokens prints tokens to file specified by --tokenfile after input files are parsed");
+         System.out.println("    if --tokenfile is given alone, print tokens to given file instead of parsing input files");
+         System.out.println("    --tokens preceeds --tokenfile and/or --alltokens");
+         System.out.println("    --RiceCAF preceeds --LOPExt");
+         System.out.println("    --alltokens has no effect without --tokenfile");
+         System.out.println("    flags cannot be used as user options - each must have a value to be forwarded");
+         System.out.println();
+         System.out.println("Copyright (c) 2005, 2006 Los Alamos National Security, LLC.");
+         System.out.println("Copyright 2017-2018  Mateusz Bysiek  https://mbdevpl.github.io/");
       }
 
       for (int i = 0; i < args.length; i++) {
@@ -376,12 +408,12 @@ public class FrontEnd implements Callable<Boolean> {
 
    public Boolean call() throws Exception {
       boolean error = false;
-      
-      int sourceForm = inputStream.getSourceForm();
 
-      if (sourceForm == FortranStream.FIXED_FORM)
-         if (verbose)       System.out.println(filename + " is FIXED FORM");
-         else if (verbose)  System.out.println(filename + " is FREE FORM");
+      if (verbose)
+         if (sourceForm == FortranStream.FIXED_FORM)
+            System.out.println(filename + " is FIXED FORM");
+         else
+            System.out.println(filename + " is FREE FORM");
 
       // determine whether the file is fixed or free form and
       // set the source form in the prepass so it knows how to handle lines.
