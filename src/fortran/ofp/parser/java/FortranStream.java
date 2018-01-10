@@ -52,22 +52,15 @@ public class FortranStream extends ANTLRFileStream
     */
    public FortranStream(String filename) throws IOException
    {
-      super(filename);
-      this.filename = filename;
-
-      File file = new File(filename);
-      this.filepath = file.getAbsolutePath();
-      
-      this.sourceForm = determineSourceForm(filename);
-      convertInputBuffer();
+      this(filename, null, null);
    }
 
-   public FortranStream(String filename, String path, int sourceForm) throws IOException
+   public FortranStream(String filename, String path, Integer sourceForm) throws IOException
    {
-      super(path);
+      super(path == null ? filename : path);
       this.filename = filename;
-      this.filepath = path;
-      this.sourceForm = sourceForm;
+      this.filepath = path == null ? new File(filename).getAbsolutePath() : path;
+      this.sourceForm = sourceForm == null ? determineSourceForm(filename) : sourceForm.intValue();
       convertInputBuffer();
    }
 
