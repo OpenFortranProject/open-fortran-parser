@@ -55,7 +55,7 @@ after_success:
   - codecov
 
 before_deploy:
-  - pip3 install --user version_query
+  - pip3 install -U --user version_query || pip3 install -U version_query
   - wget https://gist.githubusercontent.com/mbdevpl/cdbc3dab3ae1941870dcaa5bb1b358bc/raw/travis_bintray_descriptor_gen.py
   - python3 travis_bintray_descriptor_gen.py "$(python3 -m version_query -p .)" "$TRAVIS_OS_NAME-$TRAVIS_JDK_VERSION" "build/*.jar"
   - cat ".bintray.json"
