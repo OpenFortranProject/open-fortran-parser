@@ -49,7 +49,8 @@ public abstract class FortranParser extends Parser implements IFortranParser {
       super(input, state);
 
       // TODO - see if the size has to increase with new F2008 rules
-      state.ruleMemo = new HashMap[489+1];
+      // OBSOLETE from v3.3 ANTLR?
+      // state.ruleMemo = new HashMap[489+1];
    }
 	
    public void initialize(FortranParser delegate, IFortranParserAction action,

@@ -2,13 +2,8 @@ FortranToken.java
 FortranLexer.java
 FortranLexicalPrepass.java
 FortranParser.java
-FortranParser08.java
-FortranParserExtras.java
-FortranParserExtras_FortranParser08.java
-FortranParserRiceCAF.java
-FortranParserRiceCAF_FortranParser08.java
-FortranParserLOPe.java
-FortranParserLOPe_FortranParser08.java
+FortranParser2008.java
+FortranParser2008_FortranParserBase.java
 FortranParserActionFactory.java
 FortranParserActionNull.java
 FortranParserActionPrint.java

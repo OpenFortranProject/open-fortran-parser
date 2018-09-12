@@ -1,24 +1,12 @@
-///////////////////////////////////////////////////////////////////////////////
-//                                                                           //
-//  FortranParserOFP.g - grammar extensions for the OFP research effort in   //
-//  programming models for Fortran.                                          //
-//                                                                           //
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * FortranParserExtras.g - this file is needed because adding more rules to FortranParser08
+ * currently will cause javac to fail with a "Code too large" error.  Removing some of
+ * the rules to an inherited grammar is a workaround to the problem.
+ */
 
-parser grammar FortranParserLOPe;
+parser grammar FortranParserExtend;
 
-options {
-    language=Java;
-    superClass=FortranParser;
-    tokenVocab=FortranLexer;
-}
-
-import FortranParserExtend;
-
-@header {
-  package fortran.ofp.parser.java;
-  import fortran.ofp.parser.java.IActionEnums;
-}
+import FortranParserBase;
 
 @members {
    int gCount1;
@@ -28,18 +16,13 @@ import FortranParserExtend;
       action = FortranParserActionFactory.newAction(args, this, kind, filename);
 
       initialize(this, action, filename, path);
-      gFortranParserExtend.initialize(this, action, filename, path);
+      gFortranParserBase.initialize(this, action, filename, path);
 
       action.start_of_file(filename, path);
    }
 
    public void eofAction() {
-      gFortranParserExtend.eofAction();
-   }
-
-   public boolean isTPrefixSpec(int token) {
-      if (token == FortranLexer.T_CONCURRENT) return true;
-      else return super.isTPrefixSpec(token);
+      gFortranParserBase.eofAction();
    }
 
 } // end members
@@ -241,7 +224,6 @@ action_stmt
    |   assign_stmt                   // ADDED?
    |   assigned_goto_stmt            // ADDED?
    |   pause_stmt                    // ADDED?
-   |   exchange_halo_stmt            // LOPe extension
    ;
 
 
@@ -263,106 +245,11 @@ action_stmt
 type_declaration_stmt
 @init {Token lbl = null; int numAttrSpecs = 0;}
 @after{checkForInclude();}
-    :   (label {lbl=$label.tk;})? declaration_type_spec
-        ( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
-        entity_decl_list end_of_stmt
-            { action.type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.tk); }
+    :	(label {lbl=$label.tk;})? declaration_type_spec
+		( (T_COMMA attr_spec {numAttrSpecs += 1;})* T_COLON_COLON )?
+		entity_decl_list end_of_stmt
+    		{ action.type_declaration_stmt(lbl, numAttrSpecs, $end_of_stmt.tk); }
     ;
-
-// language extension point
-//
-other_spec_stmt_extension
-@init {
-   Token lbl=null;
-   boolean hbs = false;
-   boolean hcf = false;
-   int count=1;
-}
-@after{checkForInclude();}
-   :   (label {lbl=$label.tk;})?
-       T_HALO
-       (
-         (  (T_COMMA T_BOUNDARY T_LPAREN halo_boundary_spec T_RPAREN {hbs=true;})?
-            (T_COMMA                     halo_copy_fn                {hcf=true;})?
-         )
-         T_COLON_COLON
-       )?
-       halo_decl ( T_COMMA halo_decl {count++;})* end_of_stmt
-           { action.lope_halo_stmt(lbl, $T_HALO, hbs, hcf, $end_of_stmt.tk, count); }
-   ;
-
-exchange_halo_stmt
-@init {Token lbl=null;}
-@after{checkForInclude();}
-   :   //(label {lbl=$label.tk;})?
-       T_EXCHANGE_HALO T_LPAREN expr T_RPAREN end_of_stmt
-           { action.lope_exchange_halo_stmt(lbl, $T_EXCHANGE_HALO, $end_of_stmt.tk); }
-   ;
-
-halo_copy_fn
-@init{int count=0;}
-   :   T_COPY_FN T_EQUALS T_IDENT
-           {action.lope_halo_copy_fn($T_IDENT);}
-   ;
-
-halo_boundary_spec
-@init{int count=0;}
-   :   halo_boundary_spec_element {count++;}
-       (T_COMMA halo_boundary_spec_element {count++;})*
-           {action.lope_halo_boundary_spec(count);}
-   ;
-
-halo_boundary_spec_element
-@init{int type=IActionEnums.HaloSpecElement_expr_colon_asterisk_colon_expr;}
-   :   expr T_COLON
-            T_ASTERISK
-            T_COLON
-       expr
-            {
-                type = IActionEnums.HaloBoundarySpecElement_expr_colon_asterisk_colon_expr;
-                action.lope_halo_boundary_spec_element(type);
-            }
-   |   T_CYCLIC
-            {
-                type = IActionEnums.HaloBoundarySpecElement_cyclic;
-                action.lope_halo_boundary_spec_element(type);
-            }
-   ;
-
-halo_decl
-@init{boolean hasHaloSpec=false;}
-   :   T_IDENT ( T_LPAREN halo_spec T_RPAREN {hasHaloSpec=true;})?
-           {action.lope_halo_decl($T_IDENT,hasHaloSpec);}
-   ;
-
-// Extension for the HALO attribute for dummy argument type declarations
-// in CONCURRENT procedures.  From R502-F08, R503-F03.
-//
-attr_spec_extension
-    :  T_HALO T_LPAREN halo_spec T_RPAREN
-           {action.attr_spec($T_HALO, IActionEnums.AttrSpec_HALO);}
-    ;
-
-halo_spec
-@init{int count=0;}
-   :   halo_spec_element {count++;}
-       (T_COMMA halo_spec_element {count++;})*
-           {action.lope_halo_spec(count);}
-   ;
-
-// A halo specification is simple compared to an array spec
-// Types: 	0 expr:*:expr (e.g. 1:*:1)
-// 			1 expr (perhaps, expr value would be for both sides of halo)?
-halo_spec_element
-@init{int type=IActionEnums.HaloSpecElement_expr_colon_asterisk_colon_expr;}
-   :   expr T_COLON
-            T_ASTERISK
-            T_COLON
-       expr
-               { action.lope_halo_spec_element(type); }
-   |   T_COLON
-               { action.lope_halo_spec_element(IActionEnums.HaloSpecElement_colon); }
-   ;
 
 /*
  * R510-F08 deferred-coshape-spec
@@ -662,19 +549,6 @@ int_expr
 
 scalar_int_expr
    :   expr
-   ;
-
-
-/**
- * Section/Clause 12: Procedures
- */
-
-// Extension allowing CONCURRENT as a prefix-spec enabling syntax
-// for CONCURRENT procedures.  Extending R1226-F2008.
-//
-prefix_spec_extension
-   :  T_CONCURRENT
-          {action.t_prefix_spec($T_CONCURRENT);}
    ;
 
 
