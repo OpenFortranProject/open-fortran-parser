@@ -17,8 +17,8 @@
 
 ## <a name="required-packages">Required packages</a> ##
 
-The Open Fortran Parser (OFP) tools require [ANTLR] 3.3.
-You can obtain ANTLR from.  OFP also requires a Java installation.
+The Open Fortran Parser (OFP) tools require [ANTLR] 3.5.2.
+You can obtain ANTLR from http://www.antlr.org.  OFP also requires a Java installation.
 
 ## <a name="before-you-start">Before you start to compile OFP</a> ##
 
@@ -50,13 +50,6 @@ same.  First, cd to the OFP top level directory and do the following:
 
 2. Run 'make' to build the OFP libraries.
 
-   IMPORTANT NOTE: Because of a bug (we think) in antlr-3.3, the build
-   reports an error a couple of times during the build process but continues
-   to finish.  This is expected behavior.
-
-   2ND NOTE: First 'make' might randomly completely fail. In such case, just
-   run 'make' again and it should succeed.
-
 4. Run 'make install' to install the OFP files under the location
    specified with the prefix configure option.  Note that you must have
    the necessary privileges to write to the install directory.
@@ -68,7 +61,7 @@ same.  First, cd to the OFP top level directory and do the following:
     java fortran.ofp.FrontEnd [--verbose] filename
 ``` 
    Your Java [CLASSPATH] must include the OpenFortranParser-<version>.jar
-   and the antlr-3.3-complete.jar files (see the [README.md] file).
+   and the antlr-3.5.2-complete.jar files (see the [README.md] file).
   
 [Contents]:# 
 [Help]: #help

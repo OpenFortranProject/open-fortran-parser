@@ -21,10 +21,8 @@ package fortran.ofp;
 
 import java.io.*;
 
-// the concrete parser classes
-import fortran.ofp.parser.java.FortranParserExtras;
-import fortran.ofp.parser.java.FortranParserRiceCAF;
-import fortran.ofp.parser.java.FortranParserLOPe;
+// the concrete parser class
+import fortran.ofp.parser.java.FortranParser2008;
 
 import fortran.ofp.parser.java.FortranLexer;
 import fortran.ofp.parser.java.FortranLexicalPrepass;
@@ -87,17 +85,21 @@ public class FrontEnd implements Callable<Boolean> {
          // laksono 08.06.2010: only output if we have --verbose option set
    	 if (verbose) {
             System.out.println("FortranLexer: using Rice University's CAF extensions");
+            System.out.println("ERROR: Not available at this time");
+            System.exit(1);
          }
-         this.parser = new FortranParserRiceCAF(tokens);
+         // this.parser = new FortranParserRiceCAF(tokens);
       }
       else if (lanlExtensions == true) {
    	 if (verbose) {
             System.out.println("FortranLexer: using OFP's LOPe research extensions");
+            System.out.println("ERROR: Not available at this time");
+            System.exit(1);
          }
-         this.parser = new FortranParserLOPe(tokens);
+         // this.parser = new FortranParserLOPe(tokens);
       }
       else {
-         this.parser = new FortranParserExtras(tokens);
+         this.parser = new FortranParser2008(tokens);
       }
 
       this.parser.initialize(args, type, filename, path);

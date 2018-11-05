@@ -296,10 +296,11 @@ END OBSOLETE*******/
    } // end lineToString()
 
 
+/******* OBSOLETE from ANTLR v3.3?
    public List getTokens(int start, int stop) {
       return super.getTokens(start, stop);
    } // end getTokens()
-
+************/
 
    public int getCurrLineLength() {
       return this.packedList.size();

@@ -16,7 +16,7 @@ options {
     tokenVocab=FortranLexer;
 }
 
-import FortranParser08;
+import FortranParserExtend;
 
 @header {
   package fortran.ofp.parser.java;
@@ -31,13 +31,13 @@ import FortranParser08;
       action = FortranParserActionFactory.newAction(args, this, kind, filename);
 
       initialize(this, action, filename, path);
-      gFortranParser08.initialize(this, action, filename, path);
+      gFortranParserExtend.initialize(this, action, filename, path);
 
       action.start_of_file(filename, path);
    }
 
    public void eofAction() {
-      gFortranParser08.eofAction();
+      gFortranParserExtend.eofAction();
    }
 
 } // end members
