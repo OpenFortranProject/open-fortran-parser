@@ -35,7 +35,7 @@ echo "OFP_DATE is $OFP_DATE"
 # Set the version of OFP that we are installing
 OFP_MAJOR_VERSION="0"
 OFP_MINOR_VERSION="8"
-OFP_SUB_VERSION="4-5.dev"
+OFP_SUB_VERSION="5-1.dev"
 
 # Initialize variables
 OFP_CFLAGS="$CFLAGS"

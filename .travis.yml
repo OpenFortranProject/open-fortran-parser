@@ -12,7 +12,7 @@ jdk:
   - oraclejdk9
 
 install:
-  - wget "http://www.antlr3.org/download/antlr-3.3-complete.jar" -P "libs"
+  - wget "http://www.antlr3.org/download/antlr-3.5.2-complete.jar" -P "libs"
   - export CLASSPATH="${CLASSPATH}:$(pwd)/libs/*"
   # Java tests
   - mkdir -p lib
@@ -22,7 +22,7 @@ install:
 script:
   #- ./autoconf.sh  # skip this on Travis
   - ./configure --prefix=$HOME/.local
-  - time (make all || make all)
+  - time make all
   - make check
 
 after_success:
