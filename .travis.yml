@@ -14,6 +14,8 @@ jdk:
 install:
   - wget "http://www.antlr3.org/download/antlr-3.5.2-complete.jar" -P "libs"
   - export CLASSPATH="${CLASSPATH}:$(pwd)/libs/*"
+  - export JAVA="${JAVA_HOME}/bin/java"  # workaround for undetected jni.h
+  - export JAVAC="${JAVA_HOME}/bin/javac"  # workaround for mismatched javac version
   # Java tests
   - mkdir -p lib
   - wget "https://github.com/mbdevpl/open-fortran-parser-xml/releases/download/v0.2.0/org.jacoco.agent-0.7.9-runtime.jar" -O "lib/org.jacoco.agent-0.7.9-runtime.jar"
