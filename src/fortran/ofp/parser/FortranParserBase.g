@@ -239,11 +239,12 @@ declaration_construct
 
 // R208
 execution_part
+@init{int count = 0;}
 @after {
-	action.execution_part();
+	action.execution_part(count);
 }
 	:	executable_construct
-		( execution_part_construct )*
+		( execution_part_construct {count += 1;} )*
 	;
 
 // R209
