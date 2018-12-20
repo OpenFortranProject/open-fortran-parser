@@ -4282,6 +4282,16 @@ public abstract interface IFortranParserAction {
     */
    public abstract void subroutine_stmt__begin();
 
+   /** R1231
+    * subroutine_subprogram
+    * 
+    * @param hasExePart Flag specifying if optional execution_part was given.
+    * @param hasIntSubProg Flag specifying if optional internal_subprogram_part
+    * was given.
+    */
+   public abstract void
+   subroutine_subprogram(boolean hasExePart, boolean hasIntSubProg);
+
    /** R1232
     * subroutine_stmt
     *   :   (label)? (t_prefix )? T_SUBROUTINE T_IDENT
