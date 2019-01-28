@@ -239,7 +239,7 @@ declaration_construct
 
 // R208
 execution_part
-@init{int count = 0;}
+@init{int count = 1; /*for mandatory executable_construct*/}
 @after {
     action.execution_part(count);
 }
