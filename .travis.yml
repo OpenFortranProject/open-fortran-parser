@@ -32,7 +32,7 @@ install:
 script:
   #- ./autoconf.sh  # skip this on Travis
   - ./configure --prefix=$HOME/.local
-  - time make all
+  - make all
   - make check
 
 after_success:
