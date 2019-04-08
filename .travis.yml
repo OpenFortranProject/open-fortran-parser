@@ -11,6 +11,10 @@ jdk:
   - oraclejdk8
   - oraclejdk9
 
+before_install:
+  - java -version
+  - python3 --version
+
 install:
   - wget "http://www.antlr3.org/download/antlr-3.5.2-complete.jar" -P "libs"
   - export CLASSPATH="${CLASSPATH}:$(pwd)/libs/*"
