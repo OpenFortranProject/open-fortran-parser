@@ -37,28 +37,30 @@ script:
 
 after_success:
   - export CLASSPATH="${CLASSPATH}:$(pwd)/build/*"
-  - export JAVA_TOOL_OPTIONS="-javaagent:$(pwd)/lib/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar=excludes=fortran.ofp.parser.java.FortranParserExtras_FortranParser08:fortran.ofp.parser.java.FortranParserRiceCAF_FortranParser08:fortran/ofp/parser/java/FortranParserLOPe_FortranParser08"
+  - export JACOCO_EXCLUDED="fortran.ofp.parser.java.FortranParser2008_FortranParserBase"
+  # - export JACOCO_EXCLUDED="${JACOCO_EXCLUDED}:fortran.ofp.parser.java.FortranParserRiceCAF_FortranParser08:fortran.ofp.parser.java.FortranParserLOPe_FortranParser08"
+  - export JAVA_TOOL_OPTIONS="-javaagent:$(pwd)/lib/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar=excludes=${JACOCO_EXCLUDED}"
   - java fortran.ofp.FrontEnd
   - ls tests/rule-tests/*.f{90,03} | xargs java fortran.ofp.FrontEnd
   - ls tests/rule-f08-tests/*.f{,90} | xargs java fortran.ofp.FrontEnd
   - ls tests/f08-tests/*.f08 | xargs java fortran.ofp.FrontEnd
   - ls tests/bug-reports/*.f{,90,03} | xargs java fortran.ofp.FrontEnd
-  - ls tests/LOPe/*.f90 | xargs java fortran.ofp.FrontEnd --LOPExt
-  - ls tests/caf_2.0/*.caf | xargs java fortran.ofp.FrontEnd --RiceCAF
+  # - ls tests/LOPe/*.f90 | xargs java fortran.ofp.FrontEnd --LOPExt
+  # - ls tests/caf_2.0/*.caf | xargs java fortran.ofp.FrontEnd --RiceCAF
   - ls tests/rule-tests/*.f{90,03} | xargs java fortran.ofp.FrontEnd --verbose >/dev/null
   - ls tests/rule-f08-tests/*.f{,90} | xargs java fortran.ofp.FrontEnd --verbose >/dev/null
   - ls tests/f08-tests/*.f08 | xargs java fortran.ofp.FrontEnd --verbose >/dev/null
   - ls tests/bug-reports/*.f{,90,03} | xargs java fortran.ofp.FrontEnd --verbose >/dev/null
-  - ls tests/LOPe/*.f90 | xargs java fortran.ofp.FrontEnd --LOPExt --verbose >/dev/null
-  - ls tests/caf_2.0/*.caf | xargs java fortran.ofp.FrontEnd --RiceCAF --verbose >/dev/null
+  # - ls tests/LOPe/*.f90 | xargs java fortran.ofp.FrontEnd --LOPExt --verbose >/dev/null
+  # - ls tests/caf_2.0/*.caf | xargs java fortran.ofp.FrontEnd --RiceCAF --verbose >/dev/null
   - java fortran.ofp.FrontEnd --silent tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --verbose tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --class fortran.ofp.parser.java.FortranParserActionPrint tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --tokens --class fortran.ofp.parser.java.FortranParserActionPrint tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --tokenfile /dev/null tests/f08-tests/R818-F08.f08
   - java fortran.ofp.FrontEnd --alltokens --tokenfile /dev/null tests/f08-tests/R818-F08.f08
-  - java fortran.ofp.FrontEnd --LOPExt --verbose tests/LOPe/halo-stmt.f90
-  - java fortran.ofp.FrontEnd --RiceCAF --verbose tests/caf_2.0/lockset.caf
+  # - java fortran.ofp.FrontEnd --LOPExt --verbose tests/LOPe/halo-stmt.f90
+  # - java fortran.ofp.FrontEnd --RiceCAF --verbose tests/caf_2.0/lockset.caf
   - unset JAVA_TOOL_OPTIONS
   - java -jar "lib/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar" report "jacoco.exec" --classfiles "build/" --sourcefiles "src/" --xml jacoco.xml
   - pip3 install --user codecov
