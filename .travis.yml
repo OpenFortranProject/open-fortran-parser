@@ -12,6 +12,7 @@ jdk:
   - oraclejdk9
 
 env:
+  - ANTLR_VERSION=3.5.2
   - JACOCO_VERSION=0.8.3
 
 before_install:
@@ -19,12 +20,12 @@ before_install:
   - python3 --version
 
 install:
-  - wget "http://www.antlr3.org/download/antlr-3.5.2-complete.jar" -P "libs"
-  - export CLASSPATH="${CLASSPATH}:$(pwd)/libs/*"
+  - mkdir -p lib
+  - wget "https://www.antlr3.org/download/antlr-${ANTLR_VERSION}-complete.jar" -P "lib"
+  - export CLASSPATH="${CLASSPATH}:$(pwd)/lib/*"
   - export JAVA="${JAVA_HOME}/bin/java"  # workaround for undetected jni.h
   - export JAVAC="${JAVA_HOME}/bin/javac"  # workaround for mismatched javac version
   # Java tests
-  - mkdir -p lib
   - wget "https://search.maven.org/remotecontent?filepath=org/jacoco/org.jacoco.agent/${JACOCO_VERSION}/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar" -O "lib/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar"
   - wget "https://search.maven.org/remotecontent?filepath=org/jacoco/org.jacoco.cli/${JACOCO_VERSION}/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar" -O "lib/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar"
 
