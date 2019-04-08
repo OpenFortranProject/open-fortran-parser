@@ -11,6 +11,9 @@ jdk:
   - oraclejdk8
   - oraclejdk9
 
+env:
+  - JACOCO_VERSION=0.8.3
+
 before_install:
   - java -version
   - python3 --version
@@ -22,8 +25,8 @@ install:
   - export JAVAC="${JAVA_HOME}/bin/javac"  # workaround for mismatched javac version
   # Java tests
   - mkdir -p lib
-  - wget "https://github.com/mbdevpl/open-fortran-parser-xml/releases/download/v0.2.0/org.jacoco.agent-0.8.1-runtime.jar" -O "lib/org.jacoco.agent-0.8.1-runtime.jar"
-  - wget "https://github.com/mbdevpl/open-fortran-parser-xml/releases/download/v0.2.0/org.jacoco.cli-0.8.1-nodeps.jar" -O "lib/org.jacoco.cli-0.8.1-nodeps.jar"
+  - wget "https://search.maven.org/remotecontent?filepath=org/jacoco/org.jacoco.agent/${JACOCO_VERSION}/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar" -O "lib/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar"
+  - wget "https://search.maven.org/remotecontent?filepath=org/jacoco/org.jacoco.cli/${JACOCO_VERSION}/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar" -O "lib/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar"
 
 script:
   #- ./autoconf.sh  # skip this on Travis
@@ -33,7 +36,7 @@ script:
 
 after_success:
   - export CLASSPATH="${CLASSPATH}:$(pwd)/build/*"
-  - export JAVA_TOOL_OPTIONS="-javaagent:$(pwd)/lib/org.jacoco.agent-0.8.1-runtime.jar=excludes=fortran.ofp.parser.java.FortranParserExtras_FortranParser08:fortran.ofp.parser.java.FortranParserRiceCAF_FortranParser08:fortran/ofp/parser/java/FortranParserLOPe_FortranParser08"
+  - export JAVA_TOOL_OPTIONS="-javaagent:$(pwd)/lib/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar=excludes=fortran.ofp.parser.java.FortranParserExtras_FortranParser08:fortran.ofp.parser.java.FortranParserRiceCAF_FortranParser08:fortran/ofp/parser/java/FortranParserLOPe_FortranParser08"
   - java fortran.ofp.FrontEnd
   - ls tests/rule-tests/*.f{90,03} | xargs java fortran.ofp.FrontEnd
   - ls tests/rule-f08-tests/*.f{,90} | xargs java fortran.ofp.FrontEnd
@@ -56,7 +59,7 @@ after_success:
   - java fortran.ofp.FrontEnd --LOPExt --verbose tests/LOPe/halo-stmt.f90
   - java fortran.ofp.FrontEnd --RiceCAF --verbose tests/caf_2.0/lockset.caf
   - unset JAVA_TOOL_OPTIONS
-  - java -jar "lib/org.jacoco.cli-0.8.1-nodeps.jar" report "jacoco.exec" --classfiles "build/" --sourcefiles "src/" --xml jacoco.xml
+  - java -jar "lib/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar" report "jacoco.exec" --classfiles "build/" --sourcefiles "src/" --xml jacoco.xml
   - pip3 install --user codecov
   - codecov
 
