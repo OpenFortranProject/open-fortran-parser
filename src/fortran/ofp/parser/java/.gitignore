@@ -3,8 +3,10 @@
 
 FortranLexer.java
 FortranLexer.tokens
-FortranParser08.java
-FortranParser08.tokens
+FortranParser2008.java
+FortranParser2008.tokens
+FortranParserBase.tokens
+FortranParser2008_FortranParserBase.java
 FortranParserExtras.java
 FortranParserExtras.tokens
 FortranParserExtras_FortranParser08.java
