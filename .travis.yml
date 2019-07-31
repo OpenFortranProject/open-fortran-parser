@@ -1,30 +1,42 @@
-sudo: false
-language: java
-os: linux
+language: generic
 addons:
   apt:
     packages:
       - python3-pip
-jdk:
-  - openjdk7
-  - openjdk8
-  - oraclejdk8
-  - oraclejdk9
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      language: java
+      jdk: openjdk7
+    - os: linux
+      language: java
+      jdk: openjdk8
+    - os: linux
+      language: java
+      jdk: openjdk9
+    - os: linux
+      language: java
+      jdk: openjdk10
+    - os: linux
+      language: java
+      jdk: openjdk11
 
 env:
   - ANTLR_VERSION=3.5.2
     JACOCO_VERSION=0.8.3
 
 before_install:
+  - export JAVA="${JAVA_HOME}/bin/java"  # workaround for undetected jni.h
+  - export JAVAC="${JAVA_HOME}/bin/javac"  # workaround for mismatched javac version
   - java -version
+  - javac -version
   - python3 --version
 
 install:
   - mkdir -p lib
   - wget "https://www.antlr3.org/download/antlr-${ANTLR_VERSION}-complete.jar" -P "lib"
   - export CLASSPATH="${CLASSPATH}:$(pwd)/lib/*"
-  - export JAVA="${JAVA_HOME}/bin/java"  # workaround for undetected jni.h
-  - export JAVAC="${JAVA_HOME}/bin/javac"  # workaround for mismatched javac version
   # Java tests
   - wget "https://search.maven.org/remotecontent?filepath=org/jacoco/org.jacoco.agent/${JACOCO_VERSION}/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar" -O "lib/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar"
   - wget "https://search.maven.org/remotecontent?filepath=org/jacoco/org.jacoco.cli/${JACOCO_VERSION}/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar" -O "lib/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar"
