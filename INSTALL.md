@@ -18,7 +18,7 @@
 
 ## <a name="required-packages">Required packages</a> ##
 
-The Open Fortran Parser (OFP) tools require [ANTLR] 3.5.2.
+The Open Fortran Parser (OFP) tools require [ANTLR] 4.7.1.
 You can obtain ANTLR from http://www.antlr.org.  OFP also requires a Java installation.
 
 ## <a name="before-you-start">Before you start to compile OFP</a> ##
@@ -62,7 +62,7 @@ same.  First, cd to the OFP top level directory and do the following:
     java fortran.ofp.FrontEnd [--verbose] filename
 ``` 
    Your Java [CLASSPATH] must include the OpenFortranParser-0.8.5.jar
-   and the antlr-3.5.2-complete.jar files (see the [README.md] file).
+   and the antlr-4.7.1-complete.jar files (see the [README.md] file).
   
 [Contents]:# 
 [Help]: #help

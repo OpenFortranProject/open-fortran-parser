@@ -25,7 +25,7 @@ allow a parser consumer to build a custom Abstract Syntax Tree ([AST]).
 If you need access to a complete source-to-source Fortran compiler
 infrastructure incorporating OFP, please consider using [ROSE].
 
-The OFP parser is based on an [ANTLR] 3 grammar and ANTLR version 3.5.2
+The OFP parser is based on an [ANTLR] 3 grammar and ANTLR version 4.7.1
 tools are used to generate the Fortran parser (written in Java).
 The C action interfaces are currently provided by JNI.
 
@@ -45,7 +45,7 @@ The C action interfaces are currently provided by JNI.
     OpenFortranParser-0.8.5.jar.  If you use the bash shell, you can set the
     CLASSPATH with something like (assuming files are installed in /usr/local):
 ```bash
-  export CLASSPATH=/usr/local/antlr/lib/antlr-3.5.2-complete.jar:/usr/local/ofp/lib/OpenFortranParser-0.8.5.jar
+  export CLASSPATH=/usr/local/antlr/lib/antlr-4.7.1-complete.jar:/usr/local/ofp/lib/OpenFortranParser-0.8.5.jar
 ```
   - Run the parser with the command
 ```bash
