@@ -916,7 +916,7 @@ public class FortranStream extends ANTLRFileStream
       // skip initial '&'
       if (++i >= super.n) return new int[] {i0, count};
 
-      // skip characters after initial '&'
+      // skip characters after initial '&' on the current line
       while (i < super.n && buf[i] != '\n') i += 1;  // TODO - check for comment
       i += 1;  // skip '\n'
 
@@ -935,12 +935,23 @@ public class FortranStream extends ANTLRFileStream
 
       if (i >= super.n) return new int[] {i-1, count};
 
+      // at this point we are on the next line processing continued string characters
       do {
          newBuf[count++] = buf[i++];
          // look for two quote chars in a row, if found copy both
          if (i < super.n - 1 && buf[i] == quoteChar && buf[i+1] == quoteChar) {
             newBuf[count++] = buf[i++];
             newBuf[count++] = buf[i++];
+         }
+         // look for continuation character as last non-blank character and
+         // if found, return the '&' position so caller can process continuation
+         if (buf[i] == '&') {
+            int ii = i;
+            while (buf[++ii] == ' ');
+            if (buf[ii] != '\n') {
+               // '&' not a continuation, just part of the string, so copy it
+               newBuf[count++] = buf[i++];
+	    }
          }
       }
       while (i < super.n && buf[i] != quoteChar && buf[i] != '&' && buf[i] != '\n');
@@ -990,7 +1001,7 @@ public class FortranStream extends ANTLRFileStream
             int ii = i;
             while (buf[++ii] == ' ');
             if (buf[ii] != '\n') {
-               // '&' not a continuation, just part of the string, so just copy it
+               // '&' not a continuation, just part of the string, so copy it
                newBuf[count++] = buf[i++];
 	    }
 	 }
