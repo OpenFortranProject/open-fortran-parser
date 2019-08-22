@@ -3,7 +3,7 @@
 [https://github.com/openfortranproject/open-fortran-parser/blob/master/INSTALL.md]:#
 
 #             OFP installation and build instructions           #
-####                 version 0.8.5                           ####
+####                 version 0.8.6                           ####
  
 ## Contents                                                               
 * [Help]
@@ -61,7 +61,7 @@ same.  First, cd to the OFP top level directory and do the following:
 ```java
     java fortran.ofp.FrontEnd [--verbose] filename
 ``` 
-   Your Java [CLASSPATH] must include the OpenFortranParser-0.8.5.jar
+   Your Java [CLASSPATH] must include the OpenFortranParser-0.8.6.jar
    and the antlr-3.5.2-complete.jar files (see the [README.md] file).
   
 [Contents]:# 
