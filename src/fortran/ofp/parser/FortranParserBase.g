@@ -5620,6 +5620,11 @@ t_prefix_spec
    |  T_MODULE     {action.t_prefix_spec($T_MODULE);}
    |  T_PURE       {action.t_prefix_spec($T_PURE);}
    |  T_RECURSIVE  {action.t_prefix_spec($T_RECURSIVE);}
+// CUDA extensions
+   |  T_HOST       {action.t_prefix_spec($T_HOST);}
+   |  T_GLOBAL     {action.t_prefix_spec($T_GLOBAL);}
+   |  T_DEVICE     {action.t_prefix_spec($T_DEVICE);}
+   |  T_GRID_GLOBAL{action.t_prefix_spec($T_GRID_GLOBAL);}
    |  prefix_spec_extension
    ;
 

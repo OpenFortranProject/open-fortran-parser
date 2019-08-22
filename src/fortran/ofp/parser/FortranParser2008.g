@@ -1,5 +1,5 @@
 /**
- * FortranParserExtras.g - this file is needed because adding more rules to FortranParser08
+ * FortranParser2008.g - this file is needed because adding more rules to FortranParserBase
  * currently will cause javac to fail with a "Code too large" error.  Removing some of
  * the rules to an inherited grammar is a workaround to the problem.
  */
