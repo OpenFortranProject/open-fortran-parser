@@ -35,7 +35,7 @@ echo "OFP_DATE is $OFP_DATE"
 # Set the version of OFP that we are installing
 OFP_MAJOR_VERSION="0"
 OFP_MINOR_VERSION="8"
-OFP_SUB_VERSION="5-2"
+OFP_SUB_VERSION="6"
 
 # Initialize variables
 OFP_CFLAGS="$CFLAGS"
@@ -108,21 +108,21 @@ OFP_SETUP_JAR($with_jar)
 OFP_SETUP_ANTLR($with_antlr)
 
 # Determine the root directory of the java install.
-ofp_show_subtitle "Java root directory"
+ofp_show_subtitle "Java root directory" 
 # Figure out the name of the java command, without the full path
 AC_MSG_CHECKING([for root directory of Java install])
 OFP_JAVA_BASE_NAME=`basename $OFP_JAVA`
-# Strip the bin/java off the full java command so we should be left
+# Strip the bin/java off the full java command so we should be left 
 # with the root directory for the java install.
 OFP_JAVA_PATH=`echo $OFP_JAVA | sed "s/\/bin\/$OFP_JAVA_BASE_NAME//"`
 AC_MSG_RESULT([$OFP_JAVA_PATH])
 AC_SUBST(OFP_JAVA_PATH)
 
 # defines OFP_ENABLE_C_ACTIONS, OFP_CFLAGS
-if test "$enable_c_actions" = "yes" ; then
+if test "$enable_c_actions" = "yes" ; then 
    if test -n "$with_java_incs" ; then
       OFP_SETUP_JAVAH([$with_java_incs])
-   else
+   else 
       OFP_SETUP_JAVAH([])
    fi
    AC_MSG_RESULT([OFP_CFLAGS is $OFP_CFLAGS])
@@ -146,7 +146,7 @@ else
    ofp_show_subtitle "C main() disabled"
 fi
 
-if test "$OFP_ENABLE_C_ACTIONS" = "yes" -o "$OFP_ENABLE_C_MAIN" = "yes" ; then
+if test "$OFP_ENABLE_C_ACTIONS" = "yes" -o "$OFP_ENABLE_C_MAIN" = "yes" ; then 
    OFP_ENABLE_JNI="yes"
 fi
 
@@ -160,9 +160,10 @@ AC_SUBST(INSTALL)
 AC_SUBST(RANLIB)
 AC_SUBST(OFP_CC)
 
-ofp_show_subtitle "Final output"
+ofp_show_subtitle "Final output" 
 
 AC_CONFIG_FILES([
     make.inc
 ])
 AC_OUTPUT()
+

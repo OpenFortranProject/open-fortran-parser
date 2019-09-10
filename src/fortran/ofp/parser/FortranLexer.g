@@ -240,7 +240,11 @@ import fortran.ofp.parser.java.FortranToken;
       tokenType == T_DIMENSION ||
       tokenType == T_KIND ||
       tokenType == T_LEN ||
-      tokenType == T_BIND);
+      tokenType == T_BIND ||
+      tokenType == T_HOST ||
+      tokenType == T_GLOBAL ||
+      tokenType == T_DEVICE ||
+      tokenType == T_GRID_GLOBAL);
     } // end isKeyword()
 
 
@@ -758,6 +762,13 @@ T_WAIT          :       'WAIT'          ;
 T_WHERE         :       'WHERE'         ;
 T_WHILE         :       'WHILE'         ;
 T_WRITE         :       'WRITE'         ;
+
+// begin Cuda additions --------------------------
+T_HOST          :       'HOST'          ;
+T_GLOBAL        :       'GLOBAL'        ;
+T_DEVICE        :       'DEVICE'        ;
+T_GRID_GLOBAL   :       'GRID_GLOBAL'   ;
+// end Cuda additions --------------------------
 
 // begin Rice additions --------------------------
 T_WITHTEAM      :       'WITHTEAM'      ;
