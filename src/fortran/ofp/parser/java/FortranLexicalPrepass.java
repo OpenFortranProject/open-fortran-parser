@@ -22,13 +22,12 @@ package fortran.ofp.parser.java;
 import java.util.*;
 import org.antlr.runtime.*;
 
-//import fortran.ofp.FrontEnd;
-
 public class FortranLexicalPrepass {
    private FortranLexer lexer;
    private IFortranParser parser;
    private FortranTokenStream tokens;
    private Stack<Token> doLabels;
+   private boolean useCudaExtensions;
    private int sourceForm;
 
    public FortranLexicalPrepass(FortranLexer lexer, 
@@ -38,13 +37,16 @@ public class FortranLexicalPrepass {
       this.parser = parser;
       this.tokens = tokens;
       this.doLabels = new Stack<Token>();
+      this.useCudaExtensions = false;
    }
-
 
    public void setSourceForm(int sourceForm) {
       this.sourceForm = sourceForm;
    } // end setSourceForm()
 
+   public void setCudaExtensions(boolean cudaExtensions) {
+      this.useCudaExtensions = cudaExtensions;
+   } // end setCudaExtensions()
 
    /**
     * Convert keyword tokens (except for generic-spec items) from start to end to identifiers.
@@ -2603,6 +2605,29 @@ public class FortranLexicalPrepass {
    } // end matchLine()
 
 
+   // Scan for keyword extensions and turn them into identifiers
+   // if extension is not switched on (useCadaExtensions flag).
+   private void scanForExtensionKeywords(int start, int end) {
+
+      if (!useCudaExtensions) {
+         for (int i = start; i < end; i++) {
+            Token tk = tokens.getToken(i);
+
+            switch(tk.getType()) {
+               case FortranLexer.T_HOST:
+               case FortranLexer.T_GLOBAL:
+               case FortranLexer.T_DEVICE:
+               case FortranLexer.T_GRID_GLOBAL:
+                  // switch token type to a identifier
+                  tk.setType(FortranLexer.T_IDENT);
+                  break;
+               default:
+                  // don't change to identifier
+            }
+         }
+      }
+   }
+
    private int scanForRealConsts(int lineStart, int lineEnd) {
       int i;
 
@@ -2756,13 +2781,17 @@ public class FortranLexicalPrepass {
             lineStart++;
          }
 
+         // Scan for keyword extensions and turn them into identifiers
+         // if extension(s) is not switched on.
+         scanForExtensionKeywords(lineStart, lineLength);
+
          // check for the optional (T_IDENT T_COLON) that some 
          // constructs can have and skip if it's there.
          if (matchIdentColon(lineStart, lineLength) == true) {
             lineStart+=2;
          }
 
-         // scan for the real literal constant tokens created by the lexer.  
+         // Scan for the real literal constant tokens created by the lexer.
          // this method could shorten the line if it combines tokens into 
          // T_REAL_CONSTANT tokens so we need to update our lineLength and 
          // the stored size of tokens.packedListSize (probably safer to not 

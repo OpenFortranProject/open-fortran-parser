@@ -53,6 +53,7 @@ public class FrontEnd implements Callable<Boolean> {
    throws IOException {
       boolean riceCAF = false;
       boolean lanlExtensions = false;
+      boolean cudaExtensions = false;
       
       File file = new File(filename);
       String path = file.getAbsolutePath();
@@ -70,6 +71,14 @@ public class FrontEnd implements Callable<Boolean> {
       for (int i = 0; i < args.length; i++) {
          if (args[i].startsWith("--RiceCAF")) {
             riceCAF = true;
+         }
+      }
+
+      // check to see if using CUDA parser extensions
+      //
+      for (int i = 0; i < args.length; i++) {
+         if (args[i].startsWith("--cuda")) {
+            cudaExtensions = true;
          }
       }
 
@@ -107,6 +116,7 @@ public class FrontEnd implements Callable<Boolean> {
       this.prepass = new FortranLexicalPrepass(lexer, tokens, parser);
       this.filename = filename;
       this.sourceForm = inputStream.getSourceForm();
+      this.prepass.setCudaExtensions(cudaExtensions);
    }
 
    private static boolean parseMainProgram(FortranTokenStream tokens,
@@ -235,6 +245,7 @@ public class FrontEnd implements Callable<Boolean> {
       int nArgs = 0;
       boolean rice_caf = false;
       boolean lanl_extensions = false;
+      boolean cuda_extensions = false;
 
       includeDirs = new ArrayList<String>();
 
@@ -249,6 +260,11 @@ public class FrontEnd implements Callable<Boolean> {
          } else if (args[i].startsWith("--LOPExt")) {
             newArgs.add(args[i]);
             lanl_extensions = true;
+            nArgs += 1;
+            continue;
+         } else if (args[i].startsWith("--cuda")) {
+            newArgs.add(args[i]);
+            cuda_extensions = true;
             nArgs += 1;
             continue;
          } else if (args[i].startsWith("--dump")) {
@@ -311,7 +327,7 @@ public class FrontEnd implements Callable<Boolean> {
          if (args[i].startsWith("--RiceCAF") | args[i].startsWith("--LOPExt") | 
              args[i].startsWith("--dump")    | args[i].startsWith("--silent") |
              args[i].startsWith("--verbose") | args[i].startsWith("--tokens") |
-                                               args[i].startsWith("--alltokens")) {
+             args[i].startsWith("--cuda")    | args[i].startsWith("--alltokens")) {
             continue;
          } else if (args[i].startsWith("-I")) {
             /* Skip the include dir stuff; it's handled by the lexer. */
