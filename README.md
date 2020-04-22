@@ -86,7 +86,7 @@ The C action interfaces are currently provided by JNI.
 
 
 [Internal links]:#
-[INSTALL]: ./INSTALL
+[INSTALL]: ./INSTALL.md
 [src]: ./src
 [build]: ./build
 [tests]: ./tests
