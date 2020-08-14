@@ -3781,19 +3781,20 @@ case_selector
 
 // R814
 case_value_range
-@after {
-    action.case_value_range();
-}
 	:	T_COLON case_value
-	|	case_value case_value_range_suffix
+           {
+              action.case_value_range(/*hasColon*/true);
+           }
+	|   case_value case_value_range_suffix
+           {
+              action.case_value_range(/*hasColon*/false);
+           }
 	;
 
 case_value_range_suffix
-@after {
-    action.case_value_range_suffix();
-}
-	:	T_COLON ( case_value )?
-	|	{ /* empty */ }
+	:   T_COLON            { action.case_value_range_suffix(/*hasSuffixExpr*/false); }
+	|   T_COLON case_value { action.case_value_range_suffix(/*hasSuffixExpr*/true);  }
+	|                      { /* empty */ }
 	;
 
 case_value_range_list

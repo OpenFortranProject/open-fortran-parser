@@ -3118,8 +3118,9 @@ public class FortranParserActionPrint implements IFortranParserAction {
    /** R814
     * case_value_range
     */
-   public void case_value_range() {
+   public void case_value_range(boolean hasColon) {
       printRuleHeader(814, "case-value-range");
+      printParameter(hasColon, "hasColon");
       printRuleTrailer();
    }
 
@@ -3140,8 +3141,9 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * Unknown rule.
     * case_value_range_suffix
     */
-   public void case_value_range_suffix() {
+   public void case_value_range_suffix(boolean hasSuffixExpr) {
       printRuleHeader(unknownRule, "case-value-range-suffix");
+      printParameter(hasSuffixExpr, "hasSuffixExpr");
       printRuleTrailer();
    }
 

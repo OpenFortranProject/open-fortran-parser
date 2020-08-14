@@ -2734,8 +2734,9 @@ public abstract interface IFortranParserAction {
    /** R814
     * case_value_range
     *
+    * @param hasColon True if there is a colon
     */
-   public abstract void case_value_range();
+   public abstract void case_value_range(boolean hasColon);
 
    /** R814 list
     * case_value_range_list
@@ -2750,8 +2751,9 @@ public abstract interface IFortranParserAction {
     * Internal rule.
     * case_value_range_suffix
     * 
+    * @param hasSuffixExpr True if there is an upper-bound expression
     */
-   public abstract void case_value_range_suffix();
+   public abstract void case_value_range_suffix(boolean hasSuffixExpr);
 
    /** R815
     * case_value

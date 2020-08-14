@@ -3773,18 +3773,14 @@ case_selector
 
 // R814
 case_value_range
-@after {
-    action.case_value_range();
-}
-	:	T_COLON case_value
-	|	case_value case_value_range_suffix
+	:	T_COLON case_value { action.case_value_range(true); }
+	|	case_value         { action.case_value_range(false); }
+        case_value_range_suffix
 	;
 
 case_value_range_suffix
-@after {
-    action.case_value_range_suffix();
-}
 	:	T_COLON ( case_value )?
+            { action.case_value_range_suffix(); }
 	|	{ /* empty */ }
 	;
 
