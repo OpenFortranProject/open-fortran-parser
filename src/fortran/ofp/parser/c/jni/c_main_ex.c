@@ -35,6 +35,9 @@ extern "C" {
 #define ERROR_CODE 4
 
 /* These should be defined in jni.h.  */  
+#ifndef JNI_VERSION_1_8
+#define JNI_VERSION_1_8 8
+#endif
 #ifndef JNI_VERSION_1_6
 #define JNI_VERSION_1_6 6
 #endif
@@ -99,7 +102,9 @@ extern "C" {
 	 jni_version = getenv("JNI_VERSION");
 	 if(jni_version)
 	 {
-		if(strcmp(jni_version, "1.6") == 0)
+		if(strcmp(jni_version, "1.8") == 0)
+		  jvm_args.version = JNI_VERSION_1_8;
+		else if(strcmp(jni_version, "1.8") == 0)
 		  jvm_args.version = JNI_VERSION_1_6;
 		else if(strcmp(jni_version, "1.4") == 0)
 		  jvm_args.version = JNI_VERSION_1_4;
@@ -175,7 +180,7 @@ extern "C" {
 
 		/* Get the error status from the 'boolean getError()' method.  */
 		errorMethodID = (*env)->GetStaticMethodID(env, ofp_class, "getError", "()Z");
-		retval = (*env)->CallBooleanMethod(env, new_ofp_class, errorMethodID);
+		retval = (*env)->CallStaticBooleanMethod(env, new_ofp_class, errorMethodID);
 	 }
 	 
 	 /* We're done; destroy the Java VM.  */
@@ -183,7 +188,6 @@ extern "C" {
 
 	 /* Cleanup any memory we allocated.  */
 	 free(classpath);
-
 	 return (retval == JNI_TRUE ? ERROR_CODE : 0);
   }
 

@@ -346,7 +346,7 @@ public class FrontEnd implements Callable<Boolean> {
          File srcFile = new File(args[i]);
          if (srcFile.exists() == false) {
             System.err.println("Error: " + args[i] + " does not exist!");
-            error = new Boolean(true);
+            error = true;
          } else {
             includeDirs.add(srcFile.getParent());
             FrontEnd ofp = new FrontEnd(newArgs.toArray(new String[newArgs.size()]), args[i], type);
@@ -420,7 +420,7 @@ public class FrontEnd implements Callable<Boolean> {
          // see if we successfully parse the program unit or not
          if (verbose && error) {
             System.out.println("Parser failed");
-            return new Boolean(error);
+            return error;
          }
       } // end while (not end of file)
 
@@ -437,7 +437,7 @@ public class FrontEnd implements Callable<Boolean> {
          System.out.println("Parser exiting normally");
       }
 
-      return new Boolean(error);
+      return error;
    } // end call()
 
    public int getSourceForm() {

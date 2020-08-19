@@ -4445,7 +4445,7 @@ if test -n "$with_javac" ; then
     # and if found, set OFP_JAVAC to to $with_javac (third arg) and if not, set it to
     # no (arg 4).
     TMP_JAVAC_BASE_NAME="`basename $with_javac`"
-    TMP_PATH=`echo $with_javac | sed "s/\/$TMP_JAVAC_BASE_NAME//"`
+    TMP_PATH=`echo $with_javac | sed "s/\/$TMP_JAVAC_BASE_NAME$//"`
     # Extract the first word of "$TMP_JAVAC_BASE_NAME", so it can be a program name with args.
 set dummy $TMP_JAVAC_BASE_NAME; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -4586,7 +4586,7 @@ if test -n "$with_java" ; then
     # and if found, set OFP_JAVA to to $with_java (third arg) and if not, set it to
     # no (arg 4).
     TMP_JAVA_BASE_NAME="`basename $with_java`"
-    TMP_PATH=`echo $with_java | sed "s/\/$TMP_JAVA_BASE_NAME//"`
+    TMP_PATH=`echo $with_java | sed "s/\/$TMP_JAVA_BASE_NAME$//"`
     # Extract the first word of "$TMP_JAVA_BASE_NAME", so it can be a program name with args.
 set dummy $TMP_JAVA_BASE_NAME; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
