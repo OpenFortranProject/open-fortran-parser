@@ -245,6 +245,7 @@ public class FortranStream extends ANTLRFileStream
 
       char[] newData = new char[super.n];
       boolean continuation = false;
+      int continueline = 0;
       int count = 0;
       int col   = 1;    // 1 based 
       int line  = 1;    // 1 based
@@ -325,6 +326,7 @@ public class FortranStream extends ANTLRFileStream
                index_count = consumeFreeFormString(i, data, count, newData);
                ii = index_count[0]; count = index_count[1];
                while (data[ii] == '&') {
+                  continueline += 1;
                   // string is continued across multiple lines
                   line += 1;
                   col  += ii - i;
@@ -359,6 +361,14 @@ public class FortranStream extends ANTLRFileStream
                col += 1;
             }
     	    newData[count++] = data[i];
+            if(continueline > 0 &&  data[i] == '\n')
+            {
+              while(continueline > 0)
+              {
+                continueline -= 1;
+                newData[count++] = '\n';
+              }
+            }
          }
 
          // this line is to be continued
@@ -368,6 +378,9 @@ public class FortranStream extends ANTLRFileStream
       }
 
       // switch to new data buffer
+//      System.out.println(this.data); 
+//      System.out.println("================");
+//      System.out.println(newData);
       this.data = newData;
       this.n = count;
    }
