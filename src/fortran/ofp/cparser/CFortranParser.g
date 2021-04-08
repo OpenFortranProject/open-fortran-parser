@@ -5380,7 +5380,7 @@ main_program
 {
    c_action_main_program(hasProgramStmt, hasExecutionPart, hasInternalSubprogramPart);
 }
-   :   ( program_stmt {hasProgramStmt = ANTLR3_TRUE} )?
+   :   ( program_stmt {hasProgramStmt = ANTLR3_TRUE;} )?
 
        specification_part
        ( execution_part {hasExecutionPart = ANTLR3_TRUE;} )?

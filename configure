@@ -4963,7 +4963,7 @@ OFP_CURR_JDK_DIR="$OFP_JAVA_PATH"
 
 if test -n "$with_java_incs" ; then
     # the user supplied the include flags to configure with --with-java-incs
-    OFP_CFLAGS="$with_java_incs"
+    OFP_CFLAGS="-I$with_java_incs"
     OFP_ENABLE_C_ACTIONS="yes"
 else
     case "${host}" in
