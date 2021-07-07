@@ -145,8 +145,9 @@ public class FortranParserActionPrint implements IFortranParserAction {
     * execution_part
     *
     */
-   public void execution_part() {
+   public void execution_part(int count) {
       printRuleHeader(208, "execution-part");
+      printParameter(count, "count");
       printRuleTrailer();
    }
 
@@ -4927,6 +4928,22 @@ public class FortranParserActionPrint implements IFortranParserAction {
 		if (printKeywords) printParameter(keyword2, "keyword2");
 		printParameter(name, "name");
 		if (printKeywords) printParameter(eos, "eos");
+		printRuleTrailer();
+	}
+
+	/**
+	 * R1231
+	 * subroutine_subprogram
+	 * 
+	 * @param hasExePart Flag specifying if optional execution_part was given.
+	 * @param hasIntSubProg Flag specifying if optional 
+	 * internal_subprogram_part was given.
+	 */
+	public void subroutine_subprogram(boolean hasExePart, 
+											  boolean hasIntSubProg) {
+		printRuleHeader(1231, "subroutine-subprogram");
+		printParameter(hasExePart, "hasExePart");
+		printParameter(hasIntSubProg, "hasIntSubProg");
 		printRuleTrailer();
 	}
 

@@ -239,11 +239,12 @@ declaration_construct
 
 // R208
 execution_part
+@init{int count = 0;}
 @after {
-    action.execution_part();
+	action.execution_part(count);
 }
 	:	executable_construct
-		( execution_part_construct )*
+		( execution_part_construct {count += 1;} )*
 	;
 
 // R209
@@ -5671,11 +5672,16 @@ end_function_stmt
 // specification_part made non-optional to remove END ambiguity (as can 
 // be empty)
 subroutine_subprogram
+@init {
+    boolean hasExePart = false;
+    boolean hasIntSubProg = false;
+}
    :   subroutine_stmt
        specification_part
-       ( execution_part )?
-       ( internal_subprogram_part )?
+       ( execution_part { hasExePart=true; } )?
+       ( internal_subprogram_part { hasIntSubProg=true; } )?
        end_subroutine_stmt
+            { action.subroutine_subprogram(hasExePart, hasIntSubProg); }
    ;
 
 // R1232
