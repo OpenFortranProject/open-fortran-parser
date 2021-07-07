@@ -20,3 +20,4 @@ lib/
 *.lai
 *.la
 *.a
+/bin/
